@@ -5,7 +5,6 @@ import {
   useAccount,
   useInstanceContext
 } from "common-ui";
-import { useRouter } from "next/router";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
 import { useContext, useState } from "react";
@@ -17,36 +16,20 @@ import Navbar from "react-bootstrap/Navbar";
 import Row from "react-bootstrap/Row";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
+import { UIPreferenceHook } from "../../home2/UIPreferenceHook";
 
 export interface NavProps {
-  // Temporary prop for transitioning all pages to use the new layout.
   marginBottom?: boolean;
   centered?: boolean;
-  isCustomizeMode?: boolean;
-  setIsCustomizeMode?: (value: React.SetStateAction<boolean>) => void;
 }
 
-export function Nav({
-  marginBottom = true,
-  centered = true,
-  isCustomizeMode,
-  setIsCustomizeMode = () => {}
-}: NavProps) {
-  const router = useRouter();
+export function Nav({ marginBottom = true, centered = true }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
   const instanceContext = useInstanceContext();
-  const [useNewLayout, setUseNewLayout] = useState(() => {
-    return localStorage.getItem("useNewLayout") === "true";
-  });
-  const activateNewLayout = () => {
-    localStorage.setItem("useNewLayout", "true");
-    setUseNewLayout(true);
-  };
-  const deactivateNewLayout = () => {
-    localStorage.removeItem("useNewLayout");
-    setUseNewLayout(false);
-  };
+
+  const { useNewLayout } = UIPreferenceHook();
+
   const homeLink = useNewLayout ? "/feedback/home2" : "/";
 
   // Editable if current user is dina-admin, or a collection manager of any group:
@@ -88,49 +71,7 @@ export function Nav({
               <ul className="list-inline">
                 <li className="list-inline-item my-auto">
                   <div className="d-flex align-items-center">
-                    {router.pathname === "/feedback/home2" && (
-                      <Button
-                        variant={
-                          isCustomizeMode ? "success" : "outline-secondary"
-                        }
-                        size="sm"
-                        className="mr-2"
-                        onClick={() => setIsCustomizeMode((prev) => !prev)}
-                      >
-                        {isCustomizeMode ? "Done" : "Customize"}
-                      </Button>
-                    )}
-                    {/* Conditional rendering of layout switch buttons */}
-                    <div style={{ marginLeft: "20px" }}>
-                      {router.pathname === "/" && (
-                        <Link href="/feedback/home2" passHref legacyBehavior>
-                          <Button
-                            onClick={activateNewLayout}
-                            variant="outline-secondary"
-                            size="sm"
-                            className="mr-2 shadow-sm"
-                          >
-                            🎨 Try New Layout
-                          </Button>
-                        </Link>
-                      )}
-                      {router.pathname === "/feedback/home2" && (
-                        <Link href="/" passHref legacyBehavior>
-                          <Button
-                            onClick={deactivateNewLayout}
-                            variant="outline-secondary"
-                            size="sm"
-                            className="mr-2 shadow-sm"
-                            style={{ whiteSpace: "nowrap", width: "auto" }}
-                          >
-                            📋 Back to Classic Layout
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
-                    <div style={{ marginLeft: "20px" }}>
-                      <NavbarUserControl />
-                    </div>
+                    <NavbarUserControl />
                   </div>
                 </li>
               </ul>

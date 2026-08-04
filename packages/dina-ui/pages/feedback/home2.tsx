@@ -1,11 +1,12 @@
 // pages/feedback/home2.tsx (updated)
 import { GlobalSearch, useAccount } from "common-ui";
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Container from "react-bootstrap/Container";
 import {
   Footer,
   Head,
   Nav,
+  LayoutToggle,
   CustomizableSectionGrid,
   UIPreferenceHook
 } from "../../components";
@@ -445,8 +446,22 @@ export function Home2() {
     [configurationDefaults, management]
   );
 
-  const { getCards, saveCards, getSectionOrder, saveSectionOrder, loading } =
-    UIPreferenceHook(sections);
+  const {
+    getCards,
+    saveCards,
+    getSectionOrder,
+    saveSectionOrder,
+    loading,
+    useNewLayout,
+    activateNewLayout,
+    deactivateNewLayout
+  } = UIPreferenceHook(sections);
+
+  useEffect(() => {
+    if (!loading && !useNewLayout) {
+      router.replace("/");
+    }
+  }, [loading, useNewLayout, router]);
 
   const { formatMessage } = useDinaIntl();
 
@@ -561,16 +576,22 @@ export function Home2() {
   return (
     <div>
       <Head title={formatMessage("dinaHomeH1")} />
-      <Nav
-        isCustomizeMode={isCustomizeMode}
-        setIsCustomizeMode={setIsCustomizeMode}
-      />
+      <Nav />
       <main role="main">
         <Container fluid>
           {/* Global Search - Centered at 80% width */}
-          <div className="d-flex justify-content-center mb-4">
-            <div style={{ width: "80%" }}>
+          <div className="row justify-content-center align-items-center mb-4">
+            <div className="col-lg-9 col-sm-12">
               <GlobalSearch onSearch={handleSearch} />
+            </div>
+            <div className="col-auto">
+              <LayoutToggle
+                useNewLayout={useNewLayout}
+                activateNewLayout={activateNewLayout}
+                deactivateNewLayout={deactivateNewLayout}
+                isCustomizeMode={isCustomizeMode}
+                setIsCustomizeMode={setIsCustomizeMode}
+              />
             </div>
           </div>
           <CustomizableSectionGrid
