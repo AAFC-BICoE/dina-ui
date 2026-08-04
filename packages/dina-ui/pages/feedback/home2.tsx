@@ -575,7 +575,7 @@ export function Home2() {
         <Container fluid>
           {/* Global Search - Centered at 80% width */}
           <div className="row justify-content-center align-items-center mb-4">
-            <div className="col-10">
+            <div className="col-lg-9 col-sm-12">
               <GlobalSearch onSearch={handleSearch} />
             </div>
             <div className="col-auto">
