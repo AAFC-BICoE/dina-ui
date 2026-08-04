@@ -120,12 +120,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Image and Push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: aafcbicoe/dina-ui:${{ env.VERSION_TAG }}
           provenance: false
+          # Force the builder engine to output standard Docker mediatypes for OKD
+          outputs: type=image,oci-mediatypes=false
 
   build-docs:
     runs-on: ubuntu-latest
