@@ -12,7 +12,8 @@ import {
   dateCell,
   LoadingSpinner,
   ColumnDefinition,
-  SimpleSearchFilterBuilder
+  SimpleSearchFilterBuilder,
+  IFileWithMeta
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Alert, Button, Card, Form } from "react-bootstrap";
@@ -33,6 +34,9 @@ import { handleDownloadLink } from "../../components/object-store/object-store-u
 import { downloadBlobFile } from "common-ui";
 import _ from "lodash";
 import { dynamicFieldMappingForMetadata } from "../object-store/object/list";
+import { WorkbookUpload } from "../../components/workbook/WorkbookUpload";
+import { useWorkbookConversion } from "@dina-ui/components";
+import { FaCheck } from "react-icons/fa6";
 
 export interface EntityConfiguration {
   name: string;
@@ -77,8 +81,13 @@ export function WorkbookTemplateGenerator() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
 
-  // Loading state
-  const [loading, setLoading] = useState<boolean>(false);
+  const {
+    convertWorkbookFile,
+    // resetWorkbookConversion,
+    loading,
+    setLoading
+    // failed
+  } = useWorkbookConversion();
 
   // Generator errors
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -93,6 +102,9 @@ export function WorkbookTemplateGenerator() {
   const [columnsToGenerate, setColumnsToGenerate] = useState<GeneratorColumn[]>(
     []
   );
+
+  // Whether the template has been loaded from an existing file
+  const [templateLoaded, setTemplateLoaded] = useState<boolean>(false);
 
   const { groupNames } = useAccount();
 
@@ -251,6 +263,26 @@ export function WorkbookTemplateGenerator() {
     setLoading(false);
   }
 
+  async function loadExistingTemplate(files: IFileWithMeta[]) {
+    setLoading(true);
+    setErrorMessage(undefined);
+
+    const responseData = await convertWorkbookFile(files);
+
+    if (responseData && templateLoaded === false) {
+      setTemplateLoaded(true);
+
+      // Set the filename
+      const uploadedFileName = files[0]?.file?.name ?? "";
+      const safeFileName = uploadedFileName.replace(/\.[^/.]+$/, "");
+      setFileName(safeFileName);
+
+      // Load the columns from the uploaded template
+    }
+
+    setLoading(false);
+  }
+
   const TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
     "originalFilename",
     "createdBy",
@@ -362,6 +394,35 @@ export function WorkbookTemplateGenerator() {
                 />
               </FieldWrapper>
             </div>
+          </Card.Body>
+        </Card>
+
+        <h4 className="mt-4">
+          <DinaMessage id="loadExistingTemplate" />
+        </h4>
+        <Card>
+          <Card.Body>
+            {templateLoaded ? (
+              <div
+                className="alert alert-success d-flex align-items-center gap-2 mb-0"
+                role="alert"
+              >
+                <FaCheck className="flex-shrink-0" />
+                <span>
+                  <DinaMessage id="templateLoadedSuccessfully" />
+                </span>
+              </div>
+            ) : (
+              <>
+                <WorkbookUpload
+                  submitData={loadExistingTemplate}
+                  autoUpload={true}
+                />
+                <i className="text-muted small mt-2">
+                  <DinaMessage id="loadExistingTemplateHelpText" />
+                </i>
+              </>
+            )}
           </Card.Body>
         </Card>
 

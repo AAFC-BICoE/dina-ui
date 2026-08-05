@@ -38,6 +38,14 @@ export interface FileDropzoneProps {
    */
   accept?: string;
 
+  /**
+   * If true, the file dropzone will automatically submit the files when they are added, without
+   * requiring the user to click a submit button.
+   *
+   * It's recommended that this option is only used when maxFiles is set to 1.
+   */
+  autoUpload?: boolean;
+
   inputContent?: React.ReactNode;
   submitButtonContent?: React.ReactNode;
   PreviewComponent?: React.ComponentType<{
@@ -213,7 +221,8 @@ export function FileDropzone({
   submitButtonContent,
   PreviewComponent,
   SubmitButtonComponent,
-  onChange
+  onChange,
+  autoUpload = false
 }: FileDropzoneProps) {
   const [files, setFiles] = useState<InternalFileWithMeta[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -304,6 +313,12 @@ export function FileDropzone({
 
   const hasFiles = files.length > 0;
   const hasErrors = files.some((f) => f.error);
+
+  useEffect(() => {
+    if (autoUpload && hasFiles && !hasErrors) {
+      onSubmit(files);
+    }
+  }, [autoUpload, hasFiles, hasErrors, files, onSubmit]);
 
   const PreviewComp = PreviewComponent ?? DefaultPreview;
   const SubmitComp = SubmitButtonComponent ?? DefaultSubmitButton;
@@ -411,7 +426,7 @@ export function FileDropzone({
       )}
 
       {/* Submit button */}
-      {hasFiles && (
+      {hasFiles && !autoUpload && (
         <div
           className="d-flex justify-content-end"
           onClick={(e) => e.stopPropagation()}
