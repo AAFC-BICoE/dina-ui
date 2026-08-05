@@ -379,14 +379,14 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
         "bool": {
           "must_not": {
             "exists": {
-              "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+              "field": "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom",
             },
           },
         },
       },
       {
         "term": {
-          "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "",
+          "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": "",
         },
       },
     ],
@@ -418,14 +418,14 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
                         "bool": {
                           "must_not": {
                             "exists": {
-                              "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+                              "field": "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom",
                             },
                           },
                         },
                       },
                       {
                         "term": {
-                          "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "",
+                          "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": "",
                         },
                       },
                     ],
@@ -458,7 +458,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
 exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: exactMatch 1`] = `
 {
   "term": {
-    "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
+    "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": "Animalia",
   },
 }
 `;
@@ -472,7 +472,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
         "must": [
           {
             "term": {
-              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
+              "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": "Animalia",
             },
           },
           {
@@ -496,7 +496,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
         "should": [
           {
             "term": {
-              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": {
+              "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": {
                 "case_insensitive": true,
                 "value": "Animalia",
               },
@@ -524,7 +524,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
                   "should": [
                     {
                       "term": {
-                        "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": {
+                        "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": {
                           "case_insensitive": true,
                           "value": "Animalia",
                         },
@@ -553,13 +553,13 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
     "must": [
       {
         "exists": {
-          "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+          "field": "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom",
         },
       },
     ],
     "must_not": {
       "term": {
-        "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "",
+        "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": "",
       },
     },
   },
@@ -575,7 +575,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
         "must": [
           {
             "exists": {
-              "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+              "field": "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom",
             },
           },
           {
@@ -586,7 +586,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
         ],
         "must_not": {
           "term": {
-            "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "",
+            "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": "",
           },
         },
       },
@@ -603,7 +603,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
         "bool": {
           "must_not": {
             "term": {
-              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
+              "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": "Animalia",
             },
           },
         },
@@ -612,7 +612,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
         "bool": {
           "must_not": {
             "exists": {
-              "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+              "field": "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom",
             },
           },
         },
@@ -639,7 +639,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
                 },
                 {
                   "term": {
-                    "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
+                    "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": "Animalia",
                   },
                 },
               ],
@@ -661,7 +661,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
         "should": [
           {
             "term": {
-              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": {
+              "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": {
                 "case_insensitive": true,
                 "value": "Animalia",
               },
@@ -689,7 +689,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
                   "should": [
                     {
                       "term": {
-                        "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": {
+                        "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": {
                           "case_insensitive": true,
                           "value": "Animalia",
                         },
@@ -715,7 +715,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
 exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: startsWith 1`] = `
 {
   "prefix": {
-    "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": {
+    "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": {
       "case_insensitive": true,
       "value": "Animalia",
     },
@@ -732,7 +732,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
         "must": [
           {
             "prefix": {
-              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": {
+              "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": {
                 "case_insensitive": true,
                 "value": "Animalia",
               },
@@ -753,7 +753,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
 exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: wildcard 1`] = `
 {
   "wildcard": {
-    "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": {
+    "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": {
       "case_insensitive": true,
       "value": "*Animalia*",
     },
@@ -770,7 +770,7 @@ exports[`QueryBuilderClassificationSearch transformClassificationToDSL function 
         "must": [
           {
             "wildcard": {
-              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": {
+              "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword": {
                 "case_insensitive": true,
                 "value": "*Animalia*",
               },

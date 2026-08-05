@@ -2,7 +2,11 @@ import { InputResource, PersistedResource } from "kitsu";
 import TransactionEditPage, {
   TransactionForm
 } from "../../../../pages/loan-transaction/transaction/edit";
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  MATERIAL_SAMPLE_MAPPING,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { Transaction } from "../../../../types/loan-transaction-api";
 import { act, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -58,25 +62,6 @@ function testExistingTransactionWithMaterialSamples(): PersistedResource<Transac
   };
 }
 
-const MOCK_INDEX_MAPPING_RESP = {
-  data: {
-    indexName: "dina_material_sample_index",
-    attributes: [
-      {
-        name: "materialSampleName",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "dwcOtherCatalogNumbers",
-        type: "text",
-        path: "data.attributes"
-      }
-    ],
-    relationships: []
-  }
-};
-
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "loan-transaction-api/transaction/test-transaction-id":
@@ -100,7 +85,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
         ]
       };
     case "search-api/search-ws/mapping":
-      return MOCK_INDEX_MAPPING_RESP;
+      return MATERIAL_SAMPLE_MAPPING;
   }
 });
 

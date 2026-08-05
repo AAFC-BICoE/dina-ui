@@ -151,3 +151,4 @@ export * from "./classification/TaxonomyTree";
 export * from "./file-dropzone/FileDropzone";
 export * from "./file-dropzone/FileTypes";
 export * from "./link/ExternalLink";
+export * from "./list-page/__mocks__/IndexMappingMocks";
