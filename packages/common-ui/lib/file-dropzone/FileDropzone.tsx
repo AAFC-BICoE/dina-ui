@@ -16,8 +16,24 @@ export interface SubmitButtonProps {
 }
 
 export interface FileDropzoneProps {
+  /**
+   * Triggered on submit. If autoUpload is true, this will be called automatically when files are added.
+   *
+   * @param files Files that have been added to the dropzone and passed validation (e.g. file type and size).
+   */
   onSubmit: (files: IFileWithMeta[]) => void;
+
+  /**
+   * Triggered on any change to the files in the dropzone, including when files are added or removed.
+   *
+   * @param files Files that are currently in the dropzone, including any that have failed validation.
+   */
   onChange?: (files: IFileWithMeta[]) => void;
+
+  /**
+   * Triggered whenever the dropzone becomes empty after previously containing one or more files.
+   */
+  onClear?: () => void;
 
   /**
    * Number of files that can be uploaded through the file dropzone.
@@ -222,9 +238,11 @@ export function FileDropzone({
   PreviewComponent,
   SubmitButtonComponent,
   onChange,
-  autoUpload = false
+  autoUpload = false,
+  onClear
 }: FileDropzoneProps) {
   const [files, setFiles] = useState<InternalFileWithMeta[]>([]);
+  const [previousHasFiles, setPreviousHasFiles] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listBottomRef = useRef<HTMLDivElement>(null);
@@ -279,6 +297,14 @@ export function FileDropzone({
   useEffect(() => {
     onChange?.(files);
   }, [files, onChange]);
+
+  useEffect(() => {
+    const hasFiles = files.length > 0;
+    if (!hasFiles && previousHasFiles) {
+      onClear?.();
+    }
+    setPreviousHasFiles(hasFiles);
+  }, [files, onClear, previousHasFiles]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();

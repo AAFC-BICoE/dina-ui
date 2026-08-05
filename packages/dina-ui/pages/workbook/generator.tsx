@@ -472,11 +472,11 @@ export function WorkbookTemplateGenerator() {
         </h4>
         <Card>
           <Card.Body>
-            {templateLoaded ? (
+            {templateLoaded && (
               <>
                 {invalidTemplate ? (
                   <div
-                    className="alert alert-danger d-flex align-items-center gap-2 mb-0"
+                    className="alert alert-danger d-flex align-items-center gap-2 mb-2"
                     role="alert"
                   >
                     <FaExclamationCircle className="flex-shrink-0" />
@@ -486,7 +486,7 @@ export function WorkbookTemplateGenerator() {
                   </div>
                 ) : (
                   <div
-                    className="alert alert-success d-flex align-items-center gap-2 mb-0"
+                    className="alert alert-success d-flex align-items-center gap-2 mb-2"
                     role="alert"
                   >
                     <FaCheck className="flex-shrink-0" />
@@ -498,7 +498,7 @@ export function WorkbookTemplateGenerator() {
 
                 {unmappedColumns.length > 0 && (
                   <div
-                    className="alert alert-warning d-flex align-items-center gap-2 mb-0"
+                    className="alert alert-warning d-flex align-items-center gap-2 mb-2"
                     role="alert"
                   >
                     <FaExclamationCircle className="flex-shrink-0" />
@@ -511,17 +511,16 @@ export function WorkbookTemplateGenerator() {
                   </div>
                 )}
               </>
-            ) : (
-              <>
-                <WorkbookUpload
-                  submitData={loadExistingTemplate}
-                  autoUpload={true}
-                />
-                <i className="text-muted small mt-2">
-                  <DinaMessage id="loadExistingTemplateHelpText" />
-                </i>
-              </>
             )}
+            <WorkbookUpload
+              submitData={loadExistingTemplate}
+              autoUpload={true}
+              onClear={() => {
+                setTemplateLoaded(false);
+                setUnmappedColumns([]);
+                setInvalidTemplate(false);
+              }}
+            />
           </Card.Body>
         </Card>
 

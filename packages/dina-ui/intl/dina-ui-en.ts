@@ -1415,8 +1415,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   export_columnsToExport: "Columns To Export",
   templateGenerator_columnsToGenerate: "Columns To Generate",
   loadExistingTemplate: "Load Existing Template",
-  loadExistingTemplateHelpText:
-    "After upload, the template name and selected columns will be loaded into the generator.",
   templateLoadedSuccessfully:
     "Template has been loaded successfully. Template name and columns have been updated.",
   templateColumnsUnmapped:
