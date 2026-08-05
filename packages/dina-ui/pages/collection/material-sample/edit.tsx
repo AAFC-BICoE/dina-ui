@@ -15,6 +15,7 @@ import {
   NotCopiedOverWarning
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { FaCopy } from "react-icons/fa6";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -78,16 +79,16 @@ export default function MaterialSampleEditPage() {
         </div>
         <div className="col-md-3 flex-grow-1 d-flex gap-2">
           <div className="ms-auto" />
-          {!id && (
-            <SubmitButton
-              buttonProps={() => ({
-                style: { width: "13rem" },
-                onClick: () => setSaveRedirect("CREATE_NEXT")
-              })}
-            >
-              <DinaMessage id="saveAndCopyToNext" />
-            </SubmitButton>
-          )}
+          <SubmitButton
+            buttonProps={() => ({
+              style: { width: "13rem" },
+              onClick: () => setSaveRedirect("CREATE_NEXT")
+            })}
+            showSaveIcon={false}
+          >
+            <FaCopy className="me-2" />
+            <DinaMessage id="saveAndCopyToNext" />
+          </SubmitButton>
           <SubmitButton
             buttonProps={() => ({ onClick: () => setSaveRedirect("VIEW") })}
           />
