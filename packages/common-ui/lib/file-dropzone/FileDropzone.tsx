@@ -249,6 +249,9 @@ export function FileDropzone({
   const acceptList = parseAccept(accept);
   const multiple = maxFiles === undefined || maxFiles > 1;
   const atMaxFiles = maxFiles !== undefined && files.length >= maxFiles;
+  const hasFiles = files.length > 0;
+  const hasErrors = files.some((f) => f.error);
+  const autoUploadSubmitted = useRef(false);
 
   const removeFile = useCallback((id: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== id));
@@ -299,12 +302,15 @@ export function FileDropzone({
   }, [files, onChange]);
 
   useEffect(() => {
-    const hasFiles = files.length > 0;
+    if (!hasFiles) {
+      autoUploadSubmitted.current = false;
+    }
+
     if (!hasFiles && previousHasFiles) {
       onClear?.();
     }
     setPreviousHasFiles(hasFiles);
-  }, [files, onClear, previousHasFiles]);
+  }, [files, hasFiles, previousHasFiles, onClear]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -337,12 +343,10 @@ export function FileDropzone({
     [addFiles]
   );
 
-  const hasFiles = files.length > 0;
-  const hasErrors = files.some((f) => f.error);
-
   useEffect(() => {
-    if (autoUpload && hasFiles && !hasErrors) {
+    if (autoUpload && hasFiles && !hasErrors && !autoUploadSubmitted.current) {
       onSubmit(files);
+      autoUploadSubmitted.current = true;
     }
   }, [autoUpload, hasFiles, hasErrors, files, onSubmit]);
 

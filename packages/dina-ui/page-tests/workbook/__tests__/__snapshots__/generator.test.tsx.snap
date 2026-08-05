@@ -591,11 +591,6 @@ exports[`Workbook Template Generator Page Layout 1`] = `
               </div>
               <div />
             </div>
-            <i
-              class="text-muted small mt-2"
-            >
-              After upload, the template name and selected columns will be loaded into the generator.
-            </i>
           </div>
         </div>
         <h4

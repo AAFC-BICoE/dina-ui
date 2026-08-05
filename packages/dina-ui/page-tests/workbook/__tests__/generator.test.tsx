@@ -645,7 +645,7 @@ describe("Workbook Template Generator", () => {
       await userEvent.upload(fileInput, file);
 
       // Wait for the conversion API to be called
-      await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2));
+      await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
 
       // Verify the conversion call used the correct endpoint
       expect(mockPost).toHaveBeenCalledWith(
@@ -732,7 +732,7 @@ describe("Workbook Template Generator", () => {
       await userEvent.upload(fileInput, file);
 
       // Wait for the conversion API to be called
-      await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2));
+      await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
 
       // Verify the conversion call used the correct endpoint
       expect(mockPost).toHaveBeenCalledWith(
@@ -804,7 +804,7 @@ describe("Workbook Template Generator", () => {
       await userEvent.upload(fileInput, file);
 
       // Wait for the conversion API to be called
-      await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2));
+      await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
 
       // Verify the conversion call used the correct endpoint
       expect(mockPost).toHaveBeenCalledWith(
@@ -820,6 +820,125 @@ describe("Workbook Template Generator", () => {
           )
         ).toBeInTheDocument();
       });
+    });
+
+    it("Load a valid template, then clear it and load another valid template", async () => {
+      const mockPost = jest.fn();
+      const apiContext: any = {
+        apiClient: { get: mockGet, axios: { post: mockPost } }
+      };
+
+      // Response shape the conversion API returns:
+      const conversionResponse = {
+        "0": {
+          sheetName: "Sheet0",
+          originalColumns: ["barcode", "materialSampleName"],
+          columnAliases: ["Barcode", "Material Sample Name"],
+          rows: [
+            {
+              rowNumber: 0,
+              content: ["Barcode", "Material Sample Name"]
+            }
+          ]
+        }
+      };
+
+      mockPost.mockResolvedValue({ data: conversionResponse });
+
+      const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
+        apiContext
+      });
+
+      // Find the hidden input and upload a File
+      const fileInput = wrapper.container.querySelector(
+        'input[type="file"]'
+      ) as HTMLInputElement;
+      expect(fileInput).toBeInTheDocument();
+
+      const file = new File(["dummy"], "valid-test-file.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+
+      // Use userEvent to upload (this will trigger the FileDropzone onChange)
+      await userEvent.upload(fileInput, file);
+
+      // Wait for the conversion API to be called
+      await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+
+      // Ensure the material sample name column is selected (alias visible)
+      expect(
+        wrapper.getByDisplayValue(/Material Sample Name/i)
+      ).toBeInTheDocument();
+
+      // Click the clear button.
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /remove valid\-test\-file\.xlsx/i })
+      );
+
+      // Upload section should appear again.
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(
+            /drag and drop a spreadsheet here or click to open browse dialog\./i
+          )
+        ).toBeInTheDocument();
+      });
+      expect(mockPost).toHaveBeenCalledTimes(1);
+
+      // The dropzone input is recreated after the previous file is removed, so re-query it.
+      const fileInputAfterClear = wrapper.container.querySelector(
+        'input[type="file"]'
+      ) as HTMLInputElement;
+      expect(fileInputAfterClear).toBeInTheDocument();
+
+      // Generate another mock with different columns to ensure the second upload is processed correctly.
+      const conversionResponse2 = {
+        "0": {
+          sheetName: "Sheet0",
+          originalColumns: ["collectingEvent.otherRecordNumbers"],
+          columnAliases: ["Collecting Event Additional Collection Numbers"],
+          rows: [
+            {
+              rowNumber: 0,
+              content: ["Collecting Event Additional Collection Numbers"]
+            }
+          ]
+        }
+      };
+      mockPost.mockResolvedValue({ data: conversionResponse2 });
+
+      // Upload another file.
+      const file2 = new File(["dummy"], "valid-test-file-2.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+      await userEvent.upload(fileInputAfterClear, file2);
+
+      // Wait for the conversion API to be called
+      await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2));
+
+      // Now verify the UI updated — success message and mapped columns
+      await waitFor(() =>
+        expect(
+          wrapper.getByText(/Template has been loaded successfully/i)
+        ).toBeInTheDocument()
+      );
+
+      // Confirm that the template name has been changed.
+      expect(
+        wrapper.getByDisplayValue(/valid-test-file-2/i)
+      ).toBeInTheDocument();
+
+      // Confirm the generator selected the collecting event column (alias visible)
+      expect(
+        wrapper.getByDisplayValue(
+          /Collecting Event Additional Collection Numbers/i
+        )
+      ).toBeInTheDocument();
+
+      // The previous column from the first upload should no longer be present.
+      expect(
+        wrapper.queryByDisplayValue(/Material Sample Name/i)
+      ).not.toBeInTheDocument();
     });
   });
 });
