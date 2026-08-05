@@ -618,8 +618,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_tags: "Tags",
   field_targetOrganismPrimaryScientificName:
     "Target Organism Primary Scientific Name",
-  field_targetOrganismPrimaryClassification:
-    "Target Organism Primary Classification",
+  "field_targetIdentifiableEntitySummary.sex": "Target Identifiable Entity Sex",
+  "field_targetIdentifiableEntitySummary.lifeStage":
+    "Target Identifiable Entity Life Stage",
+  "field_targetIdentifiableEntitySummary.dwcVernacularName":
+    "Target Identifiable Entity Vernacular Name",
+  "field_targetIdentifiableEntitySummary.managedAttributes":
+    "Target Identifiable Entity Managed Attributes",
+  "field_targetIdentifiableEntitySummary.primaryDetermination.typeStatus":
+    "Target Identifiable Entity Primary Determination Type Status",
+  "field_targetIdentifiableEntitySummary.primaryDetermination.classification":
+    "Target Identifiable Entity Primary Determination Classification",
+  "field_targetIdentifiableEntitySummary.primaryDetermination.managedAttributes":
+    "Target Identifiable Entity Primary Determination Managed Attributes",
   field_targetOrganismPrimaryGeoShape: "Target Organism Primary GeoShape",
   field_title: "Title",
   "field_title.en": "English Title",
