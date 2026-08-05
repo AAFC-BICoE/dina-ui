@@ -37,6 +37,7 @@ import { dynamicFieldMappingForMetadata } from "../object-store/object/list";
 import { WorkbookUpload } from "../../components/workbook/WorkbookUpload";
 import { useWorkbookConversion } from "@dina-ui/components";
 import { FaCheck } from "react-icons/fa6";
+import { FaExclamationCircle } from "react-icons/fa";
 
 export interface EntityConfiguration {
   name: string;
@@ -105,6 +106,12 @@ export function WorkbookTemplateGenerator() {
 
   // Whether the template has been loaded from an existing file
   const [templateLoaded, setTemplateLoaded] = useState<boolean>(false);
+
+  // Columns from the uploaded template that could not be mapped to existing fields
+  const [unmappedColumns, setUnmappedColumns] = useState<string[]>([]);
+
+  // Whether the uploaded template is invalid (e.g., missing required columns)
+  const [invalidTemplate, setInvalidTemplate] = useState<boolean>(false);
 
   const { groupNames } = useAccount();
 
@@ -266,18 +273,81 @@ export function WorkbookTemplateGenerator() {
   async function loadExistingTemplate(files: IFileWithMeta[]) {
     setLoading(true);
     setErrorMessage(undefined);
+    setInvalidTemplate(false);
 
     const responseData = await convertWorkbookFile(files);
 
     if (responseData && templateLoaded === false) {
       setTemplateLoaded(true);
+      setUnmappedColumns([]);
+
+      // Load the columns from the uploaded template
+      const sheets = Object.values(responseData) as any[];
+      const sheet = sheets.length > 0 ? sheets[0] : undefined;
+      const originalColumns: string[] = sheet?.originalColumns ?? [];
+      const columnAliases: string[] = sheet?.columnAliases ?? [];
+
+      // Check if it's a valid template.
+      if (originalColumns.length === 0) {
+        setInvalidTemplate(true);
+        setLoading(false);
+        return;
+      }
 
       // Set the filename
       const uploadedFileName = files[0]?.file?.name ?? "";
       const safeFileName = uploadedFileName.replace(/\.[^/.]+$/, "");
       setFileName(safeFileName);
 
-      // Load the columns from the uploaded template
+      // Map originalColumns to GeneratorColumn entries, preferring existing field options when possible
+      const loadedColumnsWithUndefined = originalColumns.map(
+        (colName: string, idx: number) => {
+          const alias = columnAliases[idx];
+
+          // Try to find a matching flat option first
+          const flatOption = newFieldOptions.find(
+            (option) =>
+              !("options" in option) && (option as any).value === colName
+          );
+          if (flatOption) {
+            return {
+              columnLabel: flatOption.label,
+              columnValue: (flatOption as any).value,
+              columnAlias: alias ?? ""
+            } as GeneratorColumn;
+          }
+
+          // Try grouped/nested options
+          for (const item of newFieldOptions) {
+            if ("options" in item) {
+              const nested = item.options.find((opt) => opt.value === colName);
+              if (nested) {
+                return {
+                  columnLabel: nested.label,
+                  columnValue: nested.value,
+                  columnAlias: alias ?? ""
+                } as GeneratorColumn;
+              }
+            }
+          }
+          // If no matching option found, return undefined so it can be filtered out.
+          return undefined as unknown as GeneratorColumn;
+        }
+      );
+
+      // Filter out any undefined columns and set the loaded columns to state.
+      const loadedColumns: GeneratorColumn[] =
+        loadedColumnsWithUndefined.filter(
+          (c): c is GeneratorColumn => c !== undefined && c !== null
+        );
+
+      // Determine which original columns were not mapped
+      const unmapped = originalColumns.filter(
+        (_col, idx) => loadedColumnsWithUndefined[idx] === undefined
+      );
+      setUnmappedColumns(unmapped);
+
+      setColumnsToGenerate(loadedColumns);
     }
 
     setLoading(false);
@@ -403,15 +473,44 @@ export function WorkbookTemplateGenerator() {
         <Card>
           <Card.Body>
             {templateLoaded ? (
-              <div
-                className="alert alert-success d-flex align-items-center gap-2 mb-0"
-                role="alert"
-              >
-                <FaCheck className="flex-shrink-0" />
-                <span>
-                  <DinaMessage id="templateLoadedSuccessfully" />
-                </span>
-              </div>
+              <>
+                {invalidTemplate ? (
+                  <div
+                    className="alert alert-danger d-flex align-items-center gap-2 mb-0"
+                    role="alert"
+                  >
+                    <FaExclamationCircle className="flex-shrink-0" />
+                    <span>
+                      <DinaMessage id="invalidTemplate" />
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    className="alert alert-success d-flex align-items-center gap-2 mb-0"
+                    role="alert"
+                  >
+                    <FaCheck className="flex-shrink-0" />
+                    <span>
+                      <DinaMessage id="templateLoadedSuccessfully" />
+                    </span>
+                  </div>
+                )}
+
+                {unmappedColumns.length > 0 && (
+                  <div
+                    className="alert alert-warning d-flex align-items-center gap-2 mb-0"
+                    role="alert"
+                  >
+                    <FaExclamationCircle className="flex-shrink-0" />
+                    <span>
+                      <DinaMessage
+                        id="templateColumnsUnmapped"
+                        values={{ columns: unmappedColumns.join(", ") }}
+                      />
+                    </span>
+                  </div>
+                )}
+              </>
             ) : (
               <>
                 <WorkbookUpload

@@ -1419,6 +1419,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "After upload, the template name and selected columns will be loaded into the generator.",
   templateLoadedSuccessfully:
     "Template has been loaded successfully. Template name and columns have been updated.",
+  templateColumnsUnmapped:
+    "The following columns could not be mapped: {columns}",
+  invalidTemplate:
+    "The uploaded template is invalid. Please ensure the template is generated from the template generator and has not been modified.",
   usage: "Usage",
   editContents: "Edit Contents",
   storageUnitGridTitle: "Storage Unit Grid",
