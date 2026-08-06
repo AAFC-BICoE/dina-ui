@@ -2,7 +2,7 @@
 
 // The "setimmediate" package from NPM doesn't wait long enough during tests.
 // Manually polyfill here:
-global.setImmediate = (fn) => global.setTimeout(fn, 0);
+global.setImmediate = jest.requireActual("timers").setImmediate;
 
 // Let tests pretend they are running in the browser:
 process.browser = true;
