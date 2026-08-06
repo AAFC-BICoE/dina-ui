@@ -568,14 +568,21 @@ function normalizeColumnHeader(
  */
 function flattenFieldOptions(
   fieldOptions: FieldOptionType[]
-): Array<{ label: string; value: string }> {
+): Array<{ label: string; value: string; isDynamic?: boolean }> {
   return fieldOptions.flatMap((opt) =>
     opt.options
       ? opt.options.map((nestOpt) => ({
           label: nestOpt.label,
-          value: nestOpt.value
+          value: nestOpt.value,
+          isDynamic: nestOpt.isDynamic
         }))
-      : [{ label: opt.label, value: opt.value! }]
+      : [
+          {
+            label: opt.label,
+            value: opt.value!,
+            isDynamic: opt.isDynamic
+          }
+        ]
   );
 }
 
@@ -620,7 +627,7 @@ function extractPrefix(
  * Match option when prefix exists
  */
 function matchWithPrefix(
-  option: { label: string; value: string },
+  option: { label: string; value: string; isDynamic?: boolean },
   normalizedHeader: string,
   prefixInfo: { prefix: string; suffixStart: number },
   synonymMap: Map<string, string>
@@ -629,6 +636,14 @@ function matchWithPrefix(
     synonymMap.get(prefixInfo.prefix) ?? prefixInfo.prefix
   ).toLowerCase();
   const optionValue = option.value.toLowerCase();
+
+  if (optionValue === normalizedHeader.toLowerCase()) {
+    return true;
+  }
+
+  if (option.isDynamic && normalizedHeader.startsWith(optionValue + ".")) {
+    return true;
+  }
 
   if (!optionValue.startsWith(normalizedPrefix)) {
     return false;

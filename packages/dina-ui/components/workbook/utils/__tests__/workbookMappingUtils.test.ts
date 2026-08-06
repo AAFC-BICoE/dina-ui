@@ -18,6 +18,8 @@ import {
   getColumnHeaders,
   getDataFromWorkbook,
   getGeneratorColumnFromFieldName,
+  findMatchField,
+  WorkbookColumnInfo,
   isBoolean,
   isBooleanArray,
   isMap,
@@ -585,6 +587,44 @@ describe("workbookMappingUtils functions", () => {
           false
         )
       ).toBeUndefined();
+    });
+  });
+
+  describe("findMatchField", () => {
+    const fieldOptions = [
+      {
+        label: "Organism Determination",
+        options: [
+          {
+            label: "Scientific Name Classification",
+            value: "organism.determination.scientificNameDetails",
+            parentPath: "organism.determination",
+            isDynamic: true
+          }
+        ]
+      }
+    ];
+
+    test("matches full dynamic classification path using originalColumn", () => {
+      const columnHeader: WorkbookColumnInfo = {
+        columnHeader: "Kingdom",
+        originalColumn: "organism.determination.scientificNameDetails.kingdom"
+      };
+
+      expect(
+        findMatchField(columnHeader, fieldOptions, "material-sample")
+      ).toBe("organism.determination.scientificNameDetails");
+    });
+
+    test("matches classification path when header and originalColumn are both full paths", () => {
+      const columnHeader: WorkbookColumnInfo = {
+        columnHeader: "organism.determination.scientificNameDetails.kingdom",
+        originalColumn: "organism.determination.scientificNameDetails.kingdom"
+      };
+
+      expect(
+        findMatchField(columnHeader, fieldOptions, "material-sample")
+      ).toBe("organism.determination.scientificNameDetails");
     });
   });
 
