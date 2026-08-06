@@ -1,11 +1,11 @@
 import { connect, Field } from "formik";
 import { KitsuResource } from "kitsu";
 import _ from "lodash";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState, useContext } from "react";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 import { useIntl } from "react-intl";
-import { useFormikContext } from "formik";
+import { FormikContext } from "formik";
 
 export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
@@ -35,7 +35,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const lastCheckedItemRef = useRef<TData | undefined>(undefined);
   const { formatMessage } = useIntl();
-  const formik = useFormikContext<any>();
+  const formik = useContext(FormikContext) as any;
   const selectAllName = `${SELECT_ALL_PREFIX}.${fieldName}`;
   useEffect(() => {
     const selectedSectionsDefault = defaultAvailableItems?.map((_data) => true);
