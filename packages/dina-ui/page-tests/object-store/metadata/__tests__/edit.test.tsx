@@ -107,7 +107,7 @@ const TEST_MANAGED_ATTRIBUTE: PersistedResource<ManagedAttribute> = {
   type: "managed-attribute",
   id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
   name: "test-managed-attribute",
-  key: "test-managed-attribute",
+  key: "test_managed_attribute",
   vocabularyElementType: "STRING"
 };
 
