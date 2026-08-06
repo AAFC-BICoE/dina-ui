@@ -156,9 +156,11 @@ describe("Metadata single record edit page.", () => {
     expect(wrapper.getByText(/tag2/i)).toBeInTheDocument();
     expect(wrapper.getByText(/tag3/i)).toBeInTheDocument();
 
-    expect(
-      wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
+      ).toBeInTheDocument();
+    });
 
     // Set new values:
     await userEvent.click(
