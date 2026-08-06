@@ -30,6 +30,7 @@ const config: Config.InitialOptions = {
     "^common-ui$": "<rootDir>/packages/common-ui/lib/index.ts"
   },
   setupFiles: ["<rootDir>/jest.setup.js"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setupAfterEnv.js"],
   testPathIgnorePatterns: ["/.next/", "/node_modules/"],
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$",
   transform: {
