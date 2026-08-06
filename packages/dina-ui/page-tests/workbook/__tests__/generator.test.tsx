@@ -753,6 +753,134 @@ describe("Workbook Template Generator", () => {
       expect(
         wrapper.getByText(/testCollectingEventManagedAttribute/i)
       ).toBeInTheDocument();
+
+      // Generate the template.
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /generate template/i })
+      );
+      await waitFor(() => {
+        expect(mockPost).toHaveBeenCalledTimes(2);
+      });
+
+      // Regenerate the template and ensure the correct columns and aliases are sent to the generation API.
+      expect(mockPost).toHaveBeenCalledWith(
+        "objectstore-api/workbook/generation",
+        {
+          data: {
+            attributes: {
+              aliases: [
+                "DNA Concentration",
+                "Preparation Name",
+                "Test Collecting Event Managed Attribute"
+              ],
+              columns: [
+                "managedAttributes.dnaConcentration",
+                "preparationManagedAttributes.preparationName",
+                "collectingEvent.managedAttributes.testCollectingEventManagedAttribute"
+              ]
+            },
+            type: "workbook-generation"
+          }
+        },
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json"
+          },
+          responseType: "blob"
+        }
+      );
+    });
+
+    it("Load valid template, containing classifications, display classification columns", async () => {
+      const mockPost = jest.fn();
+      const apiContext: any = {
+        apiClient: { get: mockGet, axios: { post: mockPost } }
+      };
+
+      // Response shape the conversion API returns:
+      const classificationColumns =
+        TEST_CLASSIFICATIONS?.vocabularyElements?.map(
+          (element) => element.name
+        ) ?? [];
+      const conversionResponse = {
+        "0": {
+          sheetName: "Sheet0",
+          originalColumns: [classificationColumns],
+          columnAliases: [classificationColumns],
+          rows: [
+            {
+              rowNumber: 0,
+              content: [classificationColumns]
+            }
+          ]
+        }
+      };
+
+      mockPost.mockResolvedValue({ data: conversionResponse });
+
+      const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
+        apiContext
+      });
+
+      // Find the dropzone text (the visible instruction inside the dropzone)
+      const dropzoneText = wrapper.getByText(
+        /drag and drop a spreadsheet here or click to open browse dialog\./i
+      );
+      expect(dropzoneText).toBeInTheDocument();
+
+      // Find the hidden input and upload a File
+      const fileInput = wrapper.container.querySelector(
+        'input[type="file"]'
+      ) as HTMLInputElement;
+      expect(fileInput).toBeInTheDocument();
+
+      const file = new File(["dummy"], "valid-test-file.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+
+      // Use userEvent to upload (this will trigger the FileDropzone onChange)
+      await userEvent.upload(fileInput, file);
+
+      // Wait for the conversion API to be called
+      await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+
+      // Expect the classification aliases and columns to be displayed in the generator.
+      classificationColumns.forEach((classification) => {
+        expect(
+          wrapper.getByDisplayValue(new RegExp(classification ?? "", "i"))
+        ).toBeInTheDocument();
+        expect(
+          wrapper.getByText(new RegExp(classification ?? "", "i"))
+        ).toBeInTheDocument();
+      });
+
+      // Generate the template.
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /generate template/i })
+      );
+      await waitFor(() => {
+        expect(mockPost).toHaveBeenCalledTimes(2);
+      });
+
+      // Regenerate the template and ensure the correct columns and aliases are sent to the generation API.
+      expect(mockPost).toHaveBeenCalledWith(
+        "objectstore-api/workbook/generation",
+        {
+          data: {
+            attributes: {
+              aliases: classificationColumns,
+              columns: classificationColumns
+            },
+            type: "workbook-generation"
+          }
+        },
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json"
+          },
+          responseType: "blob"
+        }
+      );
     });
 
     it("Load an valid template, containing invalid columns that don't exist, display warning", async () => {
