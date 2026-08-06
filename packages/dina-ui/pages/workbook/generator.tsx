@@ -26,7 +26,8 @@ import FieldMappingConfig from "../../components/workbook/utils/FieldMappingConf
 import {
   FieldOptionType,
   generateWorkbookFieldOptions,
-  getFlattenedConfig
+  getFlattenedConfig,
+  getGeneratorColumnFromFieldName
 } from "../../components/workbook/utils/workbookMappingUtils";
 import InputGroup from "react-bootstrap/InputGroup";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
@@ -127,53 +128,17 @@ export function WorkbookTemplateGenerator() {
   // Automatically add required fields when type changes
   useEffect(() => {
     if (type.requiredFields && type.requiredFields.length > 0) {
-      const requiredColumns: GeneratorColumn[] = type.requiredFields.map(
-        (fieldName) => {
-          // Search through flat options first
-          const flatOption = newFieldOptions.find(
-            (option) => !("options" in option) && option.value === fieldName
-          );
-
-          if (flatOption) {
-            return {
-              columnLabel: flatOption.label,
-              columnValue: (flatOption as any).value,
-              columnAlias: ""
-            } as GeneratorColumn;
-          }
-
-          // Search through grouped/nested options
-          for (const item of newFieldOptions) {
-            if ("options" in item) {
-              const nestedOption = item.options.find(
-                (opt) => opt.value === fieldName
-              );
-              if (nestedOption) {
-                return {
-                  columnLabel: nestedOption.label,
-                  columnValue: nestedOption.value,
-                  columnAlias: ""
-                } as GeneratorColumn;
-              }
-            }
-          }
-
-          // If not found in options, create it manually with formatted label
-          return {
-            columnLabel: fieldName
-              .split(".")
-              .map(
-                (part) =>
-                  formatMessage(`field_${part}` as any)?.trim() ||
-                  formatMessage(part as any)?.trim() ||
-                  _.startCase(part)
-              )
-              .join("."),
-            columnValue: fieldName,
-            columnAlias: ""
-          } as GeneratorColumn;
-        }
-      );
+      const requiredColumns: GeneratorColumn[] = type.requiredFields
+        .map((fieldName) =>
+          getGeneratorColumnFromFieldName(
+            fieldName,
+            newFieldOptions,
+            formatMessage,
+            "",
+            true
+          )
+        )
+        .filter((column): column is GeneratorColumn => column !== undefined);
 
       setColumnsToGenerate(requiredColumns);
     } else {
@@ -293,49 +258,18 @@ export function WorkbookTemplateGenerator() {
       const safeFileName = uploadedFileName.replace(/\.[^/.]+$/, "");
       setFileName(safeFileName);
 
-      // Helper function to check if a column name matches an option, considering dynamic fields.
-      const matchesOption = (option: any, colName: string): boolean => {
-        if (option.value === colName) {
-          return true;
-        }
-        return !!option.isDynamic && colName.startsWith(`${option.value}.`);
-      };
-
       // Map originalColumns to GeneratorColumn entries, preferring existing field options when possible
       const loadedColumnsWithUndefined = originalColumns.map(
         (colName: string, idx: number) => {
           const alias = columnAliases[idx];
 
-          // Try to find a matching flat option first
-          const flatOption = newFieldOptions.find(
-            (option) => !("options" in option) && matchesOption(option, colName)
+          return getGeneratorColumnFromFieldName(
+            colName,
+            newFieldOptions,
+            formatMessage,
+            alias ?? "",
+            false
           );
-          if (flatOption) {
-            return {
-              columnLabel: flatOption.label,
-              columnValue: colName,
-              columnAlias: alias ?? ""
-            } as GeneratorColumn;
-          }
-
-          // Try grouped/nested options
-          for (const item of newFieldOptions) {
-            if ("options" in item) {
-              const nested = item.options.find((opt) =>
-                matchesOption(opt, colName)
-              );
-              if (nested) {
-                return {
-                  columnLabel: nested.label,
-                  columnValue: colName,
-                  columnAlias: alias ?? ""
-                } as GeneratorColumn;
-              }
-            }
-          }
-
-          // If no matching option found, return undefined so it can be filtered out.
-          return undefined as unknown as GeneratorColumn;
         }
       );
 

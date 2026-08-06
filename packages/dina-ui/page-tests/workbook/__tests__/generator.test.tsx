@@ -26,6 +26,8 @@ const mockGet = jest.fn<any, any>(async (path, options) => {
       }
     case "collection-api/vocabulary2/taxonomicRank":
       return { data: TEST_CLASSIFICATIONS };
+    case "objectstore-api/metadata":
+      return { data: [] };
   }
 });
 

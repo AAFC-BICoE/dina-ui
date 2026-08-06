@@ -17,6 +17,7 @@ import {
   flattenObject,
   getColumnHeaders,
   getDataFromWorkbook,
+  getGeneratorColumnFromFieldName,
   isBoolean,
   isBooleanArray,
   isMap,
@@ -120,6 +121,8 @@ const mockConfig: FieldMappingConfigType = {
     }
   }
 };
+
+const mockFormatMessage = jest.fn((message) => message.id);
 
 describe("workbookMappingUtils functions", () => {
   describe("getColumnHeaders", () => {
@@ -497,6 +500,91 @@ describe("workbookMappingUtils functions", () => {
           }
         ])
       ).toEqual(false);
+    });
+  });
+
+  describe("getGeneratorColumnFromFieldName", () => {
+    const fieldOptions = [
+      {
+        label: "Original Filename",
+        value: "originalFilename"
+      },
+      {
+        label: "Managed Attributes",
+        value: "managedAttributes",
+        isDynamic: true
+      },
+      {
+        label: "Nested Group",
+        options: [
+          {
+            label: "Nested Field",
+            value: "nested.field",
+            parentPath: "nested",
+            isDynamic: true
+          }
+        ]
+      }
+    ];
+
+    test("returns dynamic managed-attribute label suffix", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "managedAttributes.dnaConcentration",
+          fieldOptions,
+          mockFormatMessage,
+          "alias",
+          false
+        )
+      ).toEqual({
+        columnLabel: "dnaConcentration",
+        columnValue: "managedAttributes.dnaConcentration",
+        columnAlias: "alias"
+      });
+    });
+
+    test("resolves nested dynamic option values", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "nested.field.value",
+          fieldOptions,
+          mockFormatMessage,
+          "",
+          false
+        )
+      ).toEqual({
+        columnLabel: "value",
+        columnValue: "nested.field.value",
+        columnAlias: ""
+      });
+    });
+
+    test("falls back to formatted field label when allowed", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "unknown.field",
+          fieldOptions,
+          mockFormatMessage,
+          "",
+          true
+        )
+      ).toEqual({
+        columnLabel: "Unknown.Field",
+        columnValue: "unknown.field",
+        columnAlias: ""
+      });
+    });
+
+    test("returns undefined when no option matches and fallback disabled", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "unknown.field",
+          fieldOptions,
+          mockFormatMessage,
+          "",
+          false
+        )
+      ).toBeUndefined();
     });
   });
 

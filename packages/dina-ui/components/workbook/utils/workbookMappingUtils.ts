@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { ValidationError } from "yup";
+import { GeneratorColumn } from "common-ui";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 import {
   ColumnUniqueValues,
@@ -239,7 +240,9 @@ export type FieldOptionType = {
     label: string;
     value: string;
     parentPath: string;
+    isDynamic?: boolean;
   }[];
+  isDynamic?: boolean;
 };
 
 /**
@@ -341,6 +344,94 @@ export function generateWorkbookFieldOptions(
   return nonNestedRowOptions
     ? [...nonNestedRowOptions, ...groupedNestRowOptions]
     : [];
+}
+
+function formatFieldLabel(
+  fieldName: string,
+  formatMessage: (id, values?) => string
+) {
+  return fieldName
+    .split(".")
+    .map(
+      (part) =>
+        formatMessage(`field_${part}` as any)?.trim() ||
+        formatMessage(part as any)?.trim() ||
+        _.startCase(part)
+    )
+    .join(".");
+}
+
+function matchesFieldOption(option: FieldOptionType, fieldName: string) {
+  if (option.value === fieldName) {
+    return true;
+  }
+
+  return (
+    !!option.isDynamic &&
+    !!option.value &&
+    (fieldName?.startsWith?.(`${option.value}.`) ?? false)
+  );
+}
+
+function getFieldOptionLabel(option: FieldOptionType, fieldName: string) {
+  if (option.isDynamic && option.value && fieldName.includes(".")) {
+    return fieldName.substring(option.value.length + 1);
+  }
+
+  return option.label;
+}
+
+/**
+ * Generate a GeneratorColumn structure from the field name and the list of field options.
+ *
+ * @param fieldName The field name to find the matching field option for. Usually includes the path.
+ * @param fieldOptions All the possible field options to search through.
+ * @param formatMessage Function used for translation.
+ * @param alias Alias for the generated column.
+ * @param allowFallback true if a fallback should be generated if no match is found, false otherwise.
+ * @returns GeneratorColumn structure, undefined if no match is found and allowFallback is false.
+ * @see GeneratorColumn for the structure of the returned object.
+ * @see formatFieldLabel for how the label is generated to the user.
+ */
+export function getGeneratorColumnFromFieldName(
+  fieldName: string,
+  fieldOptions: FieldOptionType[],
+  formatMessage: (id, values?) => string,
+  alias = "",
+  allowFallback = false
+): GeneratorColumn | undefined {
+  for (const option of fieldOptions) {
+    if (!("options" in option) && matchesFieldOption(option, fieldName)) {
+      return {
+        columnLabel: getFieldOptionLabel(option, fieldName),
+        columnValue: fieldName,
+        columnAlias: alias ?? ""
+      };
+    }
+
+    if ("options" in option && option.options) {
+      const nestedOption = option.options.find((nested) =>
+        matchesFieldOption(nested, fieldName)
+      );
+      if (nestedOption) {
+        return {
+          columnLabel: getFieldOptionLabel(nestedOption, fieldName),
+          columnValue: fieldName,
+          columnAlias: alias ?? ""
+        };
+      }
+    }
+  }
+
+  if (allowFallback) {
+    return {
+      columnLabel: formatFieldLabel(fieldName, formatMessage),
+      columnValue: fieldName,
+      columnAlias: alias ?? ""
+    };
+  }
+
+  return undefined;
 }
 
 /**
