@@ -173,15 +173,6 @@ export function WorkbookTemplateGenerator() {
               return (col as any)?.managedAttribute?.name;
             }
 
-            // Special logic for scientificNameDetails.
-            if (
-              col.columnValue.startsWith(
-                "organism.determination.scientificNameDetails."
-              )
-            ) {
-              return col.columnLabel;
-            }
-
             return col.columnValue;
           }),
           aliases: columnsToGenerate.map<string>((col) =>

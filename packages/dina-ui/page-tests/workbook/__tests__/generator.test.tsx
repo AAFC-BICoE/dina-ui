@@ -529,15 +529,15 @@ describe("Workbook Template Generator", () => {
                 "Variety"
               ],
               columns: [
-                "Kingdom",
-                "Phylum",
-                "Class",
-                "Order",
-                "Family",
-                "Genus",
-                "Species",
-                "Subspecies",
-                "Variety"
+                "organism.determination.scientificNameDetails.kingdom",
+                "organism.determination.scientificNameDetails.phylum",
+                "organism.determination.scientificNameDetails.class",
+                "organism.determination.scientificNameDetails.order",
+                "organism.determination.scientificNameDetails.family",
+                "organism.determination.scientificNameDetails.genus",
+                "organism.determination.scientificNameDetails.species",
+                "organism.determination.scientificNameDetails.subspecies",
+                "organism.determination.scientificNameDetails.variety"
               ]
             },
             type: "workbook-generation"
@@ -807,12 +807,17 @@ describe("Workbook Template Generator", () => {
       const conversionResponse = {
         "0": {
           sheetName: "Sheet0",
-          originalColumns: [classificationColumns],
-          columnAliases: [classificationColumns],
+          originalColumns: classificationColumns.map(
+            (element) =>
+              `organism.determination.scientificNameDetails.${element}`
+          ),
+          columnAliases: classificationColumns.map(
+            (element) => `${element} Alias`
+          ),
           rows: [
             {
               rowNumber: 0,
-              content: [classificationColumns]
+              content: classificationColumns
             }
           ]
         }
@@ -849,11 +854,9 @@ describe("Workbook Template Generator", () => {
       // Expect the classification aliases and columns to be displayed in the generator.
       classificationColumns.forEach((classification) => {
         expect(
-          wrapper.getByDisplayValue(new RegExp(classification ?? "", "i"))
+          wrapper.getByDisplayValue((classification ?? "") + " Alias")
         ).toBeInTheDocument();
-        expect(
-          wrapper.getByText(new RegExp(classification ?? "", "i"))
-        ).toBeInTheDocument();
+        expect(wrapper.getByText(classification ?? "")).toBeInTheDocument();
       });
 
       // Generate the template.
@@ -870,8 +873,13 @@ describe("Workbook Template Generator", () => {
         {
           data: {
             attributes: {
-              aliases: classificationColumns,
-              columns: classificationColumns
+              aliases: classificationColumns.map(
+                (element) => `${element} Alias`
+              ),
+              columns: classificationColumns.map(
+                (element) =>
+                  `organism.determination.scientificNameDetails.${element}`
+              )
             },
             type: "workbook-generation"
           }
