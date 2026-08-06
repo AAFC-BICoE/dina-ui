@@ -200,9 +200,8 @@ describe("Material Sample View Page", () => {
     // Test Material Sample Name and Collecting Date Start Event Date Time to be rendered
     await waitFor(() => {
       expect(wrapper.getAllByText("my-sample-name")[0]).toBeInTheDocument();
+      expect(wrapper.getByText("2019_01_01_10_10_10")).toBeInTheDocument();
     });
-
-    expect(wrapper.getByText("2019_01_01_10_10_10")).toBeInTheDocument();
   });
 
   it("Renders the organisms expanded by default.", async () => {
