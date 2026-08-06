@@ -36,18 +36,3 @@ yarn
 ```
 
 Run this command from the top-level directory.
-
-## 🧪 Testing
-
-Run tests from the top-level directory:
-
-```bash
-# Run tests and type-checking
-yarn test
-
-# Bypass type-checking and run Jest directly (useful to see only test assertion failures)
-yarn jest
-
-# Run only previously failed tests
-yarn jest --onlyFailures
-```
