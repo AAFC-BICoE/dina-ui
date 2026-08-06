@@ -6,7 +6,7 @@ import {
   MaterialSample
 } from "../../../../types/collection-api";
 import "@testing-library/jest-dom";
-import { waitFor, within } from "@testing-library/react";
+import { waitFor, within, fireEvent } from "@testing-library/react";
 import { GenericMolecularAnalysis } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { TEST_QUALITY_CONTROL_TYPES } from "../../../seqdb/molecular-analysis-run/__mocks__/MolecularAnalysisRunViewMocks";
@@ -296,7 +296,7 @@ describe("Material Sample View Page", () => {
       button.className.includes("accordion-button")
     );
     expect(transactionsSection).toBeDefined();
-    transactionsSection!.click();
+    fireEvent.click(transactionsSection!);
 
     // Wait for the transaction list to be populated
     await waitFor(
