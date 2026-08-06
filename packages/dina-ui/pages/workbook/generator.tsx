@@ -82,13 +82,7 @@ export function WorkbookTemplateGenerator() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
 
-  const {
-    convertWorkbookFile,
-    // resetWorkbookConversion,
-    loading,
-    setLoading
-    // failed
-  } = useWorkbookConversion();
+  const { convertWorkbookFile, loading, setLoading } = useWorkbookConversion();
 
   // Generator errors
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -299,6 +293,14 @@ export function WorkbookTemplateGenerator() {
       const safeFileName = uploadedFileName.replace(/\.[^/.]+$/, "");
       setFileName(safeFileName);
 
+      // Helper function to check if a column name matches an option, considering dynamic fields.
+      const matchesOption = (option: any, colName: string): boolean => {
+        if (option.value === colName) {
+          return true;
+        }
+        return !!option.isDynamic && colName.startsWith(`${option.value}.`);
+      };
+
       // Map originalColumns to GeneratorColumn entries, preferring existing field options when possible
       const loadedColumnsWithUndefined = originalColumns.map(
         (colName: string, idx: number) => {
@@ -306,13 +308,12 @@ export function WorkbookTemplateGenerator() {
 
           // Try to find a matching flat option first
           const flatOption = newFieldOptions.find(
-            (option) =>
-              !("options" in option) && (option as any).value === colName
+            (option) => !("options" in option) && matchesOption(option, colName)
           );
           if (flatOption) {
             return {
               columnLabel: flatOption.label,
-              columnValue: (flatOption as any).value,
+              columnValue: colName,
               columnAlias: alias ?? ""
             } as GeneratorColumn;
           }
@@ -320,16 +321,19 @@ export function WorkbookTemplateGenerator() {
           // Try grouped/nested options
           for (const item of newFieldOptions) {
             if ("options" in item) {
-              const nested = item.options.find((opt) => opt.value === colName);
+              const nested = item.options.find((opt) =>
+                matchesOption(opt, colName)
+              );
               if (nested) {
                 return {
                   columnLabel: nested.label,
-                  columnValue: nested.value,
+                  columnValue: colName,
                   columnAlias: alias ?? ""
                 } as GeneratorColumn;
               }
             }
           }
+
           // If no matching option found, return undefined so it can be filtered out.
           return undefined as unknown as GeneratorColumn;
         }

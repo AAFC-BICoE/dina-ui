@@ -673,6 +673,88 @@ describe("Workbook Template Generator", () => {
       ).toBeInTheDocument();
     });
 
+    it("Load valid template, containing managed attributes, display managed attribute columns", async () => {
+      const mockPost = jest.fn();
+      const apiContext: any = {
+        apiClient: { get: mockGet, axios: { post: mockPost } }
+      };
+
+      // Response shape the conversion API returns:
+      const conversionResponse = {
+        "0": {
+          sheetName: "Sheet0",
+          originalColumns: [
+            "managedAttributes.dnaConcentration",
+            "preparationManagedAttributes.preparationName",
+            "collectingEvent.managedAttributes.testCollectingEventManagedAttribute"
+          ],
+          columnAliases: [
+            "DNA Concentration",
+            "Preparation Name",
+            "Test Collecting Event Managed Attribute"
+          ],
+          rows: [
+            {
+              rowNumber: 0,
+              content: [
+                "DNA Concentration",
+                "Preparation Name",
+                "Test Collecting Event Managed Attribute"
+              ]
+            }
+          ]
+        }
+      };
+
+      mockPost.mockResolvedValue({ data: conversionResponse });
+
+      const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
+        apiContext
+      });
+
+      // Find the dropzone text (the visible instruction inside the dropzone)
+      const dropzoneText = wrapper.getByText(
+        /drag and drop a spreadsheet here or click to open browse dialog\./i
+      );
+      expect(dropzoneText).toBeInTheDocument();
+
+      // Find the hidden input and upload a File
+      const fileInput = wrapper.container.querySelector(
+        'input[type="file"]'
+      ) as HTMLInputElement;
+      expect(fileInput).toBeInTheDocument();
+
+      const file = new File(["dummy"], "valid-test-file.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+
+      // Use userEvent to upload (this will trigger the FileDropzone onChange)
+      await userEvent.upload(fileInput, file);
+
+      // Wait for the conversion API to be called
+      await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+
+      // Expect the managed attribute aliases to be displayed in the generator.
+      await waitFor(() =>
+        expect(
+          wrapper.getByDisplayValue(/DNA Concentration/i)
+        ).toBeInTheDocument()
+      );
+      expect(
+        wrapper.getByDisplayValue(/Preparation Name/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByDisplayValue(/Test Collecting Event Managed Attribute/i)
+      ).toBeInTheDocument();
+
+      // Expect the managed attribute columns to be displayed in the generator.
+      expect(wrapper.getByText(/dnaConcentration/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/preparationName/i)).toBeInTheDocument();
+      expect(
+        wrapper.getByText(/testCollectingEventManagedAttribute/i)
+      ).toBeInTheDocument();
+    });
+
     it("Load an valid template, containing invalid columns that don't exist, display warning", async () => {
       const mockPost = jest.fn();
       const apiContext: any = {

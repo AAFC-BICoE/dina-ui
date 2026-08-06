@@ -7,7 +7,10 @@ import {
   WorkbookJSON,
   WorkbookRow
 } from "../types/Workbook";
-import { WorkbookDataTypeEnum } from "../types/WorkbookDataTypeEnum";
+import {
+  WorkbookDataTypeDynamic,
+  WorkbookDataTypeEnum
+} from "../types/WorkbookDataTypeEnum";
 import { BULK_ADD_FILES_KEY } from "../../../pages/object-store/upload";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
@@ -268,6 +271,10 @@ export function generateWorkbookFieldOptions(
       return;
     }
     const config = flattenedConfig[fieldPath];
+    const isDynamic = Object.values(WorkbookDataTypeDynamic).includes(
+      config.dataType as WorkbookDataTypeDynamic
+    );
+
     if (
       config.dataType !== WorkbookDataTypeEnum.OBJECT &&
       config.dataType !== WorkbookDataTypeEnum.OBJECT_ARRAY
@@ -285,7 +292,8 @@ export function generateWorkbookFieldOptions(
         const option = {
           label,
           value: fieldPath,
-          parentPath
+          parentPath,
+          isDynamic
         };
         nestedRowOptions.push(option);
       } else {
@@ -296,7 +304,8 @@ export function generateWorkbookFieldOptions(
           _.startCase(fieldPath);
         const option = {
           label,
-          value: fieldPath
+          value: fieldPath,
+          isDynamic
         };
         nonNestedRowOptions.push(option);
       }
