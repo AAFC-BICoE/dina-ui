@@ -1532,9 +1532,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAsImage: "Save as Image",
   parentMaterialSampleDisabledTooltip:
     "Material Sample can only have a single link to one of the following relationships: Parent Material Sample or a collecting event.",
-  managedAttributeCollectionTabAlertTitle:
-    "Collection managed attributes have been moved.",
-  managedAttributeCollectionTabAlertDescription:
+  managedAttributeTabAlertTitle: "{module} managed attributes have been moved.",
+  managedAttributeTabAlertDescription:
     "They are now located on the new {link} page.",
   supportedFormats: "Supported Formats",
   maxFileSize: "Maximum file size",
