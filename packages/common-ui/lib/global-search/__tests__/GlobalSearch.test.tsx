@@ -25,7 +25,7 @@ describe("GlobalSearch component", () => {
     const button = screen.getByRole("button");
 
     await userEvent.type(input, "  test query  ");
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockOnSearch).toHaveBeenCalledTimes(1);
     expect(mockOnSearch).toHaveBeenCalledWith("test query");
@@ -46,7 +46,7 @@ describe("GlobalSearch component", () => {
     mountWithAppContext(<GlobalSearch onSearch={mockOnSearch} />);
 
     const button = screen.getByRole("button");
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockOnSearch).not.toHaveBeenCalled();
   });
