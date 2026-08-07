@@ -53,13 +53,13 @@ const MATERIAL_SAMPLE_GENERATOR_FIELD_EXCLUSIONS = new Set<string>([
 const MATERIAL_SAMPLE_RELATIONSHIP_FIELD_OVERRIDES: RelationshipDynamicField[] =
   [
     {
-      apiEndpoint: "collection-api/vocabulary2/taxonomicRank",
+      type: "classification",
       label: "scientificNameDetails",
+      component: "ORGANISM",
       path: "included.attributes.determination.scientificNameDetails",
       referencedBy: "organism.determination",
       referencedType: "organism",
-      type: "classification",
-      component: "ORGANISM"
+      apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
     },
 
     // Organism Managed Attributes

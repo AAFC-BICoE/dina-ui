@@ -122,11 +122,7 @@ export function useColumnMapping() {
   } = useQuery<ControlledVocabularyItem[]>({
     path: "collection-api/controlled-vocabulary-item",
     filter: SimpleSearchFilterBuilder.create()
-      .where(
-        "controlledVocabulary.uuid",
-        "EQ",
-        COLLECTION_OTHER_IDENTIFIERS_ID
-      )
+      .where("controlledVocabulary.uuid", "EQ", COLLECTION_OTHER_IDENTIFIERS_ID)
       .build(),
     page: { limit: 1000 }
   });
@@ -455,11 +451,17 @@ export function useColumnMapping() {
       return undefined;
     }
 
+    // Depending on if it's a controlled vocabulary managed attribute or legacy managed attribute,
+    // the dina component will be stored in a different part.
+    const configDataComponent =
+      config?.managedAttributeComponent ?? config?.filter?.dinaComponent;
+
+    // Find the matching managed attribute based on the key and the dina component.
     return managedAttributes.find(
       (managedAttribute) =>
         managedAttribute.key === key &&
-        (config.managedAttributeComponent === "ENTITY" ||
-          managedAttribute?.dinaComponent === config.managedAttributeComponent)
+        (configDataComponent === "ENTITY" ||
+          managedAttribute?.dinaComponent === configDataComponent)
     );
   }
 
