@@ -4,7 +4,6 @@ import { FieldItem } from "@react-awesome-query-builder/ui";
 import { QueryOperatorSelector } from "../QueryOperatorSelector";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const OPERATOR_OPTIONS: FieldItem[] = [
@@ -43,7 +42,7 @@ describe("QueryOperatorSelector component", () => {
     );
 
     // Simulate opening up the menu.
-    await userEvent.click(wrapper.getByText(/contains/i));
+    fireEvent.click(wrapper.getByText(/contains/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     // 5 options should be rendered.
@@ -81,14 +80,14 @@ describe("QueryOperatorSelector component", () => {
     expect(wrapper.getByText(OPERATOR_OPTIONS[0].label)).toBeInTheDocument();
 
     // Select a new option in the list.
-    await userEvent.click(wrapper.getByText(/contains/i));
+    fireEvent.click(wrapper.getByText(/contains/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
     await waitFor(() => {
       expect(
         wrapper.getByRole("option", { name: /not in/i })
       ).toBeInTheDocument();
     });
-    await userEvent.click(wrapper.getByRole("option", { name: /not in/i }));
+    fireEvent.click(wrapper.getByRole("option", { name: /not in/i }));
 
     // Expect it to be changed to Not In.
     await waitFor(() => {
