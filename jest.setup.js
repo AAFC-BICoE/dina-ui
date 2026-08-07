@@ -15,7 +15,7 @@ const consoleError = console.error;
 jest.spyOn(console, "error").mockImplementation((...args) => {
   if (
     !String(args?.[0])?.includes?.(
-      "Warning: An update to %s inside a test was not wrapped in act"
+      "was not wrapped in act"
     )
   ) {
     consoleError(...args);
