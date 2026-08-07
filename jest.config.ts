@@ -34,9 +34,9 @@ const config: Config.InitialOptions = {
   testPathIgnorePatterns: ["/.next/", "/node_modules/"],
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$",
   transform: {
-    "^.+\\.tsx?$": ["babel-jest", { presets: ["next/babel"] }],
-    "^.+\\.js?$": ["babel-jest", { presets: ["next/babel"] }],
-    "\\.mjs?$": ["babel-jest", { presets: ["next/babel"] }]
+    "^.+\\.tsx?$": ["babel-jest", { presets: [["next/babel", { "preset-react": { runtime: "automatic" } }]] }],
+    "^.+\\.js?$": ["babel-jest", { presets: [["next/babel", { "preset-react": { runtime: "automatic" } }]] }],
+    "\\.mjs?$": ["babel-jest", { presets: [["next/babel", { "preset-react": { runtime: "automatic" } }]] }]
   },
   transformIgnorePatterns: [
     `/node_modules/(?!common-ui|axios|dnd-core|uuid|dexie)`
