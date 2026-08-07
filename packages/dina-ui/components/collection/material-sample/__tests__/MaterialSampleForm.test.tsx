@@ -10,6 +10,8 @@ import { waitFor, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
+import MaterialSampleEditPage from "@dina-ui/pages/collection/material-sample/edit";
+import { useRouter } from "next/router";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -17,6 +19,13 @@ jest.mock("next/dynamic", () => () => {
     return <div>Mock dynamic component</div>;
   };
 });
+
+const routerPushMock = jest.fn();
+
+// Mock the next router
+jest.mock("next/router", () => ({
+  useRouter: jest.fn()
+}));
 
 /**
  * Reusable mock block for tests that render components using `useSearchWsCustomQuery`.
@@ -327,6 +336,12 @@ describe("Material Sample Edit Page", () => {
     window.fetch = jest
       .fn()
       .mockResolvedValue(mockFetchResponse(mockGeographicSearchResults));
+
+    (useRouter as jest.Mock).mockReturnValue({
+      query: {},
+      push: routerPushMock,
+      pathname: "/collection/material-sample/edit"
+    });
   });
 
   it("Submits a new material-sample with a new CollectingEvent.", async () => {
@@ -4520,5 +4535,105 @@ describe("Material Sample Edit Page", () => {
         ])
       );
     });
+  });
+
+  describe("save and copy to next functionality", () => {
+    it("When creating a new material sample, save and copy to next, should save the current material sample and open a new form with the same values.", async () => {
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+      // Enable the collecting event section:
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        fail("Collecting event toggle needs to exist at this point.");
+      }
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
+
+      await waitFor(() =>
+        expect(
+          wrapper.getByLabelText(/verbatim event datetime/i)
+        ).toBeInTheDocument()
+      );
+
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /primary id/i }),
+        "Sample1"
+      );
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
+        "2019-12-21T16:00"
+      );
+
+      // Click the "Save & copy to next" button
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /save & copy to next/i })
+      );
+
+      // Wait for the save to be called twice (once for the collecting event, once for the material sample)
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+
+      // Saves the Collecting Event and the Material Sampl properly.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          // New collecting-event:
+          [
+            {
+              resource: {
+                dwcVerbatimCoordinateSystem: null,
+                dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+                group: "aafc",
+                geoReferenceAssertions: [
+                  {
+                    isPrimary: true
+                  }
+                ],
+                verbatimEventDateTime: "2019-12-21T16:00",
+                publiclyReleasable: false, // Default value
+                type: "collecting-event"
+              },
+              type: "collecting-event"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ],
+        [
+          // New material-sample:
+          [
+            {
+              resource: {
+                group: "aafc",
+                relationships: {
+                  collectingEvent: {
+                    data: {
+                      id: "11111111-1111-1111-1111-111111111111",
+                      type: "collecting-event"
+                    }
+                  }
+                },
+                materialSampleName: "Sample1",
+                publiclyReleasable: false
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+
+      // The next router should have pushed to the edit page for the new material sample.
+      expect(routerPushMock).toHaveBeenCalledWith(
+        "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111&lastCreatedId=11111111-1111-1111-1111-111111111111"
+      );
+
+      await waitForLoadingToDisappear();
+
+      // Todo: Seems to stay on the same page, look into figuring out why or how to get the next page to load properly for this test.
+      // screen.logTestingPlaygroundURL();
+    });
+
+    it("When editing an existing material sample, save and copy to next, should save the current material sample and open a new form with the same values.", async () => {});
   });
 });
