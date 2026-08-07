@@ -1,6 +1,6 @@
-import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { DinaForm } from "../../formik-connected/DinaForm";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { TextFieldWithCoordButtons } from "../TextFieldWithCoordButtons";
 import "@testing-library/jest-dom";
 
@@ -12,19 +12,15 @@ describe("TextFieldWithCoordButtons component", () => {
       </DinaForm>
     );
 
-    fireEvent.click(wrapper.getByRole("button", { name: /°/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /°/i }));
     expect((wrapper.getByRole("textbox") as HTMLInputElement).value).toEqual(
       "°"
     );
 
     // Move cursor to the second part in the textbox.
-    fireEvent.change(wrapper.getByRole("textbox"), {
-      target: {
-        value: "asdf"
-      }
-    });
+    await clearAndType(wrapper.getByRole("textbox"), "asdf");
 
-    fireEvent.click(wrapper.getByRole("button", { name: /″/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /″/i }));
     expect((wrapper.getByRole("textbox") as HTMLInputElement).value).toEqual(
       "asdf″"
     );
