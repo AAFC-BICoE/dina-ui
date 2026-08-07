@@ -1,4 +1,4 @@
-import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { mountWithAppContext } from "common-ui";
 import { useModal } from "../modal";
 import "@testing-library/jest-dom";
@@ -45,7 +45,7 @@ function TestComponentNestedModals() {
 }
 
 describe("Modal", () => {
-  it("Lets you open a modal.", () => {
+  it("Lets you open a modal.", async () => {
     const wrapper = mountWithAppContext(<TestComponent />);
 
     // Closed initially:
@@ -54,14 +54,14 @@ describe("Modal", () => {
     ).not.toBeInTheDocument();
 
     // Open the modal:
-    fireEvent.click(wrapper.getByRole("button", { name: /open/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /open/i }));
 
     expect(
       wrapper.getByRole("dialog", { name: /popup dialog window/i })
     ).toBeInTheDocument();
 
     // Close the modal:
-    fireEvent.click(wrapper.getByRole("button", { name: /exit/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /exit/i }));
     expect(
       wrapper.queryByRole("dialog", { name: /popup dialog window/i })
     ).not.toBeInTheDocument();
@@ -76,19 +76,19 @@ describe("Modal", () => {
     ).not.toBeInTheDocument();
 
     // Open the modal:
-    fireEvent.click(wrapper.getByRole("button", { name: /open/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /open/i }));
 
     // Open the inner modal:
-    fireEvent.click(wrapper.getAllByRole("button", { name: /open/i })[1]);
+    await userEvent.click(wrapper.getAllByRole("button", { name: /open/i })[1]);
 
     // The "Exit" button should appear in the nested modal:
     expect(wrapper.getByRole("button", { name: /exit/i })).toBeInTheDocument();
 
     // Close second modal:
-    fireEvent.click(wrapper.getByRole("button", { name: /exit/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /exit/i }));
 
     // Close first modal:
-    fireEvent.click(wrapper.getByRole("button", { name: /close/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /close/i }));
 
     // No modals left:
     expect(
