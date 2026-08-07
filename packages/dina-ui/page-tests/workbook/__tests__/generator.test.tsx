@@ -1,5 +1,8 @@
 import { waitFor } from "@testing-library/react";
-import { WorkbookTemplateGenerator } from "../../../pages/workbook/generator";
+import {
+  WorkbookTemplateGenerator,
+  buildMaterialSampleGeneratorDynamicConfig
+} from "../../../pages/workbook/generator";
 import { mountWithAppContext } from "common-ui";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
@@ -35,6 +38,47 @@ const apiContext: any = {
 
 describe("Workbook Template Generator", () => {
   beforeEach(() => jest.clearAllMocks());
+
+  it("filters overridden material-sample managed attributes from the top-level field list", () => {
+    const result = buildMaterialSampleGeneratorDynamicConfig(
+      {
+        fields: [
+          {
+            label: "targetIdentifiableEntitySummary.managedAttributes",
+            type: "managedAttribute",
+            path: "data.attributes.targetIdentifiableEntitySummary.managedAttributes"
+          },
+          {
+            label:
+              "targetIdentifiableEntitySummary.primaryDetermination.managedAttributes",
+            type: "managedAttribute",
+            path: "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.managedAttributes"
+          },
+          {
+            label: "materialSampleName",
+            type: "unsupported",
+            path: "data.attributes.materialSampleName"
+          }
+        ],
+        relationshipFields: []
+      } as any,
+      [
+        {
+          label: "managedAttributes",
+          type: "managedAttribute",
+          path: "included.attributes.managedAttributes",
+          referencedBy: "organism",
+          referencedType: "organism",
+          apiEndpoint: "collection-api/managed-attribute"
+        }
+      ] as any
+    );
+
+    expect(result.fields.map((field) => field.label)).toEqual([
+      "materialSampleName"
+    ]);
+    expect(result.relationshipFields).toHaveLength(1);
+  });
 
   it("Page Layout", async () => {
     // Generates a snapshot of the generator page. This is used to ensure the design of the page

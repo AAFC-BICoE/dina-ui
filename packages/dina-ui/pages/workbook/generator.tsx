@@ -18,7 +18,10 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Alert, Button, Card, Form } from "react-bootstrap";
 import Select from "react-select";
 import { useEffect, useMemo, useState } from "react";
-import { DynamicFieldsMappingConfig } from "common-ui/lib/list-page/types";
+import {
+  DynamicFieldsMappingConfig,
+  RelationshipDynamicField
+} from "common-ui/lib/list-page/types";
 import { dynamicFieldMappingForMaterialSample } from "../collection/material-sample/list";
 import Link from "next/link";
 import FieldMappingConfig from "../../components/workbook/utils/FieldMappingConfig";
@@ -42,27 +45,72 @@ export interface EntityConfiguration {
   requiredFields?: string[];
 }
 
+const MATERIAL_SAMPLE_GENERATOR_FIELD_EXCLUSIONS = new Set<string>([
+  "targetIdentifiableEntitySummary.managedAttributes",
+  "targetIdentifiableEntitySummary.primaryDetermination.managedAttributes"
+]);
+
+const MATERIAL_SAMPLE_RELATIONSHIP_FIELD_OVERRIDES: RelationshipDynamicField[] =
+  [
+    {
+      apiEndpoint: "collection-api/vocabulary2/taxonomicRank",
+      label: "scientificNameDetails",
+      path: "included.attributes.determination.scientificNameDetails",
+      referencedBy: "organism.determination",
+      referencedType: "organism",
+      type: "classification",
+      component: "ORGANISM"
+    },
+
+    // Organism Managed Attributes
+    // This is where it's saved in the API, the list page references the targetIdentifiableEntitySummary instead.
+    {
+      type: "managedAttribute",
+      label: "managedAttributes",
+      component: "ORGANISM",
+      path: "included.attributes.managedAttributes",
+      referencedBy: "organism",
+      referencedType: "organism",
+      apiEndpoint: "collection-api/controlled-vocabulary-item"
+    },
+
+    // Determination Managed Attributes
+    // This is where it's saved in the API, the list page references the targetIdentifiableEntitySummary instead.
+    {
+      type: "managedAttribute",
+      label: "managedAttributes",
+      component: "DETERMINATION",
+      path: "included.attributes.determination.managedAttributes",
+      referencedBy: "organism.determination",
+      referencedType: "organism",
+      apiEndpoint: "collection-api/controlled-vocabulary-item"
+    }
+  ];
+
+export function buildMaterialSampleGeneratorDynamicConfig(
+  baseConfig: DynamicFieldsMappingConfig,
+  relationshipFieldOverrides: RelationshipDynamicField[] = MATERIAL_SAMPLE_RELATIONSHIP_FIELD_OVERRIDES
+): DynamicFieldsMappingConfig {
+  return {
+    fields: baseConfig.fields.filter(
+      (field) => !MATERIAL_SAMPLE_GENERATOR_FIELD_EXCLUSIONS.has(field.label)
+    ),
+    relationshipFields: [
+      ...baseConfig.relationshipFields,
+      ...relationshipFieldOverrides
+    ]
+  };
+}
+
 // Entities that we support to generate templates
 const ENTITY_TYPES: EntityConfiguration[] = [
   {
     name: "material-sample",
     indexName: "dina_material_sample_index",
     uniqueName: "material-sample-template-generator",
-    dynamicConfig: {
-      fields: dynamicFieldMappingForMaterialSample.fields,
-      relationshipFields: [
-        ...dynamicFieldMappingForMaterialSample.relationshipFields,
-        {
-          apiEndpoint: "collection-api/vocabulary2/taxonomicRank",
-          label: "scientificNameDetails",
-          path: "included.attributes.determination.scientificNameDetails",
-          referencedBy: "organism.determination",
-          referencedType: "organism",
-          type: "classification",
-          component: "ORGANISM"
-        }
-      ]
-    }
+    dynamicConfig: buildMaterialSampleGeneratorDynamicConfig(
+      dynamicFieldMappingForMaterialSample
+    )
   },
   {
     name: "metadata",
