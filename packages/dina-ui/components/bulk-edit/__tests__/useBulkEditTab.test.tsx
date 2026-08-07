@@ -12,6 +12,8 @@ import { MaterialSampleFormProps } from "../../collection/material-sample/Materi
 import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
 import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { clearAndType } from "common-ui";
 import "@testing-library/jest-dom";
 import { useSearchWsCustomQuery } from "../../../../common-ui/lib/search/useSearchWsCustomQuery";
 
@@ -250,10 +252,12 @@ describe("Material sample bulk edit tab", () => {
     );
 
     // Set the parent on the bulk edit form programmatically
-    fireEvent.click(wrapper.getByRole("button", { name: /set parent/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /set parent/i }));
 
     // Request overrides and assert parent is present
-    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /get overrides/i })
+    );
 
     await waitFor(() => expect(mockSubmitOverride).toHaveBeenCalled());
 
@@ -270,7 +274,9 @@ describe("Material sample bulk edit tab", () => {
       ).toBeInTheDocument();
     });
 
-    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /get overrides/i })
+    );
 
     await waitFor(() => {
       expect(mockSubmitOverride).lastCalledWith({
@@ -297,11 +303,14 @@ describe("Material sample bulk edit tab", () => {
     });
 
     // Update the barcode
-    fireEvent.change(wrapper.getByRole("textbox", { name: /barcode/i }), {
-      target: { value: "test-barcode-override" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /barcode/i }),
+      "test-barcode-override"
+    );
 
-    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /get overrides/i })
+    );
 
     await waitFor(() => {
       expect(mockSubmitOverride).lastCalledWith({
@@ -331,17 +340,19 @@ describe("Material sample bulk edit tab", () => {
     const switches = wrapper.container.querySelectorAll(
       ".material-sample-nav .react-switch-bg"
     );
-    switches.forEach(async (switchFound) => {
+    for (const switchFound of Array.from(switches)) {
       await waitFor(() => expect(switchFound).toBeInTheDocument());
-      fireEvent.click(switchFound);
-    });
+      await userEvent.click(switchFound);
+    }
 
     await waitFor(() => {
       expect(
         wrapper.getByRole("button", { name: /get overrides/i })
       ).toBeInTheDocument();
     });
-    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /get overrides/i })
+    );
 
     await waitFor(() => {
       expect(mockSubmitOverride).lastCalledWith({
@@ -383,9 +394,7 @@ describe("Material sample bulk edit tab", () => {
 
     // Select the "B" managed attribute to display.
     fireEvent.focus(managedAttributesVisible);
-    fireEvent.change(managedAttributesVisible, {
-      target: { value: "Managed Attribute 2" }
-    });
+    await userEvent.type(managedAttributesVisible, "Managed Attribute 2");
     fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
 
     await waitFor(() => {
@@ -393,22 +402,20 @@ describe("Material sample bulk edit tab", () => {
         wrapper.getByRole("option", { name: /managed attribute 2/i })
       ).toBeInTheDocument();
     });
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", { name: /managed attribute 2/i })
     );
 
     // Select the "C" managed attribute to display.
     fireEvent.focus(managedAttributesVisible);
-    fireEvent.change(managedAttributesVisible, {
-      target: { value: "Managed Attribute 3" }
-    });
+    await clearAndType(managedAttributesVisible, "Managed Attribute 3");
     fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
     await waitFor(() => {
       expect(
         wrapper.getByRole("option", { name: /managed attribute 3/i })
       ).toBeInTheDocument();
     });
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", { name: /managed attribute 3/i })
     );
 
@@ -421,10 +428,12 @@ describe("Material sample bulk edit tab", () => {
       wrapper.container.querySelector(".managedAttributes_c-field input")
     )) as Element;
 
-    fireEvent.change(textboxB, { target: { value: "new-b-value" } });
-    fireEvent.change(textboxC, { target: { value: "new-c-value" } });
+    await clearAndType(textboxB, "new-b-value");
+    await clearAndType(textboxC, "new-c-value");
 
-    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /get overrides/i })
+    );
 
     await waitFor(() => {
       expect(mockSubmitOverride).lastCalledWith({
