@@ -263,7 +263,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   detachSelectedButtonText: "Auswahl lösen",
   detailsPageLink: "Detailseite",
   determination: "Bestimmung",
-  determinationManagedAttributes: "Zusatzfeld zur Bestimmung",
+  determinationManagedAttributes: "Zusatzfelder zur Bestimmung",
   determinationPrimary: "Bestimmung (Primär)",
   determinations: "Bestimmungen",
   determiningAgents: "Bestimmungsagent",
@@ -524,7 +524,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_managedAttributeCreatedOn: "Angelegt an",
   field_managedAttributeMandatoryFieldsError:
     "Sowohl Name als auch Typ sind Pflichtfelder",
-  field_managedAttributeName: "Attributsname",
+  field_managedAttributeName: "Zusatzfeldname",
   field_managedAttributes: "Zusatzfelder",
   field_materialDirection: "Materialrichtung",
   field_materialSampleName: "Primäre ID",
@@ -621,7 +621,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Startzeitpunktformat muss ein Teilformat von YYYY-MM-DDTHH:MM:SS.MMM sein. Wenn ein Datum/Zeitwert vorhanden ist, ist „T“ erforderlich.",
   field_status: "Status",
   field_storageUnit: "Lagereinheit",
-  field_tags: "Stichworte",
+  field_tags: "Schlagwörter",
   field_targetOrganismPrimaryClassification:
     "Klassifikation des Zielorganismus",
   field_targetOrganismPrimaryScientificName:
@@ -648,7 +648,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_verbatimScientificName: "Verbatim wissenschaftlicher Name",
   field_visibleManagedAttributes: "Sichtbare Zusatzfelder im Editor",
   field_visibleManagedAttributes_tooltip:
-    "Durch das Hinzufügen oder Entfernen eines Attributs mithilfe dieser Dropdown-Liste wird der Wert nicht geändert oder entfernt. Es wirkt sich nur auf die Sichtbarkeit des Attributs in diesem Editor aus.",
+    "Durch das Hinzufügen oder Entfernen eines Zusatzfeldes mithilfe dieser Dropdown-Liste wird der Wert nicht geändert oder entfernt. Es wirkt sich nur auf die Sichtbarkeit des Feldes in diesem Editor aus.",
   field_vocabularyElementType_boolean_label: "Boolean",
   field_vocabularyElementType_date_label: "Datum",
   field_vocabularyElementType_decimal_label: "Dezimal",
@@ -931,7 +931,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Es sind noch Daten ungespeichert, sind Sie sicher, dass Sie die Seite verlassen möchten?",
   preparation: "Aufbereitung",
   preparationData: "Aufbereitungsdaten",
-  preparationManagedAttributes: "Aufbereitungsattribute",
+  preparationManagedAttributes: "Zusatzfelder zur Aufbereitung",
   preparationMethod: "Aufbereitungsmethode",
   preparationMethodNameLabel: "Name der Aufbereitungsmethode",
   preparationProtocol: "Aufbereitungsprotokoll",
@@ -983,7 +983,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   queryBuilder_imageLink_ORIGINAL: "Originalbild",
   queryBuilder_imageLink_THUMBNAIL_IMAGE: "Miniaturbild",
   queryBuilder_invalid_query: "Einige Teile Ihrer Abfrage wurden entfernt",
-  queryBuilder_managedAttribute_placeholder: "Verwaltetes Attribut auswählen …",
+  queryBuilder_managedAttribute_placeholder: "Zusatzfeld auswählen …",
   queryBuilder_operator_absence: "Abwesenheit",
   queryBuilder_operator_between: "Zwischen",
   queryBuilder_operator_between_tooltip:
@@ -1319,11 +1319,11 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Das Feld „{fieldName}“ muss eine gültige Datum-Zeichenkette enthalten; ungültiger Typ empfangen.",
   workBookInvalidEnumFormat: "muss einen der zulässigen Werte enthalten:",
   workBookInvalidManagedAttributeDataType:
-    "Ungültiger Datentyp für Managed Attribute: Schlüssel {key} erwartet Datentyp {type}.",
+    "Ungültiger Datentyp für Zusatzfeld: Schlüssel {key} erwartet Datentyp {type}.",
   workBookInvalidManagedAttributeKey:
-    "Ungültiger Managed-Attributschlüssel: {key} wurde nicht gefunden.",
+    "Ungültiger Zusatzfeldschlüssel: {key} wurde nicht gefunden.",
   workBookManagedAttributeKeysTargetKeyIsRequired:
-    "Bitte einen Managed-Attributwert auswählen.",
+    "Bitte einen Zusatzfeldwert auswählen.",
   workBookSkippedField:
     "Bitte ein Feld auswählen oder den Import überspringen.",
   workBookStorageUnitIsRequired:
