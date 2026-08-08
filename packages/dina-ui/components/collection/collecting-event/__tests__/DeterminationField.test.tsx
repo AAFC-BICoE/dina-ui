@@ -1,4 +1,4 @@
-import { DinaForm } from "common-ui";
+import { clearAndType, DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { DeterminationField } from "../DeterminationField";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
@@ -30,7 +30,7 @@ describe("DeterminationField component", () => {
     const input = screen.getByRole("textbox", {
       name: /global name search/i
     });
-    fireEvent.change(input, { target: { value: "test-name" } });
+    await clearAndType(input, "test-name");
 
     // Submit the form using querySelector
     const form = container.querySelector("form");
