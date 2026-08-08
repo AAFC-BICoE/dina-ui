@@ -3,6 +3,7 @@ import { mountWithAppContext } from "common-ui";
 import { CatalogueOfLifeNameField } from "../CatalogueOfLifeNameField";
 import { NameUsageSearchResult } from "../nameusage-types";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const mockOnChange = jest.fn((val, form) =>
@@ -35,7 +36,10 @@ describe("CatalogueOfLifeNameField component", () => {
     );
 
     const input = screen.getByRole("textbox"); // Assuming the input has role "textbox"
-    fireEvent.change(input, { target: { value: "  Poa muralis  " } });
+    await userEvent.type(input, "  Poa muralis  ");
+
+    // The typed text should have been passed to onChange:
+    expect(mockOnChange).lastCalledWith("  Poa muralis  ", expect.anything());
 
     await waitFor(() => {
       expect(
@@ -44,7 +48,7 @@ describe("CatalogueOfLifeNameField component", () => {
     });
 
     const searchButton = screen.getByRole("button", { name: /search/i });
-    fireEvent.click(searchButton);
+    await userEvent.click(searchButton);
 
     await waitFor(() => {
       expect(
@@ -60,25 +64,21 @@ describe("CatalogueOfLifeNameField component", () => {
     });
 
     const selectButton = screen.getAllByRole("button", { name: /select/i });
-    fireEvent.click(selectButton[1]);
+    await userEvent.click(selectButton[1]);
 
-    expect(mockOnChange).toBeCalledTimes(2);
-
-    expect(mockOnChange.mock.calls).toEqual([
-      ["  Poa muralis  ", expect.anything()],
+    // The selected name should have been passed to onChange:
+    expect(mockOnChange).lastCalledWith(
       [
-        [
-          {
-            labelHtml: "<i>Poa muralis</i> Wibel, nom. illeg.",
-            recordedOn: "2021-11-09",
-            sourceUrl:
-              "https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"
-          },
-          expect.anything()
-        ],
+        {
+          labelHtml: "<i>Poa muralis</i> Wibel, nom. illeg.",
+          recordedOn: "2021-11-09",
+          sourceUrl:
+            "https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"
+        },
         expect.anything()
-      ]
-    ]);
+      ],
+      expect.anything()
+    );
 
     // The whitespace for the query string should be trimmed:
     expect(mockFetchJson).lastCalledWith(
@@ -97,7 +97,7 @@ describe("CatalogueOfLifeNameField component", () => {
 
     // Remove the name:
     const removeButton = screen.getByRole("button", { name: /remove/i });
-    fireEvent.click(removeButton);
+    await userEvent.click(removeButton);
     expect(mockOnChange).lastCalledWith(null, expect.anything());
     fireEvent.submit(form!);
 
