@@ -16,8 +16,24 @@ export interface SubmitButtonProps {
 }
 
 export interface FileDropzoneProps {
+  /**
+   * Triggered on submit. If autoUpload is true, this will be called automatically when files are added.
+   *
+   * @param files Files that have been added to the dropzone and passed validation (e.g. file type and size).
+   */
   onSubmit: (files: IFileWithMeta[]) => void;
+
+  /**
+   * Triggered on any change to the files in the dropzone, including when files are added or removed.
+   *
+   * @param files Files that are currently in the dropzone, including any that have failed validation.
+   */
   onChange?: (files: IFileWithMeta[]) => void;
+
+  /**
+   * Triggered whenever the dropzone becomes empty after previously containing one or more files.
+   */
+  onClear?: () => void;
 
   /**
    * Number of files that can be uploaded through the file dropzone.
@@ -37,6 +53,14 @@ export interface FileDropzoneProps {
    * client-side filtering (e.g. `"text/csv, .xlsx"`).
    */
   accept?: string;
+
+  /**
+   * If true, the file dropzone will automatically submit the files when they are added, without
+   * requiring the user to click a submit button.
+   *
+   * It's recommended that this option is only used when maxFiles is set to 1.
+   */
+  autoUpload?: boolean;
 
   inputContent?: React.ReactNode;
   submitButtonContent?: React.ReactNode;
@@ -213,15 +237,21 @@ export function FileDropzone({
   submitButtonContent,
   PreviewComponent,
   SubmitButtonComponent,
-  onChange
+  onChange,
+  autoUpload = false,
+  onClear
 }: FileDropzoneProps) {
   const [files, setFiles] = useState<InternalFileWithMeta[]>([]);
+  const [previousHasFiles, setPreviousHasFiles] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listBottomRef = useRef<HTMLDivElement>(null);
   const acceptList = parseAccept(accept);
   const multiple = maxFiles === undefined || maxFiles > 1;
   const atMaxFiles = maxFiles !== undefined && files.length >= maxFiles;
+  const hasFiles = files.length > 0;
+  const hasErrors = files.some((f) => f.error);
+  const autoUploadSubmitted = useRef(false);
 
   const removeFile = useCallback((id: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== id));
@@ -271,6 +301,17 @@ export function FileDropzone({
     onChange?.(files);
   }, [files, onChange]);
 
+  useEffect(() => {
+    if (!hasFiles) {
+      autoUploadSubmitted.current = false;
+    }
+
+    if (!hasFiles && previousHasFiles) {
+      onClear?.();
+    }
+    setPreviousHasFiles(hasFiles);
+  }, [files, hasFiles, previousHasFiles, onClear]);
+
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -302,8 +343,12 @@ export function FileDropzone({
     [addFiles]
   );
 
-  const hasFiles = files.length > 0;
-  const hasErrors = files.some((f) => f.error);
+  useEffect(() => {
+    if (autoUpload && hasFiles && !hasErrors && !autoUploadSubmitted.current) {
+      onSubmit(files);
+      autoUploadSubmitted.current = true;
+    }
+  }, [autoUpload, hasFiles, hasErrors, files, onSubmit]);
 
   const PreviewComp = PreviewComponent ?? DefaultPreview;
   const SubmitComp = SubmitButtonComponent ?? DefaultSubmitButton;
@@ -411,7 +456,7 @@ export function FileDropzone({
       )}
 
       {/* Submit button */}
-      {hasFiles && (
+      {hasFiles && !autoUpload && (
         <div
           className="d-flex justify-content-end"
           onClick={(e) => e.stopPropagation()}

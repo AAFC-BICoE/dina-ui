@@ -17,6 +17,9 @@ import {
   flattenObject,
   getColumnHeaders,
   getDataFromWorkbook,
+  getGeneratorColumnFromFieldName,
+  findMatchField,
+  WorkbookColumnInfo,
   isBoolean,
   isBooleanArray,
   isMap,
@@ -120,6 +123,8 @@ const mockConfig: FieldMappingConfigType = {
     }
   }
 };
+
+const mockFormatMessage = jest.fn((message) => message.id);
 
 describe("workbookMappingUtils functions", () => {
   describe("getColumnHeaders", () => {
@@ -497,6 +502,129 @@ describe("workbookMappingUtils functions", () => {
           }
         ])
       ).toEqual(false);
+    });
+  });
+
+  describe("getGeneratorColumnFromFieldName", () => {
+    const fieldOptions = [
+      {
+        label: "Original Filename",
+        value: "originalFilename"
+      },
+      {
+        label: "Managed Attributes",
+        value: "managedAttributes",
+        isDynamic: true
+      },
+      {
+        label: "Nested Group",
+        options: [
+          {
+            label: "Nested Field",
+            value: "nested.field",
+            parentPath: "nested",
+            isDynamic: true
+          }
+        ]
+      }
+    ];
+
+    test("returns dynamic managed-attribute label suffix", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "managedAttributes.dnaConcentration",
+          fieldOptions,
+          mockFormatMessage,
+          "alias",
+          false
+        )
+      ).toEqual({
+        columnLabel: "dnaConcentration",
+        columnValue: "managedAttributes.dnaConcentration",
+        columnAlias: "alias"
+      });
+    });
+
+    test("resolves nested dynamic option values", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "nested.field.value",
+          fieldOptions,
+          mockFormatMessage,
+          "",
+          false
+        )
+      ).toEqual({
+        columnLabel: "value",
+        columnValue: "nested.field.value",
+        columnAlias: ""
+      });
+    });
+
+    test("falls back to formatted field label when allowed", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "unknown.field",
+          fieldOptions,
+          mockFormatMessage,
+          "",
+          true
+        )
+      ).toEqual({
+        columnLabel: "Unknown.Field",
+        columnValue: "unknown.field",
+        columnAlias: ""
+      });
+    });
+
+    test("returns undefined when no option matches and fallback disabled", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "unknown.field",
+          fieldOptions,
+          mockFormatMessage,
+          "",
+          false
+        )
+      ).toBeUndefined();
+    });
+  });
+
+  describe("findMatchField", () => {
+    const fieldOptions = [
+      {
+        label: "Organism Determination",
+        options: [
+          {
+            label: "Scientific Name Classification",
+            value: "organism.determination.scientificNameDetails",
+            parentPath: "organism.determination",
+            isDynamic: true
+          }
+        ]
+      }
+    ];
+
+    test("matches full dynamic classification path using originalColumn", () => {
+      const columnHeader: WorkbookColumnInfo = {
+        columnHeader: "Kingdom",
+        originalColumn: "organism.determination.scientificNameDetails.kingdom"
+      };
+
+      expect(
+        findMatchField(columnHeader, fieldOptions, "material-sample")
+      ).toBe("organism.determination.scientificNameDetails");
+    });
+
+    test("matches classification path when header and originalColumn are both full paths", () => {
+      const columnHeader: WorkbookColumnInfo = {
+        columnHeader: "organism.determination.scientificNameDetails.kingdom",
+        originalColumn: "organism.determination.scientificNameDetails.kingdom"
+      };
+
+      expect(
+        findMatchField(columnHeader, fieldOptions, "material-sample")
+      ).toBe("organism.determination.scientificNameDetails");
     });
   });
 

@@ -1414,6 +1414,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedExport_columnsToBeSaved: "Columns to be saved",
   export_columnsToExport: "Columns To Export",
   templateGenerator_columnsToGenerate: "Columns To Generate",
+  loadExistingTemplate: "Load Existing Template",
+  templateLoadedSuccessfully:
+    "Template has been loaded successfully. Template name and columns have been updated.",
+  templateColumnsUnmapped:
+    "The following columns could not be mapped: {columns}",
+  invalidTemplate:
+    "The uploaded template is invalid. Please ensure the template is generated from the template generator and has not been modified.",
   usage: "Usage",
   editContents: "Edit Contents",
   storageUnitGridTitle: "Storage Unit Grid",

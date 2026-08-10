@@ -1,6 +1,7 @@
 export * from "./types/WorkbookDataTypeEnum";
 export * from "./types/Workbook";
 export * from "./utils/useWorkbookConverter";
+export * from "./utils/useWorkbookConversion";
 export * from "./utils/workbookMappingUtils";
 export * from "./column-mapping/WorkbookColumnMapping";
 export * from "./WorkbookDisplay";
