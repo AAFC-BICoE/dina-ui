@@ -4676,19 +4676,19 @@ describe("Material Sample Edit Page", () => {
         [
           [
             {
-              resource: {
-                group: "aafc",
-                relationships: {
+              resource: expect.objectContaining({
+                group: "test group",
+                relationships: expect.objectContaining({
                   collectingEvent: {
                     data: {
                       id: "1",
                       type: "collecting-event"
                     }
                   }
-                },
+                }),
                 materialSampleName: "Sample2",
                 publiclyReleasable: false
-              },
+              }),
               type: "material-sample"
             }
           ],
@@ -4697,8 +4697,96 @@ describe("Material Sample Edit Page", () => {
       ]);
     });
 
-    it("When editing an existing material sample, save and copy to next, should save the current material sample and open a new form with the same values.", async () => {});
+    it("When editing an existing material sample, save and copy to next, should save the current material sample and open a new form with the same values.", async () => {
+      jest.clearAllMocks();
+      (useRouter as jest.Mock).mockReturnValue({
+        query: {
+          id: "2"
+        },
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Expect "Sample1" in the form since no copy from has been done yet.
+      expect(
+        wrapper.getByRole("textbox", { name: /primary id/i })
+      ).toHaveDisplayValue("Sample1");
+
+      // Make a change to the barcode.
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /barcode/i }),
+        "barcode1"
+      );
+
+      // Click the "Save & copy to next" button
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /save & copy to next/i })
+      );
+
+      // Material sample should be updated before preceeding to copy from it.
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Saves the Collecting Event and the Material Sampl properly.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          // Update the EXISTING material sample
+          [
+            {
+              resource: {
+                id: "2",
+                type: "material-sample",
+                barcode: "barcode1"
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+
+      // The next router should have pushed to the edit page for the new material sample.
+      expect(routerPushMock).toHaveBeenCalledWith(
+        "/collection/material-sample/edit?copyFromId=2&lastCreatedId=2"
+      );
+    });
+
+    it("When editing an existing material sample, save and copy to next, make no changes, expect no save request but continue the copy to next one.", async () => {
+      jest.clearAllMocks();
+      (useRouter as jest.Mock).mockReturnValue({
+        query: {
+          id: "2"
+        },
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Expect "Sample1" in the form since no copy from has been done yet.
+      expect(
+        wrapper.getByRole("textbox", { name: /primary id/i })
+      ).toHaveDisplayValue("Sample1");
+
+      // Click the "Save & copy to next" button
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /save & copy to next/i })
+      );
+
+      // Material sample should be updated before preceeding to copy from it.
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(0));
+
+      // The next router should have pushed to the edit page for the new material sample.
+      expect(routerPushMock).toHaveBeenCalledWith(
+        "/collection/material-sample/edit?copyFromId=2&lastCreatedId=2"
+      );
+    });
 
     it("Attachments should provide an alert to ask if you would like to include it in from a copy", () => {});
+
+    it("Storage unit should provide an alert to ask if you would like to include it in from a copy", () => {});
   });
 });
