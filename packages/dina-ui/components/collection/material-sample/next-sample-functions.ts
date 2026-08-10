@@ -36,7 +36,6 @@ export function nextSampleInitialValues(
   // Use the copied sample as a base, omitting some fields that shouldn't be copied:
   const {
     id: _id,
-    type: _type,
     createdOn: _createdOn,
     createdBy: _createdBy,
     resourceVersion: _resourceVersion,

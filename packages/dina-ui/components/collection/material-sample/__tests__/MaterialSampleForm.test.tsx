@@ -4785,8 +4785,87 @@ describe("Material Sample Edit Page", () => {
       );
     });
 
-    it("Attachments should provide an alert to ask if you would like to include it in from a copy", () => {});
+    it("Attachments should provide an alert to ask if you would like to include it in from a copy", async () => {
+      (useRouter as jest.Mock).mockReturnValue({
+        query: {
+          copyFromId: "1",
+          lastCreatedId: "1"
+        },
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitForLoadingToDisappear();
 
-    it("Storage unit should provide an alert to ask if you would like to include it in from a copy", () => {});
+      // Expect an alert at the top indicating that the attachment was not automatically copied over.
+      expect(
+        wrapper.getByText(
+          /the "attachment" data component was not automatically copied over since it's specific to the previous material sample\. would you like to duplicate it anyway\?/i
+        )
+      ).toBeInTheDocument();
+
+      // Since the "next" primary id could not be detected, just supply our own.
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /primary id/i }),
+        "Sample-10"
+      );
+
+      // Select the duplicate option
+      await userEvent.click(
+        wrapper.getByRole("button", {
+          name: /duplicate attachment from "my\-sample\-name"/i
+        })
+      );
+      await waitForLoadingToDisappear();
+
+      // Click "Save & Copy to Next".
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /save & copy to next/i })
+      );
+
+      // Material sample should be updated before preceeding to copy from it.
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Saves the Collecting Event and the Material Sampl properly.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          // Create the new material sample.
+          [
+            {
+              resource: expect.objectContaining({
+                materialSampleName: "Sample-10",
+                group: "test group",
+                relationships: expect.objectContaining({
+                  // Attachment copied over.
+                  attachment: {
+                    data: [
+                      {
+                        id: "attach-1",
+                        type: "metadata"
+                      }
+                    ]
+                  },
+
+                  // Collecting event automatically copied over.
+                  collectingEvent: {
+                    data: {
+                      id: "1",
+                      type: "collecting-event"
+                    }
+                  }
+                })
+              }),
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+
+      // The next router should have pushed to the edit page for the new material sample.
+      expect(routerPushMock).toHaveBeenCalledWith(
+        "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111&lastCreatedId=11111111-1111-1111-1111-111111111111"
+      );
+    });
   });
 });
