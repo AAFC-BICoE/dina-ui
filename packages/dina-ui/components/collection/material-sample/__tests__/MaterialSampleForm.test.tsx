@@ -4641,7 +4641,7 @@ describe("Material Sample Edit Page", () => {
 
       // The next router should have pushed to the edit page for the new material sample.
       expect(routerPushMock).toHaveBeenCalledWith(
-        "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111&lastCreatedId=11111111-1111-1111-1111-111111111111"
+        "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111"
       );
 
       // Now we will simiulate a new page load with these query params, the ids are different to match a mock but the previous
@@ -4649,8 +4649,7 @@ describe("Material Sample Edit Page", () => {
       jest.clearAllMocks();
       (useRouter as jest.Mock).mockReturnValue({
         query: {
-          copyFromId: "2",
-          lastCreatedId: "2"
+          copyFromId: "2"
         },
         push: routerPushMock,
         pathname: "/collection/material-sample/edit"
@@ -4658,7 +4657,14 @@ describe("Material Sample Edit Page", () => {
       wrapper.rerender(<MaterialSampleEditPage />);
       await waitForLoadingToDisappear();
 
-      // TODO: Expect the alert at the top indiciating the copy was successful.
+      // Ensure success message appears...
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(
+            /you are now working on a new copy based on "sample1"\. this copy will not be created until it's saved\./i
+          )
+        ).toBeInTheDocument();
+      });
 
       // Ensure the primary id was incremented.
       await waitFor(() => {
@@ -4749,7 +4755,7 @@ describe("Material Sample Edit Page", () => {
 
       // The next router should have pushed to the edit page for the new material sample.
       expect(routerPushMock).toHaveBeenCalledWith(
-        "/collection/material-sample/edit?copyFromId=2&lastCreatedId=2"
+        "/collection/material-sample/edit?copyFromId=2"
       );
     });
 
@@ -4781,15 +4787,14 @@ describe("Material Sample Edit Page", () => {
 
       // The next router should have pushed to the edit page for the new material sample.
       expect(routerPushMock).toHaveBeenCalledWith(
-        "/collection/material-sample/edit?copyFromId=2&lastCreatedId=2"
+        "/collection/material-sample/edit?copyFromId=2"
       );
     });
 
     it("Attachments should provide an alert to ask if you would like to include it in from a copy", async () => {
       (useRouter as jest.Mock).mockReturnValue({
         query: {
-          copyFromId: "1",
-          lastCreatedId: "1"
+          copyFromId: "1"
         },
         push: routerPushMock,
         pathname: "/collection/material-sample/edit"
@@ -4864,7 +4869,7 @@ describe("Material Sample Edit Page", () => {
 
       // The next router should have pushed to the edit page for the new material sample.
       expect(routerPushMock).toHaveBeenCalledWith(
-        "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111&lastCreatedId=11111111-1111-1111-1111-111111111111"
+        "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111"
       );
     });
   });

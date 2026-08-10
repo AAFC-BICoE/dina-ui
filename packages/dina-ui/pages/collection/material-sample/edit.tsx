@@ -24,7 +24,6 @@ export default function MaterialSampleEditPage() {
 
   const id = router.query.id?.toString();
   const copyFromId = router.query.copyFromId?.toString();
-  const lastCreatedId = router.query.lastCreatedId?.toString();
 
   const { formatMessage } = useDinaIntl();
 
@@ -43,9 +42,7 @@ export default function MaterialSampleEditPage() {
   }
 
   async function moveToNextSamplePage(savedId: string) {
-    await router.push(
-      `/collection/material-sample/edit?copyFromId=${savedId}&lastCreatedId=${savedId}`
-    );
+    await router.push(`/collection/material-sample/edit?copyFromId=${savedId}`);
   }
 
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
@@ -156,7 +153,7 @@ export default function MaterialSampleEditPage() {
                 value={{
                   originalSample,
                   notCopiedOverWarnings: copyWarnings ?? [],
-                  lastCreatedId: lastCreatedId ?? "",
+                  copyFromId: copyFromId ?? "",
                   removeWarning
                 }}
               >
