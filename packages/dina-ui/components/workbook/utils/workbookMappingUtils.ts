@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { ValidationError } from "yup";
+import { GeneratorColumn } from "common-ui";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 import {
   ColumnUniqueValues,
@@ -7,7 +8,10 @@ import {
   WorkbookJSON,
   WorkbookRow
 } from "../types/Workbook";
-import { WorkbookDataTypeEnum } from "../types/WorkbookDataTypeEnum";
+import {
+  WorkbookDataTypeDynamic,
+  WorkbookDataTypeEnum
+} from "../types/WorkbookDataTypeEnum";
 import { BULK_ADD_FILES_KEY } from "../../../pages/object-store/upload";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
@@ -236,7 +240,9 @@ export type FieldOptionType = {
     label: string;
     value: string;
     parentPath: string;
+    isDynamic?: boolean;
   }[];
+  isDynamic?: boolean;
 };
 
 /**
@@ -268,6 +274,10 @@ export function generateWorkbookFieldOptions(
       return;
     }
     const config = flattenedConfig[fieldPath];
+    const isDynamic = Object.values(WorkbookDataTypeDynamic).includes(
+      config.dataType as WorkbookDataTypeDynamic
+    );
+
     if (
       config.dataType !== WorkbookDataTypeEnum.OBJECT &&
       config.dataType !== WorkbookDataTypeEnum.OBJECT_ARRAY
@@ -285,7 +295,8 @@ export function generateWorkbookFieldOptions(
         const option = {
           label,
           value: fieldPath,
-          parentPath
+          parentPath,
+          isDynamic
         };
         nestedRowOptions.push(option);
       } else {
@@ -296,7 +307,8 @@ export function generateWorkbookFieldOptions(
           _.startCase(fieldPath);
         const option = {
           label,
-          value: fieldPath
+          value: fieldPath,
+          isDynamic
         };
         nonNestedRowOptions.push(option);
       }
@@ -332,6 +344,94 @@ export function generateWorkbookFieldOptions(
   return nonNestedRowOptions
     ? [...nonNestedRowOptions, ...groupedNestRowOptions]
     : [];
+}
+
+function formatFieldLabel(
+  fieldName: string,
+  formatMessage: (id, values?) => string
+) {
+  return fieldName
+    .split(".")
+    .map(
+      (part) =>
+        formatMessage(`field_${part}` as any)?.trim() ||
+        formatMessage(part as any)?.trim() ||
+        _.startCase(part)
+    )
+    .join(".");
+}
+
+function matchesFieldOption(option: FieldOptionType, fieldName: string) {
+  if (option.value === fieldName) {
+    return true;
+  }
+
+  return (
+    !!option.isDynamic &&
+    !!option.value &&
+    (fieldName?.startsWith?.(`${option.value}.`) ?? false)
+  );
+}
+
+function getFieldOptionLabel(option: FieldOptionType, fieldName: string) {
+  if (option.isDynamic && option.value && fieldName.includes(".")) {
+    return fieldName.substring(option.value.length + 1);
+  }
+
+  return option.label;
+}
+
+/**
+ * Generate a GeneratorColumn structure from the field name and the list of field options.
+ *
+ * @param fieldName The field name to find the matching field option for. Usually includes the path.
+ * @param fieldOptions All the possible field options to search through.
+ * @param formatMessage Function used for translation.
+ * @param alias Alias for the generated column.
+ * @param allowFallback true if a fallback should be generated if no match is found, false otherwise.
+ * @returns GeneratorColumn structure, undefined if no match is found and allowFallback is false.
+ * @see GeneratorColumn for the structure of the returned object.
+ * @see formatFieldLabel for how the label is generated to the user.
+ */
+export function getGeneratorColumnFromFieldName(
+  fieldName: string,
+  fieldOptions: FieldOptionType[],
+  formatMessage: (id, values?) => string,
+  alias = "",
+  allowFallback = false
+): GeneratorColumn | undefined {
+  for (const option of fieldOptions) {
+    if (!("options" in option) && matchesFieldOption(option, fieldName)) {
+      return {
+        columnLabel: getFieldOptionLabel(option, fieldName),
+        columnValue: fieldName,
+        columnAlias: alias ?? ""
+      };
+    }
+
+    if ("options" in option && option.options) {
+      const nestedOption = option.options.find((nested) =>
+        matchesFieldOption(nested, fieldName)
+      );
+      if (nestedOption) {
+        return {
+          columnLabel: getFieldOptionLabel(nestedOption, fieldName),
+          columnValue: fieldName,
+          columnAlias: alias ?? ""
+        };
+      }
+    }
+  }
+
+  if (allowFallback) {
+    return {
+      columnLabel: formatFieldLabel(fieldName, formatMessage),
+      columnValue: fieldName,
+      columnAlias: alias ?? ""
+    };
+  }
+
+  return undefined;
 }
 
 /**
@@ -468,14 +568,21 @@ function normalizeColumnHeader(
  */
 function flattenFieldOptions(
   fieldOptions: FieldOptionType[]
-): Array<{ label: string; value: string }> {
+): Array<{ label: string; value: string; isDynamic?: boolean }> {
   return fieldOptions.flatMap((opt) =>
     opt.options
       ? opt.options.map((nestOpt) => ({
           label: nestOpt.label,
-          value: nestOpt.value
+          value: nestOpt.value,
+          isDynamic: nestOpt.isDynamic
         }))
-      : [{ label: opt.label, value: opt.value! }]
+      : [
+          {
+            label: opt.label,
+            value: opt.value!,
+            isDynamic: opt.isDynamic
+          }
+        ]
   );
 }
 
@@ -520,7 +627,7 @@ function extractPrefix(
  * Match option when prefix exists
  */
 function matchWithPrefix(
-  option: { label: string; value: string },
+  option: { label: string; value: string; isDynamic?: boolean },
   normalizedHeader: string,
   prefixInfo: { prefix: string; suffixStart: number },
   synonymMap: Map<string, string>
@@ -529,6 +636,14 @@ function matchWithPrefix(
     synonymMap.get(prefixInfo.prefix) ?? prefixInfo.prefix
   ).toLowerCase();
   const optionValue = option.value.toLowerCase();
+
+  if (optionValue === normalizedHeader.toLowerCase()) {
+    return true;
+  }
+
+  if (option.isDynamic && normalizedHeader.startsWith(optionValue + ".")) {
+    return true;
+  }
 
   if (!optionValue.startsWith(normalizedPrefix)) {
     return false;
