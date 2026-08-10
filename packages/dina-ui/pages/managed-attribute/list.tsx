@@ -1,6 +1,5 @@
 import { CreateButton } from "common-ui";
-import { useRouter } from "next/router";
-
+import { useState } from "react";
 import PageLayout from "../../components/page/PageLayout";
 import {
   ManagedAttributeListView,
@@ -45,12 +44,11 @@ const TAB_META: ManagedAttributeTabMeta[] = [
 const TABS: ModuleTabConfig[] = TAB_META.map(({ titleKey }) => ({ titleKey }));
 
 export default function ManagedAttributesListPage() {
-  const router = useRouter();
-  const currentTab = router.query.tab ? Number(router.query.tab) : 0;
+  const [currentTab, setCurrentTab] = useState<number>(0);
 
   const buttonBar = (
     <div className="flex d-flex ms-auto">
-      {currentTab !== 0 && (
+      {currentTab > 1 && (
         <CreateButton entityLink={TAB_META[currentTab].prependLink} />
       )}
     </div>
@@ -60,8 +58,10 @@ export default function ManagedAttributesListPage() {
     <PageLayout titleId="managedAttributes" buttonBarContent={buttonBar}>
       <ModuleTabs
         tabs={TABS}
-        alertTabIndices={[0]}
-        alertOnly={true}
+        alertTabIndices={[0, 1]}
+        onSelect={setCurrentTab}
+        selectedIndex={currentTab}
+        id="managed-attribute-tabs"
         renderTabContent={(_tab, index) => {
           const meta = TAB_META[index];
           return (

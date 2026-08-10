@@ -4,7 +4,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface ModuleTabConfig {
-  /** key for the tab title */
+  /** i18n key for the tab title */
   titleKey: string;
 }
 
@@ -15,49 +15,79 @@ export interface ModuleTabsProps {
    * Indices of tabs that should show the "moved to controlled vocabulary" alert.
    */
   alertTabIndices?: number[];
-  /**
-   * If true, alert tabs show ONLY the alert (no content).
-   * If false, alert tabs show the alert ABOVE the content.
-   * Default: false.
-   */
-  alertOnly?: boolean;
   /** ID for the tabs container element */
   id?: string;
   /**
-   * Render function for each tab's content.
+   * Render function for each tab's inline content (inside the TabPanel).
+   * Receives the tab config and its index.
+   * Omit when content is rendered outside the tabs (e.g. sidebar + list below).
    */
-  renderTabContent: (tab: ModuleTabConfig, tabIndex: number) => ReactNode;
+  renderTabContent?: (tab: ModuleTabConfig, tabIndex: number) => ReactNode;
+  /**
+   * Controlled mode: current selected tab index.
+   * When provided, the component delegates tab state to the parent.
+   * Use with `onSelect`.
+   */
+  selectedIndex?: number;
+  /**
+   * Controlled mode: called when a tab is clicked.
+   * Use with `selectedIndex`.
+   */
+  onSelect?: (index: number) => void;
 }
 
 /**
- * Reusable module-scoped tabs component that can display an alert for certain tabs.
+ * Reusable module-scoped tabs component.  Each tab represents a DINA module
+ * (Collection, Object Store, Transactions, Sequence).
+ *
+ * Supports two usage modes:
+ *
+ * **Uncontrolled** — manages its own tab state and renders inline content
+ *   via `renderTabContent`.  Content is lazy-mounted per active tab.
+ *
+ * **Controlled** — parent manages tab state via `selectedIndex`/`onSelect`.
+ *   `renderTabContent` is optional; the parent renders content outside the
+ *   tabs (sidebar, list, etc.) driven by the selected index.
  */
 export function ModuleTabs({
   tabs,
   alertTabIndices = [],
-  alertOnly = false,
   id = "moduleTabs",
-  renderTabContent
+  renderTabContent,
+  selectedIndex: controlledIndex,
+  onSelect
 }: ModuleTabsProps) {
   const { formatMessage } = useDinaIntl();
-  const [currentTab, setCurrentTab] = useState<number>(0);
 
+  // Internal state for uncontrolled mode.
+  const [internalTab, setInternalTab] = useState<number>(0);
+
+  const isControlled = controlledIndex !== undefined;
+  const currentTab = isControlled ? controlledIndex : internalTab;
+
+  // Track which tabs have been visited so their TabPanel exists in the DOM.
   const [mountedTabs, setMountedTabs] = useState<Set<number>>(
-    () => new Set([0])
+    () => new Set([currentTab])
   );
 
-  const handleSelect = useCallback((index: number) => {
-    setCurrentTab(index);
-    setMountedTabs((prev) => {
-      if (prev.has(index)) return prev;
-      const next = new Set(prev);
-      next.add(index);
-      return next;
-    });
-  }, []);
+  const handleSelect = useCallback(
+    (index: number) => {
+      if (!isControlled) {
+        setInternalTab(index);
+      }
+      onSelect?.(index);
+      setMountedTabs((prev) => {
+        if (prev.has(index)) return prev;
+        const next = new Set(prev);
+        next.add(index);
+        return next;
+      });
+    },
+    [isControlled, onSelect]
+  );
 
   const showAlert = (tabIndex: number) => alertTabIndices.includes(tabIndex);
-  const hasListTabs = tabs.some((_, idx) => !showAlert(idx) || !alertOnly);
+  const hasListTabs = tabs.some((_, idx) => !showAlert(idx));
 
   return (
     <Tabs
@@ -74,7 +104,7 @@ export function ModuleTabs({
 
       {tabs.map((tab, index) => {
         const isAlertTab = showAlert(index);
-        const showContent = !isAlertTab || !alertOnly;
+        const showContent = !isAlertTab;
         const isActive = index === currentTab;
 
         return (
@@ -83,13 +113,16 @@ export function ModuleTabs({
               <ManagedAttributeMovedAlert moduleKey={tab.titleKey} />
             )}
 
-            {showContent && mountedTabs.has(index) && (
+            {showContent && mountedTabs.has(index) && renderTabContent && (
               <>
                 {hasListTabs && (
                   <h3 className="mb-3">
                     <DinaMessage id={tab.titleKey as any} />
                   </h3>
                 )}
+                {/*
+                 * Only render content for the active tab.
+                 */}
                 {isActive && renderTabContent(tab, index)}
               </>
             )}
@@ -101,9 +134,11 @@ export function ModuleTabs({
 }
 
 export interface ManagedAttributeMovedAlertProps {
+  /** i18n key for the module name, passed as the {module} parameter. */
   moduleKey: string;
 }
 
+/** Alert banner indicating resources have been moved to Controlled Vocabulary. */
 export function ManagedAttributeMovedAlert({
   moduleKey
 }: ManagedAttributeMovedAlertProps) {
