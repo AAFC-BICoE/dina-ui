@@ -163,6 +163,20 @@ function testMaterialSample(): InputResource<MaterialSample> {
   };
 }
 
+function testCopiedMaterialSample(): InputResource<MaterialSample> {
+  return {
+    id: "2",
+    type: "material-sample",
+    group: "test group",
+    materialSampleName: "Sample1",
+    collectingEvent: {
+      id: "1",
+      type: "collecting-event"
+    },
+    ...blankMaterialSample()
+  };
+}
+
 function testMaterialSampleNoCollectingEvent(): InputResource<MaterialSample> {
   return {
     id: "1",
@@ -245,6 +259,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       };
     case "collection-api/material-sample/1":
       return { data: testMaterialSample() };
+    case "collection-api/material-sample/2":
+      return { data: testCopiedMaterialSample() };
     case "collection-api/material-sample":
       return {
         data: [
@@ -4538,7 +4554,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   describe("save and copy to next functionality", () => {
-    it("When creating a new material sample, save and copy to next, should save the current material sample and open a new form with the same values.", async () => {
+    it("When creating a new material sample, save and copy to next, should save the current material sample and go to the next form", async () => {
       const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
       await waitFor(() => expect(wrapper.container).toBeInTheDocument());
 
@@ -4628,12 +4644,61 @@ describe("Material Sample Edit Page", () => {
         "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111&lastCreatedId=11111111-1111-1111-1111-111111111111"
       );
 
+      // Now we will simiulate a new page load with these query params, the ids are different to match a mock but the previous
+      // expectation is to ensure it's the correct one.
+      jest.clearAllMocks();
+      (useRouter as jest.Mock).mockReturnValue({
+        query: {
+          copyFromId: "2",
+          lastCreatedId: "2"
+        },
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+      wrapper.rerender(<MaterialSampleEditPage />);
       await waitForLoadingToDisappear();
 
-      // Todo: Seems to stay on the same page, look into figuring out why or how to get the next page to load properly for this test.
-      // screen.logTestingPlaygroundURL();
+      // TODO: Expect the alert at the top indiciating the copy was successful.
+
+      // Ensure the primary id was incremented.
+      await waitFor(() => {
+        expect(
+          wrapper.getByRole("textbox", { name: /primary id/i })
+        ).toHaveValue("Sample2");
+      });
+
+      // Saving should create a new material sample with a link to the existing collecting event.
+      await userEvent.click(wrapper.getByRole("button", { name: "Save" }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      expect(mockSave.mock.calls).toEqual([
+        // New material-sample:
+        [
+          [
+            {
+              resource: {
+                group: "aafc",
+                relationships: {
+                  collectingEvent: {
+                    data: {
+                      id: "1",
+                      type: "collecting-event"
+                    }
+                  }
+                },
+                materialSampleName: "Sample2",
+                publiclyReleasable: false
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
     });
 
     it("When editing an existing material sample, save and copy to next, should save the current material sample and open a new form with the same values.", async () => {});
+
+    it("Attachments should provide an alert to ask if you would like to include it in from a copy", () => {});
   });
 });
