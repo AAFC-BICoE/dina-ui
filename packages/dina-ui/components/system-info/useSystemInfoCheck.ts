@@ -2,25 +2,32 @@ import { useCallback, useState } from "react";
 import useSWR from "swr";
 import { ApiConfigInfo, ApiModule } from "../../types/system-info/SystemInfo";
 import { ApiInfo } from "../../types/system-info/ApiInfo";
-import { useApiClient } from "common-ui";
+import { useAccount, useApiClient } from "common-ui";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 
 export function useSystemInfoCheck(apiConfigs: ApiConfigInfo[]) {
   const { apiClient } = useApiClient();
+  const { isAdmin } = useAccount();
+  const { formatMessage } = useDinaIntl();
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
   const fetchAllModules = useCallback(async (): Promise<ApiModule[]> => {
     const results = await Promise.allSettled(
       apiConfigs.map(async (config): Promise<ApiModule> => {
+        // measure how long the api-info request takes, even when it fails
+        const startTime = performance.now();
         try {
           const response = await apiClient.get<ApiInfo>(
             `${config.apiEndpoint}/api-info`,
             {}
           );
+          const latencyMs = Math.round(performance.now() - startTime);
           const apiInfo = response.data;
           return {
             apiConfig: config,
             moduleVersion: apiInfo.id,
             status: "online",
+            latencyMs,
             messageProducerEnabled: apiInfo.messageProducer ?? false,
             messageConsumerEnabled: apiInfo.messageConsumer ?? false,
             attentionRequired: apiInfo.attentionRequired,
@@ -29,17 +36,18 @@ export function useSystemInfoCheck(apiConfigs: ApiConfigInfo[]) {
               : undefined
           };
         } catch (err: any) {
+          const latencyMs = Math.round(performance.now() - startTime);
           return {
             apiConfig: config,
-            moduleVersion: "unknown",
             status: "offline",
+            latencyMs,
             messageProducerEnabled: undefined,
             messageConsumerEnabled: undefined,
             attentionRequired: true,
             errorMessage:
               err?.cause?.data?.error ??
               err?.message ??
-              "Unable to reach service.",
+              formatMessage("systemInfoUnableToReachService"),
             errorStatus: err?.cause?.status,
             errorStatusText: err?.cause?.data?.path
               ? `${err.cause.data.path}`
@@ -57,18 +65,19 @@ export function useSystemInfoCheck(apiConfigs: ApiConfigInfo[]) {
         ? result.value
         : {
             apiConfig: apiConfigs[index],
-            moduleVersion: "unknown",
             status: "offline" as const,
             messageProducerEnabled: false,
             messageConsumerEnabled: false,
             attentionRequired: true,
-            errorMessage: result.reason?.message ?? "Unexpected error."
+            errorMessage:
+              result.reason?.message ?? formatMessage("systemInfoUnexpectedError")
           }
     );
-  }, [apiClient, apiConfigs]);
+  }, [apiClient, apiConfigs, formatMessage]);
 
   const { data, isValidating, error, mutate } = useSWR(
-    "system-info-check",
+    // The system info page is admin-only, so don't request anything for non-admin users
+    isAdmin ? "system-info-check" : null,
     fetchAllModules,
     {
       revalidateOnFocus: false,
