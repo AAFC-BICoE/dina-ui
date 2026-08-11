@@ -107,6 +107,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     queryTableMultiSortExplanation:
       "Pour trier la liste en fonction de plusieurs colonnes : Cliquez sur un en-tête de colonne pour trier par cette colonne, puis appuyez sur la touche Maj pendant que vous cliquez sur un autre en-tête.",
     queryTableMultiSortTooltipTitle: "Trier en fonction de plusieurs colonnes ",
+    refreshButtonText: "Actualiser",
     remarks: "Remarques",
     remove: "Retirer",
     resetButtonText: "Réinitialiser",
