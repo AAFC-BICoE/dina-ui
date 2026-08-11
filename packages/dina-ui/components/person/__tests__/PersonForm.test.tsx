@@ -1,7 +1,8 @@
 import { AddPersonButton, PersonForm } from "../PersonForm";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/objectstore-api";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 const mockSave = jest.fn();
 
@@ -43,20 +44,22 @@ describe("PersonForm", () => {
     });
 
     // Open modal:
-    fireEvent.click(wrapper.getByRole("button", { name: /add person/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /add person/i }));
 
     // Modify the displayName value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
-      target: { name: "displayName", value: "new test person" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "new test person"
+    );
 
     // Modify the email value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /email/i }), {
-      target: { name: "email", value: "person@example.com" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /email/i }),
+      "person@example.com"
+    );
 
     // Submit the form.
-    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
       expect(mockSave).lastCalledWith(
@@ -89,17 +92,19 @@ describe("PersonForm", () => {
     );
 
     // Fill in displayName and aliases
-    fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
-      target: { value: "New User" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "New User"
+    );
 
     // Add aliases (simulate user typing or using alias input component)
-    fireEvent.change(wrapper.getByRole("textbox", { name: /aliases/i }), {
-      target: { value: "alias1, alias2, alias3" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /aliases/i }),
+      "alias1, alias2, alias3"
+    );
 
     // Submit
-    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
       expect(mockSave).lastCalledWith(
@@ -133,12 +138,13 @@ describe("PersonForm", () => {
     );
 
     // 1. Modify ONLY the Display Name
-    fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
-      target: { value: "Updated Name" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "Updated Name"
+    );
 
     // 2. Submit
-    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
       expect(mockSave).lastCalledWith(
@@ -196,12 +202,13 @@ describe("PersonForm", () => {
 
     // CHANGE the displayName to trigger a submission with the changed value
     // This ensures the diff logic includes displayName in the payload
-    fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
-      target: { value: "New User" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "New User"
+    );
 
     // Submit the form
-    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
       expect(mockSave).lastCalledWith(
@@ -255,11 +262,12 @@ describe("PersonForm", () => {
     );
 
     // Change displayName to trigger form submission with a changed value
-    fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
-      target: { value: "Identified Person" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "Identified Person"
+    );
 
-    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
       // Expect 2 calls to save.
@@ -333,11 +341,11 @@ describe("PersonForm", () => {
     const removeBtn = await wrapper.findByRole("button", {
       name: /remove identifier/i
     });
-    fireEvent.click(removeBtn);
+    await userEvent.click(removeBtn);
 
     // 2. Wait for the Save button to reappear after the remove operation
     const saveBtn = await wrapper.findByRole("button", { name: /save/i });
-    fireEvent.click(saveBtn);
+    await userEvent.click(saveBtn);
 
     await waitFor(() => {
       // The afterSave logic should call save with a delete operation for the removed identifier
