@@ -3,10 +3,11 @@ import {
   MATERIAL_SAMPLE_MAPPING,
   mountWithAppContext,
   OBJECT_STORE_MAPPING,
+  selectDropdownOption,
   waitForLoadingToDisappear
 } from "common-ui";
 import "@testing-library/jest-dom";
-import { waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
@@ -42,7 +43,7 @@ const mockPush = jest.fn();
 let mockQuery = {
   entityLink: "/collection/material-sample",
   indexName: "dina_material_sample_index",
-  uniqueName: "material-sample-export"
+  uniqueName: "material-sample-list"
 };
 
 jest.mock("next/router", () => ({
@@ -111,7 +112,7 @@ describe("ExportPage Component", () => {
     mockQuery = {
       entityLink: "/collection/material-sample",
       indexName: "dina_material_sample_index",
-      uniqueName: "material-sample-export"
+      uniqueName: "material-sample-list"
     };
 
     // Default API Mock setup
@@ -183,14 +184,11 @@ describe("ExportPage Component", () => {
         });
 
         // Find template selection dropdown
-        const templateContainer = wrapper
-          .getByText(/select export template/i)
-          .closest("div")!;
-        const templateInput = templateContainer.querySelector(
-          "input"
-        ) as HTMLElement;
-
-        await userEvent.click(templateInput);
+        await selectDropdownOption(
+          wrapper,
+          /select export template/i,
+          "Material Sample Demo"
+        );
 
         // Wait for the option to appear, then click it
         const option = await wrapper.findByText("Material Sample Demo");
@@ -267,17 +265,7 @@ describe("ExportPage Component", () => {
       await waitForLoadingToDisappear();
 
       // Find the separator dropdown using the container approach
-      const separatorContainer = wrapper
-        .getByText(/separator/i)
-        .closest("div")!;
-      const separatorInput = separatorContainer.querySelector(
-        "input"
-      ) as HTMLElement;
-
-      // Open dropdown and select "TAB"
-      await userEvent.click(separatorInput);
-      const tabOption = await wrapper.findByText("Tab");
-      await userEvent.click(tabOption);
+      await selectDropdownOption(wrapper, /separator/i, "Tab");
 
       // Change the name
       await userEvent.type(
@@ -331,9 +319,9 @@ describe("ExportPage Component", () => {
     beforeEach(() => {
       // Set up router for Object Store Export
       mockQuery = {
-        entityLink: "/object-store/metadata",
+        entityLink: "/object-store/object",
         indexName: "dina_object_store_index",
-        uniqueName: "object-store-export"
+        uniqueName: "object-store-list"
       };
 
       // Set up sessionStorage with selected object store ids and total records count
@@ -344,8 +332,58 @@ describe("ExportPage Component", () => {
       );
     });
 
+    it("Basic object export request testing with name change", async () => {
+      const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Switch into "Object" mode.
+      await userEvent.click(wrapper.getByText(/objects/i));
+      await waitForLoadingToDisappear();
+
+      // Change the name:
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /export name/i }),
+        "object-export-1"
+      );
+
+      // Submit the export.
+      await userEvent.click(wrapper.getByRole("button", { name: /export/i }));
+
+      // Expect the correct network request.
+      expect(mockSave).toHaveBeenCalledWith(
+        [
+          {
+            resource: {
+              fileIdentifiers: [
+                "file-obj-1?include=derivatives",
+                "file-obj-2?include=derivatives"
+              ],
+              name: "object-export-1",
+              type: "object-export"
+            },
+            type: "object-export"
+          }
+        ],
+        {
+          apiBaseUrl: "/objectstore-api"
+        }
+      );
+    });
+
     it("renders and handles File Name Alias Field selection properly", async () => {});
 
-    it("renders and handles Resize Image options correctly in the submission payload", async () => {});
+    it("renders and handles Resize Image options correctly in the submission payload", async () => {
+      const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Switch into "Object" mode.
+      await userEvent.click(wrapper.getByText(/objects/i));
+      await waitForLoadingToDisappear();
+
+      // Select resize image to 50% instead.
+      await selectDropdownOption(wrapper, "Resize Images", "50%");
+
+      screen.logTestingPlaygroundURL();
+    });
   });
 });
