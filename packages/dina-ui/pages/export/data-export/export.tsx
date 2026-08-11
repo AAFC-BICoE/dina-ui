@@ -79,7 +79,7 @@ const SEPARATOR_OPTIONS: { value: ColumnSeparator; label: string }[] = [
 ];
 
 const RESIZE_OPTIONS = [
-  { value: 100, label: "Original (100%)" },
+  { value: 100, label: "100% - Original size" },
   { value: 90, label: "90%" },
   { value: 80, label: "80%" },
   { value: 70, label: "70%" },
@@ -424,6 +424,30 @@ export default function ExportPage<TData extends KitsuResource>() {
     </>
   );
 
+  const resizeControl = (
+    <div>
+      <div className="mb-2">
+        <strong>
+          <DinaMessage id="resizeImages" />
+        </strong>
+      </div>
+      <Select
+        className="mt-2 mb-3"
+        name="resizePercentage"
+        options={RESIZE_OPTIONS}
+        onChange={(selection) => {
+          if (selection) {
+            setResizePercentage(selection.value);
+          }
+        }}
+        isDisabled={loading || !allObjectsAreJpeg}
+        value={RESIZE_OPTIONS.find(
+          (option) => option.value === resizePercentage
+        )}
+      />
+    </div>
+  );
+
   const disableObjectExportButton =
     localStorageExportObjectIds.length < 1 ||
     totalRecords > MAX_OBJECT_EXPORT_TOTAL;
@@ -713,27 +737,17 @@ export default function ExportPage<TData extends KitsuResource>() {
                           )}
                         </div>
                       </div>
-                      {allObjectsAreJpeg && (
-                        <div className="col-md-4">
-                          <div className="mb-2">
-                            <strong>Resize Images</strong>
-                          </div>
-                          <Select
-                            className="mt-2 mb-3"
-                            name="resizePercentage"
-                            options={RESIZE_OPTIONS}
-                            onChange={(selection) => {
-                              if (selection) {
-                                setResizePercentage(selection.value);
-                              }
-                            }}
-                            isDisabled={loading}
-                            value={RESIZE_OPTIONS.find(
-                              (option) => option.value === resizePercentage
-                            )}
+                      <div className="col-md-4">
+                        {!allObjectsAreJpeg ? (
+                          <Tooltip
+                            id="resizeImagesJpegOnlyTooltip"
+                            disableSpanMargin={true}
+                            visibleElement={resizeControl}
                           />
-                        </div>
-                      )}
+                        ) : (
+                          resizeControl
+                        )}
+                      </div>
                     </>
                   )}
                 </div>
