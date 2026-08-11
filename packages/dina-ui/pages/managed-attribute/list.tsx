@@ -48,7 +48,7 @@ export default function ManagedAttributesListPage() {
 
   const buttonBar = (
     <div className="flex d-flex ms-auto">
-      {currentTab > 1 && (
+      {currentTab >= 1 && (
         <CreateButton entityLink={TAB_META[currentTab].prependLink} />
       )}
     </div>
@@ -58,7 +58,7 @@ export default function ManagedAttributesListPage() {
     <PageLayout titleId="managedAttributes" buttonBarContent={buttonBar}>
       <ModuleTabs
         tabs={TABS}
-        alertTabIndices={[0, 1]}
+        alertTabIndices={[0]}
         onSelect={setCurrentTab}
         selectedIndex={currentTab}
         id="managed-attribute-tabs"
