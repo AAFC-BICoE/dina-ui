@@ -346,7 +346,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                     .label
                 )
               : get(metadata, selectedFilenameAliasField.label);
-          if (metadata.derivatives) {
+          if (metadata?.derivatives?.find) {
             // If image has derivative, use large image derivative fileIdentifier
             const largeImageDerivative = metadata.derivatives.find(
               (derivative) => {
@@ -405,6 +405,9 @@ export default function ExportPage<TData extends KitsuResource>() {
       setLoading(false);
     }
   }
+
+  const displayManagedAttributes =
+    selectedFilenameAliasField?.dynamicField?.type === "managedAttribute";
 
   const LoadingSpinner = (
     <>
@@ -669,39 +672,47 @@ export default function ExportPage<TData extends KitsuResource>() {
                   {exportType === "OBJECT_ARCHIVE" && (
                     <>
                       <div className="col-md-4">
-                        <div className="mb-2">
-                          <strong>
-                            <DinaMessage id="fileNameAliasField" />
-                          </strong>
+                        <div className="row">
+                          <div className="col-md-12">
+                            <div className="mb-2">
+                              <strong>
+                                <DinaMessage id="fileNameAliasField" />
+                              </strong>
+                            </div>
+                            <QueryFieldSelector
+                              indexMap={indexMap as ESIndexMapping[]}
+                              currentField={selectedFilenameAliasField?.value}
+                              setField={(path) => {
+                                if (indexMap) {
+                                  const columnIndex = indexMap.find(
+                                    (index) => index.value === path
+                                  );
+                                  if (columnIndex) {
+                                    setSelectedFilenameAliasField(columnIndex);
+                                  }
+                                }
+                              }}
+                              isInColumnSelector={false}
+                            />
+                          </div>
+                          {displayManagedAttributes && (
+                            <div
+                              className="col-md-12"
+                              style={{ marginTop: "22px" }}
+                            >
+                              <QueryRowManagedAttributeSearch
+                                indexMap={indexMap}
+                                managedAttributeConfig={
+                                  selectedFilenameAliasField
+                                }
+                                isInColumnSelector={true}
+                                setValue={setDynamicFieldValue}
+                                value={dynamicFieldValue}
+                              />
+                            </div>
+                          )}
                         </div>
-                        <QueryFieldSelector
-                          indexMap={indexMap as ESIndexMapping[]}
-                          currentField={selectedFilenameAliasField?.value}
-                          setField={(path) => {
-                            if (indexMap) {
-                              const columnIndex = indexMap.find(
-                                (index) => index.value === path
-                              );
-                              if (columnIndex) {
-                                setSelectedFilenameAliasField(columnIndex);
-                              }
-                            }
-                          }}
-                          isInColumnSelector={false}
-                        />
                       </div>
-                      {selectedFilenameAliasField?.dynamicField?.type ===
-                        "managedAttribute" && (
-                        <div className="col-md-4" style={{ marginTop: "22px" }}>
-                          <QueryRowManagedAttributeSearch
-                            indexMap={indexMap}
-                            managedAttributeConfig={selectedFilenameAliasField}
-                            isInColumnSelector={true}
-                            setValue={setDynamicFieldValue}
-                            value={dynamicFieldValue}
-                          />
-                        </div>
-                      )}
                       {allObjectsAreJpeg && (
                         <div className="col-md-4">
                           <div className="mb-2">
