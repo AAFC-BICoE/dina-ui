@@ -1,5 +1,5 @@
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { ApiConfigInfo } from "packages/dina-ui/types/system-info/SystemInfo";
+import PageLayout from "../../components/page/PageLayout";
+import { ApiConfigInfo } from "../../types/system-info/SystemInfo";
 import { FaSyncAlt } from "react-icons/fa";
 import { ModuleCard } from "../../components/system-info/ModuleCard";
 import { useSystemInfoCheck } from "../../components/system-info/useSystemInfoCheck";
@@ -8,6 +8,7 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import { useAccount } from "common-ui";
 import { useRouter } from "next/router";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 /**
  * System Info Configuration:
@@ -55,12 +56,6 @@ export function SystemInfo() {
   const { isAdmin } = useAccount();
   const router = useRouter();
 
-  // Ensure the user is admin before allowing access to the page.
-  if (!isAdmin) {
-    // Route to homepage...
-    router.push("/");
-  }
-
   // The useSystemInfoCheck hook handles fetching the status and info for all modules defined in the config.
   const { modules, lastRefreshed, refresh, loading } = useSystemInfoCheck(
     SYSTEM_INFO_API_CONFIG
@@ -75,6 +70,17 @@ export function SystemInfo() {
     return () => clearInterval(interval);
   }, []);
 
+  // Ensure the user is admin before allowing access to the page.
+  useEffect(() => {
+    if (!isAdmin) {
+      // Route to homepage...
+      router.push("/");
+    }
+  }, [isAdmin]);
+  if (!isAdmin) {
+    return null;
+  }
+
   // Button to refresh the status of all modules
   const buttonBar = (
     <>
@@ -86,7 +92,7 @@ export function SystemInfo() {
         disabled={loading}
       >
         <FaSyncAlt className={"me-2 " + (loading ? "spin-slow" : "")} />
-        Refresh
+        <DinaMessage id="refreshButtonText" />
       </Button>
     </>
   );
@@ -107,7 +113,7 @@ export function SystemInfo() {
         {loading ? (
           <div className="d-flex align-items-center gap-2 text-muted small mb-3">
             <FaSyncAlt size={12} className="spin-slow" />
-            Fetching system info...
+            <DinaMessage id="systemInfoFetching" />
           </div>
         ) : (
           <>
@@ -115,7 +121,7 @@ export function SystemInfo() {
             {lastRefreshed && (
               <div className="d-flex align-items-center gap-2 text-muted small mb-3">
                 <FaSyncAlt size={12} />
-                Last refreshed:{" "}
+                <DinaMessage id="systemInfoLastRefreshed" />{" "}
                 <strong>
                   {moment(lastRefreshed).fromNow()} (
                   {moment(lastRefreshed).format("YYYY-MM-DD HH:mm:ss")})
