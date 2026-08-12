@@ -100,7 +100,7 @@ describe("ScheduledActionsField", () => {
     );
 
     // Add a second Action:
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /add new/i
       })
