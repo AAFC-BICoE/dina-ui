@@ -1517,6 +1517,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   systemInfoLastRefreshed: "Last refreshed:",
   systemInfoLatency: "Latency",
   systemInfoLatencyMs: "{latencyMs} ms",
+  refreshButtonText: "Refresh",
   systemInfoMessageConsumer: "Message Consumer",
   systemInfoMessageProducer: "Message Producer",
   systemInfoModuleInfo: "Module Info",

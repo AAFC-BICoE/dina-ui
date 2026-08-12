@@ -889,6 +889,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   systemInfoLastRefreshed: "Dernière actualisation :",
   systemInfoLatency: "Latence",
   systemInfoLatencyMs: "{latencyMs} ms",
+  refreshButtonText: "Actualiser",
   systemInfoMessageConsumer: "Consommateur de messages",
   systemInfoMessageProducer: "Producteur de messages",
   systemInfoModuleInfo: "Informations sur le module",
