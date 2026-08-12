@@ -264,6 +264,19 @@ describe("System Info page", () => {
     expect(latencyValues).toHaveLength(MODULE_NAMES.length);
   });
 
+  it("Displays the last refreshed time as a seconds counter.", async () => {
+    mountWithAppContext(<SystemInfoPage />, {
+      apiContext,
+      accountContext: adminAccount
+    });
+    await screen.findByText("Collection API");
+
+    // The relative time is displayed with second-level precision e.g. "0 seconds ago",
+    // so the text can visibly tick between refreshes.
+    const lastRefreshed = screen.getByText(/last refreshed/i).closest("div");
+    expect(lastRefreshed?.textContent).toMatch(/\d+ seconds? ago/);
+  });
+
   it("Fetches all the module statuses again when the refresh button is clicked.", async () => {
     mountWithAppContext(<SystemInfoPage />, {
       apiContext,
