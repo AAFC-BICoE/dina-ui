@@ -15,13 +15,13 @@ export function useSystemInfoCheck(apiConfigs: ApiConfigInfo[]) {
     const results = await Promise.allSettled(
       apiConfigs.map(async (config): Promise<ApiModule> => {
         // measure how long the api-info request takes, even when it fails
-        const startTime = performance.now();
+        const startTime = Date.now();
         try {
           const response = await apiClient.get<ApiInfo>(
             `${config.apiEndpoint}/api-info`,
             {}
           );
-          const latencyMs = Math.round(performance.now() - startTime);
+          const latencyMs = Date.now() - startTime;
           const apiInfo = response.data;
           return {
             apiConfig: config,
@@ -36,7 +36,7 @@ export function useSystemInfoCheck(apiConfigs: ApiConfigInfo[]) {
               : undefined
           };
         } catch (err: any) {
-          const latencyMs = Math.round(performance.now() - startTime);
+          const latencyMs = Date.now() - startTime;
           return {
             apiConfig: config,
             status: "offline",
