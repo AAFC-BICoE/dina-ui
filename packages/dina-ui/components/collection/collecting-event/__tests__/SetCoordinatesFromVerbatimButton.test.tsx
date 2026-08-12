@@ -1,7 +1,8 @@
 import { DinaForm, NumberField } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { SetCoordinatesFromVerbatimButton } from "../SetCoordinatesFromVerbatimButton";
-import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import React from "react";
 
@@ -33,7 +34,7 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
 
     // Simulate button click
     const button = screen.getByRole("button");
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // Check values of decimal latitude and longitude
     const latitudeInput = screen.getByRole("textbox", {
@@ -86,7 +87,7 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
     );
 
     const button = screen.getByRole("button", { name: /test button/i });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // Wait for the error message
     await waitFor(() => {
@@ -137,7 +138,7 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
     );
 
     const button = screen.getByRole("button", { name: /test button/i });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await waitFor(() => {
       const errorContainer = screen.getByText((_content, element) => {
@@ -184,7 +185,7 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
     );
 
     const button = screen.getByRole("button", { name: /test button/i });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // Wait for validation error message
     await waitFor(() => {
