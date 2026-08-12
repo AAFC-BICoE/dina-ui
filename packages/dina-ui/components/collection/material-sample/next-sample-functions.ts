@@ -128,7 +128,7 @@ export interface CopyToNextSampleContextI {
   originalSample: MaterialSample;
 
   /** UUID of the copied material sample */
-  lastCreatedId: string;
+  copyFromId: string;
 
   /** Warnings to display to the user and logic for adding it back if the user wants to. */
   notCopiedOverWarnings: NotCopiedOverWarning[];

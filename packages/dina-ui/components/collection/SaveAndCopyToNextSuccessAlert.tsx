@@ -1,11 +1,11 @@
 import { useDinaIntl } from "../../intl/dina-ui-intl";
-import { BsFillFileEarmarkCheckFill } from "react-icons/bs";
 import Link from "next/link";
 import { FaInfoCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
 import { useCopyToNextSample } from "./material-sample/next-sample-functions";
 import { useFormikContext } from "formik";
 import { useMaterialSampleSave } from "./material-sample/useMaterialSample";
+import { FaCopy } from "react-icons/fa6";
 
 export interface SaveAndCopyToNextSuccessAlertProps {
   id: string;
@@ -30,37 +30,41 @@ export function SaveAndCopyToNextSuccessAlert({
 
   return (
     <>
-      <div className="alert alert-success">
-        <div className="d-flex gap-2">
-          <div className="d-flex gap-3">
-            <BsFillFileEarmarkCheckFill
-              style={{ width: "24px", height: "24px" }}
-            />
-            <Link
-              href={`/${entityPath}/view?id=${id}`}
-              className={className}
-              passHref={true}
-            >
-              <span style={{ fontSize: "1.2em", font: "fw-bold" }}>
-                {" "}
-                {displayName}
+      <div className="alert alert-info">
+        <div className="d-flex align-items-center gap-3">
+          <FaCopy style={{ width: "30px", height: "30px", flexShrink: 0 }} />
+          <div>
+            <div>
+              <span>{formatMessage("saveSuccess")} "</span>
+              <Link
+                href={`/${entityPath}/view?id=${id}`}
+                className={className}
+                passHref={true}
+              >
+                <span>{displayName}</span>
+              </Link>
+              ".
+              <br />
+              <span className="small">
+                {formatMessage("copyToNextSampleInProgressMessage", {
+                  displayName
+                })}
               </span>
-            </Link>
+            </div>
           </div>
-
-          <span style={{ fontSize: "1.2em", font: "fw-bold" }}>
-            {formatMessage("created")}{" "}
-          </span>
         </div>
       </div>
+
       {copyToNextSampleInfo?.notCopiedOverWarnings &&
         copyToNextSampleInfo?.notCopiedOverWarnings.length > 0 && (
           <>
             {copyToNextSampleInfo.notCopiedOverWarnings.map((warning) => (
-              <div className="alert alert-info" key={warning.componentName}>
-                <div className="d-flex gap-3">
-                  <FaInfoCircle style={{ width: "24px", height: "24px" }} />
-                  <span style={{ fontSize: "1.2em", font: "fw-bold" }}>
+              <div className="alert alert-warning" key={warning.componentName}>
+                <div className="d-flex align-items-center gap-3">
+                  <FaInfoCircle
+                    style={{ width: "24px", height: "24px", flexShrink: 0 }}
+                  />
+                  <span className="fw-bold" style={{ fontSize: "1.2em" }}>
                     {formatMessage("saveAndCopyToNextWarning", {
                       componentName: warning.componentName
                     })}
