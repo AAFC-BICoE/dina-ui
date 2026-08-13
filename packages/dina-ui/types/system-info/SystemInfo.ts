@@ -6,9 +6,10 @@ export interface ApiConfigInfo {
 }
 
 export interface ApiModule {
-  moduleVersion: string;
+  moduleVersion?: string;
   status: ModuleStatus;
   apiConfig: ApiConfigInfo;
+  latencyMs?: number;
   messageProducerEnabled?: boolean;
   messageConsumerEnabled?: boolean;
   attentionRequired?: boolean;
