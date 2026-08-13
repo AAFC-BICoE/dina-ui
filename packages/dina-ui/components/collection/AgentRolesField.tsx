@@ -7,9 +7,9 @@ import {
   ReactTable,
   TextField
 } from "../../../common-ui/lib";
-import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { PersonName } from "../../../dina-ui/pages/loan-transaction/transaction/edit";
-import { AgentRole } from "../../../dina-ui/types/loan-transaction-api";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { PersonName } from "../../pages/loan-transaction/transaction/edit";
+import { AgentRole } from "../../types/loan-transaction-api";
 import { PersonSelectField } from "../resource-select-fields/resource-select-fields";
 import { TagSelectField } from "../tag-editor/TagSelectField";
 import { TabbedArrayField } from "./TabbedArrayField";
@@ -122,6 +122,7 @@ export function AgentRolesField({
               <VocabularySelectField
                 className="col-sm-6"
                 isMulti={true}
+                canAdd={false}
                 {...fieldProps("roles")}
                 path="collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=project_role"
               />

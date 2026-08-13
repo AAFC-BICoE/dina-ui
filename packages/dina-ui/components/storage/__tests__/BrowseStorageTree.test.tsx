@@ -132,7 +132,9 @@ describe("BrowseStorageTree component", () => {
     });
 
     // Open the top-level unit to show the nested units "B" and "C":
-    userEvent.click(wrapper.getByTestId("collapser-button-A").children[0]);
+    await userEvent.click(
+      wrapper.getByTestId("collapser-button-A").children[0]
+    );
 
     // Shows the nested storage units:
     await waitFor(() => {
@@ -145,7 +147,7 @@ describe("BrowseStorageTree component", () => {
     });
 
     // Select a storage:
-    userEvent.click(
+    await userEvent.click(
       within(wrapper.getByTestId("collapser-button-C")).getByRole("button")
     );
 
@@ -180,11 +182,11 @@ describe("BrowseStorageTree component", () => {
       });
     });
 
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /name/i }),
       "test-search-text"
     );
-    userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /search/i }));
 
     // With a filter, gets units from any level matching the search text:
     await waitFor(() => {
@@ -206,7 +208,7 @@ describe("BrowseStorageTree component", () => {
     });
 
     // Reset the search:
-    userEvent.click(wrapper.getByRole("button", { name: /reset/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /reset/i }));
 
     // No filter again (empty filter object):
     await waitFor(() => {

@@ -5,7 +5,7 @@ import {
   ResourceSelectFieldCustomQueryProps,
   SimpleSearchFilterBuilder,
   useAccount,
-  useAutocompleteSearchButFallbackToRsqlApiSearch
+  useAutocompleteSearchButFallbackToApiSearch
 } from "common-ui";
 import { SetOptional } from "type-fest";
 import { useAddPersonModal } from "..";
@@ -125,8 +125,8 @@ export function PersonSelectField(
     <ResourceSelectFieldCustomQuery<Person>
       {...props}
       // Experimental: try to use the dina-search-api autocomplete endpoint to get the data
-      // but fallback to the regular RSQL search if that fails.
-      useCustomQuery={useAutocompleteSearchButFallbackToRsqlApiSearch}
+      // but fallback to the regular API search if that fails.
+      useCustomQuery={useAutocompleteSearchButFallbackToApiSearch}
       customQueryOptions={(searchQuery, querySpec) => ({
         searchQuery,
         querySpec,
@@ -143,11 +143,17 @@ export function PersonSelectField(
       model="agent-api/person"
       // Show display name, and show aliases if any:
       optionLabel={(person) => {
-        return person.displayName
-          ? `${person.displayName}${
-              person.aliases?.length ? ` (${person.aliases.join(", ")})` : ""
-            }`
-          : null;
+        if (!person.displayName) {
+          return null;
+        }
+        const parts = [person.displayName];
+        if (person.aliases && person.aliases.length > 0) {
+          parts.push(`(${person.aliases.join(", ")})`);
+        }
+        if (person.email) {
+          parts.push(`<${person.email}>`);
+        }
+        return parts.join(" ");
       }}
       asyncOptions={[
         {
@@ -177,8 +183,8 @@ export function StorageUnitSelectField({
     <ResourceSelectFieldCustomQuery<StorageUnit>
       {...resourceProps}
       // Experimental: try to use the dina-search-api autocomplete endpoint to get the data
-      // but fallback to the regular RSQL search if that fails.
-      useCustomQuery={useAutocompleteSearchButFallbackToRsqlApiSearch}
+      // but fallback to the regular API search if that fails.
+      useCustomQuery={useAutocompleteSearchButFallbackToApiSearch}
       customQueryOptions={(searchQuery, querySpec) => ({
         searchQuery,
         querySpec,

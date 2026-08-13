@@ -1,7 +1,7 @@
 import { useQuery, withResponse } from "common-ui";
 import { useRouter } from "next/router";
-import { GroupForm } from "../../../dina-ui/components/group/GroupForm";
-import { Group } from "../../../dina-ui/types/user-api";
+import { GroupForm } from "../../components/group/GroupForm";
+import { Group } from "../../types/user-api";
 import PageLayout from "../../components/page/PageLayout";
 
 export default function PersonEditPage() {

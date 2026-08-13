@@ -51,14 +51,14 @@ export function NumberField(props: NumberFieldProps) {
       clearType={ClearType.Null}
       customInput={(inputProps, formik) => {
         function onBlur(event: FocusEvent<HTMLInputElement>) {
-          const error = validate?.(event.target.value);
+          const error = validate?.((event.target as HTMLTextAreaElement | HTMLInputElement).value);
           if (error) {
             formik.setFieldError(props.name, error);
           }
         }
 
         function onChange(e: ChangeEvent<HTMLInputElement>) {
-          const isBlank = e.target.value === "";
+          const isBlank = (e.target as HTMLTextAreaElement | HTMLInputElement).value === "";
           inputProps.onChange?.(
             isBlank ? ({ target: { value: null } } as any) : e
           );

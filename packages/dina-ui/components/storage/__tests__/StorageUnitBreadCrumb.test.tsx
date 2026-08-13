@@ -56,13 +56,13 @@ describe("StorageUnitBreadCrumb component", () => {
     );
 
     // Hover over image to show tooltip
-    userEvent.hover(wrapper.getByRole("img"));
+    await userEvent.hover(wrapper.getByRole("img"));
 
     // Test tooltip rendering while hovering on the img element
     await waitFor(() => {
       expect(
         wrapper.getByRole("tooltip", {
-          name: /c \(room\) > b \(cabinet\) > a \(box\)/i
+          name: /c \(room\) opens in new tab > b \(cabinet\) opens in new tab > a \(box\) opens in new tab/i
         })
       ).toBeInTheDocument();
     });
@@ -79,19 +79,20 @@ describe("StorageUnitBreadCrumb component", () => {
       wrapper.getAllByRole("link", { name: /a \(box\)/i })[0]
     ).toHaveAttribute("href", "/collection/storage-unit/view?id=A");
   });
+
   it("Renders the breadcrumb path from the parent's hierarchy", async () => {
     const wrapper = mountWithAppContext(
       <StorageUnitBreadCrumb storageUnit={storageUnitWithParentHierarchy} />
     );
 
     // Hover over image to show tooltip
-    userEvent.hover(wrapper.getByRole("img"));
+    await userEvent.hover(wrapper.getByRole("img"));
 
     // Test tooltip rendering while hovering on the img element
     await waitFor(() => {
       expect(
         wrapper.getByRole("tooltip", {
-          name: /c \(room\) > b \(cabinet\) > a \(box\)/i
+          name: /c \(room\) opens in new tab > b \(cabinet\) opens in new tab > a \(box\) opens in new tab/i
         })
       ).toBeInTheDocument();
     });
@@ -107,5 +108,39 @@ describe("StorageUnitBreadCrumb component", () => {
     expect(
       wrapper.getAllByRole("link", { name: /a \(box\)/i })[0]
     ).toHaveAttribute("href", "/collection/storage-unit/view?id=A");
+  });
+  it("Does not render a tooltip when parentStorageUnit exists but lacks hierarchy, and the unit itself has no hierarchy", async () => {
+    const unitWithBareParent: PersistedResource<StorageUnit> = {
+      id: "VIAL-1",
+      group: "group",
+      name: "vial test",
+      type: "storage-unit",
+      isGeneric: false,
+      storageUnitType: {
+        name: "vial",
+        id: "VIAL_TYPE",
+        type: "storage-unit-type",
+        group: "test-group"
+      },
+      parentStorageUnit: {
+        id: "BOX-1",
+        group: "group",
+        name: "box",
+        type: "storage-unit",
+        isGeneric: false
+      }
+    };
+
+    const wrapper = mountWithAppContext(
+      <StorageUnitBreadCrumb storageUnit={unitWithBareParent} />
+    );
+
+    // No tooltip should appear — parentStorageUnit exists but has no hierarchy,
+    // and the unit itself has no hierarchy, so parentPath is empty.
+    expect(wrapper.queryByRole("img")).not.toBeInTheDocument();
+    // The unit name should still be displayed.
+    expect(
+      wrapper.getByRole("link", { name: /vial test \(vial\)/i })
+    ).toBeInTheDocument();
   });
 });

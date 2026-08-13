@@ -11,6 +11,7 @@ import {
   isResourceEmpty,
   ResourceWithHooks,
   SaveArgs,
+  suppressUnsavedWarning,
   useApiClient,
   withoutBlankFields
 } from "common-ui";
@@ -65,7 +66,9 @@ export function StorageUnitBulkEditor({
     initialValues
   });
 
-  const bulkEditFormRef = useRef<FormikProps<InputResource<StorageUnit>>>(null);
+  const bulkEditFormRef = useRef<FormikProps<
+    InputResource<StorageUnit>
+  > | null>(null);
 
   const storageUnitHooks = getStorageUnitHooks(storageUnits);
 
@@ -342,6 +345,16 @@ function useBulkStorageUnitSave({
       const savedStorageUnitIds = savedStorageUnits.map(
         (storageUnit) => storageUnit.id
       );
+
+      // Suppress unsaved data warning before navigating
+      suppressUnsavedWarning();
+      // Reset form dirty states for good measure
+      bulkEditFormRef.current?.resetForm({
+        values: bulkEditFormRef.current.values
+      });
+      for (const { formRef } of resourceHooks) {
+        formRef.current?.resetForm({ values: formRef.current.values });
+      }
 
       await onSaved(savedStorageUnitIds);
     } catch (error: unknown) {

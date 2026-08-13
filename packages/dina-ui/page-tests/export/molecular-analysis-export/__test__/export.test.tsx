@@ -333,14 +333,16 @@ describe("ExportMolecularAnalysisPage", () => {
     });
 
     // Deselect all button:
-    userEvent.click(wrapper.getByRole("button", { name: /deselect all/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /deselect all/i })
+    );
     await waitForLoadingToDisappear();
 
     // Total attachments should be 0 now
     expect(wrapper.getByText("0")).toBeInTheDocument();
 
     // Select one of the runs only.
-    userEvent.click(wrapper.getByTestId("runSelected[0]"));
+    await userEvent.click(wrapper.getByTestId("runSelected[0]"));
 
     // Total attachments should be 1 now
     await waitFor(() => expect(wrapper.getByText("1")).toBeInTheDocument());
@@ -367,13 +369,13 @@ describe("ExportMolecularAnalysisPage", () => {
     });
 
     // Fill in Export Name
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /export name/i }),
       "Test Export"
     );
 
     // Click Export Button
-    userEvent.click(wrapper.getByRole("button", { name: /export/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /export/i }));
 
     // Wait for save to be called
     await waitFor(() => {
@@ -398,14 +400,6 @@ describe("ExportMolecularAnalysisPage", () => {
       ],
       { apiBaseUrl: "/objectstore-api" }
     );
-
-    // Verify it attempts to download it.
-    await waitFor(() =>
-      expect(mockGet).toHaveBeenCalledWith(
-        "dina-export-api/data-export/export-job-1",
-        {}
-      )
-    );
   });
 
   it("Fetches and includes Quality Controls when toggle is enabled", async () => {
@@ -429,7 +423,7 @@ describe("ExportMolecularAnalysisPage", () => {
     });
 
     // Enable Quality Control toggle
-    userEvent.click(wrapper.getByTestId("includeQualityControls"));
+    await userEvent.click(wrapper.getByTestId("includeQualityControls"));
 
     // Wait for the quality control attachments to be loaded.
     await waitFor(() => {
@@ -438,7 +432,7 @@ describe("ExportMolecularAnalysisPage", () => {
     });
 
     // Click Export Button
-    userEvent.click(wrapper.getByRole("button", { name: /export/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /export/i }));
 
     // Wait for save to be called
     await waitFor(() => {
@@ -467,14 +461,6 @@ describe("ExportMolecularAnalysisPage", () => {
         }
       ],
       { apiBaseUrl: "/objectstore-api" }
-    );
-
-    // Verify it attempts to download it.
-    await waitFor(() =>
-      expect(mockGet).toHaveBeenCalledWith(
-        "dina-export-api/data-export/export-job-1",
-        {}
-      )
     );
   });
 });

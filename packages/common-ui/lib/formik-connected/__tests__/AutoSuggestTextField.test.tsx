@@ -3,6 +3,7 @@ import { mountWithAppContext, SimpleSearchFilterBuilder } from "common-ui";
 import { AutoSuggestTextField } from "../AutoSuggestTextField";
 import { DinaForm } from "../DinaForm";
 import { act, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { simpleSearchFilterToFiql } from "../../filter-builder/fiql";
 
@@ -159,16 +160,16 @@ describe("AutoSuggestTextField", () => {
     fireEvent.focus(
       wrapper.getByRole("textbox", { name: /example person name field/i })
     );
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /example person name field/i }),
-      { target: { value: "p" } }
+      "p"
     );
 
     // Select the first option in the list.
     await waitFor(() => {
       expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
     });
-    fireEvent.click(wrapper.getByText(/person1\-json\-api/i));
+    await userEvent.click(wrapper.getByText(/person1\-json\-api/i));
 
     await waitFor(() => {
       expect(suggestionSelectedMock).toBeCalledTimes(1);
@@ -202,9 +203,9 @@ describe("AutoSuggestTextField", () => {
     fireEvent.focus(
       wrapper.getByRole("textbox", { name: /example person name field/i })
     );
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /example person name field/i }),
-      { target: { value: "p" } }
+      "p"
     );
 
     await waitFor(() => {
@@ -227,9 +228,10 @@ describe("AutoSuggestTextField", () => {
     fireEvent.focus(
       wrapper.getByRole("textbox", { name: /example person name field/i })
     );
-    fireEvent.change(
+    // Append "e" so the search value becomes "pe" with a single input event.
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /example person name field/i }),
-      { target: { value: "pe" } }
+      "e"
     );
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledTimes(2);
@@ -239,9 +241,8 @@ describe("AutoSuggestTextField", () => {
     fireEvent.focus(
       wrapper.getByRole("textbox", { name: /example person name field/i })
     );
-    fireEvent.change(
-      wrapper.getByRole("textbox", { name: /example person name field/i }),
-      { target: { value: "" } }
+    await userEvent.clear(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
     );
     await new Promise((resolve) => setTimeout(resolve, 50));
 
@@ -267,9 +268,9 @@ describe("AutoSuggestTextField", () => {
     fireEvent.focus(
       wrapper.getByRole("textbox", { name: /example person name field/i })
     );
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /example person name field/i }),
-      { target: { value: "p" } }
+      "p"
     );
 
     // Expected suggestions to appear.
@@ -318,9 +319,10 @@ describe("AutoSuggestTextField", () => {
     fireEvent.focus(
       wrapper.getByRole("textbox", { name: /example person name field/i })
     );
-    fireEvent.change(
+    // Append "e" so the search value becomes "pe" with a single input event.
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /example person name field/i }),
-      { target: { value: "pe" } }
+      "e"
     );
 
     await waitFor(() => {
@@ -331,9 +333,8 @@ describe("AutoSuggestTextField", () => {
     fireEvent.focus(
       wrapper.getByRole("textbox", { name: /example person name field/i })
     );
-    fireEvent.change(
-      wrapper.getByRole("textbox", { name: /example person name field/i }),
-      { target: { value: "" } }
+    await userEvent.clear(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
     );
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(mockGetAxios).toHaveBeenCalledTimes(2);
@@ -358,9 +359,9 @@ describe("AutoSuggestTextField", () => {
     fireEvent.focus(
       wrapper.getByRole("textbox", { name: /example person name field/i })
     );
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /example person name field/i }),
-      { target: { value: "3" } }
+      "3"
     );
 
     // Expected suggestions to appear.
@@ -404,9 +405,9 @@ describe("AutoSuggestTextField", () => {
     fireEvent.focus(
       wrapper.getByRole("textbox", { name: /example person name field/i })
     );
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /example person name field/i }),
-      { target: { value: "p" } }
+      "p"
     );
 
     await waitFor(() => {
@@ -471,7 +472,7 @@ describe("AutoSuggestTextField", () => {
       // Simulate typing "p"
       await act(async () => {
         fireEvent.focus(textField);
-        fireEvent.change(textField, { target: { value: "p" } });
+        await userEvent.type(textField, "p");
       });
 
       // JSON API should be tried first but fails, then Elastic Search is used.
@@ -493,9 +494,9 @@ describe("AutoSuggestTextField", () => {
         wrapper.queryByText(/person3\-elastic\-search/i)
       ).toBeInTheDocument();
 
-      // Simulate typing "pe" (change from "p" to "pe")
+      // Simulate typing "pe" (append "e" so the value changes from "p" to "pe")
       await act(async () => {
-        fireEvent.change(textField, { target: { value: "pe" } });
+        await userEvent.type(textField, "e");
       });
 
       // JSON API should *not* be called again for "pe" because it failed previously and should have switched permanently to Elastic Search.
@@ -537,9 +538,9 @@ describe("AutoSuggestTextField", () => {
       fireEvent.focus(
         wrapper.getByRole("textbox", { name: /example person name field/i })
       );
-      fireEvent.change(
+      await userEvent.type(
         wrapper.getByRole("textbox", { name: /example person name field/i }),
-        { target: { value: "p" } }
+        "p"
       );
 
       // Elastic Search should be tried first, but fails.
@@ -555,9 +556,10 @@ describe("AutoSuggestTextField", () => {
       fireEvent.focus(
         wrapper.getByRole("textbox", { name: /example person name field/i })
       );
-      fireEvent.change(
+      // Append "e" so the search value becomes "pe" with a single input event.
+      await userEvent.type(
         wrapper.getByRole("textbox", { name: /example person name field/i }),
-        { target: { value: "pe" } }
+        "e"
       );
 
       // JSON API should not be called again at this point. Already failed and should have switched to

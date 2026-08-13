@@ -1,4 +1,4 @@
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import React from "react";
 import { FaCheck, FaCopy } from "react-icons/fa";
 

@@ -9,7 +9,12 @@ import {
   useQuery
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute, Vocabulary } from "../../../types/collection-api";
+import {
+  ControlledVocabularyItem,
+  ManagedAttribute,
+  Vocabulary,
+  VocabularyElement
+} from "../../../types/collection-api";
 import { useWorkbookContext } from "../WorkbookProvider";
 import {
   LinkOrCreateSetting,
@@ -32,7 +37,14 @@ import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { ResourceNameIdentifier } from "../../../types/common/resources/ResourceNameIdentifier";
-import { PersonSelectField, ProjectSelectField } from "../../resource-select-fields/resource-select-fields";
+import {
+  PersonSelectField,
+  ProjectSelectField
+} from "../../resource-select-fields/resource-select-fields";
+import {
+  COLLECTION_MANAGED_ATTRIBUTE_ID,
+  COLLECTION_OTHER_IDENTIFIERS_ID
+} from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export function useColumnMapping() {
   const { formatMessage } = useDinaIntl();
@@ -86,14 +98,32 @@ export function useColumnMapping() {
   const {
     loading: attrLoadingMaterialSample,
     response: attrRespMaterialSample
-  } = useQuery<ManagedAttribute[]>({
-    path: "collection-api/managed-attribute",
-    filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
-      .where("managedAttributeComponent", "IN", [
+  } = useQuery<ControlledVocabularyItem[]>({
+    path: "collection-api/controlled-vocabulary-item",
+    filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+      .where("dinaComponent", "IN", [
         "MATERIAL_SAMPLE",
         "PREPARATION",
-        "COLLECTING_EVENT"
+        "COLLECTING_EVENT",
+        "ORGANISM",
+        "DETERMINATION"
       ])
+      .where(
+        "controlledVocabulary.uuid" as any,
+        "EQ",
+        COLLECTION_MANAGED_ATTRIBUTE_ID
+      )
+      .build(),
+    page: { limit: 1000 }
+  });
+
+  const {
+    loading: attrLoadingMaterialSampleOtherIdentifiers,
+    response: attrRespMaterialSampleOtherIdentifiers
+  } = useQuery<ControlledVocabularyItem[]>({
+    path: "collection-api/controlled-vocabulary-item",
+    filter: SimpleSearchFilterBuilder.create()
+      .where("controlledVocabulary.uuid", "EQ", COLLECTION_OTHER_IDENTIFIERS_ID)
       .build(),
     page: { limit: 1000 }
   });
@@ -220,12 +250,16 @@ export function useColumnMapping() {
     projectLoading ||
     personLoading ||
     taxonomicRankLoading ||
-    metadataLoading;
+    metadataLoading ||
+    attrLoadingMaterialSampleOtherIdentifiers;
 
-  const managedAttributes = [
+  // Eventually this will all be controlled vocabulary.
+  const managedAttributes: any[] = [
     ...(attrRespMaterialSample?.data ?? []),
     ...(attrRespMetadata?.data ?? [])
   ];
+
+  const identifiers = attrRespMaterialSampleOtherIdentifiers?.data ?? [];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
   const assemblages = (assemblageResp?.data || []).map((item) => ({
     ...item,
@@ -289,8 +323,51 @@ export function useColumnMapping() {
         ).length,
         valueMapping: {
           columnHeader: {
-            id: targetManagedAttr.id,
+            id: targetManagedAttr.id ?? "",
             type: targetManagedAttr.type
+          }
+        }
+      };
+    } else {
+      newWorkbookColumnMap[columnHeader] = {
+        fieldPath,
+        originalColumnName: originalColumnHeader,
+        showOnUI: true,
+        mapRelationship: false,
+        numOfUniqueValues: Object.keys(
+          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+        ).length,
+        valueMapping: {}
+      };
+    }
+  }
+
+  function handleOtherIdentifierMapping(
+    columnHeader: string,
+    newWorkbookColumnMap: WorkbookColumnMap
+  ) {
+    const originalColumnHeader = columnHeader;
+    columnHeader = columnHeader.replaceAll(".", "_");
+
+    const fieldPath = "identifiers";
+    const targetIdentifierAttr = identifiers.find(
+      (item) =>
+        item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+    );
+
+    if (targetIdentifierAttr) {
+      newWorkbookColumnMap[columnHeader] = {
+        fieldPath,
+        originalColumnName: originalColumnHeader,
+        showOnUI: true,
+        mapRelationship: false,
+        numOfUniqueValues: Object.keys(
+          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+        ).length,
+        valueMapping: {
+          columnHeader: {
+            id: targetIdentifierAttr.key,
+            type: targetIdentifierAttr.type
           }
         }
       };
@@ -313,21 +390,21 @@ export function useColumnMapping() {
     newWorkbookColumnMap: WorkbookColumnMap
   ) {
     const originalColumnHeader = columnHeader;
-    columnHeader = columnHeader.replaceAll(".", "_");
+    const columnHeaderValue = columnHeader.replaceAll(".", "_");
 
     const fieldPath = "organism.determination.scientificNameDetails";
-    const targetTaxonomicRank = taxonomicRanks.find(
-      (item) =>
-        item.name?.toLowerCase().trim() === columnHeader.toLowerCase().trim()
-    );
+    const targetTaxonomicRank = findTaxonomicRankFromColumn({
+      columnHeader: originalColumnHeader,
+      originalColumn: originalColumnHeader
+    });
     if (targetTaxonomicRank) {
-      newWorkbookColumnMap[columnHeader] = {
+      newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
         originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
-          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+          columnUniqueValues?.[sheet]?.[columnHeaderValue] ?? {}
         ).length,
         valueMapping: {
           columnHeader: {
@@ -337,13 +414,13 @@ export function useColumnMapping() {
         }
       };
     } else {
-      newWorkbookColumnMap[columnHeader] = {
+      newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
         originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
-          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+          columnUniqueValues?.[sheet]?.[columnHeaderValue] ?? {}
         ).length,
         valueMapping: {}
       };
@@ -375,12 +452,29 @@ export function useColumnMapping() {
       return undefined;
     }
 
+    // Depending on if it's a controlled vocabulary managed attribute or legacy managed attribute,
+    // the dina component will be stored in a different part.
+    const configDataComponent =
+      config?.managedAttributeComponent ?? config?.filter?.dinaComponent;
+
+    // Find the matching managed attribute based on the key and the dina component.
     return managedAttributes.find(
       (managedAttribute) =>
         managedAttribute.key === key &&
-        (config.managedAttributeComponent === "ENTITY" ||
-          managedAttribute.managedAttributeComponent ===
-            config.managedAttributeComponent)
+        (configDataComponent === "ENTITY" ||
+          managedAttribute?.dinaComponent === configDataComponent)
+    );
+  }
+
+  function findTaxonomicRankFromColumn(
+    columnHeader: WorkbookColumnInfo
+  ): VocabularyElement | undefined {
+    const rankName =
+      columnHeader.originalColumn?.split(".").at(-1) ??
+      columnHeader.columnHeader;
+    return taxonomicRanks.find(
+      (item) =>
+        item.name?.toLowerCase().trim() === rankName?.toLowerCase().trim()
     );
   }
 
@@ -436,11 +530,24 @@ export function useColumnMapping() {
         ) > -1
       ) {
         handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
+      } else if (
+        identifiers.findIndex(
+          (item) =>
+            item.name.toLowerCase().trim() ===
+            columnHeaderValue.toLowerCase().trim()
+        ) > -1
+      ) {
+        handleOtherIdentifierMapping(
+          originalColumnHeader,
+          newWorkbookColumnMap
+        );
       }
     } else if (fieldPath === "organism.determination.scientificNameDetails") {
       handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath === "managedAttributes") {
       handleManagedAttributeMapping(originalColumnHeader, newWorkbookColumnMap);
+    } else if (fieldPath === "identifiers") {
+      handleOtherIdentifierMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath?.startsWith("parentMaterialSample")) {
       const { valueMapping, multipleValueMappings } =
         await resolveParentMapping(originalColumnHeader);
@@ -455,13 +562,16 @@ export function useColumnMapping() {
         multipleValueMappings
       };
     } else {
+      const lastDotIndex = fieldPath.lastIndexOf(".");
+
       const mapRelationship =
         // Check if there's a dot in the fieldPath
-        fieldPath.lastIndexOf(".") > -1 &&
+        lastDotIndex > -1 &&
         // Extract everything except the last dot
-        flattenedConfig[fieldPath.substring(0, fieldPath.lastIndexOf("."))]
-          ?.relationshipConfig?.linkOrCreateSetting ===
-          LinkOrCreateSetting.LINK;
+        [LinkOrCreateSetting.LINK, LinkOrCreateSetting.LINK_UUID_ONLY].includes(
+          flattenedConfig[fieldPath.substring(0, lastDotIndex)]
+            ?.relationshipConfig?.linkOrCreateSetting
+        );
 
       newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
@@ -529,16 +639,17 @@ export function useColumnMapping() {
               columnHeaderValue.toLowerCase().trim()
           );
 
-        // check if the columnHeaderValue is one of taxonomicRankss
-        const targetTaxonomicRank = taxonomicRanks.find(
+        // check if the columnHeaderValue is one of identifiers
+        const identifierTargetAttr = identifiers.find(
           (item) =>
-            item.name?.toLowerCase().trim() ===
+            item.name.toLowerCase().trim() ===
             columnHeaderValue.toLowerCase().trim()
         );
+
+        // check if the columnHeaderValue is one of taxonomicRankss
+        const targetTaxonomicRank = findTaxonomicRankFromColumn(columnHeader);
         if (targetManagedAttr) {
-          if (
-            targetManagedAttr.managedAttributeComponent === "MATERIAL_SAMPLE"
-          ) {
+          if (targetManagedAttr.dinaComponent === "MATERIAL_SAMPLE") {
             map.push({
               targetField: "managedAttributes",
               skipped: false,
@@ -546,9 +657,7 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
-          } else if (
-            targetManagedAttr.managedAttributeComponent === "PREPARATION"
-          ) {
+          } else if (targetManagedAttr.dinaComponent === "PREPARATION") {
             map.push({
               targetField: "preparationManagedAttributes",
               skipped: false,
@@ -556,11 +665,25 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
-          } else if (
-            targetManagedAttr.managedAttributeComponent === "COLLECTING_EVENT"
-          ) {
+          } else if (targetManagedAttr.dinaComponent === "COLLECTING_EVENT") {
             map.push({
               targetField: "collectingEvent.managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr,
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
+            });
+          } else if (targetManagedAttr.dinaComponent === "ORGANISM") {
+            map.push({
+              targetField: "organism.managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr,
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
+            });
+          } else if (targetManagedAttr.dinaComponent === "DETERMINATION") {
+            map.push({
+              targetField: "organism.determination.managedAttributes",
               skipped: false,
               targetKey: targetManagedAttr,
               columnHeader: columnHeader.columnHeader,
@@ -583,6 +706,14 @@ export function useColumnMapping() {
             columnHeader: columnHeader.columnHeader,
             originalColumn: columnHeader.originalColumn
           });
+        } else if (identifierTargetAttr) {
+          map.push({
+            targetField: "identifiers",
+            skipped: false,
+            targetKey: identifierTargetAttr,
+            columnHeader: columnHeader.columnHeader,
+            originalColumn: columnHeader.originalColumn
+          });
         } else {
           map.push({
             targetField: fieldPath,
@@ -592,9 +723,15 @@ export function useColumnMapping() {
           });
         }
       } else {
+        const targetTaxonomicRank =
+          fieldPath === "organism.determination.scientificNameDetails"
+            ? findTaxonomicRankFromColumn(columnHeader)
+            : undefined;
+
         map.push({
           targetField: fieldPath,
           skipped: false,
+          targetKey: targetTaxonomicRank,
           columnHeader: columnHeader.columnHeader,
           originalColumn: columnHeader.originalColumn
         });
@@ -713,8 +850,10 @@ export function useColumnMapping() {
             theRelationshipMapping[columnHeader][sanitizedKey] = [found];
           } else {
             // Store only id and type for single-select
-            theRelationshipMapping[columnHeader][sanitizedKey] =
-              _.pick(found, ["id", "type"]);
+            theRelationshipMapping[columnHeader][sanitizedKey] = _.pick(found, [
+              "id",
+              "type"
+            ]);
           }
         } else {
           // No value was found without string splitting
@@ -791,6 +930,7 @@ export function useColumnMapping() {
             projects.find((item) => compareAlphanumeric(item.name, value));
           break;
         case "collectingEvent.collectors.displayName":
+        case "organism.determination.determiner.displayName":
         case "preparedBy.displayName":
         case "dcCreator.displayName":
           found =
@@ -897,6 +1037,7 @@ export function useColumnMapping() {
         targetType = "project";
         break;
       case "collectingEvent.collectors.displayName":
+      case "organism.determination.determiner.displayName":
       case "preparedBy.displayName":
       case "dcCreator.displayName":
         options = persons.map((resource) => ({

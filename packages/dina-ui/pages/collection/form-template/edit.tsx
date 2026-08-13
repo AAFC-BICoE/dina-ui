@@ -18,24 +18,19 @@ import _ from "lodash";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { Promisable } from "type-fest";
-import {
-  MaterialSampleForm,
-  useMaterialSampleSave
-} from "../../../../dina-ui/components";
+import { MaterialSampleForm, useMaterialSampleSave } from "../../../components";
 import {
   getMaterialSampleComponentValues,
   getComponentOrderFromTemplate,
   getComponentValues,
   getFormTemplateCheckboxes
-} from "../../../../dina-ui/components/form-template/formTemplateUtils";
-import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
-import PageLayout from "../../../../dina-ui/components/page/PageLayout";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../dina-ui/intl/dina-ui-intl";
+} from "../../../components/form-template/formTemplateUtils";
+import { GroupSelectField } from "../../../components/group-select/GroupSelectField";
+import PageLayout from "../../../components/page/PageLayout";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
   FIELD_EXTENSIONS_COMPONENT_NAME,
   FormTemplate,
@@ -355,6 +350,8 @@ function getDataComponentsStateMap(dataComponentState) {
     dataComponentState.enableRestrictions;
   dataComponentEnabledMap[SCHEDULED_ACTIONS_COMPONENT_NAME] =
     dataComponentState.enableScheduledActions;
+  dataComponentEnabledMap[CITATIONS_COMPONENT_NAME] =
+    dataComponentState.enableCitations;
   dataComponentEnabledMap[STORAGE_COMPONENT_NAME] =
     dataComponentState.enableStorage;
   dataComponentEnabledMap[FIELD_EXTENSIONS_COMPONENT_NAME] = true;

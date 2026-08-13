@@ -1,9 +1,9 @@
 import { mountWithAppContext } from "common-ui";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import DerivativeEditPage from "../../../../pages/object-store/derivative/edit";
-import { screen, cleanup } from "@testing-library/react";
+import { cleanup } from "@testing-library/react";
 
 const mockGet = jest.fn(async (path) => {
   switch (path) {
@@ -111,7 +111,6 @@ const mockUseRouter = jest.fn();
 jest.mock("next/router", () => ({
   useRouter: () => mockUseRouter()
 }));
-jest.mock("node-fetch", () => jest.fn());
 
 describe("Derivative single record edit page.", () => {
   afterEach(() => {
@@ -135,21 +134,36 @@ describe("Derivative single record edit page.", () => {
     expect(wrapper.getByText(/paleontology/i)).toBeInTheDocument();
 
     // Set new values:
-    userEvent.click(wrapper.getByRole("button", { name: /remove specimen/i }));
-    userEvent.click(
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove specimen/i })
+    );
+    await userEvent.click(
       wrapper.getByRole("button", { name: /remove paleontology/i })
     );
 
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 1" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 1"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 1"/i })
+    );
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 2" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 2"/i })
+    );
 
-    userEvent.click(wrapper.getByRole("switch"));
+    const publiclyReleasableSelect = within(
+      wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
+    ).getByRole("combobox");
+
+    fireEvent.keyDown(publiclyReleasableSelect, { key: "ArrowDown" });
+
+    fireEvent.click(
+      wrapper.getByRole("option", { name: /yes - publicly releasable/i })
+    );
+
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
     // Check only the changed values
@@ -182,27 +196,39 @@ describe("Derivative single record edit page.", () => {
       expect(wrapper.getByText(/IMAGE/i)).toBeInTheDocument();
     });
 
-    screen.logTestingPlaygroundURL();
-
     expect(wrapper.getByText(/specimen/i)).toBeInTheDocument();
     expect(wrapper.getByText(/paleontology/i)).toBeInTheDocument();
 
     // Set new values:
-    userEvent.click(wrapper.getByRole("button", { name: /remove specimen/i }));
-    userEvent.click(
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove specimen/i })
+    );
+    await userEvent.click(
       wrapper.getByRole("button", { name: /remove paleontology/i })
     );
 
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 1" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 1"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 1"/i })
+    );
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 2" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 2"/i })
+    );
 
-    userEvent.click(wrapper.getByRole("switch"));
+    const publiclyReleasableSelect = within(
+      wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
+    ).getByRole("combobox");
+
+    fireEvent.keyDown(publiclyReleasableSelect, { key: "ArrowDown" });
+
+    fireEvent.click(
+      wrapper.getByRole("option", { name: /no - not publicly releasable/i })
+    );
 
     await waitFor(() => {
       expect(

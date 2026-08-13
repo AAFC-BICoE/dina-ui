@@ -1,7 +1,7 @@
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useSavedSearchModal } from "./useSavedSearchModal";
-import { UserPreference } from "../../../../dina-ui/types/user-api";
+import { UserPreference } from "@dina-ui/types/user-api";
 import { useAccount } from "../../account/AccountProvider";
 import { useModal } from "../../modal/modal";
 import { SaveArgs, useApiClient } from "../../api-client/ApiClientContext";
@@ -548,8 +548,7 @@ export function SavedSearch({
         type: "user-preference"
       };
       await save([saveArgs], {
-        apiBaseUrl: "/user-api",
-        skipOperationForSingleRequest: true
+        apiBaseUrl: "/user-api"
       });
 
       // Trigger a reload of the user preferences.
@@ -592,8 +591,7 @@ export function SavedSearch({
           type: "user-preference"
         };
         await save([saveArgs], {
-          apiBaseUrl: "/user-api",
-          skipOperationForSingleRequest: true
+          apiBaseUrl: "/user-api"
         });
 
         // Unselect the saved search.

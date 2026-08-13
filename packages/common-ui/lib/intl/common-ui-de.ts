@@ -14,7 +14,6 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   applyButtonText: "Anwenden",
   areYouSure: "Sind Sie sicher?",
   attachSelected: "Auswahl anhängen",
-  attached: "anhängen",
   attributeLabel: "Attribut",
   autoFillGeoSuggestLabel:
     "Standortfelder (automatisch befüllt, Inhalt ist nicht beständig)",
@@ -58,7 +57,6 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   deletedTooltip: "Dieses Feld wird für alle ausgewählten Datensätze gelöscht.",
   description: "Beschreibung",
   destroyedLabel: "zerstört",
-  detach: "Trennen",
   done: "Erledigt",
   dropdownSearchResults: "Suchergebnisse",
   editAll: "Alle bearbeiten",

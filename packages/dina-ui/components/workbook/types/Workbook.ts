@@ -1,9 +1,13 @@
-import { InputResource, KitsuResource } from "kitsu";
-import { WorkbookDataTypeEnum } from "./WorkbookDataTypeEnum";
+import { FilterParam, InputResource, KitsuResource } from "kitsu";
+import {
+  WorkbookDataTypeDynamic,
+  WorkbookDataTypePrimitive
+} from "./WorkbookDataTypeEnum";
 
 export enum LinkOrCreateSetting {
   LINK = "LINK", // Find the existing object then set to relationships. It will ignore if not found.
   CREATE = "CREATE", // Create a new object then set to relationships
+  LINK_UUID_ONLY = "LINK_UUID_ONLY", // Find the existing object by uuid then set it as attributes. ["<uuid>"]
   LINK_OR_CREATE = "LINK_OR_CREATE", // Try to find an existing object, if not found, then create one, then set to relationships
   LINK_OR_ERROR = "LINK_OR_ERROR" // Try to find an existing object, if not found, then throw an new error
 }
@@ -66,25 +70,30 @@ export type FieldMappingConfigType = {
 
 export interface PrimitiveField {
   dataType:
-    | WorkbookDataTypeEnum.NUMBER
-    | WorkbookDataTypeEnum.BOOLEAN
-    | WorkbookDataTypeEnum.STRING
-    | WorkbookDataTypeEnum.STRING_COORDINATE
-    | WorkbookDataTypeEnum.DATE
-    | WorkbookDataTypeEnum.DATE_TIME
-    | WorkbookDataTypeEnum.STRING_ARRAY
-    | WorkbookDataTypeEnum.NUMBER_ARRAY
-    | WorkbookDataTypeEnum.BOOLEAN_ARRAY;
+    | WorkbookDataTypePrimitive.NUMBER
+    | WorkbookDataTypePrimitive.BOOLEAN
+    | WorkbookDataTypePrimitive.STRING
+    | WorkbookDataTypePrimitive.STRING_COORDINATE
+    | WorkbookDataTypePrimitive.DATE
+    | WorkbookDataTypePrimitive.DATE_TIME
+    | WorkbookDataTypePrimitive.STRING_ARRAY
+    | WorkbookDataTypePrimitive.NUMBER_ARRAY
+    | WorkbookDataTypePrimitive.BOOLEAN_ARRAY;
 }
 
 export interface ManagedAttributeField {
-  dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES;
+  dataType: WorkbookDataTypeDynamic.MANAGED_ATTRIBUTES;
   managedAttributeComponent: string;
   endpoint: string;
 }
 
+export interface ControlledVocabularyField {
+  dataType: WorkbookDataTypeDynamic.CONTROLLED_VOCABULARY;
+  filter: FilterParam;
+}
+
 export interface VocabularyField {
-  dataType: WorkbookDataTypeEnum.VOCABULARY;
+  dataType: WorkbookDataTypeDynamic.VOCABULARY;
   endpoint: string;
 }
 
@@ -94,12 +103,14 @@ export interface EnumValue {
 }
 
 export interface EnumField {
-  dataType: WorkbookDataTypeEnum.ENUM;
+  dataType: WorkbookDataTypePrimitive.ENUM;
   allowedValues: EnumValue[];
 }
 
 export interface ObjectField {
-  dataType: WorkbookDataTypeEnum.OBJECT | WorkbookDataTypeEnum.OBJECT_ARRAY;
+  dataType:
+    | WorkbookDataTypePrimitive.OBJECT
+    | WorkbookDataTypePrimitive.OBJECT_ARRAY;
   attributes: Leaves<FieldConfigType>;
   // If relationshipConfig is defined, the this field need to move to relationships.
   relationshipConfig?: {
@@ -111,7 +122,7 @@ export interface ObjectField {
 }
 
 export interface ClassificationType {
-  dataType: WorkbookDataTypeEnum.CLASSIFICATION;
+  dataType: WorkbookDataTypeDynamic.CLASSIFICATION;
 }
 
 export type FieldConfigType =
@@ -119,6 +130,7 @@ export type FieldConfigType =
   | VocabularyField
   | EnumField
   | ManagedAttributeField
+  | ControlledVocabularyField
   | ObjectField
   | ClassificationType;
 

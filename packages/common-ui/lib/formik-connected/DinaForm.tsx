@@ -8,16 +8,22 @@ import {
   FormikValues
 } from "formik";
 import _ from "lodash";
-import { FormTemplate } from "../../../dina-ui/types/collection-api";
+import { FormTemplate } from "@dina-ui/types/collection-api";
 import {
   createContext,
   PropsWithChildren,
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useMemo
 } from "react";
+import {
+  formatJsonApiErrorMessage,
+  normalizeJsonApiPointer
+} from "../util/jsonApiErrorNormalization";
 import { useIntl } from "react-intl";
+import { useRouter } from "next/router";
 import { BulkEditTabContext, scrollToError } from "..";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
@@ -98,16 +104,18 @@ function parseJsonApiErrors(error: any): Record<string, string> {
   if (Array.isArray(errors)) {
     for (const err of errors) {
       const pointer = err?.source?.pointer;
-      const fieldName = pointer?.replace(/^\/?data\/attributes\//, "");
+      const fieldName = pointer ? normalizeJsonApiPointer(pointer) : "";
       if (fieldName) {
-        fieldErrors[fieldName] = err.detail
-          ? `${err.title}: ${err.detail}`
-          : err.title;
+        fieldErrors[fieldName] = formatJsonApiErrorMessage(
+          err.title,
+          err.detail
+        );
       } else {
         // If no field is specified, assign general submission error
-        fieldErrors["Form submission issue"] = err.detail
-          ? `${err.title}: ${err.detail}`
-          : err.title;
+        fieldErrors["Form submission issue"] = formatJsonApiErrorMessage(
+          err.title,
+          err.detail
+        );
       }
     }
   }
@@ -184,7 +192,9 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
    * e.g. Don't show the has-bulk-edit-value indicators in the Material Sample
    * form's nested Collecting Event form.
    */
-  const withBulkEditCtx = useCallback<(content: JSX.Element) => JSX.Element>(
+  const withBulkEditCtx = useCallback<
+    (content: React.JSX.Element) => React.JSX.Element
+  >(
     isNestedForm
       ? (content) => (
           <BulkEditTabContext.Provider value={null}>
@@ -223,9 +233,107 @@ interface FormWrapperProps {
   customErrorViewerMessage?: (field: string, error: any) => string;
 }
 
+// Singleton unsaved-data warning
+
+let dirtyFormCount = 0;
+let listenersRegistered = false;
+let suppressNextNav = false;
+
+/** Call before a programmatic navigation (save → result page, session timeout
+ *  redirect) to suppress the unsaved-data warning for the next navigation
+ *  only.  The flag auto-resets after one use. */
+export function suppressUnsavedWarning() {
+  suppressNextNav = true;
+}
+
+/** @internal Exported for tests. Resets the singleton warning state */
+export function __resetUnsavedWarningState() {
+  dirtyFormCount = 0;
+  listenersRegistered = false;
+  suppressNextNav = false;
+}
+
+const sharedBeforeUnload = (e: BeforeUnloadEvent) => {
+  if (suppressNextNav) {
+    suppressNextNav = false;
+    return;
+  }
+  e.preventDefault();
+};
+
+function registerListeners(router: any) {
+  if (listenersRegistered) return;
+  listenersRegistered = true;
+  window.addEventListener("beforeunload", sharedBeforeUnload);
+  if (router?.events) {
+    router.events.on("routeChangeStart", sharedRouteChange);
+  }
+}
+
+function unregisterListeners(router: any) {
+  if (!listenersRegistered) return;
+  listenersRegistered = false;
+  window.removeEventListener("beforeunload", sharedBeforeUnload);
+  if (router?.events) {
+    router.events.off("routeChangeStart", sharedRouteChange);
+  }
+}
+
+function sharedRouteChange() {
+  if (suppressNextNav) {
+    suppressNextNav = false;
+    return;
+  }
+  if (dirtyFormCount > 0 && !window.confirm(warningMessage)) {
+    routerRef?.events?.emit("routeChangeError");
+    throw "routeChange aborted.";
+  }
+}
+
+/** Latest warning message — kept up to date by PromptIfDirty. */
+let warningMessage = "";
+let routerRef: any = null;
+
+/** Warns on browser close/refresh and internal SPA navigation if any form
+ *  is dirty.  Uses module-level singleton listeners so multiple DinaForm
+ *  instances never produce duplicate dialogs. */
+function PromptIfDirty({
+  formik,
+  readOnly
+}: {
+  formik: any;
+  readOnly?: boolean;
+}) {
+  const { formatMessage } = useIntl();
+  const router = useRouter();
+  const isDirty =
+    !readOnly && formik.dirty && formik.values.type && formik.submitCount === 0;
+
+  useEffect(() => {
+    if (isDirty) {
+      dirtyFormCount++;
+      warningMessage = formatMessage({ id: "possibleDataLossWarning" });
+      routerRef = router;
+      registerListeners(router);
+    }
+
+    return () => {
+      if (isDirty) {
+        dirtyFormCount--;
+        if (dirtyFormCount <= 0) {
+          dirtyFormCount = 0;
+          unregisterListeners(router);
+        }
+      }
+    };
+  }, [isDirty]);
+
+  return null;
+}
+
 /** Wraps the inner content with the Form + ErrorViewer components. */
 function FormWrapper({ children, customErrorViewerMessage }: FormWrapperProps) {
-  const { isNestedForm } = useDinaFormContext();
+  const { isNestedForm, readOnly } = useDinaFormContext();
 
   // Disable enter to submit form in nested forms.
   function disableEnterToSubmitOuterForm(e) {
@@ -235,16 +343,6 @@ function FormWrapper({ children, customErrorViewerMessage }: FormWrapperProps) {
     }
   }
 
-  const PromptIfDirty = ({ formik }) => {
-    const { formatMessage } = useIntl();
-    // only prompt if there is data change in edit or add pages
-    if (formik.dirty && formik.values.type && formik.submitCount === 0) {
-      window.onbeforeunload = () => {
-        return formatMessage({ id: "possibleDataLossWarning" });
-      };
-    } else window.onbeforeunload = null;
-    return null;
-  };
   const Wrapper = isNestedForm ? "div" : Form;
 
   return (
@@ -253,11 +351,7 @@ function FormWrapper({ children, customErrorViewerMessage }: FormWrapperProps) {
     >
       <ErrorViewer customErrorViewerMessage={customErrorViewerMessage} />
       <FormikConsumer>
-        {(formik) => (
-          <>
-            <PromptIfDirty formik={formik} />
-          </>
-        )}
+        {(formik) => <PromptIfDirty formik={formik} readOnly={readOnly} />}
       </FormikConsumer>
       {children}
     </Wrapper>

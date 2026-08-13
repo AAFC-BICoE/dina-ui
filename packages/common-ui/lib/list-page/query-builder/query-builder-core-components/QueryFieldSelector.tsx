@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { DinaMessage } from "../../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import CreatableSelect from "react-select/creatable";

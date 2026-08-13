@@ -12,7 +12,7 @@ import {
 import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
 import moment from "moment";
-import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
+import { ScientificNameSourceDetails } from "../../../types/collection-api/resources/Determination";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   GlobalNamesSearchResult,
@@ -264,8 +264,8 @@ export function GlobalNamesSearchBox({
                 <input
                   aria-label={formatMessage("globalNameSearchLabel")}
                   className="form-control global-name-input"
-                  onChange={(e) => onInputChange(e.target.value)}
-                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => onInputChange((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
+                  onFocus={(e) => (e.target as HTMLInputElement).select()}
                   onKeyDown={(e) => {
                     if (e.keyCode === 13) {
                       e.preventDefault();
@@ -320,8 +320,7 @@ export function GlobalNamesSearchBox({
                           type: "user-preference"
                         };
                         await save([saveArgs], {
-                          apiBaseUrl: "/user-api",
-                          skipOperationForSingleRequest: true
+                          apiBaseUrl: "/user-api"
                         });
 
                         // Trigger a reload of the user preferences.
@@ -342,8 +341,8 @@ export function GlobalNamesSearchBox({
               <input
                 aria-label={formatMessage("colSearchLabel")}
                 className="form-control global-name-input"
-                onChange={(e) => onInputChange(e.target.value)}
-                onFocus={(e) => e.target.select()}
+                onChange={(e) => onInputChange((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
+                onFocus={(e) => (e.target as HTMLInputElement).select()}
                 onKeyDown={(e) => {
                   if (e.keyCode === 13) {
                     e.preventDefault();

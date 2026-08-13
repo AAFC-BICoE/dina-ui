@@ -18,6 +18,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addCustomPlaceName: "Ajouter",
   addDetermination: "Ajouter une détermination",
   addExistingStorageUnitAsChild: "Ajouter une unité de stockage existante",
+  addExistingStorageUnitAsChild_tooltip:
+    "Ajouter une unité de stockage existante comme enfant de cette unité de stockage.",
   addExternalResourceTitle: "Ajouter une nouvelle ressource externe",
   addFilesButton: "Ajouter des fichiers",
   addGroup: "Ajouter un groupe",
@@ -31,6 +33,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addMaterialSampleTypeTitle: "Ajouter un type d’échantillon de matière",
   addMetadataTitle: "Ajouter des métadonnées",
   addNewChildStorageUnit: "Ajouter une nouvelle unité de stockage pour enfant",
+  addNewChildStorageUnit_tooltip:
+    "Ajouter une nouvelle unité de stockage comme enfant de cette unité de stockage.",
   addNewElement: "Ajouter nouveau {typeName}",
   addNewPerson: "Ajouter nouvelle personne",
   addObjectSubtypeTitle: "Ajouter un nouveau sous-type d’objet",
@@ -62,6 +66,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   assemblage: "Assemblage",
   assemblageAttachments: "Pièces jointes de l'assemblage",
   assemblageListTitle: "Assemblages",
+  assemblageDeleteLinkedSamplesWarning:
+    "Cet assemblage contient {count} échantillons de matériaux liés. Les échantillons doivent être dissociés avant que l'assemblage puisse être supprimé. Confirmer pour dissocier tous les échantillons et supprimer l'assemblage.",
   assemblageManagedAttributes: "Attributs gérés de l'assemblage",
   assemblage_tooltip:
     "Mécanisme utilisé pour regrouper des échantillons de matériau selon un certain thème organisationnel.",
@@ -74,7 +80,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   association: "Association",
   associationType: "Type d'association",
   associationsLegend: "Associations",
-  attachExisting: "Joindre l’existant",
+  linkExisting: "Lier l’existant",
   attachExistingObjects: "Joindre des objets existants",
   attachSelected: "Joindre la sélection",
   attachedMaterialSamples: "Pièces jointes des échantillons de matériau",
@@ -366,6 +372,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_id: "ID",
   field_isFiledAs_tooltip:
     'Classé en tant que (ajouter cette détermination). Une seule détermination peut être inscrite comme "Classé en tant que".',
+  field_isGeneric: "Générique",
+  field_isGeneric_tooltip:
+    "Est-ce que l'unité de stockage représente une instance générique du type d'unité de stockage ?",
   field_isInseperable: "Garder les contenus ensemble",
   field_isInseperable_tooltip: "Les contenus sont inséparables",
   field_isPrimary_tooltip:
@@ -479,10 +488,12 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_vocabularyElementType_picklist_label: "Liste de sélection",
   field_vocabularyElementType_text_label: "Texte",
   field_webpage: "Page Web",
+  field_lastUpdatedOn: "Date d’application des métadonnées",
   field_xmpMetadataDate: "Date d’application des métadonnées",
   field_xmpMetadataDate_tooltip:
     "Date et heure de la dernière mise à jour du dossier.",
   field_xmpRightsWebStatement: "Licence",
+  field_xmpRightsOwner: "Propriétaire",
   fileTooBig: "Fichier trop volumineux",
   filterAttribute: "Attribut filtre",
   filterByGroup: "Filtrer par groupe",
@@ -559,6 +570,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   managedAttributeEditTitle: "Modifier l’attribut géré",
   managedAttributeTemplateOrderInfo:
     "Cette disposition des attributs gérés sera sauvegardée dans le modèle de formulaire.",
+  managedAttributeDeleteWarning:
+    "La suppression de cet attribut géré pourrait avoir un impact sur des ressources non suivies existantes comme les exportations ou les scripts. Voulez-vous vraiment continuer ?",
   managedAttributeValueLabel: "Valeur",
   managedAttributes: "Attributs gérés",
   managedAttributesViews: "Modèles de formulaires",
@@ -627,6 +640,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   metersField_tooltip:
     "Utilisez les unités suivantes pour la conversion automatique : pi, po, pi po, vg, mm, cm, km",
   moveAllContent: "Déplacer tout le contenu",
+  moveAllContent_tooltip:
+    "Transférez tous les articles de rangement pour enfants et les échantillons dans le nouvel espace de rangement",
   multiple: "Multiple",
   multipleMaterialSamples: "Échantillons à matériel multiple",
   multipleUnits: "Multiples unités",
@@ -641,6 +656,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   notEditableWhenThereAreChildStorageUnits:
     "Non modifiable lorsqu’il y a des unités de stockage enfant ",
   notPubliclyReleasable: "Diffusion publique interdite",
+  publiclyReleasable: "Diffusion publique",
   objectListTitle: "Objets stockés",
   objectStoreDataUnavailable:
     "Les données du stockage de l’objet ne sont pas disponibles",
@@ -697,6 +713,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   protocolListTitle: "Protocoles",
   protocolNameLabel: "Nom du protocole",
   protocolViewTitle: "Protocole",
+  publiclyReleasableOption: "Oui - Diffusion publique",
+  notPubliclyReleasableOption: "Non - Diffusion publique interdite",
   queryBuilder_addSearchGroup: "Ajouter une sous-requête",
   queryBuilder_addSearchRule: "Ajouter une requête",
   queryBuilder_conjunction_and: "ET",
@@ -742,7 +760,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   removeOrganism: "Supprimer l'organisme",
   removeSavedSearch: "Supprimer la recherche enregistrée",
   removeThisElement: "Supprimer cette {typeName}",
-  removeThisPlaceLabel: " Supprimer ce lieu",
+  removeThisPlaceLabel: "Supprimer ce lieu",
   requiredField: "Champ requis",
   resetMetadataEditorAttributesButtonText:
     "Réinitialiser à la disposition initiale des attributs",
@@ -758,6 +776,14 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   rolesPerGroup: "Rôles par groupe",
   runWorkflow: "Exécuter le flux des travaux",
   save: "Enregistrer",
+  bulkEditingAllSamples: "Modification de {total} échantillons",
+  bulkEditingSampleOf: "Modification de l'échantillon {current} sur {total}",
+  bulkEditingAllMetadata:
+    "Modification de {total} enregistrements de métadonnées",
+  bulkEditingMetadataOf: "Modification des métadonnées {current} sur {total}",
+  bulkEditLoadingProgress: "Chargement des données... {loaded} sur {total}",
+  bulkEditMetadataLoadingProgress:
+    "Chargement des métadonnées... {loaded} sur {total}",
   saveAll: "Enregistrer tout",
   saveAndCopyToNext: "Sauvegarder et copier au prochain",
   saveAndCreateNewMaterialSampleButton:
@@ -855,6 +881,24 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   storageUnitType: "Type d’unité de stockage",
   storageUnitTypeListTitle: "Types d’unités de stockage",
   storagesCreatedByMe: "Stockages créés par moi",
+  systemInfoAttentionRequired: "Attention requise",
+  systemInfoDisabled: "Désactivé",
+  systemInfoEnabled: "Activé",
+  systemInfoEndpoint: "Point d’accès",
+  systemInfoFetching: "Récupération des informations du système...",
+  systemInfoLastRefreshed: "Dernière actualisation :",
+  systemInfoLatency: "Latence",
+  systemInfoLatencyMs: "{latencyMs} ms",
+  refreshButtonText: "Actualiser",
+  systemInfoMessageConsumer: "Consommateur de messages",
+  systemInfoMessageProducer: "Producteur de messages",
+  systemInfoModuleInfo: "Informations sur le module",
+  systemInfoStatusOffline: "Hors ligne",
+  systemInfoStatusOnline: "En ligne",
+  systemInfoTitle: "Informations sur le système",
+  systemInfoUnableToReachService: "Impossible de joindre le service.",
+  systemInfoUnexpectedError: "Erreur inattendue.",
+  systemInfoUnknown: "Inconnu",
   tags: "Étiquettes",
   target: "Cible",
   template: "Modèle",
@@ -956,5 +1000,23 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   erase: "Effacer",
   close: "Fermer",
   invalidPolygon:
-    "Les coordonnées sont invalides : elles doivent être de type nombre[][][] et fermées"
+    "Les coordonnées sont invalides : elles doivent être de type nombre[][][] et fermées",
+
+  // Permissions Table
+  tableTitle_permissions: "Autorisations",
+  resource: "Ressource",
+  operation_read: "Lire",
+  operation_create: "Créer",
+  operation_edit: "Modifier",
+  operation_delete: "Supprimer",
+  permission_allowed: "Autorisé",
+  permission_denied: "Refusé",
+  permission_unavailable: "Indisponible",
+  permission_objectOwner: "Propriétaire",
+  resource_materialSample: "Échantillon",
+  resource_controlledVocabulary: "Vocabulaire contrôlé",
+  resource_collection: "Collection",
+  resource_project: "Projet",
+  resource_objectStore: "Métadonnées de l'objet",
+  resource_agent: "Agent (personne)"
 };

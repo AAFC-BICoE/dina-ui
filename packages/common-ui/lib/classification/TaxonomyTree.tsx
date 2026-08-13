@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as echarts from "echarts";
 import { useApiClient } from "..";
-import useVocabularyOptions from "../../../dina-ui/components/collection/useVocabularyOptions";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOptions";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 interface TreeNode {
@@ -97,7 +97,7 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
       aggs: {
         [`taxonomy_${rank}`]: {
           terms: {
-            field: `data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`,
+            field: `data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.${rank}.keyword`,
             size: 10000,
             order: { _count: "desc" }
           }
@@ -109,7 +109,7 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
     if (parentRanksAndValues.length > 0) {
       const must = parentRanksAndValues.map(({ rank, value }) => ({
         term: {
-          [`data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`]:
+          [`data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.${rank}.keyword`]:
             value
         }
       }));

@@ -13,14 +13,17 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Alert, Card } from "react-bootstrap";
 import useMolecularAnalysisExportAPI from "../../../components/export/useMolecularAnalysisExportAPI";
-import React from "react";
+import React, { useRef } from "react";
 import { FaCheckSquare, FaHistory, FaRegSquare } from "react-icons/fa";
+import { ExportPopup } from "@dina-ui/components/export/ExportPopup";
 
 export default function ExportMolecularAnalysisPage() {
   const router = useRouter();
 
   // Determines where the back button should link to.
   const entityLink = String(router.query.entityLink);
+
+  const submitButtonRef = useRef(null);
 
   // Hook responsible for performing all the network calls required for retriving the run and run items.
   const {
@@ -32,7 +35,9 @@ export default function ExportMolecularAnalysisPage() {
     networkLoading,
     exportLoading,
     dataExportError,
-    performExport
+    performExport,
+    exportRequestSubmitted,
+    setExportRequestSubmitted
   } = useMolecularAnalysisExportAPI();
 
   const disableObjectExportButton =
@@ -273,11 +278,12 @@ export default function ExportMolecularAnalysisPage() {
               </div>
             </Card.Body>
             <Card.Footer className="d-flex">
-              <div className="me-auto">
+              <div className="me-auto" ref={submitButtonRef}>
                 <SubmitButton
                   buttonProps={(formik) => ({
                     style: { width: "8rem" },
-                    disabled: disableObjectExportButton,
+                    disabled:
+                      disableObjectExportButton || exportRequestSubmitted,
                     onClick: () => {
                       performExport(formik);
                     }
@@ -292,6 +298,11 @@ export default function ExportMolecularAnalysisPage() {
                     <DinaMessage id="exportButtonText" />
                   )}
                 </SubmitButton>
+                <ExportPopup
+                  target={submitButtonRef.current}
+                  show={exportRequestSubmitted}
+                  onClose={() => setExportRequestSubmitted(false)}
+                />
               </div>
             </Card.Footer>
           </Card>

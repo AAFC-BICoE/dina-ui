@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { useFormikContext } from "formik";
 import { Dispatch, SetStateAction } from "react";
-import { SourceAdministrativeLevel } from "../../../dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import { SourceAdministrativeLevel } from "@dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { ReactTable } from "../table/ReactTable";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
@@ -28,7 +28,7 @@ export function PlaceSectionsSelectionField(
 
   const { values } = useFormikContext<any>();
 
-  const displayData = values.srcAdminLevels.map((opt, idx) => {
+  const displayData = values?.srcAdminLevels?.map((opt, idx) => {
     opt.type = "place-section";
     opt.shortId = idx;
     return opt;
@@ -110,6 +110,19 @@ export function PlaceSectionsSelectionField(
       ))}
     </div>
   );
+
+  if (!displayData || displayData.length === 0) {
+    return (
+      <FieldWrapper
+        {...placeFieldProps}
+        removeLabel={true}
+        readOnlyRender={defaultReadOnlyRender}
+        disableLabelClick={true}
+      >
+        {() => <></>}
+      </FieldWrapper>
+    );
+  }
 
   return (
     <FieldWrapper

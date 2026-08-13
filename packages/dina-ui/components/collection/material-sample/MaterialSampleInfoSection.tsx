@@ -121,7 +121,7 @@ export function MaterialSampleInfoSection({
           <div className="col-md-12">
             <ManagedAttributesEditor
               valuesPath="managedAttributes"
-              managedAttributeApiPath="collection-api/managed-attribute"
+              managedAttributeApiPath="collection-api/controlled-vocabulary-item"
               managedAttributeComponent="MATERIAL_SAMPLE"
               fieldSetProps={{
                 id,
@@ -130,6 +130,7 @@ export function MaterialSampleInfoSection({
               managedAttributeOrderFieldName="managedAttributesOrder"
               visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
               disableClearButton={true}
+              isControlledVocabulary={true}
             />
           </div>
         </div>

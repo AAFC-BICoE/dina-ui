@@ -149,7 +149,7 @@ describe("QueryBuilderRelationshipAutocompleteSearch", () => {
       const combobox = getByRole("combobox");
 
       // Type to trigger search
-      userEvent.type(combobox, "John");
+      await userEvent.type(combobox, "John");
 
       // Wait for API call
       await waitFor(() => {
@@ -189,7 +189,7 @@ describe("QueryBuilderRelationshipAutocompleteSearch", () => {
       const combobox = getByRole("combobox");
 
       // Type to trigger search
-      userEvent.type(combobox, "John");
+      await userEvent.type(combobox, "John");
 
       // Wait for API call and options
       await waitFor(() => {
@@ -249,7 +249,7 @@ describe("QueryBuilderRelationshipAutocompleteSearch", () => {
       );
 
       const combobox = getByRole("combobox");
-      userEvent.type(combobox, "John");
+      await userEvent.type(combobox, "John");
 
       // Wait for error to be logged
       await waitFor(() => {
@@ -282,7 +282,7 @@ describe("QueryBuilderRelationshipAutocompleteSearch", () => {
       const combobox = getByRole("combobox");
 
       // Type multiple characters quickly
-      userEvent.type(combobox, "John");
+      await userEvent.type(combobox, "John");
 
       // Should only call API once after debounce period
       await waitFor(

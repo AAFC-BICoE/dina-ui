@@ -12,10 +12,7 @@ import {
 import { useFormikContext } from "formik";
 import _ from "lodash";
 import { FaMinus, FaPlus } from "react-icons/fa";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { useEffect, useState } from "react";
 
 export function getFieldName(

@@ -2,17 +2,33 @@ import { GlobalSearch, useAccount } from "common-ui";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Stack from "react-bootstrap/Stack";
-import { Footer, Head, Nav } from "../components";
+import {
+  Footer,
+  Head,
+  Nav,
+  LayoutToggle,
+  UIPreferenceHook
+} from "../components";
 import { DinaMessage, useDinaIntl } from "../intl/dina-ui-intl";
 import { SeqdbMessage } from "../intl/seqdb-intl";
 
 export function Home() {
-  const { isAdmin, rolesPerGroup, subject } = useAccount();
+  const { isAdmin, isSuperUser, rolesPerGroup, subject } = useAccount();
   const router = useRouter();
+
+  const { useNewLayout, activateNewLayout, deactivateNewLayout, loading } =
+    UIPreferenceHook();
+
+  useEffect(() => {
+    if (!loading && useNewLayout) {
+      router.replace("/feedback/home2");
+    }
+  }, [loading, useNewLayout, router]);
 
   const handleSearch = (searchTerm: string) => {
     // Navigate to global search results page
@@ -31,9 +47,16 @@ export function Home() {
       <main role="main">
         <Container fluid={true}>
           {/* Global Search - Centered at 80% width */}
-          <div className="d-flex justify-content-center mb-4">
-            <div style={{ width: "80%" }}>
+          <div className="row justify-content-center align-items-center mb-4">
+            <div className="col-10">
               <GlobalSearch onSearch={handleSearch} />
+            </div>
+            <div className="col-auto">
+              <LayoutToggle
+                useNewLayout={useNewLayout}
+                activateNewLayout={activateNewLayout}
+                deactivateNewLayout={deactivateNewLayout}
+              />
             </div>
           </div>
 
@@ -266,6 +289,11 @@ export function Home() {
                 </h2>
 
                 <Stack style={{ display: "inline-flex" }}>
+                  {(isAdmin || isSuperUser) && (
+                    <Link href="/controlled-vocabulary/list">
+                      <DinaMessage id="controlledVocabularyTitle" />
+                    </Link>
+                  )}
                   <Link href="/group/list">
                     <DinaMessage id="groupListTitle" />
                   </Link>

@@ -1,17 +1,17 @@
-import { ApiClientContext, LoadingSpinner } from "common-ui";
+import { IFileWithMeta, LoadingSpinner } from "common-ui";
 import { withRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { SaveWorkbookProgress } from "packages/dina-ui/components/workbook/SaveWorkbookProgress";
-import { useContext, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import {
   WorkbookColumnMapping,
   WorkbookConfirmation,
   WorkbookUpload,
   trimSpace,
-  useWorkbookContext
+  useWorkbookContext,
+  useWorkbookConversion
 } from "../../components";
-import { IFileWithMeta } from "../../components/object-store";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
 import { useLocalStorage } from "@rehooks/local-storage";
@@ -23,7 +23,7 @@ import {
 } from "react-icons/fa6";
 
 export function UploadWorkbookPage() {
-  const { apiClient } = useContext(ApiClientContext);
+  // Workbook context is used to manage the state of the workbook upload process.
   const {
     workbookResources,
     status,
@@ -35,12 +35,21 @@ export function UploadWorkbookPage() {
     resourcesUpdatedCount
   } = useWorkbookContext();
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [failed, setFailed] = useState<boolean>(false);
+  // useWorkbookConversion hook is used to manage the state of the workbook conversion process and
+  // perform the network request.
+  const {
+    convertWorkbookFile,
+    resetWorkbookConversion,
+    loading,
+    setLoading,
+    failed
+  } = useWorkbookConversion();
+
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
   const [redirecting, setRedirecting] = useState<boolean>(false);
 
+  // If coming from a bulk edit, these are the files the workbook will expect to be altered.
   const [bulkEditFiles, setBulkEditFiles] =
     useLocalStorage<BulkAddFileInfo>(BULK_ADD_FILES_KEY);
 
@@ -56,24 +65,15 @@ export function UploadWorkbookPage() {
    * @param acceptedFiles Files from the file uploader.
    */
   async function submitFile(acceptedFiles: IFileWithMeta[]) {
-    const formData = new FormData();
-    formData.append("file", acceptedFiles[0].file);
-
-    // Display the loading spinner, and reset any error messages.
     setLoading(true);
 
-    // Attempt to call the conversion API.
-    await apiClient.axios
-      .post("/objectstore-api/workbook/conversion", formData)
-      .then((response) => {
-        uploadWorkbook(trimSpace(response.data));
-        setLoading(false);
-        setFailed(false);
-      })
-      .catch(() => {
-        setLoading(false);
-        setFailed(true);
-      });
+    const responseData = await convertWorkbookFile(acceptedFiles);
+
+    if (responseData) {
+      uploadWorkbook(trimSpace(responseData));
+    }
+
+    setLoading(false);
   }
 
   /**
@@ -81,9 +81,8 @@ export function UploadWorkbookPage() {
    * @param resetCompleted If true, the completed state is returned to false.
    */
   function backToUpload() {
-    setFailed(false);
-    setLoading(false);
     setPerformSave(false);
+    resetWorkbookConversion();
     reset();
   }
 

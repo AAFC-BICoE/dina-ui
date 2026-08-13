@@ -1,4 +1,3 @@
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../../../../dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { transformIdentifierToDSL } from "../QueryBuilderIdentifierSearch";
 
 interface TestValueStructure {
@@ -184,7 +183,7 @@ describe("QueryBuilderIdentifierSearch", () => {
                         label: "otherIdentifiers",
                         component: "MATERIAL_SAMPLE",
                         path: "data.attributes.identifiers",
-                        apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
+                        apiEndpoint: `collection-api/controlled-vocabulary-item`
                       },
                       hideField: true,
                       value: "data.attributes.identifiers",
@@ -237,7 +236,7 @@ describe("QueryBuilderIdentifierSearch", () => {
                         path: "included.attributes.identifiers",
                         referencedBy: "parentMaterialSample",
                         referencedType: "material-sample",
-                        apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
+                        apiEndpoint: `collection-api/controlled-vocabulary-item`
                       } as any,
                       hideField: true,
                       parentName: "parentMaterialSample",

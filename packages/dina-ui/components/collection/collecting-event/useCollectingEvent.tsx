@@ -98,6 +98,28 @@ interface UseCollectingEventSaveParams {
   attachmentsConfig?: AllowAttachmentsConfig;
 }
 
+export function useEmptyCollectingEventInitialValues(): Partial<CollectingEvent> {
+  const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
+    DEFAULT_VERBATIM_COORDSYS_KEY
+  );
+  const [defaultVerbatimSRS] = useLocalStorage<string | null | undefined>(
+    DEFAULT_VERBATIM_SRS_KEY
+  );
+
+  return useMemo<Partial<CollectingEvent>>(
+    () => ({
+      type: "collecting-event",
+      collectors: [],
+      collectorGroups: [],
+      geoReferenceAssertions: [{ isPrimary: true }],
+      dwcVerbatimCoordinateSystem:
+        defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
+      dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
+    }),
+    [defaultVerbatimCoordSys, defaultVerbatimSRS]
+  );
+}
+
 /** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
 export function useCollectingEventSave({
   fetchedCollectingEvent,
@@ -105,15 +127,8 @@ export function useCollectingEventSave({
 }: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
   const collectingEventFormSchema = useCollectingEventFormSchema();
-
-  const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
-    DEFAULT_VERBATIM_COORDSYS_KEY
-  );
-
-  const [defaultVerbatimSRS] = useLocalStorage<string | null | undefined>(
-    DEFAULT_VERBATIM_SRS_KEY
-  );
-
+  const emptyCollectingEventInitialValues =
+    useEmptyCollectingEventInitialValues();
   const collectingEventInitialValues: Partial<CollectingEvent> =
     fetchedCollectingEvent
       ? {
@@ -122,44 +137,39 @@ export function useCollectingEventSave({
             fetchedCollectingEvent.geoReferenceAssertions ?? [],
           srcAdminLevels: fetchedCollectingEvent.srcAdminLevels
         }
-      : {
-          type: "collecting-event",
-          collectors: [],
-          collectorGroups: [],
-          geoReferenceAssertions: [
-            {
-              isPrimary: true
-            }
-          ],
-          dwcVerbatimCoordinateSystem:
-            defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
-          dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84,
-          publiclyReleasable: true
-        };
+      : emptyCollectingEventInitialValues;
 
   async function saveCollectingEvent(
     submittedValues: CollectingEvent,
-    collectingEventFormik: FormikContextType<any>
+    collectingEventFormik: FormikContextType<any>,
+    forceCreate?: boolean
   ) {
     // Only submit the changed values to the back-end:
-    const collectingEventDiff = collectingEventInitialValues.id
-      ? resourceDifference({
-          original: collectingEventInitialValues as CollectingEvent,
-          updated: submittedValues
-        })
-      : submittedValues;
+    const collectingEventDiff =
+      collectingEventInitialValues.id && !forceCreate
+        ? resourceDifference({
+            original: collectingEventInitialValues as CollectingEvent,
+            updated: submittedValues
+          })
+        : submittedValues;
 
     // Init relationships object for one-to-many relations:
     (collectingEventDiff as any).relationships = {};
 
-    // handle converting to relationship manually due to crnk bug
-    if (
-      collectingEventDiff &&
-      collectingEventDiff.collectors &&
-      collectingEventDiff.collectors.length > 0
-    ) {
+    // Only send collectors relationship if they were explicitly changed by the user.
+    // This prevents data loss if collectors fail to load (bulkGet error),
+    // and avoids sending unnecessary relationship data on every save.
+    const initialCollectors = collectingEventInitialValues.collectors as any[];
+    const submittedCollectors = submittedValues.collectors ?? [];
+
+    const collectorsChanged = !_.isEqual(
+      (initialCollectors ?? []).map((c) => c.id).sort(),
+      submittedCollectors.map((c) => c.id).sort()
+    );
+
+    if (collectorsChanged) {
       (collectingEventDiff as any).relationships.collectors = {
-        data: collectingEventDiff?.collectors.map((collector) => ({
+        data: submittedCollectors.map((collector) => ({
           id: collector.id,
           type: "person"
         }))

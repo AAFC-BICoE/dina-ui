@@ -4,8 +4,8 @@ import Select from "react-select";
 import { useEffect } from "react";
 import _ from "lodash";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
-import { VocabularyOption } from "../../../../../dina-ui/components/collection/VocabularySelectField";
-import useVocabularyOptions from "../../../../../dina-ui/components/collection/useVocabularyOptions";
+import { VocabularyOption } from "@dina-ui/components/collection/VocabularySelectField";
+import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOptions";
 import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
 import { ESIndexMapping, TransformToDSLProps } from "../../types";
 import { transformTextSearchToDSL } from "./QueryBuilderTextSearch";
@@ -183,10 +183,10 @@ export default function QueryRowClassificationSearch({
           <input
             type="text"
             value={classificationState.searchValue}
-            onChange={(newValue) => {
+            onChange={(e) => {
               setClassificationState({
                 ...classificationState,
-                searchValue: newValue.target.value
+                searchValue: (e.target as HTMLTextAreaElement | HTMLInputElement).value
               });
             }}
             className={"col form-control me-3"}

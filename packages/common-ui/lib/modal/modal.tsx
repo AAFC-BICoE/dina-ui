@@ -2,7 +2,7 @@ import { createContext, ReactNode, useContext, useState } from "react";
 import ReactModal from "react-modal";
 
 interface ModalContextI {
-  openModal: (content: JSX.Element) => void;
+  openModal: (content: React.JSX.Element) => void;
   closeModal: () => void;
 }
 
@@ -22,9 +22,9 @@ const ModalContext = createContext<ModalContextI>(
 
 /** Allows opening modals using the "useModal" hook: */
 export function ModalProvider({ appElement, children }: ModalProviderProps) {
-  const [modals, setModals] = useState<JSX.Element[]>([]);
+  const [modals, setModals] = useState<React.JSX.Element[]>([]);
 
-  function openModal(newModal: JSX.Element) {
+  function openModal(newModal: React.JSX.Element) {
     // Add the new modal at the end of the array:
     setModals([...modals, newModal]);
   }

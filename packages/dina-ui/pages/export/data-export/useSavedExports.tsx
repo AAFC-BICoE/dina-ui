@@ -20,7 +20,7 @@ import {
 } from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
 
 export const VISIBILITY_OPTIONS: {
-  label: JSX.Element;
+  label: React.JSX.Element;
   value: {
     restrictToCreatedBy: boolean;
     publiclyReleasable: boolean;
@@ -491,7 +491,7 @@ export default function useSavedExports<TData extends KitsuResource>({
               displayOverrideWarning ? " is-invalid" : ""
             }`}
             value={savedExportName}
-            onChange={(e) => setSavedExportName(e.target.value)}
+            onChange={(e) => setSavedExportName((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
             disabled={loadingCreateSavedExport}
           />
           {displayOverrideWarning && (
@@ -507,7 +507,7 @@ export default function useSavedExports<TData extends KitsuResource>({
             <DinaMessage id="visibility" />
           </strong>
           <Select<{
-            label: JSX.Element;
+            label: React.JSX.Element;
             value: {
               restrictToCreatedBy: boolean;
               publiclyReleasable: boolean;

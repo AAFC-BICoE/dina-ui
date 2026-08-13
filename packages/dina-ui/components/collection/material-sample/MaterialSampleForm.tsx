@@ -45,12 +45,12 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { AssociationsField } from "../AssociationsField";
-import { CollectingEventBriefDetails } from "../collecting-event/CollectingEventBriefDetails";
 import { TabbedResourceLinker } from "../TabbedResourceLinker";
 import { MaterialSampleBreadCrumb } from "./MaterialSampleBreadCrumb";
 import { MaterialSampleIdentifiersSection } from "./MaterialSampleIdentifiersSection";
@@ -60,9 +60,11 @@ import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
+import { CitationsField } from "../citations/CitationsField";
 import { CollectionSelectSection } from "../CollectionSelectSection";
 import { ShowParentAttributesField } from "./ShowParentAttributesField";
 import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
+import { ParentSelectSection } from "../ParentSelectSection";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -149,6 +151,8 @@ export interface MaterialSampleFormProps {
   enableReinitialize?: boolean;
 
   isBulkEditAllTab?: boolean;
+
+  defaultToNotReleasable?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -184,7 +188,8 @@ export function MaterialSampleForm({
       </div>
     </ButtonBar>
   ),
-  isBulkEditAllTab
+  isBulkEditAllTab,
+  defaultToNotReleasable
 }: MaterialSampleFormProps) {
   const { isTemplate, readOnly } = useContext(DinaFormContext) ?? {};
 
@@ -206,7 +211,12 @@ export function MaterialSampleForm({
     colEventId,
     setColEventId,
     onSubmit,
-    loading
+    loading,
+    setIsCreatingNewColEvent,
+    unlinkCollectingEvent,
+    setUnlinkCollectingEvent,
+    overrideCollectingEvent,
+    setOverrideCollectingEvent
   } = materialSampleSaveHook ?? materialSampleSaveResponse;
 
   const copyFromNextSample = useCopyToNextSample();
@@ -261,15 +271,16 @@ export function MaterialSampleForm({
         <TabbedResourceLinker<CollectingEvent>
           fieldSetId={id}
           hideLinkerTab={hideLinkerTab}
+          hideCreateNewTab={isBulkEditAllTab}
           legend={<DinaMessage id="collectingEvent" />}
-          briefDetails={(colEvent) => (
-            <CollectingEventBriefDetails collectingEvent={colEvent} />
-          )}
           linkerTabContent={
             reduceRendering ? null : (
               <CollectingEventLinker
                 onCollectingEventSelect={(colEventToLink) => {
                   setColEventId(colEventToLink.id);
+                  setIsCreatingNewColEvent(false);
+                  setUnlinkCollectingEvent(false);
+                  setOverrideCollectingEvent(true);
                 }}
               />
             )
@@ -282,6 +293,22 @@ export function MaterialSampleForm({
           resourceId={colEventId}
           fieldName="collectingEvent"
           targetType="materialSample"
+          onTabSelect={(index) => {
+            // On the "Edit All" bulk tab, "Create New" tab doesn't exist at all
+            if (isBulkEditAllTab) {
+              setIsCreatingNewColEvent(false);
+              return;
+            }
+
+            // Depending if an existing collecting event is already linked determines what index the "Create new" tab is at.
+            const hasLinkedEvent = Boolean(colEventId);
+            const createNewTabIndex = hasLinkedEvent ? 1 : 0;
+
+            setIsCreatingNewColEvent(index === createNewTabIndex);
+          }}
+          setUnlinkCollectingEvent={setUnlinkCollectingEvent}
+          unlinkCollectingEvent={unlinkCollectingEvent}
+          overrideCollectingEvent={overrideCollectingEvent}
         />
       ),
     [PREPARATIONS_COMPONENT_NAME]: (id) =>
@@ -344,6 +371,22 @@ export function MaterialSampleForm({
           )}
         />
       ),
+    [CITATIONS_COMPONENT_NAME]: (id) =>
+      !reduceRendering &&
+      dataComponentState.enableCitations && (
+        <CitationsField
+          id={id}
+          wrapContent={(content) => (
+            <BulkEditTabWarning
+              messageIdSingle="bulkEditResourceSetWarning_Citations_MaterialSample_Single"
+              messageIdMultiple="bulkEditResourceSetWarning_Citations_MaterialSample_Multi"
+              fieldName="citations"
+            >
+              {content}
+            </BulkEditTabWarning>
+          )}
+        />
+      ),
     [FIELD_EXTENSIONS_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
         <DinaFormSection
@@ -375,7 +418,7 @@ export function MaterialSampleForm({
             <div className="col-md-12">
               <ManagedAttributesEditor
                 valuesPath="managedAttributes"
-                managedAttributeApiPath="collection-api/managed-attribute"
+                managedAttributeApiPath="collection-api/controlled-vocabulary-item"
                 managedAttributeComponent="MATERIAL_SAMPLE"
                 fieldSetProps={{
                   id,
@@ -386,6 +429,7 @@ export function MaterialSampleForm({
                   visibleManagedAttributeKeys?.materialSample
                 }
                 disableClearButton={true}
+                isControlledVocabulary={true}
               />
             </div>
           </div>
@@ -474,8 +518,15 @@ export function MaterialSampleForm({
                 <div className="col-md-8">
                   <CollectionSelectSection resourcePath="collection-api/collection" />
                   <ProjectSelectSection resourcePath="collection-api/project" />
+                  <ParentSelectSection
+                    enableCollectingEvent={
+                      dataComponentState.enableCollectingEvent
+                    }
+                  />
                   <AssemblageSelectSection resourcePath="collection-api/assemblage" />
-                  <NotPubliclyReleasableSection />
+                  <NotPubliclyReleasableSection
+                    defaultToNotReleasable={defaultToNotReleasable}
+                  />
                   <TagsAndRestrictionsSection
                     resourcePath="collection-api/material-sample"
                     indexName="dina_material_sample_index"
@@ -508,25 +559,25 @@ export function MaterialSampleForm({
       onSubmit={onSubmit}
       isBulkEditAllTab={isBulkEditAllTab}
     >
+      {buttonBar}
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {copyFromNextSample && (
         <>
+          <h1 id="wb-cont">
+            <DinaMessage id={"addMaterialSampleTitle"} />
+          </h1>
           <SaveAndCopyToNextSuccessAlert
-            id={copyFromNextSample.lastCreatedId ?? ""}
+            id={copyFromNextSample.copyFromId ?? ""}
             displayName={
               !!copyFromNextSample.originalSample.materialSampleName?.length
                 ? copyFromNextSample.originalSample.materialSampleName
-                : copyFromNextSample.lastCreatedId ?? ""
+                : copyFromNextSample.copyFromId ?? ""
             }
             entityPath={"collection/material-sample"}
             dataComponentState={dataComponentState}
           />
-          <h1 id="wb-cont">
-            <DinaMessage id={"addMaterialSampleTitle"} />
-          </h1>
         </>
       )}
-      {buttonBar}
       {formLayout}
     </DinaForm>
   );

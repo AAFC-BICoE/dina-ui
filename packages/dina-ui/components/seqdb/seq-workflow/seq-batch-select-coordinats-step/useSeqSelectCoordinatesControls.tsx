@@ -1,11 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import {
-  ApiClientContext,
-  DeleteArgs,
-  filterBy,
-  SaveArgs,
-  useQuery
-} from "common-ui";
+import { ApiClientContext, DeleteArgs, SaveArgs, useQuery } from "common-ui";
 import _ from "lodash";
 import {
   MaterialSample,
@@ -50,7 +44,7 @@ export function useSeqSelectCoordinatesControls({
 
   // Highlighted/selected SeqBatchItems.
   const [selectedItems, setSelectedItems] = useState<SeqReactionSample[]>([]);
-  const lastSelectedItemRef = useRef<SeqReactionSample>();
+  const lastSelectedItemRef = useRef<SeqReactionSample | undefined>(undefined);
 
   // Grid fill direction when you move multiple SeqBatchItems into the grid.
   const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");
@@ -214,15 +208,7 @@ export function useSeqSelectCoordinatesControls({
   // SeqBatchItem queries.
   const { loading: materialSampleItemsLoading } = useQuery<SeqReaction[]>(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "seqBatch.uuid",
-            comparison: "==",
-            arguments: seqBatchId
-          }
-        ]
-      })(""),
+      filter: { "seqBatch.uuid": { EQ: seqBatchId } },
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
       include: "pcrBatchItem,seqBatch,seqPrimer,storageUnitUsage"

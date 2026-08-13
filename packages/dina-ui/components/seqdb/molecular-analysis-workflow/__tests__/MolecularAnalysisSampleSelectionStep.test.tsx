@@ -1,4 +1,8 @@
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  MATERIAL_SAMPLE_MAPPING,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import {
   MolecularAnalysisSampleSelectionStep,
   MolecularAnalysisSampleSelectionStepProps
@@ -9,7 +13,6 @@ import { DinaForm } from "common-ui";
 import userEvent from "@testing-library/user-event";
 import {
   TEST_GROUP,
-  TEST_MAPPING,
   TEST_MATERIAL_SAMPLE_SUMMARY,
   TEST_MOLECULAR_ANALYSIS,
   TEST_MOLECULAR_ANALYSIS_EMPTY,
@@ -25,29 +28,47 @@ import { waitFor } from "@testing-library/react";
 const onSavedMock = jest.fn();
 const mockSetEditMode = jest.fn();
 
+// Track created IDs for run items
+let mockCreatedRunItemId = "mock-run-item-id-123";
+
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "/seqdb-api/generic-molecular-analysis-item":
-      switch (params.filter.rsql) {
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_EMPTY_ID:
+      switch (params?.filter?.["genericMolecularAnalysis.uuid"]?.EQ) {
+        case TEST_MOLECULAR_ANALYSIS_EMPTY_ID:
           return { data: [] };
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID:
+        case TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN };
       }
+      return { data: [] };
+    case "seqdb-api/molecular-analysis-run-item":
+      return {
+        data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN.filter(
+          (item) => item.molecularAnalysisRunItem?.id
+        ).map((item) => ({
+          id: item.molecularAnalysisRunItem?.id,
+          type: "molecular-analysis-run-item",
+          usageType: item.molecularAnalysisRunItem?.usageType,
+          run: {
+            id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
+            type: "molecular-analysis-run"
+          }
+        }))
+      };
     case "user-api/group":
       return TEST_GROUP;
     case "user-api/user-preference":
       return { data: [] };
     case "search-api/search-ws/mapping":
-      return TEST_MAPPING;
+      return MATERIAL_SAMPLE_MAPPING;
     case "seqdb-api/generic-molecular-analysis/" +
       TEST_MOLECULAR_ANALYSIS_EMPTY_ID:
       return TEST_MOLECULAR_ANALYSIS_EMPTY;
     case "seqdb-api/generic-molecular-analysis/" +
       TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID:
       return TEST_MOLECULAR_ANALYSIS;
+    default:
+      return { data: [] };
   }
 });
 
@@ -62,19 +83,86 @@ const mockBulkGet = jest.fn(async (paths) => {
   });
 });
 
-const mockSave = jest.fn(() => {
-  return [
-    {
-      id: "123"
-    }
-  ];
+const mockAxiosGet = jest.fn(async (path, config) => {
+  // bulkLoadResources for material-sample-summary
+  if (path.includes("material-sample-summary")) {
+    const ids = config?.params?.filter?.["id"]?.IN?.split(",") ?? [];
+    const matchedSamples = TEST_MATERIAL_SAMPLE_SUMMARY.filter((s) =>
+      ids.includes(s.id)
+    );
+    return {
+      data: {
+        data: matchedSamples,
+        meta: { totalResourceCount: matchedSamples.length }
+      }
+    };
+  }
+
+  // bulkLoadResources for generic-molecular-analysis
+  if (path.includes("generic-molecular-analysis")) {
+    const ids = config?.params?.filter?.["id"]?.IN?.split(",") ?? [];
+    const analyses = [TEST_MOLECULAR_ANALYSIS_EMPTY, TEST_MOLECULAR_ANALYSIS];
+    const matched = analyses.filter((a) => ids.includes(a.id));
+    return {
+      data: {
+        data: matched,
+        meta: { totalResourceCount: matched.length }
+      }
+    };
+  }
+
+  return { data: { data: [], meta: { totalResourceCount: 0 } } };
 });
 
-const mockPost = jest.fn((post) => {
-  switch (post) {
+const mockAxiosPost = jest.fn(async (path, _body) => {
+  switch (path) {
     case "search-api/search-ws/search":
       return TEST_SEARCH_RESPONSE;
+    default:
+      return { data: { data: [], meta: { totalResourceCount: 0 } } };
   }
+});
+
+const mockBulkCreateResources = jest.fn(async (resources, _options) => {
+  return {
+    data: {
+      data: resources.map((r, i) => ({
+        ...r,
+        id: i === 0 ? mockCreatedRunItemId : `mock-created-id-${i}`
+      }))
+    }
+  };
+});
+
+const mockBulkDeleteResources = jest.fn(async (_ids, _options) => {
+  return { data: {} };
+});
+
+const mockBulkLoadResources = jest.fn(async (ids, options) => {
+  if (options?.resourceType === "material-sample-summary") {
+    const matched = TEST_MATERIAL_SAMPLE_SUMMARY.filter((s) =>
+      ids.includes(s.id)
+    );
+    return {
+      data: {
+        data: matched,
+        meta: { totalResourceCount: matched.length }
+      }
+    };
+  }
+
+  if (options?.resourceType === "generic-molecular-analysis") {
+    const analyses = [TEST_MOLECULAR_ANALYSIS_EMPTY, TEST_MOLECULAR_ANALYSIS];
+    const matched = analyses.filter((a) => ids.includes(a.id));
+    return {
+      data: {
+        data: matched,
+        meta: { totalResourceCount: matched.length }
+      }
+    };
+  }
+
+  return { data: { data: [], meta: { totalResourceCount: 0 } } };
 });
 
 const testCtx = {
@@ -82,12 +170,14 @@ const testCtx = {
     apiClient: {
       get: mockGet,
       axios: {
-        get: mockGet,
-        post: mockPost
+        get: mockAxiosGet,
+        post: mockAxiosPost
       }
     },
-    save: mockSave,
-    bulkGet: mockBulkGet
+    bulkGet: mockBulkGet,
+    bulkLoadResources: mockBulkLoadResources,
+    bulkCreateResources: mockBulkCreateResources,
+    bulkDeleteResources: mockBulkDeleteResources
   }
 } as any;
 
@@ -132,12 +222,12 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       />,
       testCtx
     );
-    // Wait for the component to render and fetch initial data
+
     await waitFor(() =>
       expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument()
     );
 
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /edit/i
       })
@@ -155,12 +245,12 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     );
 
     // The first checkbox is the select all in the header.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("checkbox", { name: /check all/i })[0]
     );
 
     // Move the selected material samples over.
-    userEvent.click(wrapper.getByTestId("move-resources-over"));
+    await userEvent.click(wrapper.getByTestId("move-resources-over"));
 
     // 3 records are expected in the selected table.
     await waitFor(() =>
@@ -170,64 +260,77 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     );
 
     // Perform save
-    userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /save selections/i })
+    );
+    await waitFor(() =>
+      expect(mockBulkCreateResources).toHaveBeenCalledTimes(1)
+    );
 
-    expect(mockSave).toBeCalledWith(
+    expect(mockBulkCreateResources).toHaveBeenCalledWith(
       [
         {
-          resource: {
-            createdBy: "test-user",
-            genericMolecularAnalysis: {},
-            relationships: {
-              materialSample: {
-                data: {
-                  id: "01932b12-fa1a-74dc-b70c-453f55f42444",
-                  type: "material-sample"
-                }
-              },
-              molecularAnalysisRunItem: undefined
+          type: "generic-molecular-analysis-item",
+          attributes: {},
+          relationships: {
+            materialSample: {
+              data: {
+                id: "01932b12-fa1a-74dc-b70c-453f55f42444",
+                type: "material-sample"
+              }
             },
-            type: "generic-molecular-analysis-item"
-          },
-          type: "generic-molecular-analysis-item"
+            genericMolecularAnalysis: {
+              data: {
+                id: TEST_MOLECULAR_ANALYSIS_EMPTY_ID,
+                type: "generic-molecular-analysis"
+              }
+            },
+            molecularAnalysisRunItem: undefined
+          }
         },
         {
-          resource: {
-            createdBy: "test-user",
-            genericMolecularAnalysis: {},
-            relationships: {
-              materialSample: {
-                data: {
-                  id: "1182ca20-d3df-47e1-b27f-2a9cd9b6074f",
-                  type: "material-sample"
-                }
-              },
-              molecularAnalysisRunItem: undefined
+          type: "generic-molecular-analysis-item",
+          attributes: {},
+          relationships: {
+            materialSample: {
+              data: {
+                id: "1182ca20-d3df-47e1-b27f-2a9cd9b6074f",
+                type: "material-sample"
+              }
             },
-            type: "generic-molecular-analysis-item"
-          },
-          type: "generic-molecular-analysis-item"
+            genericMolecularAnalysis: {
+              data: {
+                id: TEST_MOLECULAR_ANALYSIS_EMPTY_ID,
+                type: "generic-molecular-analysis"
+              }
+            },
+            molecularAnalysisRunItem: undefined
+          }
         },
         {
-          resource: {
-            createdBy: "test-user",
-            genericMolecularAnalysis: {},
-            relationships: {
-              materialSample: {
-                data: {
-                  id: "239aaf35-9d02-409c-b099-987948cdcd63",
-                  type: "material-sample"
-                }
-              },
-              molecularAnalysisRunItem: undefined
+          type: "generic-molecular-analysis-item",
+          attributes: {},
+          relationships: {
+            materialSample: {
+              data: {
+                id: "239aaf35-9d02-409c-b099-987948cdcd63",
+                type: "material-sample"
+              }
             },
-            type: "generic-molecular-analysis-item"
-          },
-          type: "generic-molecular-analysis-item"
+            genericMolecularAnalysis: {
+              data: {
+                id: TEST_MOLECULAR_ANALYSIS_EMPTY_ID,
+                type: "generic-molecular-analysis"
+              }
+            },
+            molecularAnalysisRunItem: undefined
+          }
         }
       ],
-      { apiBaseUrl: "/seqdb-api" }
+      {
+        apiBaseUrl: "/seqdb-api",
+        resourceType: "generic-molecular-analysis-item"
+      }
     );
   });
 
@@ -238,6 +341,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       />,
       testCtx
     );
+
     await waitFor(() =>
       expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument()
     );
@@ -245,7 +349,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     // Should not automatically be in edit mode since material samples are linked already.
     expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
 
-    // Wait for the query results to be displayed
+    // Wait for the query results to be displayed (2 existing samples)
     await waitFor(() =>
       expect(
         wrapper.container.querySelector("#queryPageCount")
@@ -253,124 +357,113 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     );
 
     // Switch to edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
     await waitFor(() =>
       expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument()
     );
 
     // Remove "Sample 2" from the currently selected list.
-    userEvent.click(wrapper.getAllByRole("checkbox")[6]);
-    userEvent.click(wrapper.getByTestId("remove-resources"));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[6]);
+    await userEvent.click(wrapper.getByTestId("remove-resources"));
     await waitForLoadingToDisappear();
 
     // Now add "Sample 3" to the selected list.
-    userEvent.click(wrapper.getAllByRole("checkbox")[3]);
-    userEvent.click(wrapper.getByTestId("move-resources-over"));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[3]);
+    await userEvent.click(wrapper.getByTestId("move-resources-over"));
     await waitForLoadingToDisappear();
 
     // Perform save
-    userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(5));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /save selections/i })
+    );
+    await waitFor(() =>
+      expect(mockBulkCreateResources).toHaveBeenCalledTimes(2)
+    );
+    await waitFor(() =>
+      expect(mockBulkDeleteResources).toHaveBeenCalledTimes(3)
+    );
 
     // Create a molecular-analysis-run-item since a run exists for this workflow.
-    expect(mockSave.mock.calls[0]).toEqual([
+    expect(mockBulkCreateResources.mock.calls[0]).toEqual([
       [
         {
-          resource: {
-            relationships: {
-              run: {
-                data: {
-                  id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
-                  type: "molecular-analysis-run"
-                }
+          type: "molecular-analysis-run-item",
+          usageType:
+            MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+          relationships: {
+            run: {
+              data: {
+                id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
+                type: "molecular-analysis-run"
               }
-            },
-            type: "molecular-analysis-run-item",
-            usageType:
-              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM
-          },
-          type: "molecular-analysis-run-item"
+            }
+          }
         }
       ],
       {
-        apiBaseUrl: "/seqdb-api"
+        apiBaseUrl: "/seqdb-api",
+        resourceType: "molecular-analysis-run-item"
       }
     ]);
 
-    // Create the generic-molecular-analysis-item for "Sample 3". Linked to the run item above.
-    expect(mockSave.mock.calls[1]).toEqual([
+    // Create the generic-molecular-analysis-item for "Sample 3".
+    expect(mockBulkCreateResources.mock.calls[1]).toEqual([
       [
         {
-          resource: {
-            createdBy: "test-user",
-            genericMolecularAnalysis: {},
-            relationships: {
-              materialSample: {
-                data: {
-                  id: TEST_MATERIAL_SAMPLE_SUMMARY[2].id, // Sample 3.
-                  type: "material-sample"
-                }
-              },
-              molecularAnalysisRunItem: {
-                data: {
-                  id: "123", // Linked to the one created above, id is mocked for creation.
-                  type: "molecular-analysis-run-item"
-                }
+          type: "generic-molecular-analysis-item",
+          attributes: {},
+          relationships: {
+            materialSample: {
+              data: {
+                id: TEST_MATERIAL_SAMPLE_SUMMARY[2].id, // Sample 3
+                type: "material-sample"
               }
             },
-            type: "generic-molecular-analysis-item"
-          },
-          type: "generic-molecular-analysis-item"
+            genericMolecularAnalysis: {
+              data: {
+                id: TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID,
+                type: "generic-molecular-analysis"
+              }
+            },
+            molecularAnalysisRunItem: {
+              data: {
+                type: "molecular-analysis-run-item",
+                id: mockCreatedRunItemId
+              }
+            }
+          }
         }
       ],
       {
-        apiBaseUrl: "/seqdb-api"
+        apiBaseUrl: "/seqdb-api",
+        resourceType: "generic-molecular-analysis-item"
       }
     ]);
 
     // Delete "Sample 2" generic-molecular-analysis-item
-    expect(mockSave.mock.calls[2]).toEqual([
-      [
-        {
-          delete: {
-            id: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN[1].id,
-            type: "generic-molecular-analysis-item"
-          }
-        }
-      ],
+    expect(mockBulkDeleteResources.mock.calls[0]).toEqual([
+      [TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN[1].id],
       {
-        apiBaseUrl: "/seqdb-api"
+        apiBaseUrl: "/seqdb-api",
+        resourceType: "generic-molecular-analysis-item"
       }
     ]);
 
     // Storage unit usage should be deleted for "Sample 2".
-    expect(mockSave.mock.calls[3]).toEqual([
-      [
-        {
-          delete: {
-            id: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN[1].storageUnitUsage?.id,
-            type: "storage-unit-usage"
-          }
-        }
-      ],
+    expect(mockBulkDeleteResources.mock.calls[1]).toEqual([
+      [TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN[1].storageUnitUsage?.id],
       {
-        apiBaseUrl: "/collection-api"
+        apiBaseUrl: "/collection-api",
+        resourceType: "storage-unit-usage"
       }
     ]);
 
     // Delete the run item for "Sample 2".
-    expect(mockSave.mock.calls[4]).toEqual([
-      [
-        {
-          delete: {
-            id: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN[1]
-              .molecularAnalysisRunItem?.id,
-            type: "molecular-analysis-run-item"
-          }
-        }
-      ],
+    expect(mockBulkDeleteResources.mock.calls[2]).toEqual([
+      [TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN[1].molecularAnalysisRunItem?.id],
       {
-        apiBaseUrl: "/seqdb-api"
+        apiBaseUrl: "/seqdb-api",
+        resourceType: "molecular-analysis-run-item"
       }
     ]);
   });

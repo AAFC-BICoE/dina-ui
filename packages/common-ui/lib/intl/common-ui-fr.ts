@@ -11,7 +11,6 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     addNew: "Ajouter nouveau",
     agricultureCanada: "Agriculture et Agroalimentaire Canada",
     areYouSure: "Êtes-vous certain(e)?",
-    attached: "Joint",
     attributeLabel: "Attribut",
     autoFillGeoSuggestLabel:
       "Remplissage automatique des champs de localisation (la valeur de ce champ de recherche nest pas conservée)",
@@ -41,7 +40,6 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     deleteSelectedButtonText: "Supprimer les éléments sélectionnés",
     description: "Description",
     destroyedLabel: "Détruit",
-    detach: "Détacher",
     done: "Terminé",
     dropdownSearchResults: "Rechercher résultats",
     editAll: "Éditer tout",
@@ -109,6 +107,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     queryTableMultiSortExplanation:
       "Pour trier la liste en fonction de plusieurs colonnes : Cliquez sur un en-tête de colonne pour trier par cette colonne, puis appuyez sur la touche Maj pendant que vous cliquez sur un autre en-tête.",
     queryTableMultiSortTooltipTitle: "Trier en fonction de plusieurs colonnes ",
+    refreshButtonText: "Actualiser",
     remarks: "Remarques",
     remove: "Retirer",
     resetButtonText: "Réinitialiser",

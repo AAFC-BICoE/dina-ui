@@ -5,19 +5,19 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import {
   dateCell,
   DoOperationsError,
+  ExternalLink,
   QueryTable,
   SimpleSearchFilterBuilder,
   useAccount,
   useApiClient
 } from "../../../common-ui/lib";
-import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
 import { delay } from "./utils/workbookMappingUtils";
 import { PersistedResource, KitsuResource } from "kitsu";
 import { MaterialSample } from "../../types/collection-api";
-import Link from "next/link";
 import { ErrorBanner } from "../error/ErrorBanner";
 import { simpleSearchFilterToFiql } from "../../../common-ui/lib/filter-builder/fiql";
 import { deleteFromStorage } from "@rehooks/local-storage";
@@ -55,7 +55,7 @@ export function SaveWorkbookProgress({
     appendData
   } = useWorkbookContext();
 
-  const { save, apiClient, doOperations } = useApiClient();
+  const { save, apiClient, bulkDeleteResources } = useApiClient();
 
   const { agentId } = useAccount();
 
@@ -269,20 +269,16 @@ export function SaveWorkbookProgress({
     const materialSampleIds = fetchedMaterialSamples?.data.map(
       (materialSample) => materialSample.id
     );
-    await doOperations(
-      materialSampleIds.map((id) => ({
-        op: "DELETE",
-        path: `material-sample/${id}`
-      })),
-      { apiBaseUrl }
-    );
-    await doOperations(
-      collectingEventIds.map((id) => ({
-        op: "DELETE",
-        path: `collecting-event/${id}`
-      })),
-      { apiBaseUrl, returnNullForMissingResource: true }
-    );
+    if (apiBaseUrl) {
+      await bulkDeleteResources(materialSampleIds as string[], {
+        apiBaseUrl,
+        resourceType: "material-sample"
+      });
+      await bulkDeleteResources(collectingEventIds as string[], {
+        apiBaseUrl,
+        resourceType: "collecting-event"
+      });
+    }
 
     onWorkbookFailed?.();
   }
@@ -294,13 +290,9 @@ export function SaveWorkbookProgress({
           original: { id, materialSampleName, dwcOtherCatalogNumbers }
         }
       }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-          target="_blank"
-        >
+        <ExternalLink href={`/collection/material-sample/view?id=${id}`}>
           {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-        </Link>
+        </ExternalLink>
       ),
       accessorKey: "materialSampleName"
     },

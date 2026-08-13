@@ -4,7 +4,6 @@ import {
   LoadingSpinner,
   QueryPage,
   SaveArgs,
-  filterBy,
   useAccount,
   useApiClient
 } from "common-ui";
@@ -14,7 +13,7 @@ import { useEffect, useState } from "react";
 import {
   MaterialSample,
   MaterialSampleSummary
-} from "../../../../dina-ui/types/collection-api";
+} from "../../../types/collection-api";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
@@ -137,33 +136,31 @@ export function SangerSampleSelectionStep({
    * Retrieve all of the PCR Batch Items that are associated with the PCR Batch from step 1.
    */
   async function fetchSampledIds() {
-    await apiClient
-      .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId
-            }
-          ]
-        })(""),
+    const response = await apiClient.get<PcrBatchItem[]>(
+      "/seqdb-api/pcr-batch-item",
+      {
+        filter: { "pcrBatch.uuid": { EQ: pcrBatchId } },
         include: "materialSample",
         page: {
           limit: 1000 // Maximum page size.
         }
-      })
-      .then((response) => {
-        const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
-          response?.data?.filter(
-            (item) => item?.materialSample?.id !== undefined
-          );
-        const materialSampleIds: string[] =
-          pcrBatchItems.map((item) => item?.materialSample?.id as string) ?? [];
+      }
+    );
 
-        setPreviouslySelectedResources(pcrBatchItems);
-        fetchSamples(materialSampleIds);
-      });
+    const pcrBatchItems: PersistedResource<PcrBatchItem>[] = (
+      (response?.data as any[]) ?? []
+    ).filter((item) => item !== undefined && item !== null);
+
+    const materialSampleIds: string[] = pcrBatchItems
+      .map(
+        (item) =>
+          (item as any)?.materialSample?.id ??
+          (item as any)?.relationships?.materialSample?.data?.id
+      )
+      .filter((id) => id !== undefined && id !== null) as string[];
+
+    setPreviouslySelectedResources(pcrBatchItems);
+    fetchSamples(materialSampleIds);
   }
 
   /**
@@ -233,15 +230,7 @@ export function SangerSampleSelectionStep({
         metagenomicsBatchItemsResp = await apiClient.get<
           MetagenomicsBatchItem[]
         >(`seqdb-api/metagenomics-batch-item`, {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "metagenomicsBatch.uuid",
-                comparison: "==",
-                arguments: metagenomicsBatch.id
-              }
-            ]
-          })(""),
+          filter: { "metagenomicsBatch.uuid": { EQ: metagenomicsBatch.id } },
           page: { limit: 1000 },
           include:
             "molecularAnalysisRunItem,molecularAnalysisRunItem.run,pcrBatchItem"

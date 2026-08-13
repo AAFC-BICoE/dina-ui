@@ -1,54 +1,10 @@
-import { DinaForm } from "common-ui";
+import { DinaForm, OBJECT_STORE_MAPPING } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { AttachmentsField } from "../AttachmentsField";
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-
-const MOCK_INDEX_MAPPING_RESP = {
-  data: {
-    indexName: "dina_object_store_index",
-    attributes: [
-      {
-        name: "originalFilename",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "bucket",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "createdBy",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "acCaption",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "id",
-        type: "text",
-        path: "data"
-      },
-      {
-        name: "type",
-        type: "text",
-        path: "data"
-      },
-      {
-        name: "createdOn",
-        type: "date",
-        path: "data.attributes"
-      }
-    ],
-    relationships: []
-  }
-};
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
@@ -83,7 +39,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "objectstore-api/metadata":
       return { data: TEST_METADATAS };
     case "search-api/search-ws/mapping":
-      return MOCK_INDEX_MAPPING_RESP;
+      return OBJECT_STORE_MAPPING;
   }
 });
 
@@ -369,7 +325,7 @@ describe("AttachmentsField component", () => {
       expect(container.querySelectorAll("tbody tr").length).toEqual(2);
     });
 
-    const removeButtons = screen.getAllByRole("button", { name: /detach/i });
+    const removeButtons = screen.getAllByRole("button", { name: /unlink/i });
     fireEvent.click(removeButtons[0]);
 
     await waitFor(() => {

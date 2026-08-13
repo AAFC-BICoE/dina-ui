@@ -7,7 +7,7 @@ import Select from "react-select";
 import {
   ExtensionField,
   FieldExtension
-} from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
+} from "../../../types/collection-api/resources/FieldExtension";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 function getTableColumn() {

@@ -1,11 +1,12 @@
-import { AccountContextI } from "common-ui";
+import { AccountContextI, waitForLoadingToDisappear } from "common-ui";
 import _ from "lodash";
 import { fileUploadErrorHandler } from "../../../components/object-store/file-upload/FileUploadProvider";
 import UploadPage, {
-  BULK_ADD_IDS_KEY
+  BULK_ADD_IDS_KEY,
+  BULK_ADD_FILES_KEY
 } from "../../../pages/object-store/upload";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -49,15 +50,17 @@ describe("Upload page", () => {
     let currentUuid = 0;
 
     const mockPost = jest.fn(() => {
+      const id = objectUploadUUIDs[currentUuid++];
       return {
         data: {
           data: {
-            id: objectUploadUUIDs[currentUuid++],
+            id,
             type: "object-upload",
             attributes: {
               dateTimeDigitized: "2003-12-14T12:01:44",
               fileType: "text",
-              size: "500"
+              size: "500",
+              originalFilename: `file${currentUuid}.pdf`
             }
           }
         }
@@ -71,6 +74,9 @@ describe("Upload page", () => {
       }))
     );
     const mockGet = jest.fn((path) => {
+      if (path === "user-api/group") {
+        return { data: [{ name: "example-group" }] };
+      }
       if (path === "objectstore-api/config/file-upload") {
         return {
           data: {
@@ -99,6 +105,7 @@ describe("Upload page", () => {
       accountContext: MOCK_ACCOUNT_CONTEXT,
       apiContext: mockApiCtx as any
     });
+    await waitForLoadingToDisappear();
 
     // Pretend the FileUploader is uploading these files:
     const mockAcceptedFiles = [
@@ -108,20 +115,23 @@ describe("Upload page", () => {
     ];
     await waitFor(() => {
       expect(
-        wrapper.getByLabelText(/drag and drop files here/i)
+        wrapper.getByText(/drag and drop files here/i)
       ).toBeInTheDocument();
     });
 
     // Find the file input in the Dropzone component
-    const fileInput = screen.getByLabelText(/drag and drop files here/i);
+    const fileInput =
+      wrapper.container.querySelector<HTMLInputElement>('input[type="file"]');
+    expect(fileInput).toBeInTheDocument();
 
     // Mock the `FileList` containing the files:
     Object.defineProperty(fileInput, "files", {
-      value: mockAcceptedFiles
+      value: mockAcceptedFiles,
+      configurable: true
     });
 
     // Simulate the file selection
-    fireEvent.change(fileInput);
+    fireEvent.change(fileInput!);
 
     // Await the processing of the file uploads
     await waitFor(() => {
@@ -131,7 +141,7 @@ describe("Upload page", () => {
     });
 
     // Submit
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: "Continue with Batch Entry Form" })
     );
 
@@ -170,15 +180,17 @@ describe("Upload page", () => {
     let currentUuid = 0;
 
     const mockPost = jest.fn(() => {
+      const id = objectUploadUUIDs[currentUuid++];
       return {
         data: {
           data: {
-            id: objectUploadUUIDs[currentUuid++],
+            id,
             type: "object-upload",
             attributes: {
               dateTimeDigitized: "2003-12-14T12:01:44",
               fileType: "text",
-              size: "500"
+              size: "500",
+              originalFilename: `file${currentUuid}.pdf`
             }
           }
         }
@@ -220,6 +232,7 @@ describe("Upload page", () => {
       accountContext: MOCK_ACCOUNT_CONTEXT,
       apiContext: mockApiCtx as any
     });
+    await waitForLoadingToDisappear();
 
     // Pretend the FileUploader is uploading these files:
     const mockAcceptedFiles = [
@@ -229,20 +242,24 @@ describe("Upload page", () => {
     ];
     await waitFor(() => {
       expect(
-        wrapper.getByLabelText(/drag and drop files here/i)
+        wrapper.getByText(/drag and drop files here/i)
       ).toBeInTheDocument();
     });
 
     // Find the file input in the Dropzone component
-    const fileInput = screen.getByLabelText(/drag and drop files here/i);
+    const fileInput =
+      wrapper.container.querySelector<HTMLInputElement>('input[type="file"]');
+    expect(fileInput).toBeInTheDocument();
 
     // Mock the `FileList` containing the files:
     Object.defineProperty(fileInput, "files", {
-      value: mockAcceptedFiles
+      value: mockAcceptedFiles,
+      configurable: true
     });
 
     // Simulate the file selection
-    fireEvent.change(fileInput);
+    fireEvent.change(fileInput!);
+    await waitForLoadingToDisappear();
 
     // Await the processing of the file uploads
     await waitFor(() => {
@@ -252,7 +269,7 @@ describe("Upload page", () => {
     });
 
     // Submit
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: "Continue with Workbook" })
     );
 
@@ -275,8 +292,15 @@ describe("Upload page", () => {
       }
     });
 
-    expect(localStorage.getItem(BULK_ADD_IDS_KEY)).toEqual(
-      JSON.stringify(objectUploadUUIDs)
+    expect(localStorage.getItem(BULK_ADD_FILES_KEY)).toEqual(
+      JSON.stringify({
+        group: "example-group",
+        files: [
+          { id: objectUploadUUIDs[0], originalFilename: "file1.pdf" },
+          { id: objectUploadUUIDs[1], originalFilename: "file2.pdf" },
+          { id: objectUploadUUIDs[2], originalFilename: "file3.pdf" }
+        ]
+      })
     );
   });
 
@@ -331,7 +355,7 @@ describe("Upload page", () => {
     }
   });
 
-  it("Only renders if the user belongs a group", () => {
+  it("Only renders if the user belongs a group", async () => {
     const wrapper = mountWithAppContext(<UploadPage />, {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });

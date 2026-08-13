@@ -21,6 +21,8 @@ export interface MetadataAttributes {
 
   // optional fields
   group?: string;
+  resourceVersion?: number;
+  lastUpdatedOn?: string;
   dcRights?: string;
   acSubtype?: string;
   dcType?: DcType;

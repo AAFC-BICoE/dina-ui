@@ -62,6 +62,8 @@ export interface MetadataFormProps {
 
   // Form ref from parent component
   metadataFormRef?: Ref<FormikProps<InputResource<Metadata>>>;
+
+  defaultToNotReleasable?: boolean;
 }
 
 export function MetadataForm({
@@ -69,7 +71,8 @@ export function MetadataForm({
   onSaved,
   buttonBar,
   metadataSaveHook,
-  metadataFormRef
+  metadataFormRef,
+  defaultToNotReleasable
 }: MetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
 
@@ -102,7 +105,9 @@ export function MetadataForm({
         )}
       </div>
       <MetadataBadges />
-      <NotPubliclyReleasableSection />
+      <NotPubliclyReleasableSection
+        defaultToNotReleasable={defaultToNotReleasable}
+      />
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"

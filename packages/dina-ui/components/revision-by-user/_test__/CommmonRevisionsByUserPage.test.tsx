@@ -63,14 +63,14 @@ describe("MetadataRevisionListPage", () => {
       fail("Table should exist at this point...");
     }
 
-    // Get the number of rows
-    const numRows = table.rows.length;
-
-    // Get the number of columns in the first row (assuming consistent structure)
-    const numCols = table.rows[0].cells.length;
-
     // Renders the 2 revision rows:
     await waitFor(() => {
+      // Get the number of rows
+      const numRows = table.rows.length;
+
+      // Get the number of columns in the first row (assuming consistent structure)
+      const numCols = table.rows[0].cells.length;
+
       expect(numRows).toEqual(3);
       expect(numCols).toEqual(8);
 
@@ -91,11 +91,11 @@ describe("MetadataRevisionListPage", () => {
 
     const wrapper = mountWithAppContext(<AuthorFilterForm />);
 
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /author/i }),
       "searched-author"
     );
-    userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /search/i }));
 
     await waitFor(() => {
       expect(mockPush).lastCalledWith({

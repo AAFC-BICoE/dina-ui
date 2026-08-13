@@ -15,7 +15,7 @@ import { useContext, useState, useEffect } from "react";
 import { useLocalStorage } from "@rehooks/local-storage";
 
 interface MetadataUploadProps {
-  buttonBar?: JSX.Element;
+  buttonBar?: React.JSX.Element;
 }
 
 export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
@@ -91,6 +91,7 @@ export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
   }
   return uploadMetadata ? (
     <MetadataForm
+      defaultToNotReleasable={true}
       metadata={uploadMetadata as InputResource<Metadata>}
       onSaved={redirectToSingleMetadataPage}
       buttonBar={buttonBar}

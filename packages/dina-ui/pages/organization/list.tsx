@@ -56,7 +56,6 @@ export default function OrganizationListPage() {
           columns: ORGANIZATION_TABLE_COLUMNS,
           path: "agent-api/organization"
         }}
-        useFiql={true}
       />
     </PageLayout>
   );

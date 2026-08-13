@@ -12,6 +12,7 @@ import {
   QueryPage,
   RadioButtonsField,
   resourceDifference,
+  SimpleSearchFilterBuilder,
   StringArrayField,
   SubmitButton,
   TextField,
@@ -26,7 +27,7 @@ import _ from "lodash";
 import { useRouter } from "next/router";
 import { AgentRolesField } from "../../../components/collection/AgentRolesField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 import {
   AttachmentsField,
   Footer,
@@ -414,12 +415,10 @@ export function TransactionFormLayout({
               jsonApiBackend={{
                 query: (search, ctx) => ({
                   path: "loan-transaction-api/transaction",
-                  filter: {
-                    ...(ctx.values.group && {
-                      group: { EQ: ctx.values.group }
-                    }),
-                    rsql: `transactionType==${search}*`
-                  }
+                  filter: SimpleSearchFilterBuilder.create<Transaction>()
+                    .whereProvided("group", "EQ", ctx.values.group)
+                    .searchFilter("transactionType", search)
+                    .build()
                 }),
                 option: (transaction) => transaction?.transactionType
               }}
@@ -437,10 +436,10 @@ export function TransactionFormLayout({
             jsonApiBackend={{
               query: (search, ctx) => ({
                 path: "loan-transaction-api/transaction",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `status==${search}*`
-                }
+                filter: SimpleSearchFilterBuilder.create<Transaction>()
+                  .whereProvided("group", "EQ", ctx.values.group)
+                  .searchFilter("status", search)
+                  .build()
               }),
               option: (transaction) => transaction?.status
             }}
@@ -452,10 +451,10 @@ export function TransactionFormLayout({
             jsonApiBackend={{
               query: (search, ctx) => ({
                 path: "loan-transaction-api/transaction",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `purpose==${search}*`
-                }
+                filter: SimpleSearchFilterBuilder.create<Transaction>()
+                  .whereProvided("group", "EQ", ctx.values.group)
+                  .searchFilter("purpose", search)
+                  .build()
               }),
               option: (transaction) => transaction?.purpose
             }}

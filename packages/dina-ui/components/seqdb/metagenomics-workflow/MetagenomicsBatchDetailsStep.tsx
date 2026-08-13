@@ -2,7 +2,6 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
-  filterBy,
   ResourceSelectField,
   SaveArgs,
   SimpleSearchFilterBuilder,
@@ -54,15 +53,7 @@ export function MetagenomicsBatchDetailsStep({
   async function fetchPcrBatchItems() {
     await apiClient
       .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatch!.id!
-            }
-          ]
-        })("")
+        filter: { "pcrBatch.uuid": { EQ: pcrBatch!.id! } }
       })
       .then((response) => {
         setPcrBatchItems(response?.data);
@@ -197,7 +188,11 @@ export function MetagenomicsBatchForm() {
         <ResourceSelectField<IndexSet>
           className="col-md-6"
           name="indexSet"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<IndexSet>()
+              .searchFilter("name", input)
+              .build()
+          }
           model="seqdb-api/index-set"
           optionLabel={(set) => set.name}
           readOnlyLink="/seqdb/index-set/view?id="

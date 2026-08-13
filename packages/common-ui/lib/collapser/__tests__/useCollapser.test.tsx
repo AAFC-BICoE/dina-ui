@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { useCollapser } from "../useCollapser";
 
 function TestComponent() {
@@ -23,19 +24,17 @@ describe("Collapser", () => {
     expect(screen.queryByText("Collapsed content")).not.toBeNull();
   });
 
-  it("Provides a button to change collapsed state.", () => {
+  it("Provides a button to change collapsed state.", async () => {
     const wrapper = render(<TestComponent />);
     expect(wrapper.queryByText("Collapsed content")).toBeInTheDocument();
 
-    screen.logTestingPlaygroundURL();
-
     // Collapse the content:
     const button = wrapper.getByRole("button", { name: /collapse section/i });
-    fireEvent.click(button);
+    await userEvent.click(button);
     expect(wrapper.queryByText("Collapsed content")).not.toBeInTheDocument();
 
     // Un-collapse the content:
-    fireEvent.click(button);
+    await userEvent.click(button);
     waitFor(() => {
       expect(wrapper.queryByText("Collapsed content")).toBeInTheDocument();
     });

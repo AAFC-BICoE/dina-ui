@@ -18,10 +18,35 @@ import {
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
-  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME
 } from "../../../../types/collection-api";
 import { fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
+
+/**
+ * Reusable mock block for tests that render components using `useSearchWsCustomQuery`.
+ * Copy this block into other test files to avoid real search-ws API calls.
+ */
+jest.mock("../../../../../common-ui/lib/search/useSearchWsCustomQuery", () => {
+  const actual = jest.requireActual(
+    "../../../../../common-ui/lib/search/useSearchWsCustomQuery"
+  );
+  return {
+    ...actual,
+    useSearchWsCustomQuery: jest
+      .fn()
+      .mockReturnValue({ loading: false, response: { data: [] } })
+  };
+});
+
+function mockUseSearchWsResults(data: unknown[] = []) {
+  (useSearchWsCustomQuery as jest.Mock).mockReturnValue({
+    loading: false,
+    response: { data }
+  });
+}
 const mockOnSaved = jest.fn();
 
 const TEST_GROUP_1 = {
@@ -62,7 +87,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/vocabulary2/degreeOfEstablishment":
     case "collection-api/vocabulary2/srs":
     case "collection-api/material-sample":
-    case "collection-api/managed-attribute":
+    case "collection-api/controlled-vocabulary-item":
     case "collection-api/vocabulary2/materialSampleState":
     case "collection-api/collection":
     case "collection-api/project":
@@ -884,6 +909,20 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
+      name: CITATIONS_COMPONENT_NAME,
+      visible: undefined,
+      order: 10,
+      sections: [
+        {
+          items: [
+            {
+              name: "citations[0].title"
+            }
+          ]
+        }
+      ]
+    },
+    {
       name: FIELD_EXTENSIONS_COMPONENT_NAME,
       visible: undefined,
       order: 10,
@@ -1086,7 +1125,7 @@ const expected = {
           items: [
             { defaultValue: undefined, name: "tags", visible: false },
             {
-              defaultValue: undefined,
+              defaultValue: false,
               name: "publiclyReleasable",
               visible: false
             },
@@ -1711,9 +1750,27 @@ const expected = {
       ]
     },
     {
+      name: "citations-component",
+      visible: false,
+      order: 10,
+      sections: [
+        {
+          name: "citations-general-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "citations[0].title",
+              visible: false
+            }
+          ]
+        }
+      ]
+    },
+    {
       name: "field-extensions-component",
       visible: true,
-      order: 10,
+      order: 11,
       sections: [
         {
           items: [
@@ -1731,7 +1788,7 @@ const expected = {
     {
       name: "managed-attributes-component",
       visible: true,
-      order: 11,
+      order: 12,
       sections: [
         {
           name: "managed-attributes-section",
@@ -1754,7 +1811,7 @@ const expected = {
     {
       name: "material-sample-attachments-component",
       visible: true,
-      order: 12,
+      order: 13,
       sections: [
         {
           name: "material-sample-attachments-sections",
@@ -1778,7 +1835,10 @@ const expected = {
 };
 
 describe("Form template edit page", () => {
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseSearchWsResults();
+  });
 
   it("Renders the blank template edit page", async () => {
     const { wrapper } = await mountForm();
@@ -1815,6 +1875,7 @@ describe("Form template edit page", () => {
       "storage-component",
       "restriction-component",
       "scheduled-actions-component",
+      "citations-component",
       "field-extensions-component",
       "managed-attributes-component",
       "material-sample-attachments-component"

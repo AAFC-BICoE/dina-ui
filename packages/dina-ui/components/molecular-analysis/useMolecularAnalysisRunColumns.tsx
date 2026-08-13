@@ -54,7 +54,7 @@ export function useMolecularAnalysisRunColumns({
 }: UseMolecularAnalysisRunColumnsProps) {
   const { compareByStringAndNumber } = useStringComparator();
   const { save } = useApiClient();
-  const { groupNames } = useAccount();
+  const { groupNames, username } = useAccount();
 
   function handleNameChange(materialSampleId: string, newName: string) {
     setSequencingRunItems?.((prev) => {
@@ -226,7 +226,7 @@ export function useMolecularAnalysisRunColumns({
             value={original.molecularAnalysisRunItem?.name}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               if (original.materialSampleId) {
-                handleNameChange(original.materialSampleId, event.target.value);
+                handleNameChange(original.materialSampleId, (event.target as HTMLTextAreaElement | HTMLInputElement).value);
               }
             }}
           />
@@ -333,11 +333,11 @@ export function useMolecularAnalysisRunColumns({
                       molecularAnalysisRunItemNames;
                     if (
                       original?.materialSampleSummary?.id &&
-                      event.target.value
+                      (event.target as HTMLTextAreaElement | HTMLInputElement).value
                     ) {
                       molecularAnalysisRunItemNamesMap[
                         original?.materialSampleSummary?.id
-                      ] = event.target.value;
+                      ] = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
                     }
                     return molecularAnalysisRunItemNamesMap;
                   }
@@ -449,6 +449,7 @@ export function useMolecularAnalysisRunColumns({
                           resource: {
                             type: "molecular-analysis-result",
                             group: groupNames?.[0],
+                            createdBy: username,
                             relationships: {
                               attachments: {
                                 data: _.map(newMetadatas, (item) =>
@@ -464,7 +465,7 @@ export function useMolecularAnalysisRunColumns({
                       await save?.<MolecularAnalysisResult>(
                         molecularAnalysisRunResultSaveArgs,
                         {
-                          apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                          apiBaseUrl: "/seqdb-api"
                         }
                       );
                     const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
@@ -487,7 +488,7 @@ export function useMolecularAnalysisRunColumns({
                     await save?.<MolecularAnalysisRunItem>(
                       molecularAnalysisRunItemSaveArgs,
                       {
-                        apiBaseUrl: "seqdb-api/molecular-analysis-run-item"
+                        apiBaseUrl: "/seqdb-api"
                       }
                     );
                     setReloadGenericMolecularAnalysisRun?.(Date.now());
@@ -535,7 +536,7 @@ export function useMolecularAnalysisRunColumns({
                       await save?.<MolecularAnalysisRunItem>(
                         molecularAnalysisRunItemSaveArgs,
                         {
-                          apiBaseUrl: "seqdb-api/molecular-analysis-run-item"
+                          apiBaseUrl: "/seqdb-api"
                         }
                       );
 
@@ -550,7 +551,7 @@ export function useMolecularAnalysisRunColumns({
                           }
                         ];
                       await save?.(molecularAnalysisRunResultDeleteArgs, {
-                        apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                        apiBaseUrl: "/seqdb-api"
                       });
                     } else {
                       // Otherwise, just update the relationship with the remaining attachments
@@ -575,7 +576,7 @@ export function useMolecularAnalysisRunColumns({
                       await save?.<MolecularAnalysisResult>(
                         molecularAnalysisRunResultSaveArgs,
                         {
-                          apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                          apiBaseUrl: "/seqdb-api"
                         }
                       );
                     }
@@ -616,7 +617,7 @@ export function useMolecularAnalysisRunColumns({
                       await save?.<MolecularAnalysisRunItem>(
                         molecularAnalysisRunItemSaveArgs,
                         {
-                          apiBaseUrl: "seqdb-api/molecular-analysis-run-item"
+                          apiBaseUrl: "/seqdb-api"
                         }
                       );
                       if (original.molecularAnalysisRunItem.result.id) {
@@ -631,7 +632,7 @@ export function useMolecularAnalysisRunColumns({
                             }
                           ];
                         await save?.(molecularAnalysisRunResultDeleteArgs, {
-                          apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                          apiBaseUrl: "/seqdb-api"
                         });
                       }
                       setReloadGenericMolecularAnalysisRun?.(Date.now());
@@ -965,7 +966,7 @@ export function useMolecularAnalysisRunColumns({
       const molecularAnalysisRunItemNamesMap = molecularAnalysisRunItemNames;
       if (original?.materialSampleSummary?.id) {
         molecularAnalysisRunItemNamesMap[original?.materialSampleSummary?.id] =
-          event.target.value;
+          (event.target as HTMLTextAreaElement | HTMLInputElement).value;
       }
       return molecularAnalysisRunItemNamesMap;
     };

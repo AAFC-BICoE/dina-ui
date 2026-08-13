@@ -2,7 +2,8 @@ import {
   BulkDeleteButton,
   BulkSelectableFormValues,
   BULK_EDIT_IDS_KEY,
-  DinaForm
+  DinaForm,
+  OBJECT_STORE_MAPPING
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { Group } from "../../../../types/user-api";
@@ -26,53 +27,10 @@ const TEST_GROUP: PersistedResource<Group>[] = [
     type: "group",
     name: "test group",
     path: " test path",
-    labels: { fr: "CNCFR" }
+    labels: { fr: "CNCFR" },
+    roles: ["SUPER_USER", "USER"]
   }
 ];
-
-const MOCK_INDEX_MAPPING_RESP = {
-  data: {
-    indexName: "dina_object_store_index",
-    attributes: [
-      {
-        name: "originalFilename",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "bucket",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "createdBy",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "acCaption",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "id",
-        type: "text",
-        path: "data"
-      },
-      {
-        name: "type",
-        type: "text",
-        path: "data"
-      },
-      {
-        name: "createdOn",
-        type: "date",
-        path: "data.attributes"
-      }
-    ],
-    relationships: []
-  }
-};
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -83,7 +41,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "agent-api/person":
       return { data: TEST_PERSON };
     case "search-api/search-ws/mapping":
-      return MOCK_INDEX_MAPPING_RESP;
+      return OBJECT_STORE_MAPPING;
     case "user-api/group":
       return TEST_GROUP;
     case "user-api/user-preference":
@@ -283,7 +241,7 @@ describe("Metadata List Page", () => {
     });
 
     // Switch to gallery view.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("tab", {
         name: /gallery/i
       })
@@ -313,7 +271,9 @@ describe("Metadata List Page", () => {
     });
 
     // Select all 3 metadatas to edit.
-    userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
+    await userEvent.click(
+      wrapper.getByRole("checkbox", { name: /check all/i })
+    );
 
     // Ensure the total selected is 3.
     await waitFor(() => {
@@ -321,7 +281,9 @@ describe("Metadata List Page", () => {
     });
 
     // Click the bulk edit button:
-    userEvent.click(wrapper.getByRole("button", { name: /edit selected/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /edit selected/i })
+    );
 
     await waitFor(() => {
       // Router push should have been called with the 3 IDs.
@@ -350,7 +312,9 @@ describe("Metadata List Page", () => {
     });
 
     // Click the preview button:
-    userEvent.click(wrapper.getAllByRole("button", { name: /preview/i })[0]);
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /preview/i })[0]
+    );
 
     await waitFor(() => {
       // Preview section is visible: (5th preview element)
@@ -373,7 +337,9 @@ describe("Metadata List Page", () => {
     });
 
     // Select all 3 Metadatas to edit.
-    userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
+    await userEvent.click(
+      wrapper.getByRole("checkbox", { name: /check all/i })
+    );
     await waitFor(() => {
       // The button should now be enabled:
       expect(
@@ -382,7 +348,9 @@ describe("Metadata List Page", () => {
     });
 
     // Deselect all 3 Metadatas.
-    userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
+    await userEvent.click(
+      wrapper.getByRole("checkbox", { name: /check all/i })
+    );
     await waitFor(() => {
       // The button should now be disabled again:
       expect(
@@ -424,7 +392,7 @@ describe("Metadata List Page", () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       buttonWrapper.getAllByRole("button", { name: /delete selected/i })[1]
     );
 
@@ -436,7 +404,7 @@ describe("Metadata List Page", () => {
     });
 
     // Click 'yes' on the "Are you sure" modal:
-    userEvent.click(buttonWrapper.getByRole("button", { name: /yes/i }));
+    await userEvent.click(buttonWrapper.getByRole("button", { name: /yes/i }));
 
     await waitFor(() => {
       expect(mockDelete).toHaveBeenCalledTimes(2);
@@ -453,7 +421,7 @@ describe("Metadata List Page", () => {
     });
 
     // Click the "Close" button.
-    userEvent.click(pageWrapper.getByRole("button", { name: /close/i }));
+    await userEvent.click(pageWrapper.getByRole("button", { name: /close/i }));
 
     await waitFor(() => {
       // Verify router.reload() is called at the very end

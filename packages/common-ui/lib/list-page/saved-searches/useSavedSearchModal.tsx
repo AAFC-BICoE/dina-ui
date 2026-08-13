@@ -1,7 +1,4 @@
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { useState, useMemo } from "react";
 

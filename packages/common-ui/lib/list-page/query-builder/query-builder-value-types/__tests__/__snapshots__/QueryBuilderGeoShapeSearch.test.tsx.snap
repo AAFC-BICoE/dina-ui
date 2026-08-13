@@ -1,34 +1,34 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`QueryBuilderGeoShapeSearch transformGeoShapeToDSL function All operators nested 1`] = `
-Object {
-  "contains": Object {
-    "nested": Object {
+{
+  "contains": {
+    "nested": {
       "path": "included",
-      "query": Object {
-        "geo_shape": Object {
-          "geometry": Object {
+      "query": {
+        "geo_shape": {
+          "geometry": {
             "relation": "contains",
-            "shape": Object {
-              "coordinates": Array [
-                Array [
-                  Array [
+            "shape": {
+              "coordinates": [
+                [
+                  [
                     100,
                     0,
                   ],
-                  Array [
+                  [
                     101,
                     0,
                   ],
-                  Array [
+                  [
                     101,
                     1,
                   ],
-                  Array [
+                  [
                     100,
                     1,
                   ],
-                  Array [
+                  [
                     100,
                     0,
                   ],
@@ -41,33 +41,33 @@ Object {
       },
     },
   },
-  "disjoint": Object {
-    "nested": Object {
+  "disjoint": {
+    "nested": {
       "path": "included",
-      "query": Object {
-        "geo_shape": Object {
-          "geometry": Object {
+      "query": {
+        "geo_shape": {
+          "geometry": {
             "relation": "disjoint",
-            "shape": Object {
-              "coordinates": Array [
-                Array [
-                  Array [
+            "shape": {
+              "coordinates": [
+                [
+                  [
                     100,
                     0,
                   ],
-                  Array [
+                  [
                     101,
                     0,
                   ],
-                  Array [
+                  [
                     101,
                     1,
                   ],
-                  Array [
+                  [
                     100,
                     1,
                   ],
-                  Array [
+                  [
                     100,
                     0,
                   ],
@@ -80,33 +80,33 @@ Object {
       },
     },
   },
-  "intersects": Object {
-    "nested": Object {
+  "intersects": {
+    "nested": {
       "path": "included",
-      "query": Object {
-        "geo_shape": Object {
-          "geometry": Object {
+      "query": {
+        "geo_shape": {
+          "geometry": {
             "relation": "intersects",
-            "shape": Object {
-              "coordinates": Array [
-                Array [
-                  Array [
+            "shape": {
+              "coordinates": [
+                [
+                  [
                     100,
                     0,
                   ],
-                  Array [
+                  [
                     101,
                     0,
                   ],
-                  Array [
+                  [
                     101,
                     1,
                   ],
-                  Array [
+                  [
                     100,
                     1,
                   ],
-                  Array [
+                  [
                     100,
                     0,
                   ],
@@ -119,33 +119,33 @@ Object {
       },
     },
   },
-  "within": Object {
-    "nested": Object {
+  "within": {
+    "nested": {
       "path": "included",
-      "query": Object {
-        "geo_shape": Object {
-          "geometry": Object {
+      "query": {
+        "geo_shape": {
+          "geometry": {
             "relation": "within",
-            "shape": Object {
-              "coordinates": Array [
-                Array [
-                  Array [
+            "shape": {
+              "coordinates": [
+                [
+                  [
                     100,
                     0,
                   ],
-                  Array [
+                  [
                     101,
                     0,
                   ],
-                  Array [
+                  [
                     101,
                     1,
                   ],
-                  Array [
+                  [
                     100,
                     1,
                   ],
-                  Array [
+                  [
                     100,
                     0,
                   ],
@@ -162,31 +162,31 @@ Object {
 `;
 
 exports[`QueryBuilderGeoShapeSearch transformGeoShapeToDSL function All operators non-nested 1`] = `
-Object {
-  "contains": Object {
-    "geo_shape": Object {
-      "geometry": Object {
+{
+  "contains": {
+    "geo_shape": {
+      "geometry": {
         "relation": "contains",
-        "shape": Object {
-          "coordinates": Array [
-            Array [
-              Array [
+        "shape": {
+          "coordinates": [
+            [
+              [
                 100,
                 0,
               ],
-              Array [
+              [
                 101,
                 0,
               ],
-              Array [
+              [
                 101,
                 1,
               ],
-              Array [
+              [
                 100,
                 1,
               ],
-              Array [
+              [
                 100,
                 0,
               ],
@@ -197,30 +197,30 @@ Object {
       },
     },
   },
-  "disjoint": Object {
-    "geo_shape": Object {
-      "geometry": Object {
+  "disjoint": {
+    "geo_shape": {
+      "geometry": {
         "relation": "disjoint",
-        "shape": Object {
-          "coordinates": Array [
-            Array [
-              Array [
+        "shape": {
+          "coordinates": [
+            [
+              [
                 100,
                 0,
               ],
-              Array [
+              [
                 101,
                 0,
               ],
-              Array [
+              [
                 101,
                 1,
               ],
-              Array [
+              [
                 100,
                 1,
               ],
-              Array [
+              [
                 100,
                 0,
               ],
@@ -231,30 +231,30 @@ Object {
       },
     },
   },
-  "intersects": Object {
-    "geo_shape": Object {
-      "geometry": Object {
+  "intersects": {
+    "geo_shape": {
+      "geometry": {
         "relation": "intersects",
-        "shape": Object {
-          "coordinates": Array [
-            Array [
-              Array [
+        "shape": {
+          "coordinates": [
+            [
+              [
                 100,
                 0,
               ],
-              Array [
+              [
                 101,
                 0,
               ],
-              Array [
+              [
                 101,
                 1,
               ],
-              Array [
+              [
                 100,
                 1,
               ],
-              Array [
+              [
                 100,
                 0,
               ],
@@ -265,30 +265,30 @@ Object {
       },
     },
   },
-  "within": Object {
-    "geo_shape": Object {
-      "geometry": Object {
+  "within": {
+    "geo_shape": {
+      "geometry": {
         "relation": "within",
-        "shape": Object {
-          "coordinates": Array [
-            Array [
-              Array [
+        "shape": {
+          "coordinates": [
+            [
+              [
                 100,
                 0,
               ],
-              Array [
+              [
                 101,
                 0,
               ],
-              Array [
+              [
                 101,
                 1,
               ],
-              Array [
+              [
                 100,
                 1,
               ],
-              Array [
+              [
                 100,
                 0,
               ],

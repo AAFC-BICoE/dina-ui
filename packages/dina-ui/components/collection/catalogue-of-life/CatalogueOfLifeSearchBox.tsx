@@ -8,7 +8,7 @@ import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
 import moment from "moment";
 import { useState } from "react";
-import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
+import { ScientificNameSourceDetails } from "../../../types/collection-api/resources/Determination";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { DataSetResult } from "./dataset-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";
@@ -123,8 +123,8 @@ export function CatalogueOfLifeSearchBox({
               <input
                 aria-label={formatMessage("colSearchLabel")}
                 className="form-control col-search-input search-input"
-                onChange={(e) => onInputChange(e.target.value)}
-                onFocus={(e) => e.target.select()}
+                onChange={(e) => onInputChange((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
+                onFocus={(e) => (e.target as HTMLInputElement).select()}
                 onKeyDown={(e) => {
                   if (e.keyCode === 13) {
                     e.preventDefault();
@@ -148,8 +148,8 @@ export function CatalogueOfLifeSearchBox({
               <input
                 aria-label={formatMessage("colSearchLabel")}
                 className="form-control col-search-input"
-                onChange={(e) => onInputChange(e.target.value)}
-                onFocus={(e) => e.target.select()}
+                onChange={(e) => onInputChange((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
+                onFocus={(e) => (e.target as HTMLInputElement).select()}
                 onKeyDown={(e) => {
                   if (e.keyCode === 13) {
                     e.preventDefault();

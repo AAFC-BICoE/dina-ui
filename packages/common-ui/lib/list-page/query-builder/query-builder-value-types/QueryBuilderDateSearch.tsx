@@ -77,7 +77,7 @@ export default function QueryBuilderDateSearch({
                   }}
                   onChangeRaw={(event) => {
                     if (event?.type === "change") {
-                      let newText = event.target.value;
+                      let newText = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
                       const dashOccurrences = newText.split("-").length - 1;
                       if (newText.length === 8 && dashOccurrences === 0) {
                         newText =

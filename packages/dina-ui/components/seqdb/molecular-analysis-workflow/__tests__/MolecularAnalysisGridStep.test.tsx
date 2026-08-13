@@ -19,7 +19,7 @@ import {
   STORAGE_UNIT_USAGE_4
 } from "../__mocks__/MolecularAnalysisMocks";
 import "@testing-library/jest-dom";
-import { waitForElementToBeRemoved, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import { useState, useEffect } from "react";
 import userEvent from "@testing-library/user-event";
 import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
@@ -31,15 +31,12 @@ const mockSave = jest.fn();
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "/seqdb-api/generic-molecular-analysis-item":
-      switch (params.filter.rsql) {
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID:
+      switch (params.filter?.["genericMolecularAnalysis.uuid"]?.["EQ"]) {
+        case TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN };
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID:
+        case TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_STORAGE };
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_MULTIPLE_STORAGE_ID:
+        case TEST_MOLECULAR_ANALYSIS_MULTIPLE_STORAGE_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_STORAGE };
       }
       break;
@@ -71,19 +68,19 @@ const mockBulkGet = jest.fn(async (paths) => {
       // Storage Unit Usage Requests
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_1.id +
-        "?include=storageUnit":
+        "?include=storageUnit&optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_1;
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_2.id +
-        "?include=storageUnit":
+        "?include=storageUnit&optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_2;
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_3.id +
-        "?include=storageUnit":
+        "?include=storageUnit&optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_3;
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_4.id +
-        "?include=storageUnit":
+        "?include=storageUnit&optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_4;
 
       // Material Sample Summary
@@ -172,27 +169,29 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     });
 
     // Ensure Primary IDs are rendered in the grid with links:
-    expect(
-      wrapper.getByRole("link", { name: /sample 1/i }).getAttribute("href")
-    ).toEqual(
-      "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[0].id
-    );
-    expect(
-      wrapper.getByRole("link", { name: /sample 2/i }).getAttribute("href")
-    ).toEqual(
-      "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[1].id
-    );
-    expect(
-      wrapper.getByRole("link", { name: /sample 3/i }).getAttribute("href")
-    ).toEqual(
-      "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[2].id
-    );
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("link", { name: /sample 1/i }).getAttribute("href")
+      ).toEqual(
+        "/collection/material-sample/view?id=" +
+          TEST_MATERIAL_SAMPLE_SUMMARY[0].id
+      );
+      expect(
+        wrapper.getByRole("link", { name: /sample 2/i }).getAttribute("href")
+      ).toEqual(
+        "/collection/material-sample/view?id=" +
+          TEST_MATERIAL_SAMPLE_SUMMARY[1].id
+      );
+      expect(
+        wrapper.getByRole("link", { name: /sample 3/i }).getAttribute("href")
+      ).toEqual(
+        "/collection/material-sample/view?id=" +
+          TEST_MATERIAL_SAMPLE_SUMMARY[2].id
+      );
+    });
 
     // Switch into edit mode, skip button should not appear since storage units are linked currently.
-    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
     await waitFor(() =>
       expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument()
     );
@@ -210,7 +209,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should be in edit mode since storage units don't exist.
     await waitFor(() => {
@@ -223,13 +222,13 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     ).toBeInTheDocument();
 
     // Change the dropdowns.
-    userEvent.click(wrapper.getByRole("combobox"));
+    await userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() =>
       expect(
         wrapper.getByRole("option", { name: /test storage unit type 1/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 1/i })
     );
 
@@ -238,7 +237,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
       expect(comboboxes).toHaveLength(2);
     });
 
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await userEvent.click(wrapper.getAllByRole("combobox")[1]);
 
     await waitFor(() => {
       const options = wrapper.getAllByRole("option");
@@ -259,10 +258,10 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
           option.textContent?.includes("Storage Unit Name") ||
           option.getAttribute("value")?.includes("storage-unit")
       );
-    userEvent.click(storageUnitOptions[0]);
+    await userEvent.click(storageUnitOptions[0]);
 
     // Click cancel, nothing should be saved.
-    userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
     await waitFor(() =>
       // Expect nothing to be in the view since nothing was saved:
       expect(
@@ -282,7 +281,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should be in edit mode since storage units don't exist.
     await waitFor(() => {
@@ -290,13 +289,13 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     });
 
     // Change the dropdowns.
-    userEvent.click(wrapper.getByRole("combobox"));
+    await userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() =>
       expect(
         wrapper.getByRole("option", { name: /test storage unit type 1/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 1/i })
     );
 
@@ -305,7 +304,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
       expect(comboboxes).toHaveLength(2);
     });
 
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await userEvent.click(wrapper.getAllByRole("combobox")[1]);
 
     await waitFor(() => {
       const options = wrapper.getAllByRole("option");
@@ -327,7 +326,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
           option.textContent?.includes("Storage Unit Name") ||
           option.getAttribute("value")?.includes("storage-unit")
       );
-    userEvent.click(storageUnitOptions[0]);
+    await userEvent.click(storageUnitOptions[0]);
 
     // Wait for material samples to be loaded
     await waitFor(() => {
@@ -344,10 +343,12 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Click the move all button.
-    userEvent.click(wrapper.getByRole("button", { name: /move all/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /move all/i }));
 
     // Save the new coordinates.
-    userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /save selections/i })
+    );
     await waitFor(() => {
       // Expect the 3 API calls for the storage-unit-usages.
       expect(mockSave.mock.calls).toEqual([
@@ -454,7 +455,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Wait for component to stabilize
     await waitFor(() => {
@@ -465,10 +466,10 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     });
 
     // Switch to edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
 
     // Clear the grid.
-    userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
     await waitFor(() =>
       expect(
         wrapper.getByText(/selected material samples \(3 in list\)/i)
@@ -476,7 +477,9 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Save, should delete the 3 storage unit usages.
-    userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /save selections/i })
+    );
     await waitFor(() => {
       // Update each generic-molecular-analysis-item to remove the storage unit usage relationship.
       // Then delete the storage unit usages.
@@ -557,10 +560,10 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Switch to edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
 
     // Wait for edit mode to be active
     await waitFor(() =>
@@ -568,13 +571,13 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Change the storage unit type...
-    userEvent.click(wrapper.getAllByRole("combobox")[0]);
+    await userEvent.click(wrapper.getAllByRole("combobox")[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("option", { name: /test storage unit type 2/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 2/i })
     );
 
@@ -588,7 +591,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     });
 
     // Click proceed.
-    userEvent.click(wrapper.getByRole("button", { name: /proceed/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /proceed/i }));
 
     // Wait for any loading to finish
     await waitFor(() => {
@@ -602,7 +605,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
       expect(comboboxes).toHaveLength(2);
     });
 
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await userEvent.click(wrapper.getAllByRole("combobox")[1]);
     await waitFor(() => {
       const options = wrapper.getAllByRole("option");
       const storageUnitOptions = options.filter(
@@ -622,7 +625,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
           option.textContent?.includes("Storage Unit Name") ||
           option.getAttribute("value")?.includes("storage-unit")
       );
-    userEvent.click(storageUnitOptions[1] || storageUnitOptions[0]);
+    await userEvent.click(storageUnitOptions[1] || storageUnitOptions[0]);
 
     // Expect the grid to be cleared automatically.
     await waitFor(() => {
@@ -641,7 +644,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Display a warning to the user.
     await waitFor(() => {
@@ -653,7 +656,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     });
 
     // Switch to edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
 
     // Warning should still be displayed in edit mode.
     await waitFor(() =>
@@ -674,7 +677,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should be in edit mode since no storage units exist.
     await waitFor(() => {
@@ -682,13 +685,13 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     });
 
     // Change the dropdowns.
-    userEvent.click(wrapper.getByRole("combobox"));
+    await userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() =>
       expect(
         wrapper.getByRole("option", { name: /test storage unit type 3/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 3/i })
     );
 

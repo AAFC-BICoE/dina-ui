@@ -1,4 +1,5 @@
 import {
+  ExternalLink,
   LoadingSpinner,
   useApiClient,
   useBlobLoad,
@@ -9,28 +10,14 @@ import { ReactNode, useState, useRef } from "react";
 import { Metadata, Derivative } from "../../../types/objectstore-api";
 import {
   derivativeTypeToLabel,
+  fileExtensionToIcon,
   handleDownloadLink
 } from "../object-store-utils";
 import RcTooltip from "rc-tooltip";
 import { DownloadButton } from "../derivative-list/DerivativeList";
 import { Badge, Dropdown } from "react-bootstrap";
-import {
-  FaArrowUpRightFromSquare,
-  FaDownload,
-  FaFile,
-  FaFileAudio,
-  FaFileCsv,
-  FaFileExcel,
-  FaFileImage,
-  FaFilePdf,
-  FaFilePowerpoint,
-  FaFileVideo,
-  FaFileWord,
-  FaFileZipper
-} from "react-icons/fa6";
-import { FaFileCode, FaLink } from "react-icons/fa";
-import { MdOutlineRawOn } from "react-icons/md";
-import { IconType } from "react-icons/lib";
+import { FaDownload } from "react-icons/fa6";
+import { FaLink } from "react-icons/fa";
 import { PDFViewer } from "./PDFViewer";
 import { formatBytes } from "../object-store-utils";
 
@@ -120,20 +107,12 @@ export function FileView({
   const LinkRender = (
     <>
       <FaLink className="dropdown-icon mb-3" style={{ fontSize: "2em" }} />
-      <a
+      <ExternalLink
         href={(metadata as any)?.resourceExternalURL}
-        target="_blank"
-        rel="noopener noreferrer"
         className="btn btn-secondary"
       >
         <DinaMessage id="openLink" />
-        <FaArrowUpRightFromSquare
-          style={{
-            marginLeft: "0.5em"
-          }}
-          aria-label="Opens in new tab"
-        />
-      </a>
+      </ExternalLink>
     </>
   );
 
@@ -424,74 +403,4 @@ export function FileView({
       )}
     </div>
   );
-}
-
-// Raw‐format extensions
-const RAW_EXTS = new Set(["cr2", "nef"]);
-
-// Common media groups
-const IMAGE_EXTS = new Set([
-  "jpg",
-  "jpeg",
-  "png",
-  "gif",
-  "bmp",
-  "tiff",
-  "svg",
-  "webp"
-]);
-const VIDEO_EXTS = new Set(["mp4", "mov", "avi", "mkv", "wmv", "flv", "webm"]);
-const AUDIO_EXTS = new Set(["mp3", "wav", "flac", "aac", "ogg", "m4a"]);
-
-// Specific one‐off mapping (extension → icon)
-const SPECIFIC_ICON_MAP: Record<string, IconType> = {
-  pdf: FaFilePdf,
-  doc: FaFileWord,
-  docx: FaFileWord,
-  xls: FaFileExcel,
-  xlsx: FaFileExcel,
-  csv: FaFileCsv,
-  html: FaFileCode,
-  htm: FaFileCode,
-  ppt: FaFilePowerpoint,
-  pptx: FaFilePowerpoint,
-  zip: FaFileZipper,
-  gz: FaFileZipper,
-  gzip: FaFileZipper
-};
-
-/**
- * Render an appropriate file‐icon based on a “.ext” string.
- *
- * @param fileExtension  The extension, e.g. ".jpg", ".PDF", ".Cr2"
- * @param className      CSS className to pass to the icon
- */
-export function fileExtensionToIcon(
-  fileExtension: string | undefined,
-  className = ""
-): React.ReactNode {
-  if (!fileExtension) return null;
-
-  // strip leading dot and lowercase
-  const ext = fileExtension.replace(/^\./, "").toLowerCase();
-
-  if (RAW_EXTS.has(ext)) {
-    return <MdOutlineRawOn className={className} />;
-  }
-  if (IMAGE_EXTS.has(ext)) {
-    return <FaFileImage className={className} />;
-  }
-  if (VIDEO_EXTS.has(ext)) {
-    return <FaFileVideo className={className} />;
-  }
-  if (AUDIO_EXTS.has(ext)) {
-    return <FaFileAudio className={className} />;
-  }
-  if (SPECIFIC_ICON_MAP[ext]) {
-    const Icon = SPECIFIC_ICON_MAP[ext];
-    return <Icon className={className} />;
-  }
-
-  // Default to generic file icon
-  return <FaFile className={className} />;
 }

@@ -131,8 +131,12 @@ describe("Metadata external resource edit page.", () => {
     });
 
     // Select an option in the media format search.
-    userEvent.click(wrapper.getByRole("combobox", { name: /media format/i }));
-    userEvent.click(wrapper.getByRole("option", { name: /image\/jpeg/i }));
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /media format/i })
+    );
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /image\/jpeg/i })
+    );
 
     // Set values:
     fireEvent.change(
@@ -166,6 +170,7 @@ describe("Metadata external resource edit page.", () => {
               dcFormat: "image/jpeg",
               fileExtension: ".jpg",
               acCaption: "test caption",
+              publiclyReleasable: false,
               resourceExternalURL: "http://agr.gc.ca"
             },
             type: "metadata"
@@ -204,12 +209,14 @@ describe("Metadata external resource edit page.", () => {
     });
 
     // Set new values:
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", {
         name: /stored object type image/i
       })
     );
-    userEvent.click(wrapper.getByRole("option", { name: /moving image/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /moving image/i })
+    );
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);

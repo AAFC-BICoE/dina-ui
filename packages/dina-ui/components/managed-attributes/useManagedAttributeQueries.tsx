@@ -5,6 +5,7 @@ import {
   ControlledVocabularyItem,
   ManagedAttribute
 } from "../../types/collection-api";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "../controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface UseBulkGetParams {
   managedAttributeApiPath: string;
@@ -63,6 +64,13 @@ export function useManagedAttributeQueries({
               )
             )
             .where("key", "EQ", key)
+            .when(isControlledVocabulary, (builder) =>
+              builder.where(
+                "controlledVocabulary.uuid",
+                "EQ",
+                COLLECTION_MANAGED_ATTRIBUTE_ID
+              )
+            )
             .build()
         }
       )

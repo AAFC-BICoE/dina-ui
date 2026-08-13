@@ -72,8 +72,8 @@ export interface FieldWrapperProps {
 
   validate?: (value: any) => string | void;
   children?:
-    | JSX.Element
-    | ((renderProps: FieldWrapperRenderProps) => JSX.Element);
+    | React.JSX.Element
+    | ((renderProps: FieldWrapperRenderProps) => React.JSX.Element);
 
   /** Optional flag to make label of the field StartCase. */
   startCaseLabel?: boolean;

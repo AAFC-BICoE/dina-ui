@@ -31,7 +31,7 @@ export interface ResourceSelectBaseProps<TData extends KitsuResource> {
   /** Function to get the option label for each resource. */
   optionLabel: (
     resource: PersistedResource<TData>
-  ) => string | null | JSX.Element;
+  ) => string | null | React.JSX.Element;
 
   /**
    * Sort order + attribute.
@@ -118,7 +118,7 @@ type ResourceSelectValue<TData extends KitsuResource> =
  */
 export interface AsyncOption<TData extends KitsuResource> {
   /** Option label. */
-  label: string | JSX.Element;
+  label: string | React.JSX.Element;
 
   /**
    * Function called to fetch the resource when the option is selected.

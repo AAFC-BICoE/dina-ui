@@ -199,7 +199,7 @@ export function PreparationField({
         <div className="col-md-12">
           <ManagedAttributesEditor
             valuesPath="preparationManagedAttributes"
-            managedAttributeApiPath="collection-api/managed-attribute"
+            managedAttributeApiPath="collection-api/controlled-vocabulary-item"
             managedAttributeComponent="PREPARATION"
             fieldSetProps={{
               id,
@@ -210,6 +210,7 @@ export function PreparationField({
             managedAttributeOrderFieldName="preparationManagedAttributesOrder"
             visibleAttributeKeys={visibleManagedAttributeKeys}
             disableClearButton={true}
+            isControlledVocabulary={true}
           />
         </div>
       </div>

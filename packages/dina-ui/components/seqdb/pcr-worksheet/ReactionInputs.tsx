@@ -2,7 +2,7 @@ import {
   Protocol,
   ProtocolData,
   ProtocolDataUnitEnum
-} from "../../../../dina-ui/types/collection-api";
+} from "../../../types/collection-api";
 import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
 
 export function ReactionInputs({ protocol }: { protocol?: Protocol }) {

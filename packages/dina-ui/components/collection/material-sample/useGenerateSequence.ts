@@ -1,5 +1,5 @@
 import { KitsuResource, PersistedResource } from "kitsu";
-import { SequenceGenerator } from "../../../../dina-ui/types/collection-api/resources/SequenceGenerator";
+import { SequenceGenerator } from "../../../types/collection-api/resources/SequenceGenerator";
 import {
   DeleteArgs,
   DoOperationsOptions,
@@ -33,7 +33,7 @@ export async function generateSequence({
         type: "collection-sequence-generator"
       }
     ],
-    { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+    { apiBaseUrl: "/collection-api", forceOperationMethod: "POST" }
   );
 
   return response?.[0];

@@ -42,7 +42,7 @@ interface SampleTypeChart {
  * @param {any} props.queryBuilderTree - queryBuilderTree state value from the parent component, needed to add filter on bar click
  * @param {Function} props.setSubmittedQueryBuilderTree - submittedQueryBuilderTree state setter from the parent component, needed to add filter on bar click
  *
- * @returns {JSX.Element} The rendered chart component.
+ * @returns {React.JSX.Element} The rendered chart component.
  */
 export default function SampleTypeChart({
   query,

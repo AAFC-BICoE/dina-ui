@@ -83,7 +83,6 @@ export default function CollectionMethodListPage() {
               </div>
             </div>
           )}
-          useFiql={true}
         />
       </main>
       <Footer />

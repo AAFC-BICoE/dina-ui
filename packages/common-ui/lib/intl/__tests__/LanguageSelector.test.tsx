@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { mountWithAppContext } from "common-ui";
 import { LanguageSelector } from "../LanguageSelector";
 
@@ -61,7 +62,7 @@ describe("LanguageSelector component", () => {
     const langButton = await component.findByText("Français");
     expect(langButton).toBeInTheDocument();
 
-    fireEvent.click(langButton);
+    await userEvent.click(langButton);
 
     waitFor(async () => {
       // The locale should have been changed to "fr":

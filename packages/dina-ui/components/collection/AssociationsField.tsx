@@ -2,7 +2,7 @@ import { FieldSet, TextField } from "common-ui";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   HostOrganism
-} from "../../../dina-ui/types/collection-api";
+} from "../../types/collection-api";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AssociationsHostField } from "./AssociationsHostField";
 import { MaterialSampleAssociationsField } from "./MaterialSampleAssociationsField";

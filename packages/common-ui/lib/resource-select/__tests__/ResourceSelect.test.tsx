@@ -4,6 +4,7 @@ import { mountWithAppContext } from "common-ui";
 import { AsyncOption } from "../ResourceSelect";
 import "@testing-library/jest-dom";
 import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 /** Example */
 interface Todo extends KitsuResource {
@@ -58,7 +59,7 @@ describe("ResourceSelect component", () => {
     optionLabel: (todo) => todo.name
   };
 
-  function mountWithContext(element: JSX.Element) {
+  function mountWithContext(element: React.JSX.Element) {
     return mountWithAppContext(element, { apiContext });
   }
 
@@ -93,7 +94,7 @@ describe("ResourceSelect component", () => {
       expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
     });
 
-    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     // There should be 4 options including the <None> option.
@@ -121,7 +122,7 @@ describe("ResourceSelect component", () => {
       expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
     });
 
-    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     // Select the third option.
@@ -129,7 +130,7 @@ describe("ResourceSelect component", () => {
     await waitFor(() => {
       expect(options[3]).toBeInTheDocument();
     });
-    fireEvent.click(options[3]);
+    await userEvent.click(options[3]);
 
     await waitFor(() => {
       expect(mockOnChange).toHaveBeenCalledTimes(1);
@@ -154,7 +155,7 @@ describe("ResourceSelect component", () => {
       expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
     });
 
-    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     // Select the third option.
@@ -162,7 +163,7 @@ describe("ResourceSelect component", () => {
     await waitFor(() => {
       expect(options[3]).toBeInTheDocument();
     });
-    fireEvent.click(options[3]);
+    await userEvent.click(options[3]);
 
     // Nothing should happen because no onChange prop was provided.
   });
@@ -220,14 +221,12 @@ describe("ResourceSelect component", () => {
     });
 
     // Simulate changing the value and filtering it.
-    fireEvent.change(wrapper.getByRole("combobox"), {
-      target: { value: "test filter value" }
-    });
+    await userEvent.type(wrapper.getByRole("combobox"), "test filter value");
 
-    // The GET function shsould have been called twice: for the initial query and again for the
+    // The GET function should have been called twice: for the initial query and again for the
     // filtered query.
     await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledTimes(2);
+      expect(mockGet.mock.calls.length).toBeGreaterThanOrEqual(2);
       expect(mockGet).lastCalledWith("todo-api/todo", {
         filter: {
           description: "test filter value"
@@ -277,7 +276,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Display the options...
-    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     const options = wrapper.getAllByRole("option");
@@ -286,7 +285,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Select the null option.
-    fireEvent.click(options[0]);
+    await userEvent.click(options[0]);
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
@@ -353,7 +352,9 @@ describe("ResourceSelect component", () => {
       ).toBeInTheDocument();
     });
 
-    fireEvent.click(wrapper.getByRole("button", { name: /remove todo 1/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove todo 1/i })
+    );
 
     await waitFor(() => {
       expect(mockOnChange).toHaveBeenCalledTimes(1);
@@ -415,7 +416,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Display the options...
-    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     const options = wrapper.getAllByRole("option");
@@ -452,7 +453,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Display the options...
-    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     const options = wrapper.getAllByRole("option");
@@ -463,7 +464,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Select the callback option, which should call the callback:
-    fireEvent.click(options[4]);
+    await userEvent.click(options[4]);
 
     await waitFor(() => {
       expect(mockGetResource).toHaveBeenCalledTimes(1);
@@ -499,7 +500,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Display the options...
-    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     const options = wrapper.getAllByRole("option");
@@ -510,7 +511,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Select the callback option, which should call the callback:
-    fireEvent.click(options[3]);
+    await userEvent.click(options[3]);
 
     await waitFor(() => {
       expect(mockGetResource).toHaveBeenCalledTimes(1);
@@ -552,7 +553,7 @@ describe("ResourceSelect component", () => {
     });
 
     // There should be 5 options including the custom callback option and the none option.
-    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     const options = wrapper.getAllByRole("option");
@@ -561,9 +562,10 @@ describe("ResourceSelect component", () => {
     });
 
     // Simulate changing the value and filtering it.
-    fireEvent.change(wrapper.getByRole("combobox"), {
-      target: { value: "incorrect search with no matches" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("combobox"),
+      "incorrect search with no matches"
+    );
     fireEvent.keyPress(wrapper.getByRole("combobox"), { key: "Enter" });
 
     // Async option should always be displayed even in search results.

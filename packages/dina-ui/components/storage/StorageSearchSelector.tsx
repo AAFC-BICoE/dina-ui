@@ -4,11 +4,11 @@ import {
   dateCell,
   FormikButton,
   useBulkEditTabContext,
-  BULK_EDIT_IDS_KEY
+  BULK_EDIT_IDS_KEY,
+  ExternalLink
 } from "common-ui";
 import { TableColumn } from "common-ui/lib/list-page/types";
 import { KitsuResourceLink } from "kitsu";
-import Link from "next/link";
 import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import useLocalStorage from "@rehooks/local-storage";
@@ -70,9 +70,9 @@ export function StorageSearchSelector({
           original: { id, data }
         }
       }) => (
-        <Link href={`/collection/storage-unit/view?id=${id}`} passHref={true}>
+        <ExternalLink href={`/collection/storage-unit/view?id=${id}`}>
           {data?.attributes?.name}
-        </Link>
+        </ExternalLink>
       ),
       header: () => <FieldHeader name="name" />,
       accessorKey: "data.attributes.name",
@@ -92,12 +92,11 @@ export function StorageSearchSelector({
         }
 
         return (
-          <Link
+          <ExternalLink
             href={`/collection/storage-unit-type/view?id=${included?.storageUnitType?.id}`}
-            passHref={true}
           >
             {included?.storageUnitType?.attributes?.name}
-          </Link>
+          </ExternalLink>
         );
       },
       header: () => <FieldHeader name="storageUnitType" />,

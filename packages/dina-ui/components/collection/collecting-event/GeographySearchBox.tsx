@@ -12,6 +12,7 @@ import { ReactNode, useState } from "react";
 import useSWR from "swr";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { TbMapPinX } from "react-icons/tb";
+import { FaArrowUpRightFromSquare, FaMagnifyingGlass } from "react-icons/fa6";
 interface GeographySearchBoxProps {
   inputValue: string;
   onInputChange: (value: string) => void;
@@ -143,8 +144,12 @@ export function GeographySearchBox({
             aria-label={formatMessage("locationLabel")}
             className="form-control"
             placeholder={formatMessage("locationPlaceholder")}
-            onChange={(e) => onInputChange(e.target.value)}
-            onFocus={(e) => e.target.select()}
+            onChange={(e) =>
+              onInputChange(
+                (e.target as HTMLTextAreaElement | HTMLInputElement).value
+              )
+            }
+            onFocus={(e) => (e.target as HTMLInputElement).select()}
             onKeyDown={(e) => {
               if (e.keyCode === 13) {
                 e.preventDefault();
@@ -161,6 +166,7 @@ export function GeographySearchBox({
             disabled={suggestButtonIsDisabled}
           >
             <DinaMessage id="searchButton" />
+            <FaMagnifyingGlass style={{ marginLeft: "0.3em" }} />
           </button>
         </div>
       </div>
@@ -211,6 +217,7 @@ export function GeographySearchBox({
                   rel="noopener noreferrer"
                 >
                   <DinaMessage id="viewDetailButtonLabel" />
+                  <FaArrowUpRightFromSquare style={{ marginLeft: "0.3em" }} />
                 </a>
               </div>
             </div>

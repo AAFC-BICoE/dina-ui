@@ -1,25 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MaterialSampleBulkEditor Bulk edit all material samples using other catalogue and other identifiers 1`] = `
-Array [
-  Array [
-    Array [
-      Object {
-        "resource": Object {
-          "publiclyReleasable": null,
-        },
+exports[`MaterialSampleBulkEditor General bulk creation and saving Bulk edit all material samples using other catalogue and other identifiers 1`] = `
+[
+  [
+    [
+      {
+        "resource": {},
         "type": "material-sample",
       },
     ],
-    Object {
+    {
       "apiBaseUrl": "/collection-api",
     },
   ],
-  Array [
-    Array [
-      Object {
-        "resource": Object {
-          "dwcOtherCatalogNumbers": Array [
+  [
+    [
+      {
+        "resource": {
+          "dwcOtherCatalogNumbers": [
             "otherCatalogAll",
           ],
           "id": "1",
@@ -27,9 +25,9 @@ Array [
         },
         "type": "material-sample",
       },
-      Object {
-        "resource": Object {
-          "dwcOtherCatalogNumbers": Array [
+      {
+        "resource": {
+          "dwcOtherCatalogNumbers": [
             "otherCatalogAll",
           ],
           "id": "2",
@@ -37,9 +35,9 @@ Array [
         },
         "type": "material-sample",
       },
-      Object {
-        "resource": Object {
-          "dwcOtherCatalogNumbers": Array [
+      {
+        "resource": {
+          "dwcOtherCatalogNumbers": [
             "otherCatalogAll",
           ],
           "id": "3",
@@ -48,7 +46,7 @@ Array [
         "type": "material-sample",
       },
     ],
-    Object {
+    {
       "apiBaseUrl": "/collection-api",
     },
   ],

@@ -3,11 +3,12 @@ import { InputResource } from "kitsu";
 import _ from "lodash";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  ManagedAttribute,
+  ControlledVocabularyItem,
   MaterialSample,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { MATERIAL_SAMPLE_ATTR_NAMES } from "./ShowParentAttributesField";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 interface ShowParentMaterialSampleProps {
   className?: string;
@@ -20,16 +21,21 @@ export function ShowParentMaterialSample({
   id,
   attrList,
   materialSample
-}: ShowParentMaterialSampleProps): JSX.Element {
+}: ShowParentMaterialSampleProps): React.JSX.Element {
   const { locale } = useDinaIntl();
   const { formatMessage } = useDinaIntl();
 
   const parentMaterialSample: MaterialSample =
     (materialSample?.parentMaterialSample ?? {}) as MaterialSample;
-  const { response: attrResp } = useQuery<ManagedAttribute[]>({
-    path: "collection-api/managed-attribute",
-    filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
-      .where("managedAttributeComponent", "EQ", "ORGANISM")
+  const { response: attrResp } = useQuery<ControlledVocabularyItem[]>({
+    path: "collection-api/controlled-vocabulary-item",
+    filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+      .where("dinaComponent", "EQ", "ORGANISM")
+      .where(
+        "controlledVocabulary.uuid" as any,
+        "EQ",
+        COLLECTION_MANAGED_ATTRIBUTE_ID
+      )
       .build(),
     page: { limit: 1000 }
   });

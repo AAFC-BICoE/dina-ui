@@ -2,6 +2,8 @@
 
 = DINA UI docs
 
+include::versions.adoc[]
+
 React based user interface for the DINA project.
 
 [IMPORTANT]
@@ -66,10 +68,6 @@ include::intl.adoc[]
 :leveloffset: 2
 
 include::WCAG_compliance_test_tools_setup.adoc[]
-
-:leveloffset: 1
-
-include::WCAG_automation.adoc[]
 
 = Translation task
 

@@ -13,11 +13,13 @@ import type { NavigationCard } from "../../types/common";
 import type { UserPreference } from "packages/dina-ui/types/user-api";
 import { FilterParam } from "kitsu";
 
-
 /* Utility: given defaults and a persisted list of ids, return the cards in that exact order.
  *  - Unknown IDs are ignored (e.g., if defaults changed).
  */
-function orderByIds<T extends { id: string }>(defaults: T[], ids: string[]): T[] {
+function orderByIds<T extends { id: string }>(
+  defaults: T[],
+  ids: string[]
+): T[] {
   const byId = new Map(defaults.map((c) => [c.id, c]));
   return ids.map((id) => byId.get(id)).filter(Boolean) as T[];
 }
@@ -32,7 +34,7 @@ export type SectionsDefaults = Record<string, NavigationCard[]>;
 export interface UIPreferenceAPI {
   // Ordered cards for a section.
   getCards: (sectionKey: string) => NavigationCard[];
-  
+
   /*
    * Persist a section's order (called by your grid on drop).
    * Accepts full cards but only persists IDs.
@@ -40,12 +42,20 @@ export interface UIPreferenceAPI {
   saveCards: (sectionKey: string, nextCards: NavigationCard[]) => Promise<void>;
   getSectionOrder: (defaultOrder: string[]) => string[];
   saveSectionOrder: (nextOrder: string[]) => Promise<void>;
+
+  // Layout preference (new layout vs classic layout)
+  useNewLayout: boolean;
+  activateNewLayout: () => Promise<void>;
+  deactivateNewLayout: () => Promise<void>;
+
   loading: boolean;
   error: unknown;
   prefId?: string | null;
 }
 
-export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
+export function UIPreferenceHook(
+  sections: SectionsDefaults = {}
+): UIPreferenceAPI {
   const { subject } = useAccount();
   const { apiClient, save } = useApiClient();
 
@@ -53,14 +63,22 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
   const [error, setError] = useState<unknown>(null);
 
   // Single in-memory preference record for this user
-  const [userPref, setUserPref] = useState<UserPreference | undefined>(undefined);
+  const [userPref, setUserPref] = useState<UserPreference | undefined>(
+    undefined
+  );
 
   // Local copy of ids per section for immediate updates
-  const [idsBySection, setIdsBySection] = useState<Record<string, string[]>>({});
+  const [idsBySection, setIdsBySection] = useState<Record<string, string[]>>(
+    {}
+  );
 
-  
+  // Layout preference (new layout vs classic layout)
+  const [useNewLayout, setUseNewLayout] = useState<boolean>(false);
+
   // Keep section order in state
-  const [sectionOrder, setSectionOrder] = useState<string[] | undefined>(undefined);
+  const [sectionOrder, setSectionOrder] = useState<string[] | undefined>(
+    undefined
+  );
 
   // Keep the latest sections defaults in a ref for stable access in callbacks
   const sectionsRef = useRef<SectionsDefaults>(sections);
@@ -78,44 +96,58 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
 
       try {
         // 1) Load the preference (if any)
-        const resp = await apiClient.get<UserPreference[]>("user-api/user-preference", {
-          filter: { userId: subject as FilterParam }
-        });
+        const resp = await apiClient.get<UserPreference[]>(
+          "user-api/user-preference",
+          {
+            filter: { userId: subject as FilterParam }
+          }
+        );
         if (cancelled) return;
 
         const pref = resp?.data?.[0];
 
-        // Extract current uiPreference.homeLayout (may be undefined)
+        // Extract current uiPreference (may be undefined)
         const currentUiPref = (pref?.uiPreference ?? {}) as any;
-        const currenthomeLayout = (currentUiPref.homeLayout ?? {}) as Record<string, string[]>;
+        const currenthomeLayout = (currentUiPref.homeLayout ?? {}) as Record<
+          string,
+          string[]
+        >;
 
         // Read saved section order (may be undefined)
         const savedSectionOrder: unknown = currentUiPref.homeSectionOrder;
 
+        // Read layout preference
+        const savedUseNewLayout = currentUiPref.useNewLayout;
+
         // 2) Build a merged homeLayout object with defaults for any *missing* sections:
-        const nextHomeLayout: Record<string, string[]> = { ...currenthomeLayout };
+        const nextHomeLayout: Record<string, string[]> = {
+          ...currenthomeLayout
+        };
         let needsInitSave = false;
 
-        for (const [sectionKey, defaults] of Object.entries(sectionsRef.current)) {
+        for (const [sectionKey, defaults] of Object.entries(
+          sectionsRef.current
+        )) {
           const savedIds = currenthomeLayout[sectionKey];
 
-            if (Array.isArray(savedIds)) {
-              // Respect user's saved order (including empty [])
-              const allowed = new Set(defaults.map((c) => c.id));
-              nextHomeLayout[sectionKey] = savedIds.filter((id) => allowed.has(id));
-              // Keep [] if that's what the user saved.
-            } else if (savedIds == null) {
-              // Truly missing → seed with defaults once:
-              nextHomeLayout[sectionKey] = defaults.map((c) => c.id);
-              needsInitSave = true;
-            } else {
-              // Unexpected type → fall back to defaults and save:
-              nextHomeLayout[sectionKey] = defaults.map((c) => c.id);
-              needsInitSave = true;
-            }
+          if (Array.isArray(savedIds)) {
+            // Respect user's saved order (including empty [])
+            const allowed = new Set(defaults.map((c) => c.id));
+            nextHomeLayout[sectionKey] = savedIds.filter((id) =>
+              allowed.has(id)
+            );
+            // Keep [] if that's what the user saved.
+          } else if (savedIds == null) {
+            // Truly missing → seed with defaults once:
+            nextHomeLayout[sectionKey] = defaults.map((c) => c.id);
+            needsInitSave = true;
+          } else {
+            // Unexpected type → fall back to defaults and save:
+            nextHomeLayout[sectionKey] = defaults.map((c) => c.id);
+            needsInitSave = true;
+          }
         }
 
-        
         // compute nextSectionOrder
         const defaultSectionOrder = Object.keys(sectionsRef.current);
         let nextSectionOrder: string[];
@@ -124,7 +156,9 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
           // Keep saved order but drop unknown keys and append any new sections at the end.
           const known = new Set(defaultSectionOrder);
           const filtered = savedSectionOrder.filter((k) => known.has(k));
-          const missing = defaultSectionOrder.filter((k) => !filtered.includes(k));
+          const missing = defaultSectionOrder.filter(
+            (k) => !filtered.includes(k)
+          );
           nextSectionOrder = [...filtered, ...missing];
           if (
             filtered.length !== (savedSectionOrder as string[]).length ||
@@ -140,7 +174,10 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
         let finalPref = pref;
 
         // 3) If no pref yet OR some sections were missing → save once.
-        if (!pref?.id || needsInitSave) {
+        // Only save when there are actual sections to initialize — calling with
+        // empty sections (e.g. from Nav) must never trigger a write.
+        const hasSections = Object.keys(sectionsRef.current).length > 0;
+        if (hasSections && (!pref?.id || needsInitSave)) {
           const nextUiPreference: UiPref = {
             ...(pref?.uiPreference as UiPref),
             homeLayout: nextHomeLayout,
@@ -157,23 +194,31 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
           };
 
           await save([args], {
-            apiBaseUrl: "/user-api",
-            skipOperationForSingleRequest: true
+            apiBaseUrl: "/user-api"
           });
 
           // If pref was undefined (brand new), create an in-memory representation.
-          finalPref = pref ?? ({ id: null, userId: subject, uiPreference: nextUiPreference } as any);
+          finalPref =
+            pref ??
+            ({
+              id: null,
+              userId: subject,
+              uiPreference: nextUiPreference
+            } as any);
           // Force uiPreference to what was just saved
-          finalPref = { ...finalPref, uiPreference: nextUiPreference as UserPreference["uiPreference"] };
+          finalPref = {
+            ...finalPref,
+            uiPreference: nextUiPreference as UserPreference["uiPreference"]
+          };
         }
-          // Update state map for optimistic reads:
-          if (!cancelled) {
-            setUserPref(finalPref);
-            setIdsBySection(nextHomeLayout);
-            setSectionOrder(nextSectionOrder);
-          }
+        // Update state map for optimistic reads:
+        if (!cancelled) {
+          setUserPref(finalPref);
+          setIdsBySection(nextHomeLayout);
+          setSectionOrder(nextSectionOrder);
+          setUseNewLayout(savedUseNewLayout === true);
         }
-        catch (e) {
+      } catch (e) {
         if (!cancelled) setError(e);
       } finally {
         if (!cancelled) setLoading(false);
@@ -188,7 +233,7 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
 
   /* Returns a list of NavigationCard objects for a given sectionKey, ordered by ids
    * triggered by change in idsBySection
-  */
+   */
   const getCards = useCallback(
     (sectionKey: string): NavigationCard[] => {
       // try to fetch defaults and ids
@@ -199,7 +244,6 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
     [idsBySection]
   );
 
-  
   // Expose current section order (fall back to default order if not loaded yet)
   const getSectionOrder = useCallback(
     (defaultOrder: string[]): string[] => {
@@ -218,10 +262,16 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
 
       // Build merged uiPreference payload
       const currentUiPref = (userPref?.uiPreference ?? {}) as any;
-      const currenthomeLayout = (currentUiPref.homeLayout ?? {}) as Record<string, string[]>;
+      const currenthomeLayout = (currentUiPref.homeLayout ?? {}) as Record<
+        string,
+        string[]
+      >;
       const mergedHomeLayout = { ...currenthomeLayout, [sectionKey]: nextIds };
 
-      const nextUiPref: UiPref = { ...currentUiPref, homeLayout: mergedHomeLayout } as UiPref;
+      const nextUiPref: UiPref = {
+        ...currentUiPref,
+        homeLayout: mergedHomeLayout
+      } as UiPref;
 
       const args: SaveArgs<UserPreference> = {
         resource: {
@@ -233,12 +283,15 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
       };
 
       try {
-        await save([args], { apiBaseUrl: "/user-api", skipOperationForSingleRequest: true });
+        await save([args], { apiBaseUrl: "/user-api" });
         // Keep in-memory preference consistent:
-        setUserPref(prev => {
+        setUserPref((prev) => {
           if (!prev) return prev; // still loading or not created
           if (prev.uiPreference === nextUiPref) return prev; // nothing changed by reference
-          return { ...prev, uiPreference: nextUiPref as UserPreference["uiPreference"] };
+          return {
+            ...prev,
+            uiPreference: nextUiPref as UserPreference["uiPreference"]
+          };
         });
       } catch (e) {
         setError(e);
@@ -266,17 +319,78 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
         type: "user-preference"
       };
       try {
-        await save([args], { apiBaseUrl: "/user-api", skipOperationForSingleRequest: true });
+        await save([args], { apiBaseUrl: "/user-api" });
         setUserPref((prev) => {
           if (!prev) return prev;
           if (prev.uiPreference === nextUiPref) return prev;
-          return { ...prev, uiPreference: nextUiPref as UserPreference["uiPreference"] };
+          return {
+            ...prev,
+            uiPreference: nextUiPref as UserPreference["uiPreference"]
+          };
         });
       } catch (e) {
         setError(e);
       }
     },
     [save, subject, userPref]
+  );
+
+  // persist layout preference
+  const saveUseNewLayout = useCallback(
+    async (value: boolean) => {
+      setUseNewLayout(value);
+
+      // Fetch the latest preference from the server so we don't overwrite
+      // data from other hook instances (e.g. Home2's card layout) with stale state.
+      try {
+        const resp = await apiClient.get<UserPreference[]>(
+          "user-api/user-preference",
+          { filter: { userId: subject as FilterParam } }
+        );
+        const pref = resp?.data?.[0];
+        const latestUiPref = (pref?.uiPreference ?? {}) as Record<
+          string,
+          unknown
+        >;
+
+        const nextUiPref: UiPref = {
+          ...latestUiPref,
+          useNewLayout: value
+        } as UiPref;
+
+        const args: SaveArgs<UserPreference> = {
+          resource: {
+            id: pref?.id ?? null,
+            userId: subject,
+            uiPreference: nextUiPref
+          } as any,
+          type: "user-preference"
+        };
+
+        await save([args], { apiBaseUrl: "/user-api" });
+        setUserPref((prev) => {
+          if (!prev) return prev;
+          if (prev.uiPreference === nextUiPref) return prev;
+          return {
+            ...prev,
+            uiPreference: nextUiPref as UserPreference["uiPreference"]
+          };
+        });
+      } catch (e) {
+        setError(e);
+      }
+    },
+    [apiClient, save, subject]
+  );
+
+  const activateNewLayout = useCallback(
+    () => saveUseNewLayout(true),
+    [saveUseNewLayout]
+  );
+
+  const deactivateNewLayout = useCallback(
+    () => saveUseNewLayout(false),
+    [saveUseNewLayout]
   );
 
   // Return a stable API object to prevent unnecessary re-renders
@@ -286,10 +400,24 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
       saveCards,
       getSectionOrder,
       saveSectionOrder,
+      useNewLayout,
+      activateNewLayout,
+      deactivateNewLayout,
       loading,
       error,
       prefId: userPref?.id ?? null
     }),
-    [getCards, saveCards, loading, error, userPref?.id]
+    [
+      getCards,
+      saveCards,
+      getSectionOrder,
+      saveSectionOrder,
+      useNewLayout,
+      activateNewLayout,
+      deactivateNewLayout,
+      loading,
+      error,
+      userPref?.id
+    ]
   );
 }

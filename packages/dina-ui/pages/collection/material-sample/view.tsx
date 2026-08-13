@@ -40,6 +40,7 @@ import {
   withOrganismEditorValues,
   MaterialSampleWorkflows
 } from "../../../components";
+import { CitationsField } from "../../../components/collection/citations/CitationsField";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
 import { MaterialSampleBadges } from "../../../components/collection/material-sample/MaterialSampleBadges";
@@ -347,7 +348,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <MaterialSampleInfoSection />
                 {withResponse(colEventQuery, ({ data: colEvent }) => {
                   function legendWrapper():
-                    | ((legendElement: JSX.Element) => JSX.Element)
+                    | ((legendElement: React.JSX.Element) => React.JSX.Element)
                     | undefined {
                     return (legendElement) => {
                       return (
@@ -444,6 +445,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 {!!materialSample?.scheduledActions?.length && (
                   <ScheduledActionsField />
                 )}
+                {!!materialSample?.citations?.length && <CitationsField />}
                 <DataEntryViewer
                   name={"extensionValues"}
                   legend={<DinaMessage id="materialSampleFieldExtensions" />}

@@ -1,7 +1,7 @@
 import {
   DoOperationsError,
   LoadingSpinner,
-  filterBy,
+  SimpleSearchFilterBuilder,
   useAccount,
   useApiClient
 } from "common-ui";
@@ -74,15 +74,7 @@ export function PreLibraryPrepStep({
     // fetch all libraryPrep IDs
     const libraryPreps = (
       await apiClient.get<LibraryPrep[]>("/seqdb-api/library-prep", {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "libraryPrepBatch.uuid",
-              comparison: "==",
-              arguments: batchId
-            }
-          ]
-        })(""),
+        filter: { "libraryPrepBatch.uuid": { EQ: batchId } },
         include: "materialSample,libraryPrepBatch",
         page: {
           limit: 1000 // Maximum page size.
@@ -110,11 +102,9 @@ export function PreLibraryPrepStep({
     const savedPreLibraryPreps = await apiClient.get<PreLibraryPrep[]>(
       "seqdb-api/pre-library-prep",
       {
-        filter: {
-          rsql: libraryPrepIds.length
-            ? `libraryPrep.uuid=in=(${libraryPrepIds})`
-            : ""
-        },
+        filter: SimpleSearchFilterBuilder.create()
+          .whereIn("libraryPrep.uuid", libraryPrepIds)
+          .build(),
         include: "libraryPrep,product,protocol",
         page: { limit: 1000 }
       }
@@ -208,7 +198,7 @@ export function PreLibraryPrepStep({
         return { resource: item, type: item.type };
       });
 
-      await save(resources, { apiBaseUrl: "seqdb-api/pre-library-prep" });
+      await save(resources, { apiBaseUrl: "/seqdb-api" });
       setEditMode(false);
     } catch (e) {
       if (e.toString() === "Error: Access is denied") {

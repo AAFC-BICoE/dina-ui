@@ -1,10 +1,11 @@
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import {
   GeoSuggestSearchBox,
   NominatumApiSearchResult
 } from "../GeoSuggestSearchBox";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 // Mock out the KeyboardEventHandler which should only be rendered in the browser.
@@ -60,13 +61,13 @@ describe("GeoSuggestTextField component", () => {
 
     // Simulate typing in the input
     const input = wrapper.getByRole("textbox");
-    fireEvent.change(input, { target: { value: "ottawa" } });
+    await clearAndType(input, "ottawa");
 
     // Simulate clicking the search button
     const geosuggestButton = wrapper.getByRole("button", {
       name: /geo\-suggest/i
     });
-    fireEvent.click(geosuggestButton);
+    await userEvent.click(geosuggestButton);
 
     // The button should become disabled after the API request
     await waitFor(() => {

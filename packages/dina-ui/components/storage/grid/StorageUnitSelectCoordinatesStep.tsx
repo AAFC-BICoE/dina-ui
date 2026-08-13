@@ -5,6 +5,13 @@ import { ContainerGrid } from "../../seqdb/container-grid/ContainerGrid";
 import { DraggableItemList } from "../../seqdb/container-grid/DraggableItemList";
 import { MaterialSample, StorageUnit } from "../../../types/collection-api";
 import { useMaterialSampleGridControls } from "./utils/useMaterialSampleGridControls";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
 
 interface StorageUnitSelectCoordinatesStepProps {
   onSaved: (nextStep?: number) => Promise<void>;
@@ -42,6 +49,8 @@ export function StorageUnitSelectCoordinatesStep({
     currentStep
   });
 
+  const sensors = useSensors(useSensor(PointerSensor));
+
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
     async function performSaveInternal() {
@@ -53,6 +62,28 @@ export function StorageUnitSelectCoordinatesStep({
       performSaveInternal();
     }
   }, [performSave]);
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over) return;
+
+    const batchItemSample = active.data.current?.batchItemSample;
+    if (!batchItemSample) return;
+
+    const overId = over.id as string;
+
+    if (overId === "draggable-item-list") {
+      if (editMode) {
+        onListDrop({ batchItemSample });
+      }
+      return;
+    }
+
+    const coords = over.data.current?.coords;
+    if (coords) {
+      onGridDrop(batchItemSample, coords);
+    }
+  }
 
   if (!isStorage) {
     return (
@@ -113,48 +144,50 @@ export function StorageUnitSelectCoordinatesStep({
         </div>
       )}
 
-      <div className="row">
-        <div className="col-2">
-          <strong>
-            Selected Material Samples ({availableItems.length} in list)
-          </strong>
-          <DraggableItemList<
-            MaterialSample & { sampleName?: string; sampleId?: string }
-          >
-            availableItems={availableItems}
-            selectedItems={selectedItems}
-            movedItems={movedItems}
-            onClick={onItemClick}
-            onDrop={onListDrop}
-            editMode={editMode}
-          />
-        </div>
-        <div className="col-1">
-          {editMode && (
-            <button
-              className="btn btn-primary move-all w-100"
-              onClick={moveAll}
-              type="button"
-              disabled={gridIsPopulated}
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <div className="row">
+          <div className="col-2">
+            <strong>
+              Selected Material Samples ({availableItems.length} in list)
+            </strong>
+            <DraggableItemList<
+              MaterialSample & { sampleName?: string; sampleId?: string }
             >
-              Move All
-            </button>
-          )}
+              availableItems={availableItems}
+              selectedItems={selectedItems}
+              movedItems={movedItems}
+              onClick={onItemClick}
+              onDrop={onListDrop}
+              editMode={editMode}
+            />
+          </div>
+          <div className="col-1">
+            {editMode && (
+              <button
+                className="btn btn-primary move-all w-100"
+                onClick={moveAll}
+                type="button"
+                disabled={gridIsPopulated}
+              >
+                Move All
+              </button>
+            )}
+          </div>
+          <div className="col-9">
+            <strong>Container wells</strong>
+            <ContainerGrid
+              batch={{
+                gridLayoutDefinition:
+                  storageUnit?.storageUnitType?.gridLayoutDefinition
+              }}
+              cellGrid={cellGrid}
+              movedItems={movedItems}
+              onDrop={onGridDrop}
+              editMode={editMode}
+            />
+          </div>
         </div>
-        <div className="col-9">
-          <strong>Container wells</strong>
-          <ContainerGrid
-            batch={{
-              gridLayoutDefinition:
-                storageUnit?.storageUnitType?.gridLayoutDefinition
-            }}
-            cellGrid={cellGrid}
-            movedItems={movedItems}
-            onDrop={onGridDrop}
-            editMode={editMode}
-          />
-        </div>
-      </div>
+      </DndContext>
     </div>
   );
 }

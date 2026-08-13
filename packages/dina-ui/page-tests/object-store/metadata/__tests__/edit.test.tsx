@@ -3,7 +3,7 @@ import { ManagedAttribute } from "../../../../types/collection-api";
 import MetadataEditPage from "../../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "common-ui";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -107,7 +107,7 @@ const TEST_MANAGED_ATTRIBUTE: PersistedResource<ManagedAttribute> = {
   type: "managed-attribute",
   id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
   name: "test-managed-attribute",
-  key: "test-managed-attribute",
+  key: "test_managed_attribute",
   vocabularyElementType: "STRING"
 };
 
@@ -156,23 +156,35 @@ describe("Metadata single record edit page.", () => {
     expect(wrapper.getByText(/tag2/i)).toBeInTheDocument();
     expect(wrapper.getByText(/tag3/i)).toBeInTheDocument();
 
-    expect(
-      wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
+      ).toBeInTheDocument();
+    });
 
     // Set new values:
-    userEvent.click(wrapper.getByRole("button", { name: /remove tag1/i }));
-    userEvent.click(wrapper.getByRole("button", { name: /remove tag2/i }));
-    userEvent.click(wrapper.getByRole("button", { name: /remove tag3/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove tag1/i })
+    );
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove tag2/i })
+    );
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove tag3/i })
+    );
 
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 1" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 1"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 1"/i })
+    );
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 2" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 2"/i })
+    );
 
     fireEvent.change(
       wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i),
@@ -181,7 +193,14 @@ describe("Metadata single record edit page.", () => {
       }
     );
 
-    userEvent.click(wrapper.getByRole("switch"));
+    const publiclyReleasableSelect = within(
+      wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
+    ).getByRole("combobox");
+
+    fireEvent.keyDown(publiclyReleasableSelect, { key: "ArrowDown" });
+    fireEvent.click(
+      wrapper.getByRole("option", { name: /no - not publicly releasable/i })
+    );
 
     await waitFor(() => {
       expect(
@@ -234,12 +253,12 @@ describe("Metadata single record edit page.", () => {
     });
 
     // Set the license to <None> in the dropdown menu.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", {
         name: /license open government licence \- canada/i
       })
     );
-    userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);

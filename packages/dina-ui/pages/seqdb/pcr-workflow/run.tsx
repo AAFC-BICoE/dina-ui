@@ -6,12 +6,12 @@ import { SangerPcrBatchStep } from "../../../components/seqdb/pcr-workflow/Sange
 import { SangerSampleSelectionStep } from "../../../components/seqdb/pcr-workflow/SangerSampleSelectionStep";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
-import PageLayout from "../../../../dina-ui/components/page/PageLayout";
+import PageLayout from "../../../components/page/PageLayout";
 import { useState, useEffect } from "react";
 import { Button, Spinner, Dropdown, ButtonGroup } from "react-bootstrap";
 import { SangerPcrBatchItemGridStep } from "packages/dina-ui/components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { usePcrBatchQuery } from "../pcr-batch/edit";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
 import React from "react";
 

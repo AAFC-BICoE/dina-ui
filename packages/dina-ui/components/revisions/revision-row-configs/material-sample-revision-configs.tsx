@@ -12,9 +12,10 @@ import {
 import { Project } from "../../../types/collection-api/resources/Project";
 import { Metadata, Person } from "../../../types/objectstore-api";
 import { DinaUser } from "../../../types/user-api/resources/DinaUser";
-import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
+import { ControlledVocabularyViewer } from "@dina-ui/components/controlled-vocabulary/ControlledVocabularyViewer";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSample> =
   {
@@ -30,9 +31,11 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           original: { value }
         }
       }) => (
-        <ManagedAttributesViewer
+        <ControlledVocabularyViewer
           values={value}
-          managedAttributeApiPath="collection-api/managed-attribute"
+          baseApi="collection-api"
+          dinaComponent="MATERIAL_SAMPLE"
+          controlledVocabularyUUID={COLLECTION_MANAGED_ATTRIBUTE_ID}
         />
       ),
 

@@ -1,11 +1,11 @@
 import {
   DinaForm,
   FieldHeader,
-  filterBy,
   FormikButton,
   LoadingSpinner,
   ReactTable,
   ResourceSelectField,
+  SimpleSearchFilterBuilder,
   TextField,
   useAccount,
   useApiClient,
@@ -548,20 +548,12 @@ export function SangerSeqReactionStep({
           name="pcrBatch"
           label={formatMessage("pcrBatch")}
           className="col-md-5 pe-3"
-          filter={filterBy(
-            ["name"],
-            !isAdmin
-              ? {
-                  extraFilters: [
-                    {
-                      selector: "group",
-                      comparison: "==",
-                      arguments: group
-                    }
-                  ]
-                }
-              : undefined
-          )}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<PcrBatch>()
+              .searchFilter("name", input)
+              .when(!isAdmin, (b) => b.whereProvided("group", "EQ", group))
+              .build()
+          }
           isDisabled={!group}
           readOnlyLink="/seqdb/pcr-batch/view?id="
           model="seqdb-api/pcr-batch"
@@ -574,7 +566,11 @@ export function SangerSeqReactionStep({
         <div className="col-md-2">
           <ResourceSelectField<Region>
             name="region"
-            filter={filterBy(["name"])}
+            filter={(input) =>
+              SimpleSearchFilterBuilder.create<Region>()
+                .searchFilter("name", input)
+                .build()
+            }
             model="seqdb-api/region"
             omitNullOption={true}
             optionLabel={(region) => region.name}
@@ -583,20 +579,12 @@ export function SangerSeqReactionStep({
           />
           <ResourceSelectField<PcrPrimer>
             name="primer"
-            filter={filterBy(
-              ["name"],
-              !!selectedRegion
-                ? {
-                    extraFilters: [
-                      {
-                        selector: "region.uuid",
-                        comparison: "==",
-                        arguments: selectedRegion?.id || ""
-                      }
-                    ]
-                  }
-                : undefined
-            )}
+            filter={(input) =>
+              SimpleSearchFilterBuilder.create()
+                .searchFilter("name", input)
+                .whereProvided("region.uuid", "EQ", selectedRegion?.id)
+                .build()
+            }
             omitNullOption={true}
             isDisabled={!selectedRegion}
             model="seqdb-api/pcr-primer"

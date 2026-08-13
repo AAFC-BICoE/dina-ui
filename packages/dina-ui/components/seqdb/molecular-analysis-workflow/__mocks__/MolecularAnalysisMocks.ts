@@ -86,7 +86,8 @@ export const TEST_GROUP: PersistedResource<Group>[] = [
     type: "group",
     name: "Agriculture and Agri-food Canada",
     path: "",
-    labels: { en: "AAFC", fr: "AAC" }
+    labels: { en: "AAFC", fr: "AAC" },
+    roles: ["SUPER_USER", "USER"]
   }
 ];
 
@@ -436,7 +437,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN: PersistedResource<Gener
       genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
       materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[0],
       molecularAnalysisRunItem: {
-        id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+        id: "aaa00000-0000-0000-0000-000000000001",
         type: "molecular-analysis-run-item",
         usageType: "hrms",
         run: TEST_MOLECULAR_ANALYSIS_RUN
@@ -452,7 +453,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN: PersistedResource<Gener
       genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
       materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[1],
       molecularAnalysisRunItem: {
-        id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+        id: "aaa00000-0000-0000-0000-000000000002",
         type: "molecular-analysis-run-item",
         usageType: "hrms",
         run: {
@@ -472,7 +473,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN: PersistedResource<Gener
       genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
       materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[2],
       molecularAnalysisRunItem: {
-        id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+        id: "aaa00000-0000-0000-0000-000000000003",
         type: "molecular-analysis-run-item",
         usageType: "hrms",
         run: {
@@ -524,33 +525,6 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_STORAGE: PersistedResource<G
       }
     }
   ];
-
-export const TEST_MAPPING = {
-  attributes: [
-    {
-      name: "materialSampleName",
-      type: "text",
-      fields: ["keyword"],
-      path: "data.attributes"
-    }
-  ],
-  relationships: [
-    {
-      referencedBy: "collectingEvent",
-      name: "type",
-      path: "included",
-      value: "collecting-event",
-      attributes: [
-        {
-          name: "dwcOtherRecordNumbers",
-          type: "text",
-          path: "attributes"
-        }
-      ]
-    }
-  ],
-  index_name: "dina_material_sample_index"
-};
 
 export const TEST_SEARCH_RESPONSE = {
   data: {

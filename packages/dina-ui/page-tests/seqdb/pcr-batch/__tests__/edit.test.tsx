@@ -149,16 +149,18 @@ describe("PcrBatch edit page", () => {
     });
 
     // Select person 1 from Experimenters Combo Box
-    userEvent.click(wrapper.getByRole("combobox", { name: /experimenters/i }));
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /experimenters/i })
+    );
     await waitFor(() =>
       expect(
         wrapper.getByRole("option", { name: /person 1/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(wrapper.getByRole("option", { name: /person 1/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /person 1/i }));
 
     // Select person 2 from Experimenters Combo Box
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", { name: /experimenters person 1/i })
     );
     await waitFor(() =>
@@ -166,7 +168,7 @@ describe("PcrBatch edit page", () => {
         wrapper.getByRole("option", { name: /person 2/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -283,7 +285,7 @@ describe("PcrBatch edit page", () => {
     });
 
     // Select a storage unit type.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", {
         name: /storage unit type type here to search\./i
       })
@@ -293,7 +295,7 @@ describe("PcrBatch edit page", () => {
         wrapper.getByRole("option", { name: /undefined/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(wrapper.getByRole("option", { name: /undefined/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /undefined/i }));
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -343,7 +345,7 @@ describe("PcrBatch edit page", () => {
     });
 
     // Select a storage unit type.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", {
         name: /storage unit type type here to search\./i
       })
@@ -353,18 +355,18 @@ describe("PcrBatch edit page", () => {
         wrapper.getByRole("option", { name: /undefined/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(wrapper.getByRole("option", { name: /undefined/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /undefined/i }));
 
     await waitFor(() =>
       expect(wrapper.getByText(/<none>/i)).toBeInTheDocument()
     );
 
     // Select a storage unit.
-    userEvent.click(wrapper.getByText(/<none>/i));
+    await userEvent.click(wrapper.getByText(/<none>/i));
     await waitFor(() =>
       expect(wrapper.getByRole("option", { name: "" })).toBeInTheDocument()
     );
-    userEvent.click(wrapper.getByRole("option", { name: "" }));
+    await userEvent.click(wrapper.getByRole("option", { name: "" }));
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);

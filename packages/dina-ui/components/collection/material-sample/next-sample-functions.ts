@@ -38,6 +38,7 @@ export function nextSampleInitialValues(
     id: _id,
     createdOn: _createdOn,
     createdBy: _createdBy,
+    resourceVersion: _resourceVersion,
     materialSampleName,
     allowDuplicateName: _allowDuplicateName,
     organism,
@@ -127,7 +128,7 @@ export interface CopyToNextSampleContextI {
   originalSample: MaterialSample;
 
   /** UUID of the copied material sample */
-  lastCreatedId: string;
+  copyFromId: string;
 
   /** Warnings to display to the user and logic for adding it back if the user wants to. */
   notCopiedOverWarnings: NotCopiedOverWarning[];

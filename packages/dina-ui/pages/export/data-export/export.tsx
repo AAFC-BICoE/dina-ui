@@ -49,24 +49,17 @@ import {
   Button,
   ButtonGroup,
   Card,
-  Overlay,
-  Popover,
   Spinner,
   ToggleButton
 } from "react-bootstrap";
-import {
-  FaCheckCircle,
-  FaFileExport,
-  FaHistory,
-  FaTrash
-} from "react-icons/fa";
+import { FaFileExport, FaHistory, FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
 import { MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS } from "../../collection/material-sample/list";
 import { OBJECT_STORE_NON_EXPORTABLE_COLUMNS } from "../../object-store/object/list";
 import useSavedExports, { VISIBILITY_OPTIONS } from "./useSavedExports";
-import { IoClose } from "react-icons/io5";
+import { ExportPopup } from "@dina-ui/components/export/ExportPopup";
 
 export interface SavedExportOption {
   label?: string;
@@ -208,8 +201,11 @@ export default function ExportPage<TData extends KitsuResource>() {
     const columnFunctions = getColumnFunctions<TData>(columnsToExport);
 
     // Non-exportable columns filtering
+    // managed attribute columns are exempt from non-exportable
+    // since they are explicitly chosen by the user and have well-defined export path
     const filteredColumns = columnsToExport.filter(
       (column) =>
+        (column as any)?.managedAttribute ||
         !nonExportableColumns.some((prefix) =>
           (column?.id ?? "").startsWith(prefix)
         )
@@ -571,7 +567,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                               <DinaMessage id="visibility" />
                             </strong>
                             <Select<{
-                              label: JSX.Element;
+                              label: React.JSX.Element;
                               value: {
                                 restrictToCreatedBy: boolean;
                                 publiclyReleasable: boolean;
@@ -663,34 +659,11 @@ export default function ExportPage<TData extends KitsuResource>() {
                       <DinaMessage id="exportButtonText" />
                     )}
                   </SubmitButton>
-                  <Overlay
+                  <ExportPopup
                     target={submitButtonRef.current}
                     show={exportRequestSubmitted}
-                    placement="right"
-                  >
-                    <Popover id="popover-basic">
-                      <Popover.Header
-                        as="h3"
-                        className="m-0 d-flex justify-content-between align-items-center"
-                      >
-                        <span>
-                          <DinaMessage id="exportRequestSubmittedTitle" />
-                        </span>
-                        <IoClose
-                          style={{ cursor: "pointer" }}
-                          onClick={() => {
-                            setExportRequestSubmitted(false);
-                          }}
-                        />
-                      </Popover.Header>
-                      <Popover.Body className="d-flex flex-column align-items-center text-center gap-2">
-                        <FaCheckCircle className="text-success fs-1" />
-                        <span>
-                          <DinaMessage id="exportRequestSubmittedMessage" />
-                        </span>
-                      </Popover.Body>
-                    </Popover>
-                  </Overlay>
+                    onClose={() => setExportRequestSubmitted(false)}
+                  />
                   {uniqueName === "object-store-list" &&
                     disableObjectExportButton && (
                       <Tooltip id="exportObjectsMaxLimitTooltip" />

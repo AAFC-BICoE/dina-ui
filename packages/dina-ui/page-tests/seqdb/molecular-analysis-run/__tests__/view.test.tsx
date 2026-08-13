@@ -1,7 +1,7 @@
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import MolecularAnalysisRunViewPage from "../../../../pages/seqdb/molecular-analysis-run/view";
 import "@testing-library/jest-dom";
-import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import {
   QUALITY_CONTROL_1,
   QUALITY_CONTROL_2,
@@ -56,92 +56,101 @@ const mockGet = jest.fn(async (path, params) => {
 
     // Quality Controls
     case "seqdb-api/quality-control":
-      switch (params?.filter?.rsql) {
-        case "molecularAnalysisRunItem.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[0].id:
+      switch (params?.filter?.["molecularAnalysisRunItem.uuid"]?.EQ) {
+        case TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[0].id:
           return { data: [QUALITY_CONTROL_1] };
-        case "molecularAnalysisRunItem.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[1].id:
+        case TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[1].id:
           return { data: [QUALITY_CONTROL_2] };
-        case "molecularAnalysisRunItem.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[2].id:
+        case TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[2].id:
           return { data: [QUALITY_CONTROL_3] };
       }
+      return { data: [] };
 
-    // Molecular Analysis Result
-    case "seqdb-api/molecular-analysis-result/" +
-      TEST_MOLECULAR_ANALYSIS_RESULT.id:
-      return { data: TEST_MOLECULAR_ANALYSIS_RESULT };
+    // Molecular Analysis Run Items
+    case "seqdb-api/molecular-analysis-run-item/" +
+      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[0].id:
+      return {
+        data: {
+          ...TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[0],
+          result: {
+            id: TEST_MOLECULAR_ANALYSIS_RESULT.id,
+            type: "molecular-analysis-result"
+          }
+        }
+      };
+    case "seqdb-api/molecular-analysis-run-item/" +
+      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[1].id:
+      return {
+        data: {
+          ...TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[1],
+          result: null
+        }
+      };
+    case "seqdb-api/molecular-analysis-run-item/" +
+      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[2].id:
+      return {
+        data: {
+          ...TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[2],
+          result: null
+        }
+      };
 
     // Molecular Analysis Run Items
     case "seqdb-api/molecular-analysis-run-item":
-      switch (params?.filter?.rsql) {
-        case "run.uuid==" + TEST_MOLECULAR_ANALYSIS_RUN_GENRIC_ID:
-          return {
-            data: TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC
-          };
-        case "run.uuid==" + TEST_MOLECULAR_ANALYSIS_RUN_QUALITY_CONTROL_ID:
+      switch (params?.filter?.["run.uuid"]?.EQ) {
+        case TEST_MOLECULAR_ANALYSIS_RUN_GENRIC_ID:
+          return { data: TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC };
+        case TEST_MOLECULAR_ANALYSIS_RUN_QUALITY_CONTROL_ID:
           return {
             data: [
               ...TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC,
               ...TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL
             ]
           };
-        case "run.uuid==" + TEST_MOLECULAR_ANALYSIS_RUN_NO_ITEMS_ID:
-          return {
-            data: []
-          };
-        case "run.uuid==" + TEST_METAGENOMICS_BATCH_RUN_ID:
-          return {
-            data: TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS
-          };
-        case "run.uuid==" + TEST_SEQ_REACTIONS_RUN_ID:
-          return {
-            data: TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS
-          };
+        case TEST_MOLECULAR_ANALYSIS_RUN_NO_ITEMS_ID:
+          return { data: [] };
+        case TEST_METAGENOMICS_BATCH_RUN_ID:
+          return { data: TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS };
+        case TEST_SEQ_REACTIONS_RUN_ID:
+          return { data: TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS };
       }
+      return { data: [] };
 
     // Generic Molecular Analysis Items
-    case "seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
-      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC[0].id:
+    case `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC[0].id}`:
       return { data: [TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS[0]] };
-    case "seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
-      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC[1].id:
+    case `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC[1].id}`:
       return { data: [TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS[1]] };
-    case "seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
-      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC[2].id:
+    case `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC[2].id}`:
       return { data: [TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS[2]] };
 
-    // Metageneomic Batch Items
-    case "seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
-      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[0].id:
+    // Metagenomics Batch Items
+    case `seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[0].id}`:
       return { data: [TEST_METAGENOMIC_MOLECULAR_ANALYSIS_ITEMS[0]] };
-    case "seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
-      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[1].id:
+    case `seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[1].id}`:
       return { data: [TEST_METAGENOMIC_MOLECULAR_ANALYSIS_ITEMS[1]] };
-    case "seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
-      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[2].id:
+    case `seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[2].id}`:
       return { data: [TEST_METAGENOMIC_MOLECULAR_ANALYSIS_ITEMS[2]] };
 
-    // Seq Reaction Items
-    case "seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[rsql]=molecularAnalysisRunItem.uuid==" +
-      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS[0].id:
+    // Seq Reactions
+    case `seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[molecularAnalysisRunItem.uuid][EQ]=${TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS[0].id}`:
       return { data: [TEST_SEQ_REACTION_MOLECULAR_ANALYSIS_ITEMS[0]] };
-    case "seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[rsql]=molecularAnalysisRunItem.uuid==" +
-      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS[1].id:
+    case `seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[molecularAnalysisRunItem.uuid][EQ]=${TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS[1].id}`:
       return { data: [TEST_SEQ_REACTION_MOLECULAR_ANALYSIS_ITEMS[1]] };
-    case "seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[rsql]=molecularAnalysisRunItem.uuid==" +
-      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS[2].id:
+    case `seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[molecularAnalysisRunItem.uuid][EQ]=${TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS[2].id}`:
       return { data: [TEST_SEQ_REACTION_MOLECULAR_ANALYSIS_ITEMS[2]] };
+
+    // Molecular Analysis Result
+    case "seqdb-api/molecular-analysis-result/" +
+      TEST_MOLECULAR_ANALYSIS_RESULT.id:
+      return { data: TEST_MOLECULAR_ANALYSIS_RESULT };
 
     // Attachments
     case "objectstore-api/metadata":
     case "seqdb-api/molecular-analysis-run/" +
       TEST_MOLECULAR_ANALYSIS_RUN_GENRIC_ID +
       "/attachments":
-      return {
-        data: [TEST_METADATA]
-      };
+      return { data: [TEST_METADATA] };
 
     // Blob storage
     case "":
@@ -208,9 +217,20 @@ const mockBulkGet = jest.fn(async (paths) => {
   });
 });
 
+const mockBulkLoadResources = jest.fn(async (ids: string[], options: any) => {
+  if (options?.resourceType === "seq-reaction") {
+    const data = ids.map((id) =>
+      TEST_SEQ_REACTION_MOLECULAR_ANALYSIS_ITEMS.find((item) => item.id === id)
+    );
+    return { status: 200, data: { data } };
+  }
+  return { status: 200, data: { data: [] } };
+});
+
 const apiContext: any = {
   apiClient: { get: mockGet },
-  bulkGet: mockBulkGet
+  bulkGet: mockBulkGet,
+  bulkLoadResources: mockBulkLoadResources
 };
 
 let mockRouterId = "b4c78082-61a8-4784-a116-8601f76c85d7";
@@ -322,7 +342,7 @@ describe("Molecular Analysis Run View", () => {
     const wrapper = mountWithAppContext(<MolecularAnalysisRunViewPage />, {
       apiContext
     });
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Run Name is displayed:
     expect(
@@ -354,7 +374,7 @@ describe("Molecular Analysis Run View", () => {
     const wrapper = mountWithAppContext(<MolecularAnalysisRunViewPage />, {
       apiContext
     });
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Run Name is displayed:
     expect(wrapper.getAllByText("Seq Reactions Run")[0]).toBeInTheDocument();

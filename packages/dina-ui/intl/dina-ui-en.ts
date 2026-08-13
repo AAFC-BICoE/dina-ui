@@ -12,6 +12,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
+  addCitation: "Add Citation",
   addCataloguedObjectTitle: "Add Catalogued Object",
   addCollectingEventTitle: "Add Collecting Event",
   addCollectionMethodTitle: "Add Collection Method",
@@ -20,6 +21,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addCustomPlaceName: "Add",
   addDetermination: "Add Determination",
   addExistingStorageUnitAsChild: "Add Existing Storage Unit",
+  addExistingStorageUnitAsChild_tooltip:
+    "Add an existing storage unit as a child of this storage unit.",
   addExternalResourceTitle: "Add New External Resource",
   addFilesButton: "Add Files",
   addFilterTooltip:
@@ -39,6 +42,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addMaterialSampleTypeTitle: "Add Material Sample Type",
   addMetadataTitle: "Add Metadata",
   addNewChildStorageUnit: "Add New Child Storage Unit",
+  addNewChildStorageUnit_tooltip:
+    "Add a new storage unit as a child of this storage unit.",
   addNewElement: "Add New {typeName}",
   addNewGroup: "Add New Group",
   addNewPerson: "Add New Person",
@@ -72,6 +77,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   assemblage: "Assemblage",
   assemblageAttachments: "Assemblage Attachments",
   assemblageListTitle: "Assemblages",
+  assemblageDeleteLinkedSamplesWarning:
+    "This assemblage has {count} linked material sample(s). The samples must be unlinked before the assemblage can be deleted. Confirm to unlink all samples and delete the assemblage.",
   assemblageManagedAttributes: "Assemblage Managed Attributes",
   siteManagedAttributes: "Site Managed Attributes",
   assemblage_tooltip:
@@ -85,7 +92,27 @@ export const DINAUI_MESSAGES_ENGLISH = {
   association: "Association",
   associationType: "Association Type",
   associationsLegend: "Associations",
-  attachExisting: "Attach Existing",
+  linkExisting: "Link Existing",
+  unlinkAll: "Unlink All",
+  noCollectingEventAttached:
+    "None of these material samples currently have a Collecting Event.",
+  mixedCollectingEventAttached:
+    "The selected material samples are linked to different collecting events. Edit the individual material samples to see the attached collecting event.",
+  sameCollectingEventAttached:
+    "All material samples being bulk edited share the same collecting event.",
+  overrideCollectingEventBulk:
+    "The selected collecting event will replace all existing collecting event links across all material samples when saved.",
+  overrideCollectingEvent:
+    "The selected collecting event will replace the previously linked collecting event for this material sample when saved.",
+  unlinkAllTitle: "Unlink collecting events?",
+  unlinkAllBody:
+    "Are you sure you want to unlink the collecting event(s) from the selected material samples? This change will take effect once you save the bulk edit.",
+  unlinkAllNotice:
+    "Collecting event(s) will be unlinked from the material samples when the form is saved.",
+  replaceExistingLinkNotice:
+    "Selecting and linking a new collecting event will replace any currently linked collecting events upon saving.",
+  createNewLinkNotice:
+    "Creating a new collecting event to link to this material sample will replace any currently linked collecting events upon saving.",
   attachExistingObjects: "Attach Existing Objects",
   attachSelected: "Attach Selected",
   attachedMaterialSamples: "Attached Material Samples",
@@ -95,6 +122,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   backToParentUnit: "Back To Parent Unit",
   baseNameLabel: "Base Name",
   batchModeInfo: "Batch Mode: All Material Samples have the same ID.",
+  citations: "Citations",
   browseContents: "Browse Contents",
   browseStorageTree: "Browse Storage Tree",
   bulkCreate: "Create Multiple New",
@@ -211,7 +239,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createAndAssign: "Create & Assign",
   createFormTemplate: "Create Form Template",
   createMaterialSampleFormTemplate: "Create Material Sample Form Template",
-  createNew: "Create new",
+  createNew: "Create New",
   createNewLabel: "Create New",
   createNewMaterialSamples: "Create New Material Samples",
   createNewView: "Create New View",
@@ -270,6 +298,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   userProfile: "User Profile",
   disabledForChildMaterialSamples: "Disabled for child Material Samples",
   discardUploadedFiles: "Discard uploaded files",
+  doiPlaceholder: "Enter DOI as URL as https://doi.org/...",
+  doiSearch: "Search DOI",
+  doiSearchError: "Failed to fetch provided DOI",
   dragDropInstructionsHeader: "To rearrange the attribute order:",
   dragDropKeyboardInstructions:
     "Tab to the attribute, then press space to select it. Use the arrow keys to move the item, then press space to place it.",
@@ -331,6 +362,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
   projectFieldExtensions: "Project Field Extensions",
+  field_author: "Author",
   field_includeQualityControls: "Include Quality Controls and Blanks",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
@@ -586,8 +618,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_tags: "Tags",
   field_targetOrganismPrimaryScientificName:
     "Target Organism Primary Scientific Name",
-  field_targetOrganismPrimaryClassification:
-    "Target Organism Primary Classification",
+  "field_targetIdentifiableEntitySummary.sex": "Target Identifiable Entity Sex",
+  "field_targetIdentifiableEntitySummary.lifeStage":
+    "Target Identifiable Entity Life Stage",
+  "field_targetIdentifiableEntitySummary.dwcVernacularName":
+    "Target Identifiable Entity Vernacular Name",
+  "field_targetIdentifiableEntitySummary.managedAttributes":
+    "Target Identifiable Entity Managed Attributes",
+  "field_targetIdentifiableEntitySummary.primaryDetermination.typeStatus":
+    "Target Identifiable Entity Primary Determination Type Status",
+  "field_targetIdentifiableEntitySummary.primaryDetermination.classification":
+    "Target Identifiable Entity Primary Determination Classification",
+  "field_targetIdentifiableEntitySummary.primaryDetermination.managedAttributes":
+    "Target Identifiable Entity Primary Determination Managed Attributes",
   field_targetOrganismPrimaryGeoShape: "Target Organism Primary GeoShape",
   field_title: "Title",
   "field_title.en": "English Title",
@@ -616,11 +659,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_vocabularyElementType_picklist_label: "Pick List",
   field_vocabularyElementType_text_label: "Text",
   field_webpage: "Web Page",
+  field_lastUpdatedOn: "Last Updated On",
   field_xmpMetadataDate: "Last Updated On",
+  field_xmpRightsOwner: "Owner",
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "License",
   field_isExternalResource: "Is External Resource",
+  field_identifiers: "Other Identifiers",
   fileTooBig: "File too big",
   filterAttribute: "Filter Attribute",
   filterByGroup: "Filter By Group",
@@ -682,6 +728,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   institution: "Institution",
   institutionListTitle: "Institutions",
   isFiledAs: "Filed As",
+  field_isGeneric: "Generic",
+  field_isGeneric_tooltip:
+    "Is the storage unit representing a generic instance of the storage unit type?",
   isTargetHeader: "Is Target ?",
   isolation: "Isolation",
   keepContentsTogether: "Keep Contents Together",
@@ -710,6 +759,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeTemplateOrderInfo:
     "This Managed Attribute layout will be saved into the Form Template.",
+  managedAttributeDeleteWarning:
+    "Deleting this Managed Attribute could impact existing untracked resources like exports or scripts. Are you sure you want to proceed?",
   managedAttributeValueLabel: "Value",
   managedAttributes: "Managed Attributes",
   managedAttributesViews: "Form Templates",
@@ -803,6 +854,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metersField_tooltip:
     "Use the following units for auto-conversion: ft, in, ft in, yd, mm, cm, km, pd, po, pd po.",
   moveAllContent: " Move All Content",
+  moveAllContent_tooltip:
+    "Move all child storage units and material samples to the new storage unit.",
   multiple: "Multiple",
   multipleMaterialSamples: "Multiple Material Samples",
   multipleUnits: "Multiple Units",
@@ -818,6 +871,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   notEditableWhenThereAreChildStorageUnits:
     "Not editable when there are child Storage Units.",
   notPubliclyReleasable: "Not Publicly Releasable",
+  publiclyReleasable: "Publicly Releasable",
   objectListTitle: "Stored Objects",
   objectStoreDataUnavailable: "Object Store data unavailable",
   objectStoreDetailsTitle: "Object Store Details",
@@ -879,6 +933,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   protocolNameLabel: "Protocol Name",
   splitConfigurationNameLabel: "Split Configuration Name",
   protocolViewTitle: "Protocol",
+  publiclyReleasableOption: "Yes - Publicly Releasable",
+  notPubliclyReleasableOption: "No - Not Publicly Releasable",
   queryBuilder_addSearchGroup: "Add sub-query",
   queryBuilder_addSearchRule: "Add query",
   queryBuilder_conjunction_and: "AND",
@@ -960,7 +1016,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeSavedSearch: "Remove Saved Search",
   areYouSureRemoveSavedSearch: "Are you sure you want to remove:",
   removeThisElement: "Remove This {typeName}",
-  removeThisPlaceLabel: " Remove this Place",
+  removeThisPlaceLabel: "Remove this Place",
   requiredField: "Required field",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   resetNamesToDefaultValues: "Reset Names to Default Values",
@@ -986,8 +1042,18 @@ export const DINAUI_MESSAGES_ENGLISH = {
   rolesPerGroup: "Roles Per Group",
   runWorkflow: "Run Workflow",
   save: "Save",
+  bulkEditingAllSamples: "Editing {total} material samples",
+  bulkEditingSampleOf: "Editing material sample {current} of {total}",
+  bulkEditingAllMetadata: "Editing {total} metadata records",
+  bulkEditingMetadataOf: "Editing metadata {current} of {total}",
+  bulkEditLoadingProgress:
+    "Loading material sample data... {loaded} of {total}",
+  bulkEditMetadataLoadingProgress: "Loading metadata... {loaded} of {total}",
   saveAll: "Save All",
   saveAndCopyToNext: "Save & Copy To Next",
+  saveSuccess: "Successfully saved record: ",
+  copyToNextSampleInProgressMessage:
+    'You are now working on a new copy based on "{displayName}". This copy will not be created until it\'s saved.',
   saveAndCopyToNextWarning:
     'The "{componentName}" data component was not automatically copied over since it\'s specific to the previous Material Sample. Would you like to duplicate it anyway?',
   saveAndCopyToNextWarningButton:
@@ -1034,6 +1100,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   columnSelector_addNewColumn: "Add a new column:",
   columnSelector_selectManagedAttribute: "Select managed attribute:",
   columnSelector_selectClassification: "Select classification:",
+  columnSelector_selectIdentifier: "Select identifier:",
   columnSelector_addColumnButton: "Add Column",
   columnSelector_resetButton: "Reset Columns",
   field_columnFunction: "Functions",
@@ -1198,6 +1265,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
   workBookManagedAttributeKeysTargetKeyIsRequired:
     "Please select a Managed Attribute value",
+  workBookControlledVocabularyKeysTargetKeyIsRequired:
+    "Please select a Controlled Vocabulary value",
   workBookStorageUnitIsRequired:
     "Storage unit not provided. Must provide valid storage unit for well row and well column.",
   workbookGroupUploadTitle: "Upload Workbook",
@@ -1348,6 +1417,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedExport_columnsToBeSaved: "Columns to be saved",
   export_columnsToExport: "Columns To Export",
   templateGenerator_columnsToGenerate: "Columns To Generate",
+  loadExistingTemplate: "Load Existing Template",
+  templateLoadedSuccessfully:
+    "Template has been loaded successfully. Template name and columns have been updated.",
+  templateColumnsUnmapped:
+    "The following columns could not be mapped: {columns}",
+  invalidTemplate:
+    "The uploaded template is invalid. Please ensure the template is generated from the template generator and has not been modified.",
   usage: "Usage",
   editContents: "Edit Contents",
   storageUnitGridTitle: "Storage Unit Grid",
@@ -1410,6 +1486,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   pasteRunItemName: "Paste Run Item Names",
   pasteQualityControlName: "Paste Quality Control Names",
   pasteMaterialSample: "Paste Material Samples",
+  permissionRoles: "Permissions",
   adminRoles: "Admin Roles",
   separator: "Separator",
   visibility: "Visibility",
@@ -1435,6 +1512,23 @@ export const DINAUI_MESSAGES_ENGLISH = {
   siteListTitle: "Site",
   siteAttachments: "Site Attachments",
   systemInfoTitle: "System Information",
+  systemInfoAttentionRequired: "Attention Required",
+  systemInfoDisabled: "Disabled",
+  systemInfoEnabled: "Enabled",
+  systemInfoEndpoint: "Endpoint",
+  systemInfoFetching: "Fetching system info...",
+  systemInfoLastRefreshed: "Last refreshed:",
+  systemInfoLatency: "Latency",
+  systemInfoLatencyMs: "{latencyMs} ms",
+  refreshButtonText: "Refresh",
+  systemInfoMessageConsumer: "Message Consumer",
+  systemInfoMessageProducer: "Message Producer",
+  systemInfoModuleInfo: "Module Info",
+  systemInfoStatusOffline: "Offline",
+  systemInfoStatusOnline: "Online",
+  systemInfoUnableToReachService: "Unable to reach service.",
+  systemInfoUnexpectedError: "Unexpected error.",
+  systemInfoUnknown: "Unknown",
   code: "Code",
   siteMap: "Site Map",
   siteCoordinates: "Site Coordinates",
@@ -1446,6 +1540,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editOnMap: "Edit on Map",
   erase: "Erase",
   close: "Close",
+  doi: "DOI",
+  title: "Title",
+  authors: "Authors",
+  journal: "Journal",
+  volume: "Volume",
+  pages: "Pages",
+  citationRemarks: "Citation Remarks",
+  invalidDOIValue:
+    "Invalid DOI value. A DOI should start with 'https://doi.org/'. For example: 'https://doi.org/10.1234/abcd5678'",
   invalidPolygon:
     "The coordinates are invalid: must be number[][][] and closed",
   errorFetchingExport: "Error fetching export details. Please try again later.",
@@ -1453,5 +1556,31 @@ export const DINAUI_MESSAGES_ENGLISH = {
   exportRequestSubmittedMessage:
     "Your export is being processed. You will receive a notification when it's ready to download.",
   resetView: "Reset View",
-  saveAsImage: "Save as Image"
+  saveAsImage: "Save as Image",
+  parentMaterialSampleDisabledTooltip:
+    "Material Sample can only have a single link to one of the following relationships: Parent Material Sample or a collecting event.",
+  managedAttributeTabAlertTitle: "{module} managed attributes have been moved.",
+  managedAttributeTabAlertDescription:
+    "They are now located on the new {link} page.",
+  supportedFormats: "Supported Formats",
+  maxFileSize: "Maximum file size",
+  openInNewTab: "Opens in new tab",
+
+  // Permissions Table
+  tableTitle_permissions: "Permissions",
+  resource: "Resource",
+  operation_read: "Read",
+  operation_create: "Create",
+  operation_edit: "Edit",
+  operation_delete: "Delete",
+  permission_allowed: "Allowed",
+  permission_denied: "Denied",
+  permission_unavailable: "Unavailable",
+  permission_objectOwner: "Object Owner",
+  resource_materialSample: "Material Sample",
+  resource_controlledVocabulary: "Controlled Vocabulary",
+  resource_collection: "Collection",
+  resource_project: "Project",
+  resource_objectStore: "Object Metadata",
+  resource_agent: "Agent (person)"
 };

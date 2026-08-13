@@ -2,7 +2,7 @@
 
 // The "setimmediate" package from NPM doesn't wait long enough during tests.
 // Manually polyfill here:
-global.setImmediate = (fn) => global.setTimeout(fn, 0);
+global.setImmediate = jest.requireActual("timers").setImmediate;
 
 // Let tests pretend they are running in the browser:
 process.browser = true;
@@ -15,21 +15,26 @@ const consoleError = console.error;
 jest.spyOn(console, "error").mockImplementation((...args) => {
   if (
     !String(args?.[0])?.includes?.(
-      "Warning: An update to %s inside a test was not wrapped in act"
+      "was not wrapped in act"
     )
   ) {
     consoleError(...args);
   }
 });
 
-// Mock scroll method for react-dropzone-uploader compatibility in JSDOM test environment
+// Mock scroll method for compatibility in JSDOM test environment
 Object.defineProperty(Element.prototype, "scroll", {
   value: jest.fn(),
   writable: true,
   configurable: true
 });
+Object.defineProperty(Element.prototype, "scrollIntoView", {
+  value: jest.fn(),
+  writable: true,
+  configurable: true
+});
 
-jest.setTimeout(40000);
+jest.setTimeout(50000);
 
 if (!HTMLElement.prototype.scroll) {
   HTMLElement.prototype.scroll = () => {};

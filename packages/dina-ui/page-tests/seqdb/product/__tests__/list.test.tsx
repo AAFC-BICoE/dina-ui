@@ -56,7 +56,7 @@ describe("Product list page", () => {
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(
         "seqdb-api/product",
-        expect.objectContaining({ filter: { rsql: "name==*omni*" } })
+        expect.objectContaining({ fiql: "name==*omni*" })
       );
       expect(wrapper.getByText(/test product 1/i)).toBeInTheDocument();
       expect(wrapper.getByText(/test product 2/i)).toBeInTheDocument();

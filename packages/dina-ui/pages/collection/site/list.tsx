@@ -73,7 +73,6 @@ export default function ListPage() {
             </div>
           </div>
         )}
-        useFiql={true}
       />
     </PageLayout>
   );

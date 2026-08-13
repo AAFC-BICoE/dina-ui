@@ -23,6 +23,7 @@ export interface MaterialSampleAttributes {
   materialSampleName?: string;
 
   group?: string;
+  resourceVersion?: number;
   createdOn?: string;
   createdBy?: string;
   sourceSet?: string;
@@ -78,6 +79,7 @@ export interface MaterialSampleAttributes {
 
   isRestricted?: boolean;
   restrictionRemarks?: string | null;
+  citations?: Citation[];
   extensionValues?: any;
   version?: string;
 
@@ -102,6 +104,17 @@ export interface ScheduledAction {
   actionStatus?: string;
   assignedTo?: KitsuResourceLink;
   remarks?: string;
+}
+
+export interface Citation {
+  doi?: string;
+  title?: string;
+  year?: number;
+  authors?: { given_names: string; family_names: string; id: string }[];
+  journal?: string;
+  volume?: string;
+  pages?: string;
+  citationRemarks?: string;
 }
 
 export interface MaterialSampleRelationships {

@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "esnext",
     "module": "esnext",
     "jsx": "preserve",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
@@ -16,11 +15,14 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "paths": {
+      "@dina-ui/*": ["./packages/dina-ui/*"],
+      "common-ui": ["./packages/common-ui/lib/index.ts"],
       // Use our own Kitsu type definitions instead of the incomplete provided types.
       "kitsu": [
         "./packages/common-ui/types/kitsu",
         "./packages/common-ui/types/react-table"
-      ]
+      ],
+      "packages/*": ["./packages/*"]
     },
     "allowJs": true,
     "strict": false,

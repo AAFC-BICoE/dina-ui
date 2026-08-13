@@ -66,7 +66,7 @@ function StringArrayFieldInternal(
     <TextareaAutosize
       minRows={4}
       {...inputProps}
-      onChange={(event) => onChange(event.target.value)}
+      onChange={(event) => onChange((event.target as HTMLTextAreaElement | HTMLInputElement).value)}
       value={textValue}
     />
   );

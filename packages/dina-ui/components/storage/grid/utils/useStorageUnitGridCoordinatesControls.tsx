@@ -28,8 +28,8 @@ export function useGridCoordinatesControls({
 
   const usageTypeRef = useRef<string | undefined>(undefined);
   const editContentsPathRef = useRef<string>("");
-  const usageTypeLinkRef = useRef<UrlObject>();
-  const usageTypeResourceNameRef = useRef<string>();
+  const usageTypeLinkRef = useRef<UrlObject | undefined>(undefined);
+  const usageTypeResourceNameRef = useRef<string | undefined>(undefined);
 
   // Change to track an array of objects with well coordinate and associated samples.
   const multipleSamplesWellCoordinates = useRef<
@@ -91,7 +91,7 @@ export function useGridCoordinatesControls({
 
     try {
       const storageUnitUsagesQuery = await apiClient.get<StorageUnitUsage[]>(
-        "collection-api/storage-unit-usage/",
+        "collection-api/storage-unit-usage",
         {
           include: "storageUnit",
           filter: SimpleSearchFilterBuilder.create()

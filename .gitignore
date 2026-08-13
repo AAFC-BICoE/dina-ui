@@ -1,7 +1,5 @@
 /node_modules
 /generated-docs
-/packages/*/pa11y-result.json
-/packages/*/pa11y-html-report
 /coverage
 
 # Yarn
@@ -12,3 +10,8 @@
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# TypeScript
+tsconfig.tsbuildinfo
+**/tsconfig.tsbuildinfo
+**/next-env.d.ts

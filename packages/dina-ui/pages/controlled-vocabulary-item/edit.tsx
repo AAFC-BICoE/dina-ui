@@ -1,5 +1,6 @@
 import {
   DateField,
+  DeleteButton,
   DinaForm,
   MultilingualDescription,
   MultilingualTitle,
@@ -19,7 +20,14 @@ import _ from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { createContext, RefObject, useContext, useRef, useState } from "react";
+import {
+  createContext,
+  RefObject,
+  useContext,
+  useRef,
+  useState,
+  Fragment
+} from "react";
 import { GroupSelectField } from "../../components";
 import {
   getInitialVocabularyElementType,
@@ -31,7 +39,7 @@ import {
   CollectionModuleType,
   COLLECTION_MODULE_TYPES,
   COLLECTION_MODULE_TYPE_LABELS,
-  MANAGED_ATTRIBUTE_TYPE_OPTIONS,
+  VOCABULARY_ELEMENT_TYPE_OPTIONS,
   VocabularyElementType
 } from "../../types/collection-api";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
@@ -41,7 +49,9 @@ import { FaFloppyDisk } from "react-icons/fa6";
 
 interface FormSubmissionContextType {
   submitForm?: () => void;
-  formRef?: RefObject<FormikProps<InputResource<ControlledVocabularyItem>>>;
+  formRef?: RefObject<FormikProps<
+    InputResource<ControlledVocabularyItem>
+  > | null>;
 }
 
 const FormSubmissionContext = createContext<FormSubmissionContextType>({});
@@ -158,6 +168,14 @@ function ControlledVocabularyItemEditPageContent({
           };
         }
 
+        // Uri template should be null if empty string, and should include $1 if not empty.
+        if (
+          submittedValues.uriTemplate &&
+          !submittedValues.uriTemplate?.includes("$1")
+        ) {
+          submittedValues.uriTemplate = `${submittedValues.uriTemplate}$1`;
+        }
+
         return submittedValues;
       }
     ],
@@ -190,7 +208,7 @@ function ControlledVocabularyItemEditPageContent({
       </Link>
     );
 
-  const buttonBarContent = <ButtonBarContent backButton={backButton} />;
+  const buttonBarContent = <ButtonBarContent backButton={backButton} id={id} />;
 
   return (
     <FormSubmissionContext.Provider value={{ submitForm, formRef }}>
@@ -203,14 +221,20 @@ function ControlledVocabularyItemEditPageContent({
           onSubmit={onSubmit}
           innerRef={formRef}
         >
-          <ControlledVocabularyItemFormLayout />
+          <ControlledVocabularyItemFormLayout isEditMode={!!fetchedItem} />
         </DinaForm>
       </PageLayout>
     </FormSubmissionContext.Provider>
   );
 }
 
-function ButtonBarContent({ backButton }: { backButton: JSX.Element }) {
+function ButtonBarContent({
+  backButton,
+  id
+}: {
+  backButton: React.JSX.Element;
+  id?: string;
+}) {
   const { submitForm } = useFormSubmission();
 
   return (
@@ -226,12 +250,21 @@ function ButtonBarContent({ backButton }: { backButton: JSX.Element }) {
           <FaFloppyDisk className="me-2" />
           <DinaMessage id="submitBtnText" />
         </button>
+        {id && (
+          <DeleteButton
+            id={id}
+            options={{ apiBaseUrl: "/collection-api" }}
+            postDeleteRedirect="/controlled-vocabulary/list"
+            type="controlled-vocabulary-item"
+            messageBody={<DinaMessage id="managedAttributeDeleteWarning" />}
+          />
+        )}
       </div>
     </>
   );
 }
 
-export function ControlledVocabularyItemFormLayout() {
+export function ControlledVocabularyItemFormLayout({ isEditMode = false }) {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
   const { isAdmin } = useAccount();
@@ -240,7 +273,7 @@ export function ControlledVocabularyItemFormLayout() {
     VocabularyElementType | undefined
   >(getInitialVocabularyElementType(initialValues));
 
-  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
+  const ATTRIBUTE_TYPE_OPTIONS = VOCABULARY_ELEMENT_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
 
@@ -285,11 +318,12 @@ export function ControlledVocabularyItemFormLayout() {
           name="dinaComponent"
           options={ATTRIBUTE_COMPONENT_OPTIONS}
           label={formatMessage("field_managedAttributeComponent")}
+          disabled={isEditMode}
         />
       </div>
       <div className="row">
-        <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="key" readOnly={true} />
+        <TextField className="col-md-6" name="name" disabled={isEditMode} />
+        <TextField className="col-md-6" name="key" disabled={true} />
       </div>
       <div className="row">
         <SelectField
@@ -299,6 +333,7 @@ export function ControlledVocabularyItemFormLayout() {
           onChange={(selectValue: VocabularyElementType) =>
             setVocabularyElementType(selectValue)
           }
+          disabled={isEditMode}
         />
         {(vocabularyElementType === "DECIMAL" ||
           vocabularyElementType === "INTEGER") && (
@@ -317,6 +352,26 @@ export function ControlledVocabularyItemFormLayout() {
           className="col-md-6"
           name="term"
           link={initialValues?.term ?? ""}
+        />
+        <TextField
+          className="col-md-6"
+          name={"uriTemplate"}
+          readOnlyRender={(value) => {
+            try {
+              const url = new URL(value);
+              if (url.protocol === "http:" || url.protocol === "https:") {
+                return (
+                  <Fragment key={value}>
+                    <Link href={value} passHref={true}>
+                      {value}
+                    </Link>
+                  </Fragment>
+                );
+              }
+            } catch (_) {
+              return value;
+            }
+          }}
         />
       </div>
       <MultilingualTitle />

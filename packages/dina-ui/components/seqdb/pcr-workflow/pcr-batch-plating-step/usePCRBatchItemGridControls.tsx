@@ -2,7 +2,6 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   DeleteArgs,
-  filterBy,
   SaveArgs,
   useQuery,
   useStringComparator
@@ -39,7 +38,7 @@ export function usePCRBatchItemGridControls({
 
   // Highlighted/selected PcrBatchItems.
   const [selectedItems, setSelectedItems] = useState<PcrBatchItemSample[]>([]);
-  const lastSelectedItemRef = useRef<PcrBatchItemSample>();
+  const lastSelectedItemRef = useRef<PcrBatchItemSample | undefined>(undefined);
 
   // Grid fill direction when you move multiple PcrBatchItems into the grid.
   const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");
@@ -74,15 +73,7 @@ export function usePCRBatchItemGridControls({
   // PcrBatchItem queries.
   const { loading: materialSampleItemsLoading } = useQuery<PcrBatchItem[]>(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "pcrBatch.uuid",
-            comparison: "==",
-            arguments: pcrBatchId
-          }
-        ]
-      })(""),
+      filter: { "pcrBatch.uuid": { EQ: pcrBatchId } },
       page: { limit: 1000 },
       path: `/seqdb-api/pcr-batch-item`,
       include: "materialSample,storageUnitUsage"

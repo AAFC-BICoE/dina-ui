@@ -1,9 +1,9 @@
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
 import _ from "lodash";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
-import { FieldHeader, dateCell } from "..";
+import { FieldHeader, SimpleSearchFilterBuilder, dateCell } from "..";
 import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
 import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
@@ -23,9 +23,9 @@ import {
   IMAGE_VIEW_LINK,
   ImageLinkStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
-import { FunctionDef } from "../../../dina-ui/types/dina-export-api/resources/DataExport";
-import { ControlledVocabularyItem } from "../../../dina-ui/types/collection-api/resources/ControlledVocabularyItem";
-import { ControlledVocabularyFieldHeader } from "../../../dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
+import { FunctionDef } from "@dina-ui/types/dina-export-api/resources/DataExport";
+import { ControlledVocabularyItem } from "@dina-ui/types/collection-api/resources/ControlledVocabularyItem";
+import { ControlledVocabularyFieldHeader } from "@dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
 
 /**
  * Convert ElasticSearch index name to entity key (kebab-case).
@@ -424,6 +424,57 @@ export function NestedColumnLabel({
   return <FieldHeader name={label} prefixName={relationshipLabel} />;
 }
 
+/**
+ * Resolves a dot-notation managed attribute path (e.g. "organism.managedAttributes.org_test"
+ * or "managedAttributes.org_test") by matching against the dynamic fields config, then
+ * delegates to getManagedAttributesColumn.
+ */
+async function resolveDotNotationManagedAttribute(
+  path: string,
+  config: DynamicFieldsMappingConfig,
+  apiClient: Kitsu
+): Promise<TableColumn<KitsuResource> | undefined> {
+  const dotParts = path.split(".");
+
+  // Try entity-level configs: {fieldName}.{key}
+  for (const fc of config.fields) {
+    if (fc.type !== "managedAttribute") continue;
+    const fieldName = fc.path.split(".").pop() ?? "";
+    if (dotParts[0] !== fieldName) continue;
+
+    const key = dotParts.slice(1).join(".");
+    return getManagedAttributesColumn(
+      path,
+      fc.component ?? "ENTITY",
+      key,
+      undefined,
+      apiClient,
+      config
+    );
+  }
+
+  // Try relationship configs: {referencedBy}.{fieldName}.{key}
+  for (const rc of config.relationshipFields) {
+    if (rc.type !== "managedAttribute") continue;
+    const fieldName = rc.path.split(".").pop() ?? "";
+    const fieldIdx = dotParts.indexOf(fieldName);
+    if (fieldIdx <= 0) continue;
+    if (dotParts.slice(0, fieldIdx).join(".") !== rc.referencedBy) continue;
+
+    const key = dotParts.slice(fieldIdx + 1).join(".");
+    return getManagedAttributesColumn(
+      path,
+      rc.component ?? "ENTITY",
+      key,
+      rc.referencedBy,
+      apiClient,
+      config
+    );
+  }
+
+  return undefined;
+}
+
 // Handle getting columns from query options that contain dynamicField
 async function getDynamicFieldColumn<TData extends KitsuResource>(
   path: string,
@@ -433,7 +484,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
 ): Promise<TableColumn<TData> | undefined> {
   const pathParts = path.split("/");
   if (pathParts.length > 0) {
-    // Handle managed attribute paths.
+    // Handle managed attribute paths (slash-notation).
     if (
       dynamicFieldsMappingConfig &&
       pathParts.length === 3 &&
@@ -451,6 +502,22 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
         apiClient,
         dynamicFieldsMappingConfig
       );
+    }
+
+    // Handle managed attribute paths in dot notation (legacy format from saved exports).
+    // Dot notation format: {referencedBy}.{fieldName}.{key} for relationships,
+    // or {fieldName}.{key} for entity-level managed attributes.
+    if (
+      dynamicFieldsMappingConfig &&
+      pathParts.length === 1 &&
+      !path.startsWith("columnFunction")
+    ) {
+      const result = await resolveDotNotationManagedAttribute(
+        path,
+        dynamicFieldsMappingConfig,
+        apiClient
+      );
+      if (result) return result as TableColumn<TData>;
     }
 
     // Handle field extension paths.
@@ -566,7 +633,7 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
   // API request params:
   const params = {
     filter: {
-      ...(component !== "ENTITY" && { managedAttributeComponent: component }),
+      ...(component !== "ENTITY" && { dinaComponent: component }),
       key
     },
     page: { limit: 1 }
@@ -669,13 +736,10 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
 
   const managedAttributesColumn = {
     cell: ({ row: { original } }) => {
-      const relationshipAccessor = accessorKey?.split(".");
-      relationshipAccessor?.splice(
-        1,
-        0,
-        config.referencedBy ? config.referencedBy : ""
+      const valuePath = buildRelationshipAccessorPath(
+        accessorKey,
+        config.referencedBy
       );
-      const valuePath = relationshipAccessor?.join(".");
       const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
@@ -733,7 +797,11 @@ export function getAttributesManagedAttributeColumn<
   const accessorKey = `${config.path}.${managedAttributeKey}`;
 
   const pathParts = config.path.split(".");
-  const fieldName = pathParts[pathParts.length - 1];
+  const attributesIndex = pathParts.indexOf("attributes");
+  const fieldName =
+    attributesIndex !== -1
+      ? pathParts.slice(attributesIndex + 1).join(".")
+      : pathParts[pathParts.length - 1];
 
   const managedAttributesColumn = {
     header: () => <FieldHeader name={managedAttribute.name} />,
@@ -898,13 +966,10 @@ export function getIncludedExtensionFieldColumn(
   const accessorKey = `${config.path}.${extensionValue.id}.${extensionField.key}`;
   const extensionValuesColumn = {
     cell: ({ row: { original } }) => {
-      const relationshipAccessor = accessorKey?.split(".");
-      relationshipAccessor?.splice(
-        1,
-        0,
-        config.referencedBy ? config.referencedBy : ""
+      const valuePath = buildRelationshipAccessorPath(
+        accessorKey,
+        config.referencedBy
       );
-      const valuePath = relationshipAccessor?.join(".");
       const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
@@ -1109,13 +1174,10 @@ export function getIncludedVocabularyColumn<TData extends KitsuResource>(
 
   const vocabularyColumn = {
     cell: ({ row: { original } }) => {
-      const relationshipAccessor = accessorKey?.split(".");
-      relationshipAccessor?.splice(
-        1,
-        0,
-        config.referencedBy ? config.referencedBy : ""
+      const valuePath = buildRelationshipAccessorPath(
+        accessorKey,
+        config.referencedBy
       );
-      const valuePath = relationshipAccessor?.join(".");
       const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
@@ -1179,7 +1241,10 @@ async function getControlledVocabularyColumn<TData extends KitsuResource>(
 ): Promise<TableColumn<TData> | undefined> {
   // API request params:
   const params = {
-    page: { limit: 1 }
+    page: { limit: 1 },
+    filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+      .where("uuid", "EQ", controlledVocabularyKey)
+      .build()
   };
 
   // Figure out API endpoint using the dynamicFieldsMappingConfig.
@@ -1326,13 +1391,10 @@ export function getIncludedControlledVocabularyColumn<
 
   const controlledVocabularyColumn = {
     cell: ({ row: { original } }) => {
-      const relationshipAccessor = accessorKey?.split(".");
-      relationshipAccessor?.splice(
-        1,
-        0,
-        config.referencedBy ? config.referencedBy : ""
+      const valuePath = buildRelationshipAccessorPath(
+        accessorKey,
+        config.referencedBy
       );
-      const valuePath = relationshipAccessor?.join(".");
       const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
@@ -1589,4 +1651,26 @@ export function FunctionFieldLabel({
   } else {
     return <></>;
   }
+}
+
+/**
+ * Builds a value path by inserting the first segment of `referencedBy` at index 1
+ * of the accessor key parts.
+ *
+ * e.g. accessorKey: "included.managedAttributes.myKey"
+ *      referencedBy: "organism.determination"
+ *      result: "included.organism.managedAttributes.myKey"
+ */
+export function buildRelationshipAccessorPath(
+  accessorKey: string,
+  referencedBy: string | undefined
+): string {
+  if (!referencedBy) {
+    return accessorKey;
+  }
+
+  const parts = accessorKey.split(".");
+  const referencedByRoot = (referencedBy ?? "").split(".")[0];
+  parts.splice(1, 0, referencedByRoot);
+  return parts.join(".");
 }

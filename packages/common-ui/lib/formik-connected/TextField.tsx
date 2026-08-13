@@ -22,7 +22,7 @@ export interface TextFieldProps extends FieldWrapperProps {
   customInput?: (
     inputProps: InputHTMLAttributes<any>,
     form: FormikProps<any>
-  ) => JSX.Element;
+  ) => React.JSX.Element;
   onChangeExternal?: (
     form: FormikProps<any>,
     name: string,
@@ -96,7 +96,7 @@ export function TextField(props: TextFieldProps) {
             { "is-invalid": invalid },
             inputPropsExternal?.className
           ),
-          onChange: (event) => onChangeInternal(event.target.value),
+          onChange: (event) => onChangeInternal((event.target as HTMLTextAreaElement | HTMLInputElement).value),
           value: value || "",
           readOnly,
           disabled: isDisabled,

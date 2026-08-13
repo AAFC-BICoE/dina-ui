@@ -8,7 +8,8 @@ import {
 } from "react";
 import Keycloak from "keycloak-js";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
-import { DINA_ADMIN } from "../../types/DinaRoles";
+import { DINA_ADMIN, SUPER_USER } from "../../types/DinaRoles";
+import { suppressUnsavedWarning } from "../formik-connected/DinaForm";
 
 export interface AccountContextI {
   agentId?: string;
@@ -21,6 +22,7 @@ export interface AccountContextI {
   username?: string;
   subject?: string;
   isAdmin?: boolean;
+  isSuperUser?: boolean;
   rolesPerGroup?: Record<string, string[] | undefined>;
   getCurrentToken: () => Promise<string | undefined>;
 }
@@ -42,11 +44,6 @@ export function useAccount(): AccountContextI {
 export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   const accountContext = useContext(AccountContext);
 
-  // Check if the context already exists.
-  if (accountContext) {
-    return <>{children}</>;
-  }
-
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -63,7 +60,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       .init({
         onLoad: "check-sso",
         silentCheckSsoRedirectUri:
-          typeof window !== undefined
+          typeof window !== "undefined"
             ? `${window.location.origin}/static/silent-check-sso.xhtml`
             : undefined,
         checkLoginIframe: false
@@ -78,8 +75,17 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         } else {
           setInitialized(true);
         }
+      })
+      .catch((error) => {
+        console.error("Failed to initialize Keycloak", error);
+        setInitialized(true);
       });
   }, [accountContext]);
+
+  // Check if the context already exists.
+  if (accountContext) {
+    return <>{children}</>;
+  }
 
   // Non-authenticated users should never see the the full website. Display a loading indicator.
   if (!authenticated || !initialized || !keycloak) {
@@ -119,7 +125,12 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 
   const getCurrentToken = async () => {
     // If it expires in the next 30 seconds, generate a new one.
-    await keycloak.updateToken(30).catch(login);
+    await keycloak.updateToken(30).catch(() => {
+      // Allow the forced auth redirect through - otherwise the
+      // unsaved data warning would block it
+      suppressUnsavedWarning();
+      login();
+    });
     return keycloak.token;
   };
 
@@ -136,6 +147,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         username,
         subject,
         isAdmin: checkIsAdmin(roles),
+        isSuperUser: checkIsSuperUser(roles),
         rolesPerGroup,
         getCurrentToken
       }}
@@ -154,6 +166,14 @@ export function checkIsAdmin(roles: string[]): boolean {
   return roles.includes(DINA_ADMIN) ?? false;
 }
 
+/**
+ * Checks if the array contains "super-user" as a group role (root)
+ * @param roles Roles to check
+ * @returns `true` if "SUPER-USER" exists as a group role, `false` otherwise.
+ */
+export function checkIsSuperUser(roles: string[]): boolean {
+  return roles.includes(SUPER_USER) ?? false;
+}
 /**
  * Convert from Keycloak's format ( ["/cnc", "/cnc/user"] to just the group name ["cnc"] )
  */

@@ -3,14 +3,11 @@ import { useIntl } from "react-intl";
 import _ from "lodash";
 import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
 import Select from "react-select";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { TableColumn } from "../../types";
 import { KitsuResource } from "kitsu";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { RAW_EXTS } from "dina-ui/components/object-store/object-store-utils";
+import { ExternalLink } from "common-ui";
 
 interface QueryRowImageLinkProps {
   /**
@@ -27,6 +24,10 @@ interface QueryRowImageLinkProps {
    * When in export mode, only ORIGINAL type is supported.
    */
   exportMode?: boolean;
+  /**
+   * Image types that should be excluded from the selector (already displayed).
+   */
+  excludedImageTypes?: string[];
 }
 
 // Supported derivative types for the image link selection.
@@ -49,16 +50,15 @@ export interface ImageLinkStates {
 export default function QueryRowImageLink({
   value,
   setValue,
-  exportMode
+  exportMode,
+  excludedImageTypes
 }: QueryRowImageLinkProps) {
   const { formatMessage } = useIntl();
 
   const [imageLinkState, setImageLinkState] = useState<ImageLinkStates>(() =>
     value
       ? JSON.parse(value)
-      : {
-          selectedImageType: exportMode ? "ORIGINAL" : "LARGE_IMAGE"
-        }
+      : { selectedImageType: exportMode ? "ORIGINAL" : "LARGE_IMAGE" }
   );
 
   // Convert the state in this component to a value that can be stored in the Query Builder.
@@ -74,15 +74,19 @@ export default function QueryRowImageLink({
       setImageLinkState(JSON.parse(value));
     } else {
       setImageLinkState({
-        selectedImageType: "LARGE_IMAGE"
+        selectedImageType: exportMode ? "ORIGINAL" : "LARGE_IMAGE"
       });
     }
   }, []);
 
   // Generate the image type options (export mode only supports ORIGINAL)
-  const availableTypes = exportMode
+  const availableTypesBase = exportMode
     ? SUPPORTED_DERIVATIVE_TYPES.filter((t) => t === "ORIGINAL")
     : SUPPORTED_DERIVATIVE_TYPES;
+
+  const availableTypes = availableTypesBase.filter(
+    (t) => !(excludedImageTypes ?? []).includes(t)
+  );
   const imageTypeOptions = availableTypes.map<SelectOption<string>>(
     (option) => ({
       label: formatMessage({ id: "queryBuilder_imageLink_" + option }),
@@ -230,13 +234,9 @@ export function ImageLinkButton({ imageType, metadata }: ImageLinkButtonProps) {
 
   return (
     <div className="text-center" style={{ whiteSpace: "nowrap" }}>
-      <a
-        href={IMAGE_VIEW_LINK + fileIdentifier}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <DinaMessage id="viewImage" /> <FaArrowUpRightFromSquare />
-      </a>
+      <ExternalLink href={IMAGE_VIEW_LINK + fileIdentifier}>
+        <DinaMessage id="viewImage" />
+      </ExternalLink>
     </div>
   );
 }

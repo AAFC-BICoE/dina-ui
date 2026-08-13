@@ -15,7 +15,8 @@ import {
   withoutBlankFields,
   SimpleSearchFilterBuilder,
   useBulkQueries,
-  DeleteArgs
+  DeleteArgs,
+  BULK_QUERY_CONCURRENCY
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -29,6 +30,7 @@ import {
   useCollectingEventQuery,
   useCollectingEventSave,
   useDuplicateSampleNameDetection,
+  useEmptyCollectingEventInitialValues,
   useLastUsedCollection
 } from "../..";
 import {
@@ -42,17 +44,18 @@ import {
   ORGANISMS_COMPONENT_NAME,
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
   ScientificNameSource,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
-} from "../../../../dina-ui/types/collection-api";
-import { Person } from "../../../../dina-ui/types/objectstore-api";
+} from "../../../types/collection-api";
+import { Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { generateSequence } from "./useGenerateSequence";
-import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { Alert } from "react-bootstrap";
 import CollectingEventEditAlert from "../collecting-event/CollectingEventEditAlert";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
@@ -89,10 +92,11 @@ export function useMaterialSampleQuery(id?: string | null) {
         const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
           `seqdb-api/generic-molecular-analysis-item`,
           {
-            include: "genericMolecularAnalysis, materialSample",
+            include: "genericMolecularAnalysis,materialSample",
             filter: SimpleSearchFilterBuilder.create()
               .where("materialSample.id", "EQ", data.id)
-              .build()
+              .build(),
+            page: { limit: 1000 }
           }
         );
 
@@ -193,7 +197,8 @@ export function useMaterialSampleQuery(id?: string | null) {
             filter: SimpleSearchFilterBuilder.create()
               .where("sample.uuid", "EQ", data.id)
               .build(),
-            include: "associatedSample,sample"
+            include: "associatedSample,sample",
+            page: { limit: 1000 }
           }
         );
         if (associations) {
@@ -233,16 +238,38 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
     })),
     {
       disabled: !ids.length,
+      concurrency: BULK_QUERY_CONCURRENCY,
       onSuccess: async ({ data }) => {
-        const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
-          `seqdb-api/generic-molecular-analysis-item`,
-          {
-            include: "genericMolecularAnalysis, materialSample",
+        // Fire all independent network calls in parallel so each sample's slot
+        // in the semaphore isn't held through sequential round-trips.
+        const [workflowItems, storageUnit, associations] = await Promise.all([
+          // Workflow items linked to this material sample
+          apiClient.get<GenericMolecularAnalysis[]>(
+            `seqdb-api/generic-molecular-analysis-item`,
+            {
+              include: "genericMolecularAnalysis,materialSample",
+              filter: SimpleSearchFilterBuilder.create()
+                .where("materialSample.id", "EQ", data.id)
+                .build(),
+              page: { limit: 1000 }
+            }
+          ),
+          // Storage unit (only fetched when a storageUnitUsage id exists)
+          data?.storageUnitUsage?.id
+            ? apiClient.get<StorageUnitUsage>(
+                `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
+                { include: "storageUnit" }
+              )
+            : Promise.resolve(null),
+          // Associations linked to this material sample
+          apiClient.get<Association[]>(`collection-api/association`, {
             filter: SimpleSearchFilterBuilder.create()
-              .where("materialSample.id", "EQ", data.id)
-              .build()
-          }
-        );
+              .where("sample.uuid", "EQ", data.id)
+              .build(),
+            include: "associatedSample,sample",
+            page: { limit: 1000 }
+          })
+        ]);
 
         if (workflowItems) {
           data.workflows = [
@@ -254,10 +281,18 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
           ];
         }
 
-        for (const organism of data.organism ?? []) {
-          if (organism?.determination) {
-            // Retrieve determiner arrays on determination.
-            for (const determination of organism.determination) {
+        if (storageUnit?.data?.storageUnit) {
+          data.storageUnit = storageUnit.data.storageUnit;
+        }
+
+        if (associations) {
+          data.associations = associations.data;
+        }
+
+        // Retrieve determiner Person objects for all determinations in parallel.
+        await Promise.all(
+          (data.organism ?? []).flatMap((organism) =>
+            (organism?.determination ?? []).map(async (determination) => {
               if (determination.determiner) {
                 determination.determiner = _.compact(
                   await bulkGet<Person, true>(
@@ -271,23 +306,9 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
                   )
                 );
               }
-            }
-          }
-        }
-
-        // Setup the storage unit if it's stored on the storage unit usage.
-        if (data?.storageUnitUsage?.id) {
-          const storageUnit = await apiClient.get<StorageUnitUsage>(
-            `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
-            {
-              include: "storageUnit"
-            }
-          );
-
-          if (storageUnit?.data?.storageUnit) {
-            data.storageUnit = storageUnit.data.storageUnit;
-          }
-        }
+            })
+          )
+        );
 
         // Process loaded back-end data into data structure that Formik can use
         if (data.extensionValues) {
@@ -332,20 +353,6 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
             };
           }
         }
-
-        // Fetch associations for each sample
-        const associations = await apiClient.get<Association[]>(
-          `collection-api/association`,
-          {
-            filter: SimpleSearchFilterBuilder.create()
-              .where("sample.uuid", "EQ", data.id)
-              .build(),
-            include: "associatedSample,sample"
-          }
-        );
-        if (associations) {
-          data.associations = associations.data;
-        }
       }
     }
   );
@@ -361,7 +368,7 @@ export interface UseMaterialSampleSaveParams {
 
   onSaved?: (id: string) => Promise<void>;
 
-  colEventFormRef?: React.RefObject<FormikProps<any>>;
+  colEventFormRef?: React.RefObject<FormikProps<any> | null>;
 
   isTemplate?: boolean;
 
@@ -387,6 +394,8 @@ export interface UseMaterialSampleSaveParams {
   showChangedIndicatorsInNestedForms?: boolean;
 
   visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
+
+  isBulkEditAllTab?: boolean;
 }
 
 export interface PrepareSampleSaveOperationParams {
@@ -394,7 +403,17 @@ export interface PrepareSampleSaveOperationParams {
   preProcessSample?: (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
-  collectingEventRefExternal?: React.RefObject<FormikProps<any>>;
+  collectingEventRefExternal?: React.RefObject<FormikProps<any> | null>;
+
+  /**
+   * When true, forcibly clears the linked Collecting Event regardless of local form state.
+   */
+  unlinkCollectingEvent?: boolean;
+
+  /**
+   * The UUID to be set as the collecting event. This is used for overriding.
+   */
+  overrideCollectingEventUUID?: string;
 }
 
 export function useMaterialSampleSave({
@@ -475,6 +494,15 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasCitationsTemplate =
+    isTemplate &&
+    !_.isEmpty(
+      _.pickBy(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        (_, key) => key.startsWith(CITATIONS_COMPONENT_NAME)
+      )
+    );
+
   const hasShowParentAttributes =
     isTemplate &&
     (materialSampleTemplateInitialValues?.parentAttributes?.length ?? 0) > 0;
@@ -491,6 +519,7 @@ export function useMaterialSampleSave({
     useState<boolean>(false);
   const [enableAssociations, setEnableAssociations] = useState<boolean>(false);
   const [enableRestrictions, setEnableRestrictions] = useState<boolean>(false);
+  const [enableCitations, setEnableCitations] = useState<boolean>(false);
 
   // Delete Data Component
   const [deleteCollectingEvent, setDeleteCollectingEvent] =
@@ -516,6 +545,7 @@ export function useMaterialSampleSave({
             )?.visible ?? false
       )
     );
+
     setEnableCollectingEvent(
       Boolean(
         hasColEventTemplate
@@ -524,7 +554,7 @@ export function useMaterialSampleSave({
           ? _.find(formTemplate?.components, {
               name: COLLECTING_EVENT_COMPONENT_NAME
             })?.visible ?? false
-          : materialSample?.collectingEvent
+          : materialSample?.collectingEvent?.id
       )
     );
 
@@ -609,6 +639,19 @@ export function useMaterialSampleSave({
             )
       )
     );
+
+    setEnableCitations(
+      // Show the references section if the field is set or the template enables it:
+      Boolean(
+        hasCitationsTemplate
+          ? true
+          : formTemplate
+          ? _.find(formTemplate?.components, {
+              name: CITATIONS_COMPONENT_NAME
+            })?.visible ?? false
+          : materialSample?.citations?.length
+      )
+    );
   }, [formTemplate]);
 
   // The state describing which Data components (Form sections) are enabled:
@@ -647,18 +690,25 @@ export function useMaterialSampleSave({
     setEnableRestrictions,
     setDeleteRestrictions,
 
+    // Citations
+    enableCitations,
+    setEnableCitations,
+
     // Parent Attributes (Form template only)
     enableShowParentAttributes,
     setEnableShowParentAttributes
   };
 
-  const { loading, lastUsedCollection } = useLastUsedCollection();
+  const { loading, lastUsedCollection } = useLastUsedCollection(
+    // When editing an existing sample, skip the query — lastUsedCollection
+    // is only used for the default values of a new sample.
+    !!materialSample
+  );
 
   const defaultValues: InputResource<MaterialSample> = {
     type: "material-sample",
     // Defaults to the last Collection used to create a Material Sample:
-    ...(lastUsedCollection && { collection: lastUsedCollection }),
-    publiclyReleasable: true
+    ...(lastUsedCollection && { collection: lastUsedCollection })
   };
 
   const msInitialValues: InputResource<MaterialSample> =
@@ -688,6 +738,27 @@ export function useMaterialSampleSave({
   });
   const collectingEventInitialValues =
     collectingEventInitialValuesProp ?? collectingEventHookInitialValues;
+
+  const [isCreatingNewColEvent, setIsCreatingNewColEvent] = useState<boolean>(
+    !collectingEventInitialValues?.id
+  );
+  const [overrideCollectingEvent, setOverrideCollectingEvent] =
+    useState<boolean>(false);
+
+  const emptyCollectingEventInitialValues =
+    useEmptyCollectingEventInitialValues();
+
+  useEffect(() => {
+    if (collectingEventInitialValues?.id) {
+      setIsCreatingNewColEvent(false);
+    }
+  }, [collectingEventInitialValues?.id]);
+
+  // Used if the user uses the "Unlink All" functionality for collecting event.
+  // If this is set on the bulk edit all tab, it will unlink ALL collecting events. If it's just
+  // set on an individual tab, it will just unlink that specific record.
+  const [unlinkCollectingEvent, setUnlinkCollectingEvent] =
+    useState<boolean>(false);
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
@@ -892,7 +963,9 @@ export function useMaterialSampleSave({
   async function prepareSampleSaveOperation({
     submittedValues,
     preProcessSample,
-    collectingEventRefExternal
+    collectingEventRefExternal,
+    unlinkCollectingEvent,
+    overrideCollectingEventUUID
   }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample>> {
     const materialSampleInput = await prepareSampleInput(submittedValues);
 
@@ -907,44 +980,105 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
+    // The collectingEvent relationship is always managed explicitly in the block below
+    // (which uses the freshly-saved ID from saveCollectingEvent). We want to avoid
+    // attribute-level diff to control it, because the fetched object is
+    // mutated in-place by the onSuccess callback (adding geoReferenceAssertions, attachment,
+    // collectors arrays, etc.) *after* DinaForm has already cloned the initial values.
+    // That race means resourceDifference would see a spurious shape change and include
+    // collectingEvent in the diff even when the user did not touch it.
+    if (unlinkCollectingEvent || deleteCollectingEvent) {
+      (msDiff as any).collectingEvent = null;
+    } else {
+      delete (msDiff as any).collectingEvent;
+    }
+
     // Save and link the Collecting Event if enabled:
     const colEventFormRefToUse = colEventFormRef?.current?.values
       ? colEventFormRef
       : collectingEventRefExternal;
-    if (colEventFormRefToUse?.current) {
+
+    const isUsingExternalColEventForm =
+      !colEventFormRef?.current?.values &&
+      !!collectingEventRefExternal?.current?.values;
+
+    let isStaleForm = false;
+
+    if (
+      colEventFormRefToUse?.current &&
+      !unlinkCollectingEvent &&
+      !overrideCollectingEventUUID
+    ) {
+      const formValues = colEventFormRef?.current?.values;
+      const externalValues = collectingEventRefExternal?.current?.values;
+
+      isStaleForm =
+        !isCreatingNewColEvent &&
+        !!colEventId &&
+        formValues?.id !== colEventId &&
+        externalValues?.id !== colEventId;
+
       const collectingEventValues = {
-        ...withoutBlankFields(colEventFormRef?.current?.values),
-        ...withoutBlankFields(collectingEventRefExternal?.current?.values)
+        // Prevent injecting the local colEventId if we are using the external form
+        ...(colEventId && !isCreatingNewColEvent && !isUsingExternalColEventForm
+          ? { id: colEventId, type: "collecting-event" }
+          : {}),
+        ...(isStaleForm ? {} : withoutBlankFields(formValues)),
+        ...(isStaleForm ? {} : withoutBlankFields(externalValues))
       };
+
+      // Only delete the ID if the form we are actually using is creating a new event
+      if (isCreatingNewColEvent && !isUsingExternalColEventForm) {
+        delete collectingEventValues.id;
+      }
+
       colEventFormRefToUse.current.values = collectingEventValues;
     }
 
     if (
       (enableCollectingEvent || collectingEventRefExternal) &&
-      colEventFormRefToUse?.current
+      colEventFormRefToUse?.current &&
+      !unlinkCollectingEvent &&
+      !overrideCollectingEventUUID
     ) {
       // Save the linked CollectingEvent if included:
       const submittedCollectingEvent = _.cloneDeep(
         colEventFormRefToUse.current.values
       );
 
+      // Check if we are merely linking an existing CE from the bulk tab
+      const isLinkingExistingExternal =
+        isUsingExternalColEventForm && !!submittedCollectingEvent.id;
+
+      // Only evaluate as edited if it's explicitly a new CE, or if the user modified the fields.
+      // We ignore "edits" if we just stripped stale fields or if we are merely linking an existing external CE.
       const collectingEventWasEdited =
-        !submittedCollectingEvent.id ||
-        !_.isEqual(submittedCollectingEvent, collectingEventInitialValues);
+        (isCreatingNewColEvent && !isUsingExternalColEventForm) ||
+        (!isStaleForm &&
+          !isLinkingExistingExternal &&
+          (!submittedCollectingEvent.id ||
+            !_.isEqual(
+              submittedCollectingEvent,
+              collectingEventInitialValues
+            )));
 
       try {
         // Throw if the Collecting Event sub-form has errors:
         const colEventErrors =
           await colEventFormRefToUse?.current?.validateForm();
-        if (!_.isEmpty(colEventErrors)) {
+
+        // If it's a stale form, bypass validation errors from the discarded fields.
+        if (!_.isEmpty(colEventErrors) && !isStaleForm) {
           throw new DoOperationsError("", colEventErrors);
         }
+
         // Only send the save request if the Collecting Event was edited:
         const savedCollectingEvent = collectingEventWasEdited
           ? // Use the same save method as the Collecting Event page:
             await saveCollectingEvent(
               submittedCollectingEvent,
-              colEventFormRefToUse.current
+              colEventFormRefToUse.current,
+              isCreatingNewColEvent
             )
           : submittedCollectingEvent;
 
@@ -979,6 +1113,17 @@ export function useMaterialSampleSave({
         }
         throw error;
       }
+    } else if (overrideCollectingEventUUID) {
+      // Bypass editing/validating/saving the Collecting Event sub-form entirely.
+      // We're just re-pointing the relationship at an existing Collecting Event
+      // by UUID (e.g. a bulk-edit override), so the only thing that needs to
+      // change is the link on the Material Sample itself.
+      setColEventId(overrideCollectingEventUUID);
+
+      msDiff.collectingEvent = {
+        id: overrideCollectingEventUUID,
+        type: "collecting-event"
+      };
     }
 
     // Validate associations before saving
@@ -1058,6 +1203,13 @@ export function useMaterialSampleSave({
       // Explicitly declare these fields as relationships here before saving:
       // One-to-many relationships go in the 'relationships' object:
       relationships: {
+        ...(msDiffWithOrganisms.collectingEvent !== undefined && {
+          collectingEvent: {
+            data: msDiffWithOrganisms.collectingEvent?.id
+              ? _.pick(msDiffWithOrganisms.collectingEvent, "id", "type")
+              : null
+          }
+        }),
         ...(msDiffWithOrganisms.attachment && {
           attachment: {
             data: msDiffWithOrganisms.attachment.map((it) =>
@@ -1114,6 +1266,13 @@ export function useMaterialSampleSave({
               ? _.pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
               : null
           }
+        }),
+        ...(msDiffWithOrganisms.parentMaterialSample && {
+          parentMaterialSample: {
+            data: msDiffWithOrganisms.parentMaterialSample?.id
+              ? _.pick(msDiffWithOrganisms.parentMaterialSample, "id", "type")
+              : null
+          }
         })
       }
     };
@@ -1122,8 +1281,10 @@ export function useMaterialSampleSave({
     delete msInputWithRelationships.associations;
     delete msInputWithRelationships.organismsIndividualEntry;
     delete msInputWithRelationships.organismsQuantity;
+    delete msInputWithRelationships.workflows;
 
     // Delete these since they have been moved to the relationship section.
+    delete msInputWithRelationships.collectingEvent;
     delete msInputWithRelationships.attachment;
     delete msInputWithRelationships.projects;
     delete msInputWithRelationships.organism;
@@ -1405,7 +1566,8 @@ export function useMaterialSampleSave({
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
     // In case of error, return early instead of saving to the back-end:
     const materialSampleSaveOp = await prepareSampleSaveOperation({
-      submittedValues
+      submittedValues,
+      unlinkCollectingEvent: unlinkCollectingEvent
     });
     async function saveToBackend() {
       delete materialSampleSaveOp.resource.useNextSequence;
@@ -1489,41 +1651,81 @@ export function useMaterialSampleSave({
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
   function nestedCollectingEventForm(
-    colEvent?: PersistedResource<CollectingEvent>
+    colEvent?: PersistedResource<CollectingEvent>,
+    forceReadOnlyMode?: boolean
   ) {
     const initialValues =
       colEvent ??
       (isTemplate
         ? colEventTemplateInitialValues
+        : isCreatingNewColEvent
+        ? emptyCollectingEventInitialValues
         : collectingEventInitialValues);
+    const hasMultipleUsages = Boolean(
+      materialSampleUsageCount && materialSampleUsageCount > 1
+    );
+    const hasExistingColEvent = Boolean(!!colEventId && !isCreatingNewColEvent);
+
+    // Permission Evaluation...
+    const permissionsProvided = initialValues?.meta?.permissionsProvider;
+    const canEdit = permissionsProvided
+      ? initialValues?.meta?.permissions?.includes(
+          colEvent?.id ? "update" : "create"
+        ) ?? false
+      : true;
+
+    const shouldShowCollectingEventEditAlert = (() => {
+      // If already being forced into read only, do not display this message.
+      if (forceReadOnlyMode) return false;
+
+      // If no permissions don't show this alert, another alert will be displayed.
+      if (!canEdit) return false;
+
+      // If you are creating a new collecting event, do not display this message.
+      if (isCreatingNewColEvent) return false;
+
+      // If it has a collecting event, and multiple usages then display a warning message.
+      return Boolean(
+        disableNestedFormEdits || (hasMultipleUsages && hasExistingColEvent)
+      );
+    })();
+
+    const makeCollectingEventReadOnly = (() => {
+      // If forcing read only, then go into read only.
+      if (forceReadOnlyMode) return true;
+
+      // If you are creating a new collecting event, it should be allowed to edit.
+      if (isCreatingNewColEvent) return false;
+
+      // User does not have permission to edit, go into read only mode.
+      if (!canEdit) return true;
+
+      // If it has multiple usages you should NOT be allowed to edit.
+      return Boolean(disableNestedFormEdits || hasMultipleUsages);
+    })();
 
     const colEventFormProps: DinaFormProps<any> = {
       innerRef: colEventFormRef,
       initialValues,
       validationSchema: collectingEventFormSchema,
       isTemplate,
-      // In bulk-edit and workflow run, disable editing existing Col events:
-      readOnly:
-        (materialSampleUsageCount && materialSampleUsageCount >= 1) ||
-        disableNestedFormEdits ||
-        isTemplate
-          ? !!colEventId
-          : false,
+      readOnly: makeCollectingEventReadOnly,
       formTemplate,
       children: reduceRendering ? (
         <div />
       ) : (
         <div className={nestedFormClassName}>
-          {!!materialSampleUsageCount && materialSampleUsageCount >= 1 && (
+          {shouldShowCollectingEventEditAlert && (
             <CollectingEventEditAlert
               materialSampleUsageCount={materialSampleUsageCount}
               alertMessage="collectingEventEditErrorMessage"
               collectingEventUUID={initialValues?.id}
-              override={true}
               displayCollectingEventDetailsLink={true}
+              override={disableNestedFormEdits}
             />
           )}
           <CollectingEventFormLayout
+            defaultToNotReleasable={true}
             visibleManagedAttributeKeys={
               visibleManagedAttributeKeys?.collectingEvent
             }
@@ -1533,26 +1735,14 @@ export function useMaterialSampleSave({
       )
     };
 
-    // Check the request to see if a permission provider is present.
-    const permissionsProvided = initialValues?.meta?.permissionsProvider;
-
-    const canEdit = permissionsProvided
-      ? initialValues?.meta?.permissions?.includes(
-          colEvent?.id ? "update" : "create"
-        ) ?? false
-      : true;
-
-    const isEditDisabled = colEventFormProps.readOnly || !canEdit;
-    const showAlert = !canEdit && !colEventFormProps.readOnly;
-
     return (
       <>
-        {showAlert && (
+        {!canEdit && (
           <Alert variant="warning" className="mb-2">
             <DinaMessage id="collectingEventPermissionAlert" />
           </Alert>
         )}
-        <DinaForm {...colEventFormProps} readOnly={isEditDisabled} />
+        <DinaForm {...colEventFormProps} />
       </>
     );
   }
@@ -1568,7 +1758,12 @@ export function useMaterialSampleSave({
     prepareSampleSaveOperation,
     saveAssociations,
     loading,
-    colEventFormRef
+    colEventFormRef,
+    setIsCreatingNewColEvent,
+    unlinkCollectingEvent,
+    setUnlinkCollectingEvent,
+    overrideCollectingEvent,
+    setOverrideCollectingEvent
   };
 }
 

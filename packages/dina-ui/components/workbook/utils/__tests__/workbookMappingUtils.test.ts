@@ -1,3 +1,4 @@
+import { COLLECTION_OTHER_IDENTIFIERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   convertDateTime,
   detectEntityType,
@@ -10,13 +11,15 @@ import {
 } from "../../";
 import {
   convertDate,
-  convertMap,
   convertNumber,
   convertNumberArray,
   convertStringArray,
   flattenObject,
   getColumnHeaders,
   getDataFromWorkbook,
+  getGeneratorColumnFromFieldName,
+  findMatchField,
+  WorkbookColumnInfo,
   isBoolean,
   isBooleanArray,
   isMap,
@@ -48,6 +51,13 @@ const mockConfig: FieldMappingConfigType = {
       dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
       endpoint: "managed attribute endpoint",
       managedAttributeComponent: "component"
+    },
+    controlledVocabularyField: {
+      dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+      filter: {
+        "controlledVocabulary.uuid": COLLECTION_OTHER_IDENTIFIERS_ID,
+        dinaComponent: "MATERIAL_SAMPLE"
+      }
     },
     objectField1: {
       dataType: WorkbookDataTypeEnum.OBJECT,
@@ -86,9 +96,35 @@ const mockConfig: FieldMappingConfigType = {
           }
         }
       }
+    },
+    objectFieldUuid: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      relationshipConfig: {
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_UUID_ONLY,
+        hasGroup: true,
+        type: "uuid-object",
+        baseApiPath: "apiPath"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
+    objectArrayFieldUuid: {
+      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+      relationshipConfig: {
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_UUID_ONLY,
+        hasGroup: true,
+        type: "uuid-array-object",
+        baseApiPath: "apiPath"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING }
+      }
     }
   }
 };
+
+const mockFormatMessage = jest.fn((message) => message.id);
 
 describe("workbookMappingUtils functions", () => {
   describe("getColumnHeaders", () => {
@@ -469,6 +505,129 @@ describe("workbookMappingUtils functions", () => {
     });
   });
 
+  describe("getGeneratorColumnFromFieldName", () => {
+    const fieldOptions = [
+      {
+        label: "Original Filename",
+        value: "originalFilename"
+      },
+      {
+        label: "Managed Attributes",
+        value: "managedAttributes",
+        isDynamic: true
+      },
+      {
+        label: "Nested Group",
+        options: [
+          {
+            label: "Nested Field",
+            value: "nested.field",
+            parentPath: "nested",
+            isDynamic: true
+          }
+        ]
+      }
+    ];
+
+    test("returns dynamic managed-attribute label suffix", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "managedAttributes.dnaConcentration",
+          fieldOptions,
+          mockFormatMessage,
+          "alias",
+          false
+        )
+      ).toEqual({
+        columnLabel: "dnaConcentration",
+        columnValue: "managedAttributes.dnaConcentration",
+        columnAlias: "alias"
+      });
+    });
+
+    test("resolves nested dynamic option values", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "nested.field.value",
+          fieldOptions,
+          mockFormatMessage,
+          "",
+          false
+        )
+      ).toEqual({
+        columnLabel: "value",
+        columnValue: "nested.field.value",
+        columnAlias: ""
+      });
+    });
+
+    test("falls back to formatted field label when allowed", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "unknown.field",
+          fieldOptions,
+          mockFormatMessage,
+          "",
+          true
+        )
+      ).toEqual({
+        columnLabel: "Unknown.Field",
+        columnValue: "unknown.field",
+        columnAlias: ""
+      });
+    });
+
+    test("returns undefined when no option matches and fallback disabled", () => {
+      expect(
+        getGeneratorColumnFromFieldName(
+          "unknown.field",
+          fieldOptions,
+          mockFormatMessage,
+          "",
+          false
+        )
+      ).toBeUndefined();
+    });
+  });
+
+  describe("findMatchField", () => {
+    const fieldOptions = [
+      {
+        label: "Organism Determination",
+        options: [
+          {
+            label: "Scientific Name Classification",
+            value: "organism.determination.scientificNameDetails",
+            parentPath: "organism.determination",
+            isDynamic: true
+          }
+        ]
+      }
+    ];
+
+    test("matches full dynamic classification path using originalColumn", () => {
+      const columnHeader: WorkbookColumnInfo = {
+        columnHeader: "Kingdom",
+        originalColumn: "organism.determination.scientificNameDetails.kingdom"
+      };
+
+      expect(
+        findMatchField(columnHeader, fieldOptions, "material-sample")
+      ).toBe("organism.determination.scientificNameDetails");
+    });
+
+    test("matches classification path when header and originalColumn are both full paths", () => {
+      const columnHeader: WorkbookColumnInfo = {
+        columnHeader: "organism.determination.scientificNameDetails.kingdom",
+        originalColumn: "organism.determination.scientificNameDetails.kingdom"
+      };
+
+      expect(
+        findMatchField(columnHeader, fieldOptions, "material-sample")
+      ).toBe("organism.determination.scientificNameDetails");
+    });
+  });
+
   describe("getData", () => {
     test("get data success", () => {
       expect(
@@ -591,6 +750,68 @@ describe("workbookMappingUtils functions", () => {
     });
   });
 
+  describe("targetKey branching", () => {
+    test("identifier with null vocabularyElementType uses key branch, not managed attribute branch", () => {
+      const result = getDataFromWorkbook(
+        {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              { rowNumber: 0, content: ["CatNum"] },
+              { rowNumber: 1, content: ["CAT-123"] }
+            ]
+          }
+        } as WorkbookJSON,
+        0,
+        [
+          {
+            targetField: "identifiers",
+            skipped: false,
+            columnHeader: "CatNum",
+            targetKey: {
+              key: "catalog-number",
+              type: "controlled-vocabulary-item",
+              vocabularyElementType: null
+            } as any
+          }
+        ]
+      );
+      expect(result).toEqual([
+        { identifiers: { "catalog-number": "CAT-123" } }
+      ]);
+    });
+
+    test("managed attribute with vocabularyElementType=STRING still works", () => {
+      const result = getDataFromWorkbook(
+        {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              { rowNumber: 0, content: ["Attr"] },
+              { rowNumber: 1, content: ["attr-value"] }
+            ]
+          }
+        } as WorkbookJSON,
+        0,
+        [
+          {
+            targetField: "managedAttributes",
+            skipped: false,
+            columnHeader: "Attr",
+            targetKey: {
+              key: "some-attr",
+              type: "controlled-vocabulary-item",
+              vocabularyElementType: "STRING"
+            } as any
+          }
+        ]
+      );
+      expect(result).toEqual([
+        { managedAttributes: { "some-attr": "attr-value" } }
+      ]);
+    });
+  });
+
   it("isNumber", () => {
     expect(isNumber("111")).toBeTruthy();
     expect(isNumber("adf")).toBeFalsy();
@@ -649,22 +870,6 @@ describe("workbookMappingUtils functions", () => {
     expect(convertNumberArray("111, 222.22, abcdef, false, ")).toEqual([
       111, 222.22
     ]);
-  });
-
-  it("convertMap", () => {
-    expect(convertMap("key1:value1, key2 : 2, key3 : false")).toEqual({
-      key1: "value1",
-      key2: 2,
-      key3: false
-    });
-    expect(convertMap('key1:"value1 with , and :"')).toEqual({
-      key1: "value1 with , and :"
-    });
-    expect(convertMap("key1: , :value2, key3:value3")).toEqual({
-      key3: "value3"
-    });
-    expect(convertMap("223:value3")).toEqual({ "223": "value3" });
-    expect(convertMap("223ddd:value3")).toEqual({ "223ddd": "value3" });
   });
 
   describe("isDate", () => {
@@ -1030,6 +1235,11 @@ describe("workbookMappingUtils functions", () => {
   it("flattenObject", () => {
     expect(flattenObject(mockConfig)).toEqual({
       "mockEntity.booleanField.dataType": "boolean",
+      "mockEntity.controlledVocabularyField.dataType": "controlledVocabulary",
+      "mockEntity.controlledVocabularyField.filter.controlledVocabulary.uuid":
+        "019c961e-4c0d-7398-b4ae-73687826b3b5",
+      "mockEntity.controlledVocabularyField.filter.dinaComponent":
+        "MATERIAL_SAMPLE",
       "mockEntity.mapField.dataType": "managedAttributes",
       "mockEntity.mapField.endpoint": "managed attribute endpoint",
       "mockEntity.mapField.managedAttributeComponent": "component",
@@ -1065,6 +1275,22 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.objectField2.attributes.address.attributes.province.dataType":
         "string",
       "mockEntity.objectField2.attributes.address.dataType": "object",
+      "mockEntity.objectFieldUuid.attributes.name.dataType": "string",
+      "mockEntity.objectFieldUuid.dataType": "object",
+      "mockEntity.objectFieldUuid.relationshipConfig.baseApiPath": "apiPath",
+      "mockEntity.objectFieldUuid.relationshipConfig.hasGroup": true,
+      "mockEntity.objectFieldUuid.relationshipConfig.linkOrCreateSetting":
+        "LINK_UUID_ONLY",
+      "mockEntity.objectFieldUuid.relationshipConfig.type": "uuid-object",
+      "mockEntity.objectArrayFieldUuid.attributes.name.dataType": "string",
+      "mockEntity.objectArrayFieldUuid.dataType": "object[]",
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.baseApiPath":
+        "apiPath",
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.hasGroup": true,
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.linkOrCreateSetting":
+        "LINK_UUID_ONLY",
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.type":
+        "uuid-array-object",
       "mockEntity.objectField2.attributes.age.dataType": "number",
       "mockEntity.objectField2.attributes.name.dataType": "string",
       "mockEntity.objectField2.dataType": "object",

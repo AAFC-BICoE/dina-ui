@@ -5,6 +5,7 @@ import { mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
+import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -12,6 +13,29 @@ jest.mock("next/dynamic", () => () => {
     return <div>Mock dynamic component</div>;
   };
 });
+
+/**
+ * Reusable mock block for tests that render components using `useSearchWsCustomQuery`.
+ * Copy this block into other test files to avoid real search-ws API calls.
+ */
+jest.mock("../../../../../common-ui/lib/search/useSearchWsCustomQuery", () => {
+  const actual = jest.requireActual(
+    "../../../../../common-ui/lib/search/useSearchWsCustomQuery"
+  );
+  return {
+    ...actual,
+    useSearchWsCustomQuery: jest
+      .fn()
+      .mockReturnValue({ loading: false, response: { data: [] } })
+  };
+});
+
+function mockUseSearchWsResults(data: unknown[] = []) {
+  (useSearchWsCustomQuery as jest.Mock).mockReturnValue({
+    loading: false,
+    response: { data }
+  });
+}
 
 const mockPush = jest.fn();
 
@@ -31,7 +55,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
       };
     case "collection-api/material-sample":
     case "objectstore-api/metadata":
-    case "collection-api/managed-attribute":
+    case "collection-api/controlled-vocabulary-item":
     case "collection-api/material-sample-type":
     case "collection-api/project":
     case "collection-api/vocabulary2/materialSampleState":
@@ -45,12 +69,11 @@ const testCtx = {
 };
 
 describe("MaterialSampleBulkCreatePage", () => {
-  beforeEach(jest.clearAllMocks);
-
   beforeEach(() => {
     // Set the deault group selection:
     writeStorage(DEFAULT_GROUP_STORAGE_KEY, "aafc");
     jest.clearAllMocks();
+    mockUseSearchWsResults();
   });
 
   it("Can click the 'previous' button to go back to the previous step", async () => {
@@ -67,14 +90,18 @@ describe("MaterialSampleBulkCreatePage", () => {
 
     // Fill out the form:
     // Collection field
-    userEvent.click(wrapper.getByRole("combobox", { name: /collection/i }));
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /collection/i })
+    );
 
     await waitFor(() => {
       expect(
         wrapper.getByRole("option", { name: /test collection/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("option", { name: /test collection/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /test collection/i })
+    );
 
     // Material Samples to Create field
     fireEvent.change(
@@ -113,7 +140,7 @@ describe("MaterialSampleBulkCreatePage", () => {
         wrapper.getByRole("button", { name: /go to the previous step/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: /go to the previous step/i })
     );
 

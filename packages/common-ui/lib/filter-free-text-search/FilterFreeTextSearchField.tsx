@@ -26,7 +26,7 @@ export function FilterFreeTextSearchField({
           const filterModel: FreeTextSearchFilterModel = {
             type: "FREE_TEXT_SEARCH_FILTER",
             filterAttributes,
-            value: e.target.value
+            value: (e.target as HTMLTextAreaElement | HTMLInputElement).value
           };
           setFieldValue(name, filterModel);
           setFieldTouched(name);

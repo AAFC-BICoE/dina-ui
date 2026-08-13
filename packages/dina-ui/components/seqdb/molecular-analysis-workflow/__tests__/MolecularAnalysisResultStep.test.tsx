@@ -30,11 +30,22 @@ import {
 import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 // Mock API responses
+function filterIncludes(params: any, substr: string): boolean {
+  const filter = params?.filter;
+  if (!filter) return false;
+  if (typeof filter.rsql === "string") return filter.rsql.includes(substr);
+  try {
+    return JSON.stringify(filter).includes(substr);
+  } catch {
+    return false;
+  }
+}
+
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "/seqdb-api/generic-molecular-analysis-item":
       // Return items associated with the run
-      if (params?.filter?.rsql?.includes(TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)) {
+      if (filterIncludes(params, TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)) {
         return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN };
       }
       return { data: [] };
@@ -45,10 +56,11 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "seqdb-api/molecular-analysis-run-item":
       // Return QC run items
       if (
-        params?.filter?.rsql?.includes(
+        filterIncludes(
+          params,
           MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
         ) &&
-        params?.filter?.rsql?.includes(TEST_MOLECULAR_ANALYSIS_RUN_ID)
+        filterIncludes(params, TEST_MOLECULAR_ANALYSIS_RUN_ID)
       ) {
         return { data: TEST_QUALITY_CONTROL_RUN_ITEMS };
       }
@@ -56,14 +68,10 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 
     case "seqdb-api/quality-control":
       // Return specific QC items based on run item UUID
-      if (
-        params?.filter?.rsql?.includes(TEST_QUALITY_CONTROL_RUN_ITEMS[0].id)
-      ) {
+      if (filterIncludes(params, TEST_QUALITY_CONTROL_RUN_ITEMS[0].id)) {
         return { data: TEST_QUALITY_CONTROL_1 };
       }
-      if (
-        params?.filter?.rsql?.includes(TEST_QUALITY_CONTROL_RUN_ITEMS[1].id)
-      ) {
+      if (filterIncludes(params, TEST_QUALITY_CONTROL_RUN_ITEMS[1].id)) {
         return { data: TEST_QUALITY_CONTROL_2 };
       }
       return { data: [] };
@@ -93,6 +101,24 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 
     case "seqdb-api/molecular-analysis-result":
       return { data: [] };
+  }
+
+  // Handle specific molecular-analysis-run-item GETs (single resource)
+  const runItemMatch = path.match(/molecular-analysis-run-item\/?([^/?]+)/);
+  if (runItemMatch) {
+    const runItemId = runItemMatch[1];
+    const runItemsCandidates = [
+      ...(TEST_QUALITY_CONTROL_RUN_ITEMS || []),
+      ...(TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN || []).map(
+        (i) => i.molecularAnalysisRunItem
+      )
+    ].filter(Boolean);
+    const foundRunItem = runItemsCandidates.find(
+      (ri: any) => ri?.id === runItemId
+    );
+    if (foundRunItem) {
+      return { data: foundRunItem };
+    }
   }
 
   // Handle specific ID gets if needed
@@ -217,10 +243,10 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const runContentAutoSelectButton = dropdowns[0];
 
       // Click the dropdown
-      userEvent.click(runContentAutoSelectButton);
+      await userEvent.click(runContentAutoSelectButton);
 
       // Click "Attachments based on Item Name"
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /attachments based on item name/i })
       );
 
@@ -235,6 +261,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
           {
             resource: {
               group: "aafc",
+              createdBy: "test-user",
               relationships: {
                 attachments: {
                   data: [
@@ -250,7 +277,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             type: "molecular-analysis-result"
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+        { apiBaseUrl: "/seqdb-api" }
       );
 
       // Check the 2nd call: Saving the Molecular Analysis Run Item (linked to the result)
@@ -273,7 +300,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             type: "molecular-analysis-run-item"
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-run-item" }
+        { apiBaseUrl: "/seqdb-api" }
       );
 
       // Verify alert appears indicating attachment found
@@ -323,7 +350,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
         // Intercept request for generic items to return our test item
         if (
           path === "/seqdb-api/generic-molecular-analysis-item" &&
-          params?.filter?.rsql?.includes(TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
+          filterIncludes(params, TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
         ) {
           return { data: [GENERIC_ITEM_WITH_ISSUES] };
         }
@@ -413,7 +440,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const mockGetWithResult = jest.fn<any, any>(async (path, params) => {
         if (
           path === "/seqdb-api/generic-molecular-analysis-item" &&
-          params?.filter?.rsql?.includes(TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
+          filterIncludes(params, TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
         ) {
           return { data: [GENERIC_ITEM_WITH_RESULT] };
         }
@@ -456,7 +483,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const detachAllButton = wrapper.getAllByRole("button", {
         name: /detach all/i
       });
-      userEvent.click(detachAllButton[0]);
+      await userEvent.click(detachAllButton[0]);
 
       // Expect save to be called to update Run Items/Results
       await waitFor(() => {
@@ -480,7 +507,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             type: "molecular-analysis-run-item"
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-run-item" }
+        { apiBaseUrl: "/seqdb-api" }
       );
 
       // Now delete the result itself
@@ -494,7 +521,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             }
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+        { apiBaseUrl: "/seqdb-api" }
       );
     });
 
@@ -537,7 +564,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
         // Intercept request for generic items to return our test item
         if (
           path === "/seqdb-api/generic-molecular-analysis-item" &&
-          params?.filter?.rsql?.includes(TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
+          filterIncludes(params, TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
         ) {
           return { data: [GENERIC_ITEM_WITH_ISSUES] };
         }
@@ -595,14 +622,18 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       expect(wrapper.getAllByText(/not found/i).length).toBeGreaterThan(0);
 
       // Click the "Add" button (The first one corresponds to the Run Content section)
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[0]
+      );
       await waitForLoadingToDisappear();
 
       // Check the "Select all" checkbox.
-      userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
+      await userEvent.click(
+        wrapper.getByRole("checkbox", { name: /check all/i })
+      );
 
       // Click the "Detach Selected" button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /detach selected/i })
       );
       await waitForLoadingToDisappear();
@@ -629,7 +660,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             type: "molecular-analysis-run-item"
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-run-item" }
+        { apiBaseUrl: "/seqdb-api" }
       );
 
       // Delete the result itself now it has been unlinked.
@@ -643,7 +674,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             }
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+        { apiBaseUrl: "/seqdb-api" }
       );
     });
 
@@ -682,7 +713,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const mockGetWithIssues = jest.fn<any, any>(async (path, params) => {
         if (
           path === "/seqdb-api/generic-molecular-analysis-item" &&
-          params?.filter?.rsql?.includes(TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
+          filterIncludes(params, TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
         ) {
           return { data: [GENERIC_ITEM_WITH_ISSUES] };
         }
@@ -728,14 +759,16 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       ).toBeInTheDocument();
 
       // Click the "Add" button (First one for Run Content)
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[0]
+      );
       await waitForLoadingToDisappear();
 
       // Check the checkbox for just the deleted attachment (index 1)
-      userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+      await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
 
       // Click the "Detach Selected" button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /detach selected/i })
       );
       await waitForLoadingToDisappear();
@@ -767,7 +800,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             type: "molecular-analysis-result"
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+        { apiBaseUrl: "/seqdb-api" }
       );
     });
   });
@@ -812,10 +845,10 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const qcAutoSelectButton = dropdowns[1];
 
       // Click QC Auto Select
-      userEvent.click(qcAutoSelectButton);
+      await userEvent.click(qcAutoSelectButton);
 
       // Click "Attachments based on Item Name"
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /attachments based on item name/i })
       );
 
@@ -896,7 +929,8 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const mockGetWithIssues = jest.fn<any, any>(async (path, params) => {
         if (
           path === "seqdb-api/molecular-analysis-run-item" &&
-          params?.filter?.rsql?.includes(
+          filterIncludes(
+            params,
             MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
           )
         ) {
@@ -904,7 +938,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
         }
         if (
           path === "seqdb-api/quality-control" &&
-          params?.filter?.rsql?.includes(QC_RUN_ITEM_WITH_ISSUES.id)
+          filterIncludes(params, QC_RUN_ITEM_WITH_ISSUES.id)
         ) {
           return { data: [QC_WITH_ISSUES] };
         }
@@ -958,7 +992,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const detachAllButton = wrapper.getAllByRole("button", {
         name: /detach all/i
       });
-      userEvent.click(detachAllButton[2]);
+      await userEvent.click(detachAllButton[2]);
 
       // Expect save to be called to update Quality Controls/Results
       await waitFor(() => {
@@ -1032,7 +1066,8 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const mockGetWithIssues = jest.fn<any, any>(async (path, params) => {
         if (
           path === "seqdb-api/molecular-analysis-run-item" &&
-          params?.filter?.rsql?.includes(
+          filterIncludes(
+            params,
             MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
           )
         ) {
@@ -1040,7 +1075,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
         }
         if (
           path === "seqdb-api/quality-control" &&
-          params?.filter?.rsql?.includes(QC_RUN_ITEM_WITH_ISSUES.id)
+          filterIncludes(params, QC_RUN_ITEM_WITH_ISSUES.id)
         ) {
           return { data: [QC_WITH_ISSUES] };
         }
@@ -1086,14 +1121,18 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       expect(wrapper.getByText(/not found/i)).toBeInTheDocument();
 
       // Click the "Add" button which will display a popup menu with all the existing attachments.
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[2]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[2]
+      );
       await waitForLoadingToDisappear();
 
       // Check the "Select all" checkbox.
-      userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
+      await userEvent.click(
+        wrapper.getByRole("checkbox", { name: /check all/i })
+      );
 
       // Click the "Detach Selected" button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /detach selected/i })
       );
       await waitForLoadingToDisappear();
@@ -1170,7 +1209,8 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const mockGetWithIssues = jest.fn<any, any>(async (path, params) => {
         if (
           path === "seqdb-api/molecular-analysis-run-item" &&
-          params?.filter?.rsql?.includes(
+          filterIncludes(
+            params,
             MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
           )
         ) {
@@ -1178,7 +1218,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
         }
         if (
           path === "seqdb-api/quality-control" &&
-          params?.filter?.rsql?.includes(QC_RUN_ITEM_WITH_ISSUES.id)
+          filterIncludes(params, QC_RUN_ITEM_WITH_ISSUES.id)
         ) {
           return { data: [QC_WITH_ISSUES] };
         }
@@ -1224,14 +1264,16 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       expect(wrapper.getByText(/not found/i)).toBeInTheDocument();
 
       // Click the "Add" button which will display a popup menu with all the existing attachments.
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[2]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[2]
+      );
       await waitForLoadingToDisappear();
 
       // Check the checkbox for just the deleted attachment.
-      userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+      await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
 
       // Click the "Detach Selected" button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /detach selected/i })
       );
       await waitForLoadingToDisappear();
@@ -1270,7 +1312,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
   });
 
   describe("Sequencing Run Attachments Section", () => {
-    it("Detaches an existing run attachment", async () => {
+    it("Unlinks an existing run attachment", async () => {
       const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
       await waitForLoadingToDisappear();
 
@@ -1280,9 +1322,9 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       ).toBeInTheDocument();
 
       // Find and click the detach button for that attachment
-      const detachButtons = wrapper.getAllByRole("button", { name: /detach/i });
+      const detachButtons = wrapper.getAllByRole("button", { name: /unlink/i });
       // The last detach button belongs to the run attachments table
-      userEvent.click(detachButtons[detachButtons.length - 1]);
+      await userEvent.click(detachButtons[detachButtons.length - 1]);
 
       // Trigger the save
       await waitFor(() => {

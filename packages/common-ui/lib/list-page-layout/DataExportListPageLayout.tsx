@@ -5,14 +5,15 @@ import {
   useApiClient,
   LoadingSpinner,
   DinaForm,
-  BulkDeleteButton
+  BulkDeleteButton,
+  SimpleSearchFilterBuilder
 } from "..";
-import { DataExport } from "../../../dina-ui/types/dina-export-api";
+import { DataExport } from "@dina-ui/types/dina-export-api";
 import { Button } from "react-bootstrap";
 import { useState } from "react";
 import { useIntl } from "react-intl";
 import { downloadDataExport } from "../export/exportUtils";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import { FaArrowRotateLeft } from "react-icons/fa6";
 
 export interface DataExportListPageLayoutProps {
@@ -69,11 +70,13 @@ export function DataExportListPageLayout({
           typeName: "data-export",
           apiBaseUrl: "/dina-export-api"
         }}
-        additionalFilters={{ createdBy: username || "" }}
+        additionalFilters={SimpleSearchFilterBuilder.create<DataExport>()
+          .where("createdBy", "EQ", username)
+          .build()}
         id="data-export-list"
         queryTableProps={{
           columns: TABLE_COLUMNS,
-          path: `dina-export-api/data-export/`,
+          path: `dina-export-api/data-export`,
           topRightCorner: (
             <div className="d-flex gap-3">
               {

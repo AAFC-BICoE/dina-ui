@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
-import { useDinaIntl } from "../../../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { ESIndexMapping } from "../../types";
 import { QueryFieldSelector } from "../query-builder-core-components/QueryFieldSelector";
 import QueryRowClassificationSearch from "./QueryBuilderClassificationSearch";
@@ -12,7 +12,7 @@ import QueryRowRelationshipPresenceSearch from "./QueryBuilderRelationshipPresen
 import {
   FunctionDef,
   FunctionDefinitions
-} from "../../../../../dina-ui/types/dina-export-api";
+} from "@dina-ui/types/dina-export-api";
 
 interface QueryRowColumnFunctionInputProps {
   /**

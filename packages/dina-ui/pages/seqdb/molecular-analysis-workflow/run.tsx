@@ -2,7 +2,6 @@ import {
   BackToListButton,
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
-  filterBy,
   LoadingSpinner,
   useApiClient
 } from "common-ui";
@@ -10,10 +9,10 @@ import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import PageLayout from "../../../../dina-ui/components/page/PageLayout";
+import PageLayout from "../../../components/page/PageLayout";
 import { useState, useEffect } from "react";
 import { Button, Spinner } from "react-bootstrap";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import React from "react";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { useMolecularAnalysisQuery } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/useMolecularAnalysisQuery";
@@ -99,15 +98,9 @@ export default function MolecularAnalysisWorkflowRunPage() {
       .get<GenericMolecularAnalysisItem[]>(
         "/seqdb-api/generic-molecular-analysis-item",
         {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "genericMolecularAnalysis.uuid",
-                comparison: "==",
-                arguments: molecularAnalysisId
-              }
-            ]
-          })(""),
+          filter: {
+            "genericMolecularAnalysis.uuid": { EQ: molecularAnalysisId }
+          },
           include: "materialSample",
           page: {
             limit: 1000 // Maximum page size.

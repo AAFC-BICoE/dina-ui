@@ -179,8 +179,8 @@ function TgnSearchBox({
           <input
             aria-label="tgn-label1"
             className="form-control"
-            onChange={(e) => onInputChange(e.target.value)}
-            onFocus={(e) => e.target.select()}
+            onChange={(e) => onInputChange((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
+            onFocus={(e) => (e.target as HTMLInputElement).select()}
             onKeyDown={(e) => {
               if (e.keyCode === 13) {
                 e.preventDefault();

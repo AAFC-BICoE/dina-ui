@@ -11,7 +11,7 @@ describe("GlobalSearch component", () => {
     jest.clearAllMocks();
   });
 
-  it("Renders the search input and button", () => {
+  it("Renders the search input and button", async () => {
     mountWithAppContext(<GlobalSearch onSearch={mockOnSearch} />);
 
     expect(screen.getByRole("textbox")).toBeInTheDocument();
@@ -25,7 +25,7 @@ describe("GlobalSearch component", () => {
     const button = screen.getByRole("button");
 
     await userEvent.type(input, "  test query  ");
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockOnSearch).toHaveBeenCalledTimes(1);
     expect(mockOnSearch).toHaveBeenCalledWith("test query");
@@ -46,7 +46,7 @@ describe("GlobalSearch component", () => {
     mountWithAppContext(<GlobalSearch onSearch={mockOnSearch} />);
 
     const button = screen.getByRole("button");
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockOnSearch).not.toHaveBeenCalled();
   });
@@ -62,7 +62,7 @@ describe("GlobalSearch component", () => {
     expect(mockOnSearch).not.toHaveBeenCalled();
   });
 
-  it("Disables input and button when pending is true", () => {
+  it("Disables input and button when pending is true", async () => {
     mountWithAppContext(
       <GlobalSearch onSearch={mockOnSearch} pending={true} />
     );
@@ -74,7 +74,7 @@ describe("GlobalSearch component", () => {
     expect(button).toBeDisabled();
   });
 
-  it("Disables button when search term is empty", () => {
+  it("Disables button when search term is empty", async () => {
     mountWithAppContext(<GlobalSearch onSearch={mockOnSearch} />);
 
     const button = screen.getByRole("button");
@@ -92,7 +92,7 @@ describe("GlobalSearch component", () => {
     expect(button).not.toBeDisabled();
   });
 
-  it("Uses controlled searchTerm value from props", () => {
+  it("Uses controlled searchTerm value from props", async () => {
     mountWithAppContext(
       <GlobalSearch onSearch={mockOnSearch} searchTerm="initial value" />
     );
@@ -116,7 +116,7 @@ describe("GlobalSearch component", () => {
     });
   });
 
-  it("Applies custom className", () => {
+  it("Applies custom className", async () => {
     const { container } = mountWithAppContext(
       <GlobalSearch onSearch={mockOnSearch} className="custom-class" />
     );
@@ -135,7 +135,7 @@ describe("GlobalSearch component", () => {
     expect(input).toHaveValue("typing test");
   });
 
-  it("Renders search icon in button", () => {
+  it("Renders search icon in button", async () => {
     const { container } = mountWithAppContext(
       <GlobalSearch onSearch={mockOnSearch} />
     );

@@ -175,7 +175,7 @@ export function SeqProtocolReactionTable({
                   className="form-control bg-warning"
                   value={val}
                   onChange={(e) =>
-                    onInputChange(index, convertNumber(e.target.value) || 0)
+                    onInputChange(index, convertNumber((e.target as HTMLTextAreaElement | HTMLInputElement).value) || 0)
                   }
                 />
               </td>

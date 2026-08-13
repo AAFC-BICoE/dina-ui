@@ -1,5 +1,9 @@
 import { PersistedResource } from "kitsu";
-import { DinaForm, waitForLoadingToDisappear } from "common-ui";
+import {
+  DinaForm,
+  STORAGE_UNIT_MAPPING,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitChildrenViewer } from "../StorageUnitChildrenViewer";
@@ -34,68 +38,6 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
   storageUnitChildren: STORAGE_UNIT_CHILDREN
 };
 
-/** Target container. */
-const STORAGE_B: PersistedResource<StorageUnit> = {
-  id: "B",
-  group: "group",
-  name: "B",
-  isGeneric: false,
-  type: "storage-unit"
-};
-
-const MAPPING = {
-  attributes: [
-    {
-      name: "createdBy",
-      type: "text",
-      fields: ["keyword"],
-      path: "data.attributes"
-    },
-    {
-      name: "name",
-      type: "text",
-      fields: ["autocomplete", "keyword"],
-      path: "data.attributes"
-    },
-    {
-      name: "createdOn",
-      type: "date",
-      path: "data.attributes",
-      subtype: "date_time"
-    }
-  ],
-  relationships: [
-    {
-      referencedBy: "storageUnitType",
-      name: "type",
-      path: "included",
-      value: "storage-unit-type",
-      attributes: [
-        {
-          name: "name",
-          type: "text",
-          fields: ["keyword"],
-          path: "attributes",
-          distinct_term_agg: true
-        },
-        {
-          name: "createdBy",
-          type: "text",
-          fields: ["keyword"],
-          path: "attributes"
-        },
-        {
-          name: "createdOn",
-          type: "date",
-          path: "attributes",
-          subtype: "date_time"
-        }
-      ]
-    }
-  ],
-  index_name: "dina_storage_index"
-};
-
 // Just return what is passed to it:
 const mockSave = jest.fn(async (ops) => ops.map((op) => op.resource));
 const mockPush = jest.fn();
@@ -108,37 +50,8 @@ jest.mock("next/router", () => ({
   })
 }));
 
-const mockGet = jest.fn<any, any>(async (path, params) => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
-    case "collection-api/storage-unit":
-      switch (params?.include) {
-        case "hierarchy,storageUnitChildren,storageUnitType":
-          switch (params?.filter?.rsql) {
-            case "parentStorageUnit.uuid==A":
-              // The initial Storage Unit's children:
-              return {
-                data: STORAGE_UNIT_CHILDREN,
-                meta: { totalResourceCount: 3 }
-              };
-            case "parentStorageUnit.uuid==X":
-              // The initial Storage Unit's children:
-              return {
-                data: [],
-                meta: { totalResourceCount: 0 }
-              };
-          }
-        case "hierarchy,storageUnitType":
-          switch (params?.filter?.rsql) {
-            case "uuid!=X;group=in=(aafc,cnc,overy-lab)":
-            case "group=in=(aafc,cnc,overy-lab)":
-            case "":
-              // The searchable table results:
-              return {
-                data: [STORAGE_B],
-                meta: { totalResourceCount: 1 }
-              };
-          }
-      }
     case "collection-api/storage-unit-type":
       return { data: [], meta: { totalResourceCount: 0 } };
     case "collection-api/storage-unit/A?optFields[storage-unit]=storageUnitChildren":
@@ -148,14 +61,12 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         meta: { totalResourceCount: 1 }
       };
     case "collection-api/material-sample":
-      // Stored material samples:
-      if (params?.filter?.rsql === "storageUnitUsage.storageUnit.uuid==A") {
-        return { data: [{ id: "ms-1", type: "material-sample" }] };
-      } else {
-        return { data: [{ id: "ms-1", type: "material-sample" }] };
-      }
+      return { data: [{ id: "ms-1", type: "material-sample" }] };
     case "search-api/search-ws/mapping":
-      return { data: MAPPING, meta: { totalResourceCount: 0 } };
+      return STORAGE_UNIT_MAPPING;
+    case "collection-api/storage-unit":
+      // Fallback query when storageUnitChildren is undefined.
+      return { data: [], meta: { totalResourceCount: 0 } };
   }
 });
 
@@ -489,7 +400,9 @@ describe("StorageUnitChildrenViewer component", () => {
       ).toBeInTheDocument()
     );
     // Click "Move All Content" button
-    userEvent.click(wrapper.getByRole("button", { name: /move all content/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /move all content/i })
+    );
 
     await waitFor(() =>
       expect(
@@ -497,7 +410,9 @@ describe("StorageUnitChildrenViewer component", () => {
       ).toBeInTheDocument()
     );
     // Click "Select" button for B (Box) storage unit
-    userEvent.click(wrapper.getAllByRole("button", { name: /select/i })[0]);
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /select/i })[0]
+    );
 
     await waitFor(() => {
       // Test expected API Call
@@ -531,31 +446,24 @@ describe("StorageUnitChildrenViewer component", () => {
   });
 
   it("Lets you move an existing Storage Unit into this Storage Unit", async () => {
-    // Render a storage unit with no children:
-    const wrapper = mountWithAppContext(
+    // Render with ADD_EXISTING_AS_CHILD mode active
+    mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer
           storageUnit={storageUnitX}
           materialSamples={undefined}
+          actionMode="ADD_EXISTING_AS_CHILD"
+          onCancelAction={jest.fn()}
         />
         ,
       </DinaForm>,
       testCtx as any
     );
-    await waitFor(() =>
-      expect(
-        wrapper.getByRole("button", { name: /add existing storage unit/i })
-      ).toBeInTheDocument()
-    );
-
-    // Click "Add Existing Storage Unit" button
-    userEvent.click(
-      wrapper.getByRole("button", { name: /add existing storage unit/i })
-    );
+    await waitForLoadingToDisappear();
 
     await waitFor(() => {
       const row = screen.getByRole("row", {
-        name: /test unit child 2 test test unit aafc dina\-admin 2025\-07\-18, 7:08:21 p\.m\. select/i
+        name: /test unit child 2 opens in new tab test opens in new tab test unit aafc dina\-admin 2025\-07\-18, 7:08:21 p\.m\. select/i
       });
 
       const row_button = within(row).getByRole("button", {

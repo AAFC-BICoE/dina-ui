@@ -5,7 +5,8 @@ import {
   FieldHeader,
   FilterAttribute,
   ListPageLayout,
-  LoadingSpinner
+  LoadingSpinner,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -105,15 +106,15 @@ export default function MolecularAnalysisWorkflowListPage() {
         <h1 id="wb-cont">{formatMessage("molecularAnalysisWorkflowTitle")}</h1>
         <ListPageLayout
           bulkDeleteButtonProps={{
-            apiBaseUrl: "/seqdb",
+            apiBaseUrl: "/seqdb-api",
             typeName: "molecular-analysis-workflow",
             beforeDelete: handleDeleteMolecularAnalysisWorkflows
           }}
-          additionalFilters={(filterForm) => ({
-            isCompleted: false,
-            // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-          })}
+          additionalFilters={(filterForm) =>
+            SimpleSearchFilterBuilder.create<GenericMolecularAnalysis>()
+              .whereProvided("group", "EQ", filterForm.group)
+              .build()
+          }
           filterAttributes={FILTER_ATTRIBUTES}
           id="molecular-analysis-workflow-list"
           queryTableProps={{

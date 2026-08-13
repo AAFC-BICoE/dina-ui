@@ -13,6 +13,7 @@ import {
   isResourceEmpty,
   ResourceWithHooks,
   SaveArgs,
+  suppressUnsavedWarning,
   useApiClient,
   withoutBlankFields
 } from "common-ui";
@@ -79,7 +80,9 @@ export const MetadataBulkEditor = forwardRef<
       initialValues
     });
 
-    const bulkEditFormRef = useRef<FormikProps<InputResource<Metadata>>>(null);
+    const bulkEditFormRef = useRef<FormikProps<InputResource<Metadata>> | null>(
+      null
+    );
 
     const metadataHooks = getMetadataHooks(metadatas);
 
@@ -125,6 +128,13 @@ export const MetadataBulkEditor = forwardRef<
       saveAll
     }));
 
+    const selectedMetadataIndex = selectedTab
+      ? metadataHooks.findIndex(
+          (hook: ResourceWithHooks) => hook.key === selectedTab.key
+        )
+      : -1;
+    const isEditAll = selectedTab?.key === "EDIT_ALL";
+
     return (
       <div>
         <DinaForm initialValues={{}}>
@@ -159,6 +169,24 @@ export const MetadataBulkEditor = forwardRef<
             </ButtonBar>
           )}
         </DinaForm>
+        {selectedTab && (
+          <div className="alert alert-info py-2 px-3 mb-2 bulk-edit-status-banner">
+            {isEditAll ? (
+              <DinaMessage
+                id="bulkEditingAllMetadata"
+                values={{ total: metadataHooks.length }}
+              />
+            ) : (
+              <DinaMessage
+                id="bulkEditingMetadataOf"
+                values={{
+                  current: selectedMetadataIndex + 1,
+                  total: metadataHooks.length
+                }}
+              />
+            )}
+          </div>
+        )}
         {selectedTab && (
           <BulkEditNavigator
             selectedTab={selectedTab}
@@ -380,6 +408,15 @@ function useBulkMetadataSave({
           const originalIndex = nonEmptyIndices[i];
           resultMetadata[originalIndex] = savedMetadata[i];
         }
+      }
+      // Suppress unsaved data warning before navigating
+      suppressUnsavedWarning();
+      // Reset form dirty states for good measure
+      bulkEditFormRef.current?.resetForm({
+        values: bulkEditFormRef.current.values
+      });
+      for (const { formRef } of metadataHooks) {
+        formRef.current?.resetForm({ values: formRef.current.values });
       }
 
       // Call onSaved with all samples in the original order

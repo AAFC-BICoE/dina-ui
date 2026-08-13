@@ -4,7 +4,7 @@ import { Table } from "react-bootstrap";
 import { getIndexConfig } from "./searchConfig";
 import { ElasticsearchHit } from "./useMultiIndexSearch";
 import { startCase } from "lodash";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 
 export interface SearchResultItemProps {
   hit: ElasticsearchHit;
@@ -79,7 +79,7 @@ export function SearchResultItem({
   const linkText = getLinkText();
 
   // Build attribute display rows from highlight or source
-  const attributeRows: JSX.Element[] = [];
+  const attributeRows: React.JSX.Element[] = [];
   Object.entries(highlight).forEach(([field, values]: [string, any]) => {
     const attributeName = field
       .replace("data.attributes.", "")

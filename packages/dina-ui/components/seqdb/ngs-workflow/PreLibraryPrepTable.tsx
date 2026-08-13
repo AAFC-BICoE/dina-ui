@@ -4,8 +4,7 @@ import {
   ReactTable,
   ReadOnlyResourceLink,
   ResourceSelect,
-  SimpleSearchFilterBuilder,
-  filterBy
+  SimpleSearchFilterBuilder
 } from "packages/common-ui/lib";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { Protocol } from "packages/dina-ui/types/collection-api";
@@ -275,7 +274,11 @@ function ProductCellInner({
         (table.options.meta as any).updateData(index, columnId, value);
         setProduct(value as PersistedResource<Product>);
       }}
-      filter={filterBy(["name"])}
+      filter={(input) =>
+        SimpleSearchFilterBuilder.create<Product>()
+          .searchFilter("name", input)
+          .build()
+      }
       model="seqdb-api/product"
       optionLabel={(resource) => resource.name}
     />
@@ -310,7 +313,7 @@ export function TextInputCell<TData>({
       className="form-control w-100"
       value={value as string}
       onChange={(e) => {
-        setValue(e.target.value);
+        setValue((e.target as HTMLTextAreaElement | HTMLInputElement).value);
         setValueChanged(true);
       }}
       onBlur={onBlur}
@@ -347,7 +350,7 @@ export function NumberInputCell<TData>({
       type="number"
       value={value}
       onChange={(e) => {
-        setValue(Number(e.target.value));
+        setValue(Number((e.target as HTMLTextAreaElement | HTMLInputElement).value));
         setValueChanged(true);
       }}
       onBlur={onBlur}

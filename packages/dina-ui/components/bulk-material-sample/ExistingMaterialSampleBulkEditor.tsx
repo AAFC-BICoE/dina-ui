@@ -3,6 +3,7 @@ import { PersistedResource } from "kitsu";
 import _ from "lodash";
 import { Promisable } from "type-fest";
 import { MaterialSampleBulkEditor, useMaterialSampleQueries } from "..";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api";
 
 export interface ExistingMaterialSampleBulkEditorProps {
@@ -18,16 +19,26 @@ export function ExistingMaterialSampleBulkEditor({
 }: ExistingMaterialSampleBulkEditorProps) {
   const sampleQueries = useMaterialSampleQueries(ids);
 
+  const loadedCount = sampleQueries.filter((q) => !q.loading).length;
+  const total = ids.length;
+
   /** Whether any query is loading. */
-  const isLoading = sampleQueries.reduce(
-    (prev, current) => prev || current.loading,
-    false
-  );
+  const isLoading = sampleQueries.some((q) => q.loading);
 
   const errors = _.compact(sampleQueries.map((query) => query.error));
 
   if (isLoading) {
-    return <LoadingSpinner loading={true} />;
+    return (
+      <div className="d-flex flex-column align-items-center gap-2 mt-4">
+        <LoadingSpinner loading={true} />
+        <div className="text-muted">
+          <DinaMessage
+            id="bulkEditLoadingProgress"
+            values={{ loaded: loadedCount, total }}
+          />
+        </div>
+      </div>
+    );
   }
 
   if (errors.length) {

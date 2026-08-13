@@ -231,7 +231,7 @@ function ExternalResourceMetadataForm({
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <NotPubliclyReleasableWarning />
       {buttonBar}
-      <NotPubliclyReleasableSection />
+      <NotPubliclyReleasableSection defaultToNotReleasable={true} />
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"

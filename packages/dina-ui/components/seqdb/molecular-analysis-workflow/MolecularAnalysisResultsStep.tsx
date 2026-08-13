@@ -44,7 +44,7 @@ export function MolecularAnalysisResultsStep({
 }: MolecularAnalysisResultsStepProps) {
   const { formatMessage } = useDinaIntl();
   const { apiClient, save } = useApiClient();
-  const { groupNames } = useAccount();
+  const { groupNames, username } = useAccount();
   const {
     loading,
     errorMessage,
@@ -205,6 +205,7 @@ export function MolecularAnalysisResultsStep({
                                     resource: {
                                       type: "molecular-analysis-result",
                                       group: groupNames?.[0],
+                                      createdBy: username,
                                       relationships: {
                                         attachments: {
                                           data: metadataResp.data as Metadata[]
@@ -218,8 +219,7 @@ export function MolecularAnalysisResultsStep({
                                 await save?.<MolecularAnalysisResult>(
                                   molecularAnalysisRunResultSaveArgs,
                                   {
-                                    apiBaseUrl:
-                                      "seqdb-api/molecular-analysis-result"
+                                    apiBaseUrl: "/seqdb-api"
                                   }
                                 );
                               const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
@@ -243,8 +243,7 @@ export function MolecularAnalysisResultsStep({
                               await save?.<MolecularAnalysisRunItem>(
                                 molecularAnalysisRunItemSaveArgs,
                                 {
-                                  apiBaseUrl:
-                                    "seqdb-api/molecular-analysis-run-item"
+                                  apiBaseUrl: "/seqdb-api"
                                 }
                               );
                               foundAttachments++;

@@ -1,13 +1,38 @@
 import { InputResource } from "kitsu";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import {
   blankMaterialSample,
   MaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../../bulk-material-sample/MaterialSampleBulkEditor";
 import _ from "lodash";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import { useSearchWsCustomQuery } from "../../../../common-ui/lib/search/useSearchWsCustomQuery";
+
+/**
+ * Reusable mock block for tests that render components using `useSearchWsCustomQuery`.
+ * Copy this block into other test files to avoid real search-ws API calls.
+ */
+jest.mock("../../../../common-ui/lib/search/useSearchWsCustomQuery", () => {
+  const actual = jest.requireActual(
+    "../../../../common-ui/lib/search/useSearchWsCustomQuery"
+  );
+  return {
+    ...actual,
+    useSearchWsCustomQuery: jest
+      .fn()
+      .mockReturnValue({ loading: false, response: { data: [] } })
+  };
+});
+
+function mockUseSearchWsResults(data: any[] = []) {
+  (useSearchWsCustomQuery as jest.Mock).mockReturnValue({
+    loading: false,
+    response: { data }
+  });
+}
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -25,7 +50,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/material-sample-type":
     case "collection-api/project":
     case "collection-api/material-sample":
-    case "collection-api/managed-attribute":
+    case "collection-api/controlled-vocabulary-item":
     case "objectstore-api/metadata":
     case "user-api/group":
       return { data: [] };
@@ -183,7 +208,10 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
 ];
 
 describe("BulkEditTabWarning", () => {
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseSearchWsResults();
+  });
 
   it("Shows the warning when there are multiple determination values in the individual samples.", async () => {
     const wrapper = mountWithAppContext(
@@ -194,49 +222,69 @@ describe("BulkEditTabWarning", () => {
       testCtx
     );
     await waitFor(() => {
-      // Enable the determination:
-      const organismToggle = wrapper.container.querySelector(
-        ".enable-organisms .react-switch-bg"
-      );
-      if (!organismToggle) {
-        fail("Organism toggle needs to exist at this point.");
-      }
-      fireEvent.click(organismToggle);
+      expect(
+        wrapper.container.querySelector(".enable-organisms .react-switch-bg")
+      ).toBeInTheDocument();
     });
+    // Enable the determination:
+    const organismToggle = wrapper.container.querySelector(
+      ".enable-organisms .react-switch-bg"
+    );
+    if (!organismToggle) {
+      throw new Error("Organism toggle needs to exist at this point.");
+    }
+    await userEvent.click(organismToggle);
     await waitFor(() => {
-      // Find the organism override button and click it.
-      const overrideButton = wrapper.container.querySelector(
-        "#organisms-component button"
+      expect(
+        wrapper.container.querySelector("#organisms-component button")
+      ).toBeInTheDocument();
+    });
+    // Find the organism override button and click it.
+    const overrideButton = wrapper.container.querySelector(
+      "#organisms-component button"
+    );
+    if (!overrideButton) {
+      throw new Error(
+        "Override button inside of the organisms component needs to exist at this point."
       );
-      if (!overrideButton) {
-        fail(
-          "Override button inside of the organisms component needs to exist at this point."
-        );
-      }
-      fireEvent.click(overrideButton);
+    }
+    await userEvent.click(overrideButton);
 
-      // Click "Yes" on the popup dialog.
-      fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    });
+    // Click "Yes" on the popup dialog.
     await waitFor(() => {
-      // Click the "Add New Determination" button.
-      fireEvent.click(
+      expect(wrapper.getByRole("button", { name: /yes/i })).toBeInTheDocument();
+    });
+    await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+    await waitFor(() => {
+      expect(
         wrapper.getByRole("button", { name: /add new determination/i })
-      );
+      ).toBeInTheDocument();
     });
+    // Click the "Add New Determination" button.
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /add new determination/i })
+    );
     await waitFor(() => {
-      // Override the verbatim scientific name.
-      fireEvent.change(
+      expect(
         wrapper.getByRole("textbox", {
           name: /verbatim scientific name no changes × insert hybrid symbol/i
-        }),
-        { target: { value: "test-name-override" } }
-      );
+        })
+      ).toBeInTheDocument();
     });
+    // Override the verbatim scientific name.
+    await clearAndType(
+      wrapper.getByRole("textbox", {
+        name: /verbatim scientific name no changes × insert hybrid symbol/i
+      }),
+      "test-name-override"
+    );
     await waitFor(() => {
-      // Click the "Save All" button:
-      fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      expect(
+        wrapper.getByRole("button", { name: /save all/i })
+      ).toBeInTheDocument();
     });
+    // Click the "Save All" button:
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
 
     await waitFor(() => {
       const EXPECTED_ORGANISM_SAVE = {
@@ -312,15 +360,18 @@ describe("BulkEditTabWarning", () => {
       testCtx
     );
     await waitFor(() => {
-      // Enable the determination:
-      const organismToggle = wrapper.container.querySelector(
-        ".enable-organisms .react-switch-bg"
-      );
-      if (!organismToggle) {
-        fail("Organism toggle needs to exist at this point.");
-      }
-      fireEvent.click(organismToggle);
+      expect(
+        wrapper.container.querySelector(".enable-organisms .react-switch-bg")
+      ).toBeInTheDocument();
     });
+    // Enable the determination:
+    const organismToggle = wrapper.container.querySelector(
+      ".enable-organisms .react-switch-bg"
+    );
+    if (!organismToggle) {
+      throw new Error("Organism toggle needs to exist at this point.");
+    }
+    await userEvent.click(organismToggle);
 
     await waitFor(() => {
       // The Override button is there:
@@ -328,14 +379,14 @@ describe("BulkEditTabWarning", () => {
         "#organisms-component button"
       );
       if (!overrideButton) {
-        fail(
+        throw new Error(
           "Override button inside of the organisms component needs to exist at this point."
         );
       }
     });
 
     // Click the "Save All" button:
-    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
 
     await waitFor(() => {
       // No changes expected, not overriding anything.
@@ -352,38 +403,49 @@ describe("BulkEditTabWarning", () => {
       testCtx
     );
     await waitFor(() => {
-      // Enable the determination:
-      const organismToggle = wrapper.container.querySelector(
-        ".enable-organisms .react-switch-bg"
-      );
-      if (!organismToggle) {
-        fail("Organism toggle needs to exist at this point.");
-      }
-      fireEvent.click(organismToggle);
+      expect(
+        wrapper.container.querySelector(".enable-organisms .react-switch-bg")
+      ).toBeInTheDocument();
     });
+    // Enable the determination:
+    const organismToggle = wrapper.container.querySelector(
+      ".enable-organisms .react-switch-bg"
+    );
+    if (!organismToggle) {
+      throw new Error("Organism toggle needs to exist at this point.");
+    }
+    await userEvent.click(organismToggle);
     await waitFor(() => {
       expect(
         wrapper.getByRole("button", { name: /add new determination/i })
       ).toBeInTheDocument();
     });
 
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
 
     await waitFor(() => {
-      // Override the verbatim scientific name.
-      fireEvent.change(
+      expect(
         wrapper.getByRole("textbox", {
           name: /verbatim scientific name no changes × insert hybrid symbol/i
-        }),
-        { target: { value: "test-name-override" } }
-      );
+        })
+      ).toBeInTheDocument();
     });
+    // Override the verbatim scientific name.
+    await clearAndType(
+      wrapper.getByRole("textbox", {
+        name: /verbatim scientific name no changes × insert hybrid symbol/i
+      }),
+      "test-name-override"
+    );
     await waitFor(() => {
-      // Click the "Save All" button:
-      fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      expect(
+        wrapper.getByRole("button", { name: /save all/i })
+      ).toBeInTheDocument();
     });
+    // Click the "Save All" button:
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await waitFor(() => {
       const EXPECTED_ORGANISM_SAVE = {
         resource: {
@@ -446,15 +508,18 @@ describe("BulkEditTabWarning", () => {
       )
     );
     await waitFor(() => {
-      // Enable the determination:
-      const organismToggle = wrapper.container.querySelector(
-        ".enable-organisms .react-switch-bg"
-      );
-      if (!organismToggle) {
-        fail("Organism toggle needs to exist at this point.");
-      }
-      fireEvent.click(organismToggle);
+      expect(
+        wrapper.container.querySelector(".enable-organisms .react-switch-bg")
+      ).toBeInTheDocument();
     });
+    // Enable the determination:
+    const organismToggle = wrapper.container.querySelector(
+      ".enable-organisms .react-switch-bg"
+    );
+    if (!organismToggle) {
+      throw new Error("Organism toggle needs to exist at this point.");
+    }
+    await userEvent.click(organismToggle);
     await waitFor(() => {
       expect(
         wrapper.container.querySelector("#organisms-component button")
@@ -466,14 +531,14 @@ describe("BulkEditTabWarning", () => {
       "#organisms-component button"
     );
     if (!overrideButton) {
-      fail(
+      throw new Error(
         "Override button inside of the organisms component needs to exist at this point."
       );
     }
-    fireEvent.click(overrideButton);
+    await userEvent.click(overrideButton);
 
     // Click "Yes" on the popup dialog.
-    fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
     await waitFor(() => {
       expect(
         wrapper.getByRole("button", { name: /add new determination/i })
@@ -481,7 +546,7 @@ describe("BulkEditTabWarning", () => {
     });
 
     // Click the "Add New Determination" button.
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
     await waitFor(() => {
@@ -493,11 +558,11 @@ describe("BulkEditTabWarning", () => {
     });
 
     // Override the verbatim scientific name.
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", {
         name: /verbatim scientific name no changes × insert hybrid symbol/i
       }),
-      { target: { value: "test-name-override" } }
+      "test-name-override"
     );
 
     await waitFor(() => {
@@ -507,7 +572,7 @@ describe("BulkEditTabWarning", () => {
     });
 
     // Click the "Save All" button:
-    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await waitFor(() => {
       const EXPECTED_ORGANISM_SAVE = {
         resource: {

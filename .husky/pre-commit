@@ -1,4 +1,9 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+
+# Sync versions.adoc with package.json files
+yarn sync-documentation-versions
+
+# Add updated versions.adoc if it changed
+git add docs/versions.adoc
 
 yarn lint-staged

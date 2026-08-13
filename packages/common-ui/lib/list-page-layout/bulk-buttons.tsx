@@ -25,6 +25,7 @@ import {
 import { FiDownload } from "react-icons/fi";
 import { TbArrowsSplit2 } from "react-icons/tb";
 import { useState } from "react";
+import { FaPaperclip } from "react-icons/fa6";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -53,6 +54,7 @@ export function AttachSelectedButton({
       }}
       buttonProps={bulkButtonProps}
     >
+      <FaPaperclip className="me-2" />
       <CommonMessage id="attachSelected" />
     </FormikButton>
   );

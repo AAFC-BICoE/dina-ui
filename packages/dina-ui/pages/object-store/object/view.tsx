@@ -7,7 +7,8 @@ import {
   CustomQueryPageView,
   UploadDerivativeButton,
   withResponse,
-  BackToListButton
+  BackToListButton,
+  LastUpdatedOn
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -202,6 +203,7 @@ export default function MetadataViewPage() {
             </div>
           );
         })}
+        <LastUpdatedOn date={metadata?.lastUpdatedOn} />
       </main>
       <Footer />
     </div>

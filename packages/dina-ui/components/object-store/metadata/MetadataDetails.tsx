@@ -1,6 +1,7 @@
 import {
   ApiClientContext,
   DateView,
+  ExternalLink,
   FieldHeader,
   ReactTable,
   useCollapser
@@ -8,14 +9,13 @@ import {
 import { PersistedResource } from "kitsu";
 import _ from "lodash";
 import { ReactNode, useContext, useEffect, useState } from "react";
-import { ORIENTATION_OPTIONS } from "../../../../dina-ui/pages/object-store/metadata/edit";
+import { ORIENTATION_OPTIONS } from "../../../pages/object-store/metadata/edit";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { License, Metadata } from "../../../types/objectstore-api";
 import { GroupLabel } from "../../group-select/GroupFieldView";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { DerivativeList } from "../derivative-list/DerivativeList";
 import { formatBytes } from "../object-store-utils";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -60,21 +60,9 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
                 {
                   name: "resourceExternalURL",
                   value: (
-                    <a
-                      href={metadata.resourceExternalURL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <>
-                        {metadata.resourceExternalURL}
-                        <FaArrowUpRightFromSquare
-                          style={{
-                            marginLeft: "0.5em"
-                          }}
-                          aria-label="Opens in new tab"
-                        />
-                      </>
-                    </a>
+                    <ExternalLink href={metadata.resourceExternalURL ?? ""}>
+                      {metadata.resourceExternalURL}
+                    </ExternalLink>
                   )
                 }
               ]
@@ -92,10 +80,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             name: "createdOn",
             value: <DateView date={metadata.createdOn} />
           },
-          {
-            name: "xmpMetadataDate",
-            value: <DateView date={metadata.xmpMetadataDate} />
-          },
+
           "acMetadataCreator.displayName"
         ]}
         title={
@@ -139,7 +124,11 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
 
       <MetadataAttributeGroup
         metadata={metadata}
-        fields={["dcRights", { name: "xmpRightsWebStatement", value: license }]}
+        fields={[
+          "dcRights",
+          { name: "xmpRightsWebStatement", value: license },
+          "xmpRightsOwner"
+        ]}
         title={formatMessage("metadataRightsDetailsLabel")}
       />
       {!isExternalResource && (

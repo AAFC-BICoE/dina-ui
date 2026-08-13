@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "include": ["**/*.ts"],
   "compilerOptions": {
-    "module": "commonjs"
+    "module": "commonjs",
+    "types": ["node"]
   }
 }

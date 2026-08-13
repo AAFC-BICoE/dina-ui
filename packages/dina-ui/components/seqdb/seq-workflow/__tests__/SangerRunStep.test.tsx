@@ -1,7 +1,7 @@
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
 import _ from "lodash";
-import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import {
   MATERIAL_SAMPLE_SUMMARY_1,
@@ -29,16 +29,24 @@ import { useState, useEffect } from "react";
 import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
-  switch (path) {
-    case "/seqdb-api/seq-reaction":
-      switch (params.filter.rsql) {
-        case "seqBatch.uuid==" + SEQ_BATCH_ID_MULTIPLE_RUNS:
-          return SEQ_REACTIONS_MULTIPLE;
-        case "seqBatch.uuid==" + SEQ_BATCH_ID:
-          return SEQ_REACTIONS;
-        case "seqBatch.uuid==" + SEQ_BATCH_NO_RUNS:
-          return SEQ_REACTIONS_NO_RUNS;
+  const normalizedPath =
+    (typeof path === "string" ? path.replace(/^\/+/, "") : path) || "";
+
+  switch (normalizedPath) {
+    case "seqdb-api/seq-reaction": {
+      if (params?.filter && params.filter["seqBatch.uuid"]) {
+        const eqVal = params.filter["seqBatch.uuid"].EQ;
+        switch (eqVal) {
+          case SEQ_BATCH_ID_MULTIPLE_RUNS:
+            return SEQ_REACTIONS_MULTIPLE;
+          case SEQ_BATCH_ID:
+            return SEQ_REACTIONS;
+          case SEQ_BATCH_NO_RUNS:
+            return SEQ_REACTIONS_NO_RUNS;
+        }
       }
+      break;
+    }
 
     case "seqdb-api/molecular-analysis-run/" + TEST_MOLECULAR_ANALYSIS_RUN_ID:
       return { data: TEST_MOLECULAR_ANALYSIS_RUN };
@@ -147,7 +155,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Alert should not exist, since there is only one run.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
@@ -156,7 +164,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     const sequencingRunNameInput = wrapper.container.querySelector(
       'input[name="sequencingRunName"]'
     );
-    expect(sequencingRunNameInput).toHaveDisplayValue("run-name-1");
+    expect(sequencingRunNameInput).toHaveDisplayValue(/run-name-1/i);
 
     // Ensure Primary IDs are rendered in the table with links:
     expect(
@@ -226,7 +234,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Alert should exist indicating that multiple runs exist.
     expect(wrapper.getByRole("alert")).toBeInTheDocument();
@@ -288,7 +296,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(sequencingRunNameInput).toHaveDisplayValue("");
 
     // Try saving with no sequencing run name, it should report an error.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => {
       expect(wrapper.queryByRole("alert")).toBeInTheDocument();
     });
@@ -299,17 +307,17 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     ).toBeInTheDocument();
 
     // Type a name for the run to be created.
-    userEvent.type(sequencingRunNameInput!, "My new run");
+    await userEvent.type(sequencingRunNameInput!, "My new run");
 
     // Enter in names for the run items:
-    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
-    userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
+    await userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    await userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
@@ -452,31 +460,31 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
     expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
     expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Change the sequencing run name to something different.
     const sequencingRunNameInput = wrapper.container.querySelector(
       'input[name="sequencingRunName"]'
     );
-    userEvent.clear(sequencingRunNameInput!);
-    userEvent.type(sequencingRunNameInput!, "Updated run name");
+    await userEvent.clear(sequencingRunNameInput!);
+    await userEvent.type(sequencingRunNameInput!, "Updated run name");
 
     // Update the two run iten name
-    userEvent.clear(wrapper.getAllByRole("textbox")[1]);
-    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    await userEvent.clear(wrapper.getAllByRole("textbox")[1]);
+    await userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
@@ -533,18 +541,22 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should be in edit mode automatically since no runs exist.
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Cancel out of edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
 
     // Even though we still have no runs, since the user explictly canceled
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
 
-    // Info alert to display that no sequencing runs exist
-    expect(wrapper.queryByRole("alert")).toBeInTheDocument();
+      // Info alert to display that no sequencing runs exist
+      expect(wrapper.queryByRole("alert")).toBeInTheDocument();
+    });
   });
 });

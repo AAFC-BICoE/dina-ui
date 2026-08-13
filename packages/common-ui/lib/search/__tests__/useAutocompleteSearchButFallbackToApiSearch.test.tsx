@@ -1,6 +1,6 @@
 import { Person } from "packages/dina-ui/types/agent-api";
 import { mountWithAppContext } from "common-ui";
-import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../useAutocompleteSearchButFallbackToRsqlApiSearch";
+import { useAutocompleteSearchButFallbackToApiSearch } from "../useAutocompleteSearchButFallbackToApiSearch";
 import "@testing-library/jest-dom";
 import { waitFor } from "@testing-library/react";
 
@@ -51,7 +51,7 @@ function TestPersonSearchComponent({
   searchQuery = ""
 }: TestPersonSearchComponentProps) {
   const { loading, response } =
-    useAutocompleteSearchButFallbackToRsqlApiSearch<Person>({
+    useAutocompleteSearchButFallbackToApiSearch<Person>({
       indexName: "dina_agent_index",
       searchField: "data.attributes.displayName",
       querySpec: {
@@ -75,10 +75,10 @@ function TestPersonSearchComponent({
   );
 }
 
-describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
+describe("useAutocompleteSearchButFallbackToApiSearch hook", () => {
   beforeEach(jest.clearAllMocks);
 
-  it("Able to perform searches with elastic search, RSQL should be called for an empty response.", async () => {
+  it("Able to perform searches with elastic search, API should be called for an empty response.", async () => {
     const wrapper = mountWithAppContext(
       <TestPersonSearchComponent searchQuery={""} />,
       {
@@ -138,7 +138,7 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
     });
   });
 
-  it("Falls back to the RSQL filter API when the search API throws an error.", async () => {
+  it("Falls back to the API when the search API throws an error.", async () => {
     const wrapper = mountWithAppContext(
       <TestPersonSearchComponent searchQuery={"test-query"} />,
       {

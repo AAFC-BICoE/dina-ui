@@ -13,7 +13,7 @@ export interface FilterGroupModel {
 
 export interface FilterGroupProps {
   model: FilterGroupModel;
-  children: JSX.Element[];
+  children: React.JSX.Element[];
   showAndOrButtons: boolean;
   showRemoveButton: boolean;
   onAndClick: () => void;

@@ -11,7 +11,7 @@ const mockSubmit = jest.fn();
 describe("MetersField component", () => {
   beforeEach(jest.clearAllMocks);
 
-  it("Converts other units to meters.", () => {
+  it("Converts other units to meters.", async () => {
     expect(toMeters("1 Foot")).toEqual("0.3048");
     expect(toMeters("1 Feet")).toEqual("0.3048");
     expect(toMeters("1 ft")).toEqual("0.3048");
@@ -75,14 +75,14 @@ describe("MetersField component", () => {
     expect(toMeters(": 36.5 kl")).toEqual("36.5");
   });
 
-  it("Can set maximum decimal places.", () => {
+  it("Can set maximum decimal places.", async () => {
     expect(toMeters("1 meter", 2)).toEqual("1");
     // Trailing zeroes should be kept:
     expect(toMeters("4 feet 3 inches", 2)).toEqual("1.30");
     expect(toMeters("4 feet 4 inches", 2)).toEqual("1.32");
   });
 
-  it("Returns number-only values as-is without changing the decimals.", () => {
+  it("Returns number-only values as-is without changing the decimals.", async () => {
     expect(toMeters("0", 2)).toEqual("0");
     expect(toMeters("12345", 2)).toEqual("12345");
     expect(toMeters("0.30", 2)).toEqual("0.30");
@@ -174,7 +174,7 @@ describe("MetersField component", () => {
 
     // Simulate user input
     const input = screen.getByRole("textbox", { name: /length/i });
-    userEvent.type(input, "1 ft");
+    await userEvent.type(input, "1 ft");
 
     // Simulate form submission
     const form = container.querySelector("form");
@@ -188,7 +188,7 @@ describe("MetersField component", () => {
     });
   });
 
-  it("Renders the initial value.", () => {
+  it("Renders the initial value.", async () => {
     mountWithAppContext(
       <DinaForm
         initialValues={{ length: "10.00" }}
@@ -201,7 +201,7 @@ describe("MetersField component", () => {
     expect(input).toHaveValue("10.00");
   });
 
-  it("Updates the input value when the form state changes.", () => {
+  it("Updates the input value when the form state changes.", async () => {
     mountWithAppContext(
       <DinaForm
         initialValues={{ length: "10.00" }}
@@ -222,7 +222,7 @@ describe("MetersField component", () => {
 
     // Simulate button click to change form state
     const button = screen.getByRole("button", { name: /change val/i });
-    userEvent.click(button);
+    await userEvent.click(button);
 
     // The new value is rendered:
     expect(input).toHaveValue("20.5");

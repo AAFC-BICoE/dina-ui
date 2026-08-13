@@ -3,8 +3,14 @@ import { fromPairs } from "lodash";
 import { VocabularyElementType } from "../../types/collection-api";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 
-export const MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID =
+export const COLLECTION_OTHER_IDENTIFIERS_ID =
   "019c961e-4c0d-7398-b4ae-73687826b3b5";
+
+export const COLLECTION_MANAGED_ATTRIBUTE_ID =
+  "01998155-a6f0-7c2f-9fcc-994d74222f9c";
+
+export const OBJECT_STORE_MANAGED_ATTRIBUTE_ID =
+  "b8527bdf-a1d2-465d-a8bb-2a66d552de23";
 
 /**
  * Transforms a ControlledVocabularyItem from the API format to a format suitable for form editing.

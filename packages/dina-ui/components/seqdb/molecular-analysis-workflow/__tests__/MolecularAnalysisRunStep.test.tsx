@@ -1,9 +1,9 @@
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import {
-  fireEvent,
-  waitFor,
-  waitForElementToBeRemoved
-} from "@testing-library/react";
+  mountWithAppContext,
+  OBJECT_STORE_MAPPING,
+  waitForLoadingToDisappear
+} from "common-ui";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -34,51 +34,11 @@ import {
   MolecularAnalysisRunStep,
   MolecularAnalysisRunStepProps
 } from "../MolecularAnalysisRunStep";
-import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-
-const MOCK_INDEX_MAPPING_RESP = {
-  data: {
-    indexName: "dina_object_store_index",
-    attributes: [
-      {
-        name: "originalFilename",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "bucket",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "createdBy",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "acCaption",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "id",
-        type: "text",
-        path: "data"
-      },
-      {
-        name: "type",
-        type: "text",
-        path: "data"
-      },
-      {
-        name: "createdOn",
-        type: "date",
-        path: "data.attributes"
-      }
-    ],
-    relationships: []
-  }
-};
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { PersistedResource } from "kitsu";
 
 const TEST_ELASTIC_SEARCH_RESPONSE = {
   data: {
@@ -104,43 +64,105 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "search-api/search-ws/mapping":
-      return MOCK_INDEX_MAPPING_RESP;
-    case "/seqdb-api/generic-molecular-analysis-item":
-      switch (params.filter.rsql) {
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID:
+      return OBJECT_STORE_MAPPING;
+    case "/seqdb-api/generic-molecular-analysis-item": {
+      const uuid = params.filter?.["genericMolecularAnalysis.uuid"]?.EQ;
+      switch (uuid) {
+        case TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN };
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID:
+        case TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN };
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID:
+        case TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN };
       }
+    }
 
     case "seqdb-api/molecular-analysis-run/" + TEST_MOLECULAR_ANALYSIS_RUN_ID:
       return { data: TEST_MOLECULAR_ANALYSIS_RUN };
 
-    case "seqdb-api/molecular-analysis-run-item":
-      switch (params.filter.rsql) {
-        case "run.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_RUN_ID +
-          ";usageType==" +
-          MolecularAnalysisRunItemUsageType.QUALITY_CONTROL:
-          return { data: TEST_QUALITY_CONTROL_RUN_ITEMS };
+    case "seqdb-api/molecular-analysis-run-item": {
+      const runUuid = params.filter?.["run.uuid"]?.EQ;
+      const usageType = params.filter?.usageType?.EQ;
+      const uuidIn = params.filter?.uuid?.IN;
+
+      if (uuidIn) {
+        const requestedUuids = uuidIn.split(",");
+        const allRunItems: PersistedResource<MolecularAnalysisRunItem>[] = [
+          {
+            id: "f65ed036-eb92-40d9-af03-d027646e8948",
+            type: "molecular-analysis-run-item",
+            name: "Provided run item name",
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+            run: TEST_MOLECULAR_ANALYSIS_RUN
+          },
+          {
+            id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+            type: "molecular-analysis-run-item",
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+            run: TEST_MOLECULAR_ANALYSIS_RUN
+          },
+          {
+            id: "aaa00000-0000-0000-0000-000000000001",
+            type: "molecular-analysis-run-item",
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+            run: TEST_MOLECULAR_ANALYSIS_RUN
+          },
+          {
+            id: "aaa00000-0000-0000-0000-000000000002",
+            type: "molecular-analysis-run-item",
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+            run: {
+              id: "9ec624c9-8465-4f00-b3d4-1bbab5f1e2f2",
+              type: "molecular-analysis-run",
+              name: "run-name-2"
+            }
+          },
+          {
+            id: "aaa00000-0000-0000-0000-000000000003",
+            type: "molecular-analysis-run-item",
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+            run: {
+              id: "9ec624c9-8465-4f00-b3d4-1bbab5f1e2f2",
+              type: "molecular-analysis-run",
+              name: "run-name-2"
+            }
+          }
+        ];
+        return {
+          data: allRunItems.filter((item) => requestedUuids.includes(item.id))
+        };
       }
+
+      if (
+        runUuid === TEST_MOLECULAR_ANALYSIS_RUN_ID &&
+        usageType === MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+      ) {
+        return { data: TEST_QUALITY_CONTROL_RUN_ITEMS };
+      }
+    }
+
+    case "seqdb-api/molecular-analysis-run-item/" +
+      TEST_QUALITY_CONTROL_RUN_ITEMS[1].id:
+      return { data: TEST_QUALITY_CONTROL_RUN_ITEMS[1] };
 
     case "seqdb-api/molecular-analysis-result/" +
       TEST_MOLECULAR_ANALYSIS_RESULT.id:
       return { data: TEST_MOLECULAR_ANALYSIS_RESULT };
 
-    case "seqdb-api/quality-control":
-      switch (params.filter.rsql) {
-        case "molecularAnalysisRunItem.uuid==2a3b15ce-6781-466b-bc1e-49e35af3df58":
+    case "seqdb-api/quality-control": {
+      const runItemUuid = params.filter?.["molecularAnalysisRunItem.uuid"]?.EQ;
+      switch (runItemUuid) {
+        case "2a3b15ce-6781-466b-bc1e-49e35af3df58":
           return { data: TEST_QUALITY_CONTROL_1 };
-        case "molecularAnalysisRunItem.uuid==e9e39b72-ece7-454b-893a-2fc2d075e7b7":
+        case "e9e39b72-ece7-454b-893a-2fc2d075e7b7":
           return { data: TEST_QUALITY_CONTROL_2 };
       }
+    }
 
     case "seqdb-api/vocabulary/qualityControlType":
       return { data: TEST_QUALITY_CONTROL_TYPES };
@@ -203,16 +225,19 @@ const mockBulkGet = jest.fn(async (paths) => {
       case "metadata/" +
         TEST_METADATA_1.id +
         "?include=acMetadataCreator,derivatives":
+      case "metadata/" + TEST_METADATA_1.id:
         return TEST_METADATA_1;
       case "metadata/" + TEST_METADATA_2.id + "?include=derivatives":
       case "metadata/" +
         TEST_METADATA_2.id +
         "?include=acMetadataCreator,derivatives":
+      case "metadata/" + TEST_METADATA_2.id:
         return TEST_METADATA_2;
       case "metadata/" + TEST_METADATA_3.id + "?include=derivatives":
       case "metadata/" +
         TEST_METADATA_3.id +
         "?include=acMetadataCreator,derivatives":
+      case "metadata/" + TEST_METADATA_3.id:
         return TEST_METADATA_3;
     }
   });
@@ -303,14 +328,17 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Alert should not exist, since there is only one run.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Run name should be in the textbox.
     expect(wrapper.getAllByRole("textbox")[0]).toHaveDisplayValue("run-name-1");
@@ -353,12 +381,14 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.getByText(/acn blank/i)).toBeInTheDocument();
 
     // Expect Quality Control 1 to have 2 attachments
-    expect(wrapper.getAllByRole("link", { name: /japan\.jpg/i }).length).toBe(
-      1
-    );
-    expect(wrapper.getAllByRole("link", { name: /canada\.jpg/i }).length).toBe(
-      1
-    );
+    await waitFor(() => {
+      expect(wrapper.getAllByRole("link", { name: /japan\.jpg/i }).length).toBe(
+        2
+      );
+      expect(
+        wrapper.getAllByRole("link", { name: /canada\.jpg/i }).length
+      ).toBe(1);
+    });
 
     // Ensure attachment appears.
     expect(
@@ -378,7 +408,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Alert should exist indicating that multiple runs exist.
     expect(wrapper.getByRole("alert")).toBeInTheDocument();
@@ -410,7 +440,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(sequencingRunNameInput).toHaveDisplayValue("");
 
     // Try saving with no sequencing run name, it should report an error.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => {
       expect(wrapper.queryByRole("alert")).toBeInTheDocument();
     });
@@ -421,30 +451,30 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ).toBeInTheDocument();
 
     // Enter in names for the run items:
-    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
-    userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
+    await userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    await userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
 
     // Type a name for the run to be created.
-    userEvent.type(sequencingRunNameInput!, "My new run");
+    await userEvent.type(sequencingRunNameInput!, "My new run");
 
     // Add new quality control.
-    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+    await userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
     // Provide quality control
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByTestId("qualityControl-name-0"),
       "Quality Control Test Name 1"
     );
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    userEvent.click(
+    await userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
     // Add an attachment to the quality control
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("button", { name: "Add Attachments" })[0]
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
 
@@ -455,27 +485,29 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
-    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /attach selected/i })
+    );
 
     // Wait for attachments to be displayed on the page.
     await waitForLoadingToDisappear();
 
     // Add another quality control.
-    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+    await userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
     // Provide quality control
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByTestId("qualityControl-name-1"),
       "Quality Control Test Name 2"
     );
-    userEvent.click(wrapper.getAllByRole("combobox")[2]);
-    userEvent.click(
+    await userEvent.click(wrapper.getAllByRole("combobox")[2]);
+    await userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
     await new Promise(setImmediate);
@@ -740,55 +772,66 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Change the sequencing run name to something different.
-    userEvent.clear(wrapper.getAllByRole("textbox")[0]);
-    userEvent.type(wrapper.getAllByRole("textbox")[0], "Updated run name");
+    await userEvent.clear(wrapper.getAllByRole("textbox")[0]);
+    await userEvent.type(
+      wrapper.getAllByRole("textbox")[0],
+      "Updated run name"
+    );
 
     // Add a new run name.
-    userEvent.clear(wrapper.getAllByRole("textbox")[1]);
-    userEvent.type(
+    await userEvent.clear(wrapper.getAllByRole("textbox")[1]);
+    await userEvent.type(
       wrapper.getAllByRole("textbox")[1],
       "Update run item name 1"
     );
-    userEvent.type(wrapper.getAllByRole("textbox")[2], "Add a new one");
+    await userEvent.type(wrapper.getAllByRole("textbox")[2], "Add a new one");
 
     // Edit Quality Control 1
-    userEvent.clear(wrapper.getAllByRole("textbox")[4]);
-    userEvent.type(
+    await userEvent.clear(wrapper.getAllByRole("textbox")[4]);
+    await userEvent.type(
       wrapper.getAllByRole("textbox")[4],
       "Updated Quality Control"
     );
 
     // Delete Quality Control 2
     expect(wrapper.queryByText(/acn blank/i)).toBeInTheDocument();
-    userEvent.click(wrapper.getByTestId("delete-quality-control-1"));
+    await userEvent.click(wrapper.getByTestId("delete-quality-control-1"));
     expect(wrapper.queryByText(/acn blank/i)).not.toBeInTheDocument();
 
     // Add new Quality Control
-    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
-    userEvent.type(wrapper.getAllByRole("textbox")[5], "New Quality Control");
-    userEvent.click(wrapper.getAllByRole("combobox")[2]);
-    userEvent.click(
+    await userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+    await userEvent.type(
+      wrapper.getAllByRole("textbox")[5],
+      "New Quality Control"
+    );
+    await userEvent.click(wrapper.getAllByRole("combobox")[2]);
+    await userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
     // Add blank quality control, should not be saved.
-    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+    await userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
     // Add an attachment to the existing quality control
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("button", { name: "Add Attachments" })[0]
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
 
@@ -798,14 +841,16 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
-    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /attach selected/i })
+    );
 
     // Add an attachment to the new quality control
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("button", { name: "Add Attachments" })[1]
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
 
@@ -815,18 +860,22 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
-    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /attach selected/i })
+    );
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Expect the network request to only contain the update of the run.
     expect(mockSave.mock.calls).toEqual([
@@ -1050,27 +1099,34 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Delete the quality control with existing attachments.
-    userEvent.click(wrapper.getByTestId("delete-quality-control-0"));
+    await userEvent.click(wrapper.getByTestId("delete-quality-control-0"));
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Expect the network request to properly delete the quality control and attachments.
     expect(mockSave.mock.calls).toEqual([
@@ -1130,31 +1186,39 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Remove all the attachments for the quality control
-    userEvent.click(wrapper.getAllByRole("button", { name: /detach/i })[0]);
-    await waitForElementToBeRemoved(
-      wrapper.queryAllByText(/loading\.\.\./i)[0]
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /unlink/i })[0]
     );
-    userEvent.click(wrapper.getAllByRole("button", { name: /detach/i })[0]);
+    await waitForLoadingToDisappear();
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /unlink/i })[0]
+    );
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Expect the network request to properly delete the quality control and attachments.
     expect(mockSave.mock.calls).toEqual([
@@ -1206,28 +1270,34 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Change the quality control type.
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    userEvent.click(wrapper.getByRole("option", { name: /meoh blank/i }));
+    await userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await userEvent.click(wrapper.getByRole("option", { name: /meoh blank/i }));
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Expect the network request to properly delete the quality control and attachments.
     expect(mockSave.mock.calls).toEqual([
@@ -1259,20 +1329,24 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Add an attachment to the first quality control (already contains attachments.)
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("button", { name: /add attachments/i })[0]
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
 
@@ -1282,20 +1356,24 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
-    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /attach selected/i })
+    );
 
-    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
+    await waitForLoadingToDisappear();
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Expect the network request to change the request to include all original 2 and the new
     // attachment.
@@ -1345,41 +1423,50 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Create 4 new quality controls.
     for (let i = 0; i < 4; i++) {
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[0]
+      );
     }
 
     // Quality Control 1 - Both provided.
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByTestId("qualityControl-name-0"),
       "both-provided"
     );
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    userEvent.click(
+    await userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
     // Quality Control 2 - Name only provided.
-    userEvent.type(wrapper.getByTestId("qualityControl-name-1"), "name-only");
+    await userEvent.type(
+      wrapper.getByTestId("qualityControl-name-1"),
+      "name-only"
+    );
 
     // Quality Control 3 - Type only provided.
-    userEvent.click(wrapper.getAllByRole("combobox")[3]);
-    userEvent.click(
+    await userEvent.click(wrapper.getAllByRole("combobox")[3]);
+    await userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
     // Save and expect an error message.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => {
       expect(wrapper.queryByRole("alert")).toBeInTheDocument();
     });
@@ -1394,16 +1481,20 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should be in edit mode automatically since no runs exist.
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Cancel out of edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
 
     // Even though we still have no runs, since the user explictly canceled
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Info alert to display that no sequencing runs exist
     expect(wrapper.queryByRole("alert")).toBeInTheDocument();
@@ -1414,10 +1505,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
       // Wait for loading to be finished.
-      await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
 
       // Should be in edit mode automatically since no runs exist.
-      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      });
 
       const dataPasteZone = wrapper.getAllByPlaceholderText(
         "Paste your data here (e.g., copied from Excel)"
@@ -1447,10 +1540,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
       // Wait for loading to be finished.
-      await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
 
       // Should be in edit mode automatically since no runs exist.
-      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      });
 
       const dataPasteZone = wrapper.getAllByPlaceholderText(
         "Paste your data here (e.g., copied from Excel)"
@@ -1477,10 +1572,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
       // Wait for loading to be finished.
-      await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
 
       // Should be in edit mode automatically since no runs exist.
-      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      });
 
       const dataPasteZone = wrapper.getAllByPlaceholderText(
         "Paste your data here (e.g., copied from Excel)"

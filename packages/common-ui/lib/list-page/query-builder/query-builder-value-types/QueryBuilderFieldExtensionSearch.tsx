@@ -6,7 +6,7 @@ import QueryBuilderTextSearch, {
 import Select from "react-select";
 import { useIntl } from "react-intl";
 import { SelectOption, useQuery } from "common-ui";
-import { FieldExtension } from "../../../../../dina-ui/types/collection-api/resources/FieldExtension";
+import { FieldExtension } from "@dina-ui/types/collection-api/resources/FieldExtension";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
 } from "./QueryBuilderNumberSearch";

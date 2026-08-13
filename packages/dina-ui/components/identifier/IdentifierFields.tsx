@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { FieldArray } from "formik";
 import _ from "lodash";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { IdentifierRow } from "./IdentifierRow";
 
 export interface IdentifierFieldsProps {

@@ -37,7 +37,7 @@ describe("GroupSelectField component", () => {
     );
 
     // Click the dropdown to show options.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", { name: /group select\.\.\./i })
     );
 
@@ -77,7 +77,7 @@ describe("GroupSelectField component", () => {
     );
 
     // Click the dropdown to show options.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", { name: /group select\.\.\./i })
     );
 
@@ -142,7 +142,7 @@ describe("GroupSelectField component", () => {
       expect(wrapper.queryByRole("combobox")).not.toBeInTheDocument()
     );
 
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockSubmit).lastCalledWith({ group: "cnc" }));
 
     // The default group was selected:
@@ -167,7 +167,7 @@ describe("GroupSelectField component", () => {
       expect(wrapper.getByRole("button", { name: /save/i })).toBeInTheDocument()
     );
 
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockSubmit).lastCalledWith({ group: null }));
 
     // The default group was selected:

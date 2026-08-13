@@ -1,8 +1,9 @@
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { NumberField } from "../NumberField";
 import "@testing-library/jest-dom";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 const mockOnSubmit = jest.fn();
 
@@ -38,7 +39,7 @@ describe("NumberField component", () => {
 
     // Change the value of the input field.
     const input = screen.getByLabelText("Test Field");
-    fireEvent.change(input, { target: { value: "456.78" } });
+    await clearAndType(input, "456.78");
 
     // Simulate form submission
     const form = wrapper.container.querySelector("form");
@@ -56,7 +57,7 @@ describe("NumberField component", () => {
 
     // Change the value to blank.
     const input = screen.getByLabelText("Test Field");
-    fireEvent.change(input, { target: { value: "" } });
+    await userEvent.clear(input);
 
     // Simulate form submission
     const form = wrapper.container.querySelector("form");
@@ -83,7 +84,7 @@ describe("NumberField component", () => {
     expect(input).toHaveValue("123.23");
 
     // Change the value to undefined.
-    fireEvent.change(input, { target: { value: "" } });
+    await userEvent.clear(input);
 
     // The input should become blank.
     expect(input).toHaveValue("");

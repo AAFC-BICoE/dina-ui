@@ -9,7 +9,7 @@ import {
   FormikButton,
   useInstanceContext
 } from "../../../common-ui/lib";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface GroupLabelsEditorProps {
   valuesPath: string;
@@ -75,7 +75,7 @@ function GroupLabelsEditorInner({
                     return (
                       <input
                         className="form-control"
-                        onChange={(event) => setValue(event.target.value)}
+                        onChange={(event) => setValue((event.target as HTMLTextAreaElement | HTMLInputElement).value)}
                         value={value || ""}
                       />
                     );
