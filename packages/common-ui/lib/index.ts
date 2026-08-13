@@ -144,6 +144,7 @@ export * from "./visibility/useIsVisible";
 export * from "./table/ScientificNameCell";
 export * from "./settings-button/SettingsButton";
 export * from "./test-util/mock-app-context";
+export * from "./test-util/user-event-utils";
 export * from "./export/exportUtils";
 export * from "./export/useBlobLoad";
 export * from "./classification/TaxonomyTree";

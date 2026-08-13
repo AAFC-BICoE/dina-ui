@@ -107,7 +107,7 @@ const TEST_MANAGED_ATTRIBUTE: PersistedResource<ManagedAttribute> = {
   type: "managed-attribute",
   id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
   name: "test-managed-attribute",
-  key: "test-managed-attribute",
+  key: "test_managed_attribute",
   vocabularyElementType: "STRING"
 };
 
@@ -156,9 +156,11 @@ describe("Metadata single record edit page.", () => {
     expect(wrapper.getByText(/tag2/i)).toBeInTheDocument();
     expect(wrapper.getByText(/tag3/i)).toBeInTheDocument();
 
-    expect(
-      wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
+      ).toBeInTheDocument();
+    });
 
     // Set new values:
     await userEvent.click(

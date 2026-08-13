@@ -1,7 +1,8 @@
 import { mountWithAppContext } from "common-ui";
 import { AreYouSureModal } from "../AreYouSureModal";
 import { useModal } from "../modal";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const mockYesClick = jest.fn();
@@ -43,13 +44,13 @@ describe("AreYouSureModal", () => {
     expect(wrapper.queryByText(/test message/i)).not.toBeInTheDocument();
 
     // Open modal:
-    fireEvent.click(wrapper.getByRole("button", { name: /open/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /open/i }));
 
     // Ensure the test message is displayed.
     expect(wrapper.getByText(/test message/i)).toBeInTheDocument();
 
     // Click 'no':
-    fireEvent.click(wrapper.getByRole("button", { name: /no/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /no/i }));
 
     // Should be closed now:
     expect(wrapper.queryByText(/test message/i)).not.toBeInTheDocument();
@@ -59,13 +60,13 @@ describe("AreYouSureModal", () => {
     const wrapper = mountWithAppContext(<TestComponent />);
 
     // Open modal:
-    fireEvent.click(wrapper.getByRole("button", { name: /open/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /open/i }));
 
     // Ensure the test message is displayed.
     expect(wrapper.getByText(/test message/i)).toBeInTheDocument();
 
     // Click 'yes':
-    fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
 
     // Should have run the function:
     await waitFor(() => {

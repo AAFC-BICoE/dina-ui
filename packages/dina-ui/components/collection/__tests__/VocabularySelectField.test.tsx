@@ -7,6 +7,7 @@ import {
 } from "../VocabularySelectField";
 import _ from "lodash";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const mockOnSubmit = jest.fn();
@@ -66,22 +67,18 @@ describe("VocabularySelectField component", () => {
     });
 
     // Get the current selected values and remove them by clicking each "remove" button.
-    screen.getAllByLabelText(/remove/i).forEach((removeButton) => {
-      fireEvent.click(removeButton);
-    });
+    while (screen.queryAllByLabelText(/remove/i).length > 0) {
+      await userEvent.click(screen.getAllByLabelText(/remove/i)[0]);
+    }
 
     // Open the dropdown.
     fireEvent.mouseDown(screen.getByRole("combobox"));
 
     // Select the new values.
-    fireEvent.change(screen.getByRole("combobox"), {
-      target: { value: "new-val-1" }
-    });
+    await userEvent.type(screen.getByRole("combobox"), "new-val-1");
     fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
 
-    fireEvent.change(screen.getByRole("combobox"), {
-      target: { value: "new-val-2" }
-    });
+    await userEvent.type(screen.getByRole("combobox"), "new-val-2");
     fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
 
     // Verify the new selection.
@@ -133,9 +130,7 @@ describe("VocabularySelectField component", () => {
     expect(screen.getByText(/select or type/i)).toBeInTheDocument();
 
     // Simulate selecting a new value
-    fireEvent.change(screen.getByRole("combobox"), {
-      target: { value: "substrate_1" }
-    });
+    await userEvent.type(screen.getByRole("combobox"), "substrate_1");
     fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
 
     // Wait for the component to update after selection
@@ -179,9 +174,7 @@ describe("VocabularySelectField component", () => {
     expect(screen.getByText(/select or type/i)).toBeInTheDocument();
 
     // Simulate selecting a new value
-    fireEvent.change(screen.getByRole("combobox"), {
-      target: { value: "substrate_1" }
-    });
+    await userEvent.type(screen.getByRole("combobox"), "substrate_1");
     fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
 
     // Wait for the component to update after selection

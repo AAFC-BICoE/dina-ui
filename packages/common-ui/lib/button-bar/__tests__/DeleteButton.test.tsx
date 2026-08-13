@@ -1,6 +1,6 @@
 import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { DeleteButton } from "../DeleteButton";
-import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const mockDoOperations = jest.fn();
@@ -32,11 +32,11 @@ describe("DeleteButton", () => {
     const deleteButton = wrapper.getByRole("button", { name: /delete/i });
 
     // Click the button.
-    fireEvent.click(deleteButton);
+    await userEvent.click(deleteButton);
 
     // Click Yes:
     const yesButton = wrapper.getByRole("button", { name: /yes/i });
-    fireEvent.click(yesButton);
+    await userEvent.click(yesButton);
 
     // Wait for the loading to be removed.
     await waitForLoadingToDisappear();

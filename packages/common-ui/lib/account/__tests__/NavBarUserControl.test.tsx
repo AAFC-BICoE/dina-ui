@@ -1,10 +1,10 @@
 import { NavbarUserControl } from "../NavBarUserControl";
 import "@testing-library/jest-dom";
-import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { mountWithAppContext } from "common-ui";
 
 describe("NavBarUserControl component", () => {
-  it("Shows the logout button when logged in.", () => {
+  it("Shows the logout button when logged in.", async () => {
     const mockLogout = jest.fn();
     const wrapper = mountWithAppContext(<NavbarUserControl />, {
       accountContext: { authenticated: true, logout: mockLogout }
@@ -13,7 +13,7 @@ describe("NavBarUserControl component", () => {
     const logoutButton = wrapper.getByRole("button", { name: /logout/i });
 
     // Click the logout button:
-    fireEvent.click(logoutButton);
+    await userEvent.click(logoutButton);
     expect(mockLogout).toHaveBeenCalledTimes(1);
   });
 
