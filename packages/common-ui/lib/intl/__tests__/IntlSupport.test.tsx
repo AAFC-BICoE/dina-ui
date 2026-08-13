@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { getIntlSupport } from "../..";
 import "@testing-library/jest-dom";
 
@@ -42,7 +43,7 @@ describe("IntlSupport", () => {
     expect(screen.getByText("test message")).toBeInTheDocument();
   });
 
-  it("Provides a 'useIntl' hook to change the locale.", () => {
+  it("Provides a 'useIntl' hook to change the locale.", async () => {
     function LocaleSelector() {
       const { locale, setLocale } = useIntl();
 
@@ -66,7 +67,7 @@ describe("IntlSupport", () => {
     expect(screen.getByText("Current locale: en")).toBeInTheDocument();
     expect(screen.getByText("test message")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("Change To French"));
+    await userEvent.click(screen.getByText("Change To French"));
 
     expect(screen.getByText("Current locale: fr")).toBeInTheDocument();
     expect(screen.getByText("message dans test")).toBeInTheDocument();

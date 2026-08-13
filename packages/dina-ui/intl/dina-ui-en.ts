@@ -1051,6 +1051,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   bulkEditMetadataLoadingProgress: "Loading metadata... {loaded} of {total}",
   saveAll: "Save All",
   saveAndCopyToNext: "Save & Copy To Next",
+  saveSuccess: "Successfully saved record: ",
+  copyToNextSampleInProgressMessage:
+    'You are now working on a new copy based on "{displayName}". This copy will not be created until it\'s saved.',
   saveAndCopyToNextWarning:
     'The "{componentName}" data component was not automatically copied over since it\'s specific to the previous Material Sample. Would you like to duplicate it anyway?',
   saveAndCopyToNextWarningButton:

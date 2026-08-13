@@ -1,6 +1,6 @@
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { FilterRowDatePicker } from "../FilterRowDatePicker";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 
 // The state to pass in to the datepicker:
 const TEST_DATE_VALUE1 =
@@ -33,7 +33,7 @@ describe("FilterRowDatePicker", () => {
     const TEST_SINGLE_DATE_CHANGE =
       "Tue Oct 20 2020 21:05:30 GMT+0000 (Coordinated Universal Time)";
 
-    fireEvent.change(datepicker, { target: { value: "10/20/2020" } });
+    await clearAndType(datepicker, "10/20/2020");
     await waitFor(() => {
       expect(mockOnChanged).lastCalledWith(TEST_SINGLE_DATE_CHANGE);
     });
@@ -53,7 +53,7 @@ describe("FilterRowDatePicker", () => {
     const datepickers = wrapper.getAllByRole("textbox") as HTMLInputElement[];
 
     // Passes the selected dates as a string to react-datepicker:
-    fireEvent.change(datepickers[0], { target: { value: "10/20/2020" } });
+    await clearAndType(datepickers[0], "10/20/2020");
     await waitFor(() => {
       expect(mockOnChanged).lastCalledWith({
         high: "Thu Oct 15 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
@@ -61,7 +61,7 @@ describe("FilterRowDatePicker", () => {
       });
     });
 
-    fireEvent.change(datepickers[1], { target: { value: "10/25/2020" } });
+    await clearAndType(datepickers[1], "10/25/2020");
     await waitFor(() => {
       expect(mockOnChanged).lastCalledWith({
         high: "Sun Oct 25 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",

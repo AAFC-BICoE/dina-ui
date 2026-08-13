@@ -1,6 +1,6 @@
-import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { DinaForm } from "../../formik-connected/DinaForm";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { TextFieldWithMultiplicationButton } from "../TextFieldWithMultiplicationButton";
 
 describe("TextFieldWithMultiplicationButton component", () => {
@@ -11,10 +11,8 @@ describe("TextFieldWithMultiplicationButton component", () => {
       </DinaForm>
     );
 
-    fireEvent.change(wrapper.getByRole("textbox"), {
-      target: { value: "species1" }
-    });
-    fireEvent.click(wrapper.getByRole("button", { name: /×/i }));
+    await clearAndType(wrapper.getByRole("textbox"), "species1");
+    await userEvent.click(wrapper.getByRole("button", { name: /×/i }));
 
     expect((wrapper.getByRole("textbox") as HTMLInputElement).value).toEqual(
       "species1×"

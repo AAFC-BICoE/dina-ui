@@ -3,7 +3,7 @@
 :var_yarn_version: 1.22.21
 :var_typescript_version: 6.0.3
 :var_react_version: 19.2.7
-:var_nextjs_version: 16.2.10
+:var_nextjs_version: 16.2.12
 :var_bootstrap_version: 5.1.3
 :var_jest_version: 29.7.0
 :var_formik_version: 2.2.7

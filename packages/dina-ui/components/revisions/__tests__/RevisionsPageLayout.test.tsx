@@ -39,19 +39,14 @@ describe("RevisionsPageLayout component", () => {
       { apiContext: { apiClient: { get: mockGet } as any } }
     );
 
-    const table = document.querySelector("table");
     await waitFor(() => {
+      const table = document.querySelector("table");
       expect(table).not.toBeNull();
-    });
-    if (!table) {
-      fail("A table is expected at this point...");
-    }
+      
+      const numRows = table?.rows.length;
+      const numCols = table?.rows[0].cells.length;
 
-    const numRows = table.rows.length;
-    const numCols = table.rows[0].cells.length;
-
-    // Expect a specific table layout
-    await waitFor(() => {
+      // Expect a specific table layout
       expect(numRows).toEqual(3); // 2 rows including the header.
       expect(numCols).toEqual(6);
     });

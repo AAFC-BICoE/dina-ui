@@ -4,6 +4,7 @@ import { FilterAttribute } from "../FilterBuilder";
 import { FilterBuilderContextProvider } from "../FilterBuilderContext";
 import { FilterRow, FilterRowProps } from "../FilterRow";
 import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const TEST_SPECIMEN_NUMBER_FILTER: FilterAttribute = {
@@ -107,8 +108,10 @@ describe("FilterRow component", () => {
     const wrapper = mountFilterRow();
 
     const select = wrapper.getByRole("combobox", { name: /filter attribute/i });
-    fireEvent.change(select, { target: { value: "Desc" } });
-    fireEvent.click(wrapper.getByRole("option", { name: /description/i }));
+    await userEvent.type(select, "Desc");
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /description/i })
+    );
 
     await waitFor(() => {
       expect(mockModelChange).lastCalledWith({
@@ -127,8 +130,8 @@ describe("FilterRow component", () => {
     const wrapper = mountFilterRow();
 
     const select = wrapper.getByRole("combobox", { name: /filter predicate/i });
-    fireEvent.change(select, { target: { value: "i" } });
-    fireEvent.click(wrapper.getAllByRole("option", { name: "" })[1]);
+    await userEvent.type(select, "i");
+    await userEvent.click(wrapper.getAllByRole("option", { name: "" })[1]);
 
     await waitFor(() => {
       expect(mockModelChange).lastCalledWith({
@@ -143,11 +146,12 @@ describe("FilterRow component", () => {
     });
   });
 
-  it("Changes the model's filter value when the filter value is changed.", () => {
+  it("Changes the model's filter value when the filter value is changed.", async () => {
     const wrapper = mountFilterRow();
-    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
-      target: { value: "101F" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /filter value/i }),
+      "101F"
+    );
 
     expect(mockModelChange).lastCalledWith({
       attribute: "name",
@@ -157,7 +161,8 @@ describe("FilterRow component", () => {
       type: "FILTER_ROW",
       value: "101F"
     });
-    expect(mockOnChange).toHaveBeenCalledTimes(1);
+    // userEvent.type fires one change event per typed character:
+    expect(mockOnChange).toHaveBeenCalledTimes(4);
   });
 
   it("Provides a prop to show the remove button.", () => {

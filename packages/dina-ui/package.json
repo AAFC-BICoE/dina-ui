@@ -19,7 +19,7 @@
     "esri-loader": "^3.3.0",
     "esri-loader-hooks": "^0.4.0",
     "moment": "^2.29.4",
-    "next": "16.2.10",
+    "next": "16.2.12",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "react-switch": "^7.1.0",
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
-    "eslint-config-next": "16.2.10",
+    "eslint-config-next": "16.2.12",
     "eslint-plugin-jest": "^29.12.1"
   }
 }

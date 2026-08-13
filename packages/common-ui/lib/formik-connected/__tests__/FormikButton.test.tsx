@@ -1,7 +1,8 @@
 import { FormikButton } from "../..";
 import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const mockOnClick = jest.fn();
@@ -33,10 +34,16 @@ describe("FormikButton component", () => {
   });
 
   it("Renders a loading spinner while the form is loading.", async () => {
+    // Keep the form in the submitting state until this promise is resolved
+    let resolveOnClick: () => void;
+    mockOnClick.mockImplementation(
+      () => new Promise<void>((resolve) => (resolveOnClick = resolve))
+    );
+
     const wrapper = getWrapper();
 
     // Submit the form
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /test button/i
       })
@@ -48,11 +55,14 @@ describe("FormikButton component", () => {
         wrapper.container.querySelector(".spinner-border")
       ).toBeInTheDocument();
     });
+
+    // Finish the submission
+    resolveOnClick!();
   });
 
-  it("Provides an onClick method that provides access to the formik context.", () => {
+  it("Provides an onClick method that provides access to the formik context.", async () => {
     const wrapper = getWrapper();
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /test button/i
       })
