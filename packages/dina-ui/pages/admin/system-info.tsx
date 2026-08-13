@@ -103,7 +103,7 @@ export function SystemInfo() {
       // Route to homepage...
       router.push("/");
     }
-  }, [isAdmin]);
+  }, [isAdmin, router]);
   if (!isAdmin) {
     return null;
   }
