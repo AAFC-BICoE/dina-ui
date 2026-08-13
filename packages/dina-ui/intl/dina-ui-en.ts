@@ -1218,6 +1218,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   typeAnythingOrPickAScientificName: "Type anything or pick a Scientific Name",
   typeNewTagOrSearchPreviousTags: "Type New Tag or Search Previous Tags",
   typeSpecimen: "Type Specimen",
+  resizeImages: "Resize Images",
+  resizeImagesJpegOnlyTooltip:
+    "Image resizing is only available when all selected files are JPEG format.",
   unit: "Unit",
   unsavedChanges: "Unsaved changes made",
   unsetAsDefault: "Unset as default",

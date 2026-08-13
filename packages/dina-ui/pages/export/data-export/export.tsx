@@ -17,34 +17,34 @@ import {
   TextField,
   Tooltip,
   useApiClient
-} from "packages/common-ui/lib";
+} from "common-ui";
 import {
   convertColumnsToAliases,
   convertColumnsToPaths,
   getColumnFunctions,
   getEntityKeyFromIndexName
-} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
+} from "common-ui/lib/column-selector/ColumnSelectorUtils";
 import {
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
   MAX_OBJECT_EXPORT_TOTAL
-} from "packages/common-ui/lib/export/exportUtils";
-import { QueryFieldSelector } from "packages/common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
-import QueryRowManagedAttributeSearch from "packages/common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+} from "common-ui/lib/export/exportUtils";
+import { QueryFieldSelector } from "common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
+import QueryRowManagedAttributeSearch from "common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import {
   DynamicFieldsMappingConfig,
   ESIndexMapping
-} from "packages/common-ui/lib/list-page/types";
-import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMapping";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+} from "common-ui/lib/list-page/types";
+import { useIndexMapping } from "common-ui/lib/list-page/useIndexMapping";
+import PageLayout from "dina-ui/components/page/PageLayout";
+import { DinaMessage } from "dina-ui/intl/dina-ui-intl";
 import {
   ColumnSeparator,
   DataExport,
   DataExportTemplate,
   ExportType
-} from "packages/dina-ui/types/dina-export-api";
-import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
-import { ReactNode, useRef, useState } from "react";
+} from "dina-ui/types/dina-export-api";
+import { Metadata, ObjectExport } from "dina-ui/types/objectstore-api";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Button,
   ButtonGroup,
@@ -78,6 +78,19 @@ const SEPARATOR_OPTIONS: { value: ColumnSeparator; label: string }[] = [
   }
 ];
 
+const RESIZE_OPTIONS = [
+  { value: 100, label: "100% - Original size" },
+  { value: 90, label: "90%" },
+  { value: 80, label: "80%" },
+  { value: 70, label: "70%" },
+  { value: 60, label: "60%" },
+  { value: 50, label: "50%" },
+  { value: 40, label: "40%" },
+  { value: 30, label: "30%" },
+  { value: 20, label: "20%" },
+  { value: 10, label: "10%" }
+];
+
 const NON_EXPORTABLE_COLUMNS_MAP: { [key: string]: string[] } = {
   ["dina_material_sample_index"]: MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS,
   ["dina_object_store_index"]: OBJECT_STORE_NON_EXPORTABLE_COLUMNS
@@ -108,6 +121,12 @@ export default function ExportPage<TData extends KitsuResource>() {
 
   // State holding the current export type. For example, Data export / Object export.
   const [exportType, setExportType] = useState<ExportType>("TABULAR_DATA");
+
+  // Only available through the object export (all objects need to be JPEG), the scale to apply to the export.
+  const [resizePercentage, setResizePercentage] = useState<number>(100);
+
+  // Tracks if all selected objects in OBJECT_ARCHIVE mode are JPEG.
+  const [allObjectsAreJpeg, setAllObjectsAreJpeg] = useState<boolean>(false);
 
   // State to determine if the export API request has been submitted.
   const [exportRequestSubmitted, setExportRequestSubmitted] = useState(false);
@@ -154,6 +173,43 @@ export default function ExportPage<TData extends KitsuResource>() {
       optimizedPrefix: false
     } as ESIndexMapping);
   }
+
+  // Check if all selected objects are JPEGs when switching to OBJECT_ARCHIVE export
+  useEffect(() => {
+    async function checkJpegEligibility() {
+      if (
+        exportType === "OBJECT_ARCHIVE" &&
+        localStorageExportObjectIds.length > 0
+      ) {
+        try {
+          const paths = localStorageExportObjectIds.map(
+            (id) => `metadata/${id}`
+          );
+          const metadatas: PersistedResource<Metadata>[] = await bulkGet(
+            paths,
+            {
+              apiBaseUrl: "/objectstore-api"
+            }
+          );
+
+          const isAllJpeg = metadatas.every(
+            (meta) =>
+              meta.dcFormat === "image/jpeg" ||
+              meta.fileExtension?.toLowerCase() === ".jpg" ||
+              meta.fileExtension?.toLowerCase() === ".jpeg"
+          );
+
+          setAllObjectsAreJpeg(isAllJpeg);
+        } catch {
+          setAllObjectsAreJpeg(false);
+        }
+      } else {
+        setAllObjectsAreJpeg(false);
+      }
+    }
+
+    checkJpegEligibility();
+  }, [exportType, localStorageExportObjectIds]);
 
   // The selected field from the query field selector.
   const [selectedFilenameAliasField, setSelectedFilenameAliasField] =
@@ -266,7 +322,7 @@ export default function ExportPage<TData extends KitsuResource>() {
       const fileIdentifiers = metadatas.map((metadata) => {
         // If the metadata is for an image and has derivatives, return the large image derivative fileIdentifier if present
         if (metadata.dcType === "IMAGE" && metadata.derivatives) {
-          const largeImageDerivative = metadata.derivatives.find(
+          const largeImageDerivative = metadata?.derivatives?.find?.(
             (derivative) => derivative.derivativeType === "LARGE_IMAGE"
           );
           if (largeImageDerivative) {
@@ -290,7 +346,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                     .label
                 )
               : get(metadata, selectedFilenameAliasField.label);
-          if (metadata.derivatives) {
+          if (metadata?.derivatives?.find) {
             // If image has derivative, use large image derivative fileIdentifier
             const largeImageDerivative = metadata.derivatives.find(
               (derivative) => {
@@ -311,12 +367,24 @@ export default function ExportPage<TData extends KitsuResource>() {
         });
       }
 
+      const hasFilenameAliases = Object.keys(filenameAliases).length > 0;
+
       const objectExportSaveArg = {
         resource: {
           type: "object-export",
           fileIdentifiers,
           name: formik?.values?.name,
-          filenameAliases: filenameAliases
+          ...(hasFilenameAliases ? { filenameAliases } : {}),
+          ...(allObjectsAreJpeg && resizePercentage < 100
+            ? {
+                exportFunction: {
+                  functionDef: "IMG_RESIZE",
+                  params: {
+                    factor: (resizePercentage / 100).toString()
+                  }
+                }
+              }
+            : {})
         },
         type: "object-export"
       };
@@ -338,6 +406,9 @@ export default function ExportPage<TData extends KitsuResource>() {
     }
   }
 
+  const displayManagedAttributes =
+    selectedFilenameAliasField?.dynamicField?.type === "managedAttribute";
+
   const LoadingSpinner = (
     <>
       <Spinner
@@ -351,6 +422,30 @@ export default function ExportPage<TData extends KitsuResource>() {
         <DinaMessage id="loadingSpinner" />
       </span>
     </>
+  );
+
+  const resizeControl = (
+    <div>
+      <div className="mb-2">
+        <strong>
+          <DinaMessage id="resizeImages" />
+        </strong>
+      </div>
+      <Select
+        className="mt-2 mb-3"
+        name="resizePercentage"
+        options={RESIZE_OPTIONS}
+        onChange={(selection) => {
+          if (selection) {
+            setResizePercentage(selection.value);
+          }
+        }}
+        isDisabled={loading || !allObjectsAreJpeg}
+        value={RESIZE_OPTIONS.find(
+          (option) => option.value === resizePercentage
+        )}
+      />
+    </div>
   );
 
   const disableObjectExportButton =
@@ -601,39 +696,58 @@ export default function ExportPage<TData extends KitsuResource>() {
                   {exportType === "OBJECT_ARCHIVE" && (
                     <>
                       <div className="col-md-4">
-                        <div className="mb-2">
-                          <strong>
-                            <DinaMessage id="fileNameAliasField" />
-                          </strong>
+                        <div className="row">
+                          <div className="col-md-12">
+                            <div className="mb-2">
+                              <strong>
+                                <DinaMessage id="fileNameAliasField" />
+                              </strong>
+                            </div>
+                            <QueryFieldSelector
+                              indexMap={indexMap as ESIndexMapping[]}
+                              currentField={selectedFilenameAliasField?.value}
+                              setField={(path) => {
+                                if (indexMap) {
+                                  const columnIndex = indexMap.find(
+                                    (index) => index.value === path
+                                  );
+                                  if (columnIndex) {
+                                    setSelectedFilenameAliasField(columnIndex);
+                                  }
+                                }
+                              }}
+                              isInColumnSelector={false}
+                            />
+                          </div>
+                          {displayManagedAttributes && (
+                            <div
+                              className="col-md-12"
+                              style={{ marginTop: "22px" }}
+                            >
+                              <QueryRowManagedAttributeSearch
+                                indexMap={indexMap}
+                                managedAttributeConfig={
+                                  selectedFilenameAliasField
+                                }
+                                isInColumnSelector={true}
+                                setValue={setDynamicFieldValue}
+                                value={dynamicFieldValue}
+                              />
+                            </div>
+                          )}
                         </div>
-                        <QueryFieldSelector
-                          indexMap={indexMap as ESIndexMapping[]}
-                          currentField={selectedFilenameAliasField?.value}
-                          setField={(path) => {
-                            if (indexMap) {
-                              const columnIndex = indexMap.find(
-                                (index) => index.value === path
-                              );
-                              if (columnIndex) {
-                                setSelectedFilenameAliasField(columnIndex);
-                              }
-                            }
-                          }}
-                          isInColumnSelector={false}
-                        />
                       </div>
-                      {selectedFilenameAliasField?.dynamicField?.type ===
-                        "managedAttribute" && (
-                        <div className="col-md-4" style={{ marginTop: "22px" }}>
-                          <QueryRowManagedAttributeSearch
-                            indexMap={indexMap}
-                            managedAttributeConfig={selectedFilenameAliasField}
-                            isInColumnSelector={true}
-                            setValue={setDynamicFieldValue}
-                            value={dynamicFieldValue}
+                      <div className="col-md-4">
+                        {!allObjectsAreJpeg ? (
+                          <Tooltip
+                            id="resizeImagesJpegOnlyTooltip"
+                            disableSpanMargin={true}
+                            visibleElement={resizeControl}
                           />
-                        </div>
-                      )}
+                        ) : (
+                          resizeControl
+                        )}
+                      </div>
                     </>
                   )}
                 </div>
