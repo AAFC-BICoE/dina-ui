@@ -12,7 +12,7 @@ export function useSystemInfoCheck(apiConfigs: ApiConfigInfo[]) {
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
   const fetchAllModules = useCallback(async (): Promise<ApiModule[]> => {
-    const results = await Promise.allSettled(
+    const results = await Promise.all(
       apiConfigs.map(async (config): Promise<ApiModule> => {
         // measure how long the api-info request takes, even when it fails
         const startTime = Date.now();
@@ -60,19 +60,7 @@ export function useSystemInfoCheck(apiConfigs: ApiConfigInfo[]) {
     // Update the last refresh date.
     setLastRefreshed(new Date());
 
-    return results.map((result, index) =>
-      result.status === "fulfilled"
-        ? result.value
-        : {
-            apiConfig: apiConfigs[index],
-            status: "offline" as const,
-            messageProducerEnabled: false,
-            messageConsumerEnabled: false,
-            attentionRequired: true,
-            errorMessage:
-              result.reason?.message ?? formatMessage("systemInfoUnexpectedError")
-          }
-    );
+    return results;
   }, [apiClient, apiConfigs, formatMessage]);
 
   const { data, isValidating, error, mutate } = useSWR(
