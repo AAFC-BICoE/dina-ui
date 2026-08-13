@@ -1281,6 +1281,7 @@ export function useMaterialSampleSave({
     delete msInputWithRelationships.associations;
     delete msInputWithRelationships.organismsIndividualEntry;
     delete msInputWithRelationships.organismsQuantity;
+    delete msInputWithRelationships.workflows;
 
     // Delete these since they have been moved to the relationship section.
     delete msInputWithRelationships.collectingEvent;
