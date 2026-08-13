@@ -7,12 +7,12 @@ import {
   ManagedAttributeFormProps
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ManagedAttribute } from "../../../types/collection-api";
 import {
-  ManagedAttribute,
   SEQDB_MODULE_TYPE_LABELS,
   SEQDB_MODULE_TYPES,
   SeqDBModuleType
-} from "../../../types/collection-api";
+} from "../../../types/seqdb-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 export function ManagedAttributesEditPage({ router }: WithRouterProps) {

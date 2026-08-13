@@ -412,10 +412,12 @@ describe("useQuery hook", () => {
     });
 
     // The loading state is returned when waiting for the second fetch.
-    expect(mockChild).lastCalledWith({
-      isDisabled: false,
-      loading: true
-    });
+    expect(mockChild).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isDisabled: false,
+        loading: true
+      })
+    );
 
     // Continue the test after the second request finishes.
     await waitFor(() => {

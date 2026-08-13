@@ -618,8 +618,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_tags: "Tags",
   field_targetOrganismPrimaryScientificName:
     "Target Organism Primary Scientific Name",
-  field_targetOrganismPrimaryClassification:
-    "Target Organism Primary Classification",
+  "field_targetIdentifiableEntitySummary.sex": "Target Identifiable Entity Sex",
+  "field_targetIdentifiableEntitySummary.lifeStage":
+    "Target Identifiable Entity Life Stage",
+  "field_targetIdentifiableEntitySummary.dwcVernacularName":
+    "Target Identifiable Entity Vernacular Name",
+  "field_targetIdentifiableEntitySummary.managedAttributes":
+    "Target Identifiable Entity Managed Attributes",
+  "field_targetIdentifiableEntitySummary.primaryDetermination.typeStatus":
+    "Target Identifiable Entity Primary Determination Type Status",
+  "field_targetIdentifiableEntitySummary.primaryDetermination.classification":
+    "Target Identifiable Entity Primary Determination Classification",
+  "field_targetIdentifiableEntitySummary.primaryDetermination.managedAttributes":
+    "Target Identifiable Entity Primary Determination Managed Attributes",
   field_targetOrganismPrimaryGeoShape: "Target Organism Primary GeoShape",
   field_title: "Title",
   "field_title.en": "English Title",
@@ -1040,6 +1051,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   bulkEditMetadataLoadingProgress: "Loading metadata... {loaded} of {total}",
   saveAll: "Save All",
   saveAndCopyToNext: "Save & Copy To Next",
+  saveSuccess: "Successfully saved record: ",
+  copyToNextSampleInProgressMessage:
+    'You are now working on a new copy based on "{displayName}". This copy will not be created until it\'s saved.',
   saveAndCopyToNextWarning:
     'The "{componentName}" data component was not automatically copied over since it\'s specific to the previous Material Sample. Would you like to duplicate it anyway?',
   saveAndCopyToNextWarningButton:
@@ -1403,6 +1417,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedExport_columnsToBeSaved: "Columns to be saved",
   export_columnsToExport: "Columns To Export",
   templateGenerator_columnsToGenerate: "Columns To Generate",
+  loadExistingTemplate: "Load Existing Template",
+  templateLoadedSuccessfully:
+    "Template has been loaded successfully. Template name and columns have been updated.",
+  templateColumnsUnmapped:
+    "The following columns could not be mapped: {columns}",
+  invalidTemplate:
+    "The uploaded template is invalid. Please ensure the template is generated from the template generator and has not been modified.",
   usage: "Usage",
   editContents: "Edit Contents",
   storageUnitGridTitle: "Storage Unit Grid",
@@ -1521,9 +1542,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAsImage: "Save as Image",
   parentMaterialSampleDisabledTooltip:
     "Material Sample can only have a single link to one of the following relationships: Parent Material Sample or a collecting event.",
-  managedAttributeCollectionTabAlertTitle:
-    "Collection managed attributes have been moved.",
-  managedAttributeCollectionTabAlertDescription:
+  managedAttributeTabAlertTitle: "{module} managed attributes have been moved.",
+  managedAttributeTabAlertDescription:
     "They are now located on the new {link} page.",
   supportedFormats: "Supported Formats",
   maxFileSize: "Maximum file size",

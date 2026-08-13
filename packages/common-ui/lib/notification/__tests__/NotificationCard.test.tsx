@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { NotificationCard } from "../NotificationCard";
 import { Notification } from "../types";
 
@@ -384,7 +385,7 @@ describe("NotificationCard", () => {
       );
 
       const card = wrapper.container.querySelector(".notification-card");
-      fireEvent.click(card!);
+      await userEvent.click(card!);
 
       await waitFor(() => {
         expect(mockOnMarkAsRead).toHaveBeenCalledWith("test-id");
@@ -411,7 +412,7 @@ describe("NotificationCard", () => {
       );
 
       const card = wrapper.container.querySelector(".notification-card");
-      fireEvent.click(card!);
+      await userEvent.click(card!);
 
       // Wait a bit to ensure no call is made
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -439,7 +440,7 @@ describe("NotificationCard", () => {
       );
 
       const link = wrapper.getByRole("link");
-      fireEvent.click(link);
+      await userEvent.click(link);
 
       // Wait a bit to ensure no call is made
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -473,7 +474,7 @@ describe("NotificationCard", () => {
       );
 
       const card = wrapper.container.querySelector(".notification-card");
-      fireEvent.click(card!);
+      await userEvent.click(card!);
 
       // Should have processing class
       await waitFor(() => {
@@ -512,7 +513,7 @@ describe("NotificationCard", () => {
       );
 
       const card = wrapper.container.querySelector(".notification-card");
-      fireEvent.click(card!);
+      await userEvent.click(card!);
 
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalled();
@@ -552,7 +553,7 @@ describe("NotificationCard", () => {
       );
 
       const link = wrapper.getByRole("link");
-      fireEvent.click(link);
+      await userEvent.click(link);
 
       await new Promise((resolve) => setTimeout(resolve, 100));
 

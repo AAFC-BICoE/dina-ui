@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { mountWithAppContext } from "common-ui";
 import { Nav } from "../nav";
 
@@ -13,7 +13,7 @@ describe("Nav component", () => {
     const logoutButton = await component.findByText("Logout");
 
     // Click the logout button:
-    fireEvent.click(logoutButton);
+    await userEvent.click(logoutButton);
     expect(mockLogout).toHaveBeenCalledTimes(1);
   });
 

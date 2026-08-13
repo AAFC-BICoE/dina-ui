@@ -622,7 +622,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_status: "Status",
   field_storageUnit: "Lagereinheit",
   field_tags: "Schlagwörter",
-  field_targetOrganismPrimaryClassification:
+  "field_targetIdentifiableEntitySummary.primaryDetermination.classification":
     "Klassifikation des Zielorganismus",
   field_targetOrganismPrimaryScientificName:
     "Wissenschaftlicher Name des Zielorganismus",

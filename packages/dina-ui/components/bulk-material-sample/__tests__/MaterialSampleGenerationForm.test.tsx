@@ -1,8 +1,12 @@
 import { writeStorage } from "@rehooks/local-storage";
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  clearAndType,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../group-select/useStoredDefaultGroup";
 import { MaterialSampleGenerationForm } from "../MaterialSampleGenerationForm";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -72,37 +76,40 @@ describe("MaterialSampleGenerationForm", () => {
       "test-collection"
     );
     await waitForLoadingToDisappear();
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", { name: /test\-collection \(tc\)/i })
     );
 
     // Number to create
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("spinbutton", { name: /material samples to create/i }),
-      { target: { value: "5" } }
+      "5"
     );
 
     // Base name
-    fireEvent.change(wrapper.getByRole("textbox", { name: /base name/i }), {
-      target: { value: "my-sample" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /base name/i }),
+      "my-sample"
+    );
 
     // Starting number
-    fireEvent.change(wrapper.getByRole("textbox", { name: /start/i }), {
-      target: { value: "00001" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /start/i }),
+      "00001"
+    );
 
     // Separator
-    fireEvent.change(wrapper.getByRole("textbox", { name: /separator/i }), {
-      target: { value: "-" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /separator/i }),
+      "-"
+    );
 
     // Source Set
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", {
         name: "Source Set User-defined name that can be used to retrieve all material samples that were created in the same batch."
       }),
-      { target: { value: "sourceSet1" } }
+      "sourceSet1"
     );
 
     const expectedNames = [
@@ -118,7 +125,7 @@ describe("MaterialSampleGenerationForm", () => {
       expect(wrapper.getByPlaceholderText(expectedName)).toBeInTheDocument()
     );
 
-    fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /next/i }));
     await waitFor(() => {
       // Sample initialValues are created with the expected names and the linked collection:
       expect(mockOnGenerate).lastCalledWith({

@@ -168,7 +168,7 @@ export function useAvailableGroupOptions({
   );
 
   const groupOptions = response?.data?.map((group) => ({
-    label: group.labels[locale] ?? group.name,
+    label: group.labels?.[locale] ?? group.name,
     value: group.name
   }));
 

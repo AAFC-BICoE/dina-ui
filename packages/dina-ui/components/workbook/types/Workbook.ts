@@ -1,5 +1,8 @@
 import { FilterParam, InputResource, KitsuResource } from "kitsu";
-import { WorkbookDataTypeEnum } from "./WorkbookDataTypeEnum";
+import {
+  WorkbookDataTypeDynamic,
+  WorkbookDataTypePrimitive
+} from "./WorkbookDataTypeEnum";
 
 export enum LinkOrCreateSetting {
   LINK = "LINK", // Find the existing object then set to relationships. It will ignore if not found.
@@ -67,30 +70,30 @@ export type FieldMappingConfigType = {
 
 export interface PrimitiveField {
   dataType:
-    | WorkbookDataTypeEnum.NUMBER
-    | WorkbookDataTypeEnum.BOOLEAN
-    | WorkbookDataTypeEnum.STRING
-    | WorkbookDataTypeEnum.STRING_COORDINATE
-    | WorkbookDataTypeEnum.DATE
-    | WorkbookDataTypeEnum.DATE_TIME
-    | WorkbookDataTypeEnum.STRING_ARRAY
-    | WorkbookDataTypeEnum.NUMBER_ARRAY
-    | WorkbookDataTypeEnum.BOOLEAN_ARRAY;
+    | WorkbookDataTypePrimitive.NUMBER
+    | WorkbookDataTypePrimitive.BOOLEAN
+    | WorkbookDataTypePrimitive.STRING
+    | WorkbookDataTypePrimitive.STRING_COORDINATE
+    | WorkbookDataTypePrimitive.DATE
+    | WorkbookDataTypePrimitive.DATE_TIME
+    | WorkbookDataTypePrimitive.STRING_ARRAY
+    | WorkbookDataTypePrimitive.NUMBER_ARRAY
+    | WorkbookDataTypePrimitive.BOOLEAN_ARRAY;
 }
 
 export interface ManagedAttributeField {
-  dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES;
+  dataType: WorkbookDataTypeDynamic.MANAGED_ATTRIBUTES;
   managedAttributeComponent: string;
   endpoint: string;
 }
 
 export interface ControlledVocabularyField {
-  dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY;
+  dataType: WorkbookDataTypeDynamic.CONTROLLED_VOCABULARY;
   filter: FilterParam;
 }
 
 export interface VocabularyField {
-  dataType: WorkbookDataTypeEnum.VOCABULARY;
+  dataType: WorkbookDataTypeDynamic.VOCABULARY;
   endpoint: string;
 }
 
@@ -100,12 +103,14 @@ export interface EnumValue {
 }
 
 export interface EnumField {
-  dataType: WorkbookDataTypeEnum.ENUM;
+  dataType: WorkbookDataTypePrimitive.ENUM;
   allowedValues: EnumValue[];
 }
 
 export interface ObjectField {
-  dataType: WorkbookDataTypeEnum.OBJECT | WorkbookDataTypeEnum.OBJECT_ARRAY;
+  dataType:
+    | WorkbookDataTypePrimitive.OBJECT
+    | WorkbookDataTypePrimitive.OBJECT_ARRAY;
   attributes: Leaves<FieldConfigType>;
   // If relationshipConfig is defined, the this field need to move to relationships.
   relationshipConfig?: {
@@ -117,7 +122,7 @@ export interface ObjectField {
 }
 
 export interface ClassificationType {
-  dataType: WorkbookDataTypeEnum.CLASSIFICATION;
+  dataType: WorkbookDataTypeDynamic.CLASSIFICATION;
 }
 
 export type FieldConfigType =

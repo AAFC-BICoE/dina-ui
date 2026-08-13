@@ -18,7 +18,7 @@ import { GroupSelectField } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
-  MANAGED_ATTRIBUTE_TYPE_OPTIONS,
+  VOCABULARY_ELEMENT_TYPE_OPTIONS,
   VocabularyElementType
 } from "../../types/collection-api";
 
@@ -141,7 +141,7 @@ export function ManagedAttributeFormLayout({
 
   const router = useRouter();
   const uuid = String(router?.query?.id);
-  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
+  const ATTRIBUTE_TYPE_OPTIONS = VOCABULARY_ELEMENT_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
   return (

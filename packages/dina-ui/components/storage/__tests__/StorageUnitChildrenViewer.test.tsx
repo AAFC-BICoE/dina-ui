@@ -1,5 +1,9 @@
 import { PersistedResource } from "kitsu";
-import { DinaForm, waitForLoadingToDisappear } from "common-ui";
+import {
+  DinaForm,
+  STORAGE_UNIT_MAPPING,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitChildrenViewer } from "../StorageUnitChildrenViewer";
@@ -34,59 +38,6 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
   storageUnitChildren: STORAGE_UNIT_CHILDREN
 };
 
-const MAPPING = {
-  attributes: [
-    {
-      name: "createdBy",
-      type: "text",
-      fields: ["keyword"],
-      path: "data.attributes"
-    },
-    {
-      name: "name",
-      type: "text",
-      fields: ["autocomplete", "keyword"],
-      path: "data.attributes"
-    },
-    {
-      name: "createdOn",
-      type: "date",
-      path: "data.attributes",
-      subtype: "date_time"
-    }
-  ],
-  relationships: [
-    {
-      referencedBy: "storageUnitType",
-      name: "type",
-      path: "included",
-      value: "storage-unit-type",
-      attributes: [
-        {
-          name: "name",
-          type: "text",
-          fields: ["keyword"],
-          path: "attributes",
-          distinct_term_agg: true
-        },
-        {
-          name: "createdBy",
-          type: "text",
-          fields: ["keyword"],
-          path: "attributes"
-        },
-        {
-          name: "createdOn",
-          type: "date",
-          path: "attributes",
-          subtype: "date_time"
-        }
-      ]
-    }
-  ],
-  index_name: "dina_storage_index"
-};
-
 // Just return what is passed to it:
 const mockSave = jest.fn(async (ops) => ops.map((op) => op.resource));
 const mockPush = jest.fn();
@@ -112,7 +63,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/material-sample":
       return { data: [{ id: "ms-1", type: "material-sample" }] };
     case "search-api/search-ws/mapping":
-      return { data: MAPPING, meta: { totalResourceCount: 0 } };
+      return STORAGE_UNIT_MAPPING;
     case "collection-api/storage-unit":
       // Fallback query when storageUnitChildren is undefined.
       return { data: [], meta: { totalResourceCount: 0 } };

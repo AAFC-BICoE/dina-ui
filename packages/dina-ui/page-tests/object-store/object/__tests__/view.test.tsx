@@ -1,6 +1,10 @@
 import { PersistedResource } from "kitsu";
 import MetadataViewPage from "../../../../pages/object-store/object/view";
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  MATERIAL_SAMPLE_MAPPING,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import "@testing-library/jest-dom";
 import { waitFor } from "@testing-library/react";
@@ -35,25 +39,6 @@ const TEST_MANAGED_ATTRIBUTES = [
   }
 ];
 
-const MOCK_INDEX_MAPPING_RESP = {
-  data: {
-    indexName: "dina_material_sample_index",
-    attributes: [
-      {
-        name: "materialSampleName",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "dwcOtherCatalogNumbers",
-        type: "text",
-        path: "data.attributes"
-      }
-    ],
-    relationships: []
-  }
-};
-
 const mockBulkGet = jest.fn(async (paths) =>
   paths.map((path) => {
     switch (path) {
@@ -72,7 +57,7 @@ const mockBulkGet = jest.fn(async (paths) =>
 const mockGet = jest.fn(async (path) => {
   switch (path) {
     case "search-api/search-ws/mapping":
-      return MOCK_INDEX_MAPPING_RESP;
+      return MATERIAL_SAMPLE_MAPPING;
     case "objectstore-api/managed-attribute":
       return { data: TEST_MANAGED_ATTRIBUTES };
     case "objectstore-api/metadata/b794d633-5a37-4628-977c-3a8c9067f7df":

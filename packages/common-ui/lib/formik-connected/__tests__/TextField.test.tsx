@@ -1,5 +1,6 @@
-import { fireEvent, waitFor } from "@testing-library/react";
-import { mountWithAppContext } from "common-ui";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { SubmitButton } from "../SubmitButton";
 import { TextField } from "../TextField";
@@ -24,7 +25,7 @@ describe("TextField component", () => {
     ).toEqual("initial value");
   });
 
-  it("Changes the field's value.", () => {
+  it("Changes the field's value.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: "initial value" } }}>
         {({
@@ -40,9 +41,7 @@ describe("TextField component", () => {
       </DinaForm>
     );
 
-    fireEvent.change(wrapper.getByRole("textbox"), {
-      target: { name: "testObject.testField", value: "new value" }
-    });
+    await clearAndType(wrapper.getByRole("textbox"), "new value");
     expect(
       (
         wrapper.getByRole("textbox", {
@@ -68,7 +67,7 @@ describe("TextField component", () => {
       </DinaForm>
     );
 
-    fireEvent.click(wrapper.getByRole("button"));
+    await userEvent.click(wrapper.getByRole("button"));
     await waitFor(() => {
       expect(
         wrapper.getByText(/1 : test field \- test error/i)

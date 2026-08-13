@@ -1,5 +1,10 @@
-import { fireEvent, waitFor } from "@testing-library/react";
-import { mountWithAppContext, SimpleSearchFilterBuilder } from "common-ui";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import {
+  clearAndType,
+  mountWithAppContext,
+  SimpleSearchFilterBuilder
+} from "common-ui";
 import { ListPageLayout } from "../ListPageLayout";
 import "@testing-library/jest-dom";
 
@@ -35,10 +40,13 @@ describe("ListPageLayout component", () => {
     });
 
     // Do a filtered search.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
-      target: { value: "101F" }
-    });
-    fireEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /filter value/i }),
+      "101F"
+    );
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /filter list/i })
+    );
 
     // There should be an FIQL filter.
     await waitFor(() => {
@@ -51,7 +59,9 @@ describe("ListPageLayout component", () => {
     });
 
     // Click the reset button.
-    fireEvent.click(wrapper.getByRole("button", { name: /reset filters/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /reset filters/i })
+    );
 
     // There should be no FIQL filter. Ensure it contains no fiql property.
     await waitFor(() => {
@@ -83,7 +93,7 @@ describe("ListPageLayout component", () => {
     });
 
     // Click the type header to trigger the sort.
-    fireEvent.click(wrapper.getByText("Type"));
+    await userEvent.click(wrapper.getByText("Type"));
 
     // There should be an FIQL filter.
     await waitFor(() => {
@@ -174,10 +184,13 @@ describe("ListPageLayout component", () => {
     });
 
     // Do a filtered search.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
-      target: { value: "101F" }
-    });
-    fireEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /filter value/i }),
+      "101F"
+    );
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /filter list/i })
+    );
 
     // There should be a fiql filter.
     await waitFor(() => {
@@ -219,10 +232,13 @@ describe("ListPageLayout component", () => {
     });
 
     // Do a filtered search.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
-      target: { value: "101F" }
-    });
-    fireEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /filter value/i }),
+      "101F"
+    );
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /filter list/i })
+    );
 
     // All filters should be combined with semicolons (AND operator).
     await waitFor(() => {

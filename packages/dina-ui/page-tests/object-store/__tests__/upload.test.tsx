@@ -2,7 +2,8 @@ import { AccountContextI, waitForLoadingToDisappear } from "common-ui";
 import _ from "lodash";
 import { fileUploadErrorHandler } from "../../../components/object-store/file-upload/FileUploadProvider";
 import UploadPage, {
-  BULK_ADD_IDS_KEY
+  BULK_ADD_IDS_KEY,
+  BULK_ADD_FILES_KEY
 } from "../../../pages/object-store/upload";
 import { mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor } from "@testing-library/react";
@@ -49,15 +50,17 @@ describe("Upload page", () => {
     let currentUuid = 0;
 
     const mockPost = jest.fn(() => {
+      const id = objectUploadUUIDs[currentUuid++];
       return {
         data: {
           data: {
-            id: objectUploadUUIDs[currentUuid++],
+            id,
             type: "object-upload",
             attributes: {
               dateTimeDigitized: "2003-12-14T12:01:44",
               fileType: "text",
-              size: "500"
+              size: "500",
+              originalFilename: `file${currentUuid}.pdf`
             }
           }
         }
@@ -71,6 +74,9 @@ describe("Upload page", () => {
       }))
     );
     const mockGet = jest.fn((path) => {
+      if (path === "user-api/group") {
+        return { data: [{ name: "example-group" }] };
+      }
       if (path === "objectstore-api/config/file-upload") {
         return {
           data: {
@@ -174,15 +180,17 @@ describe("Upload page", () => {
     let currentUuid = 0;
 
     const mockPost = jest.fn(() => {
+      const id = objectUploadUUIDs[currentUuid++];
       return {
         data: {
           data: {
-            id: objectUploadUUIDs[currentUuid++],
+            id,
             type: "object-upload",
             attributes: {
               dateTimeDigitized: "2003-12-14T12:01:44",
               fileType: "text",
-              size: "500"
+              size: "500",
+              originalFilename: `file${currentUuid}.pdf`
             }
           }
         }
@@ -284,8 +292,15 @@ describe("Upload page", () => {
       }
     });
 
-    expect(localStorage.getItem(BULK_ADD_IDS_KEY)).toEqual(
-      JSON.stringify(objectUploadUUIDs)
+    expect(localStorage.getItem(BULK_ADD_FILES_KEY)).toEqual(
+      JSON.stringify({
+        group: "example-group",
+        files: [
+          { id: objectUploadUUIDs[0], originalFilename: "file1.pdf" },
+          { id: objectUploadUUIDs[1], originalFilename: "file2.pdf" },
+          { id: objectUploadUUIDs[2], originalFilename: "file3.pdf" }
+        ]
+      })
     );
   });
 

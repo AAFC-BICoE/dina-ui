@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { TagSelectField } from "../TagSelectField";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -104,15 +104,11 @@ describe("TagSelectField", () => {
     });
 
     // Change combobox value
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("combobox", {
         name: /tags type new tag or search previous tags/i
       }),
-      {
-        target: {
-          value: "my-tag-1"
-        }
-      }
+      "my-tag-1"
     );
 
     // Test expected option in the combobox

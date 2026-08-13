@@ -22,6 +22,8 @@ export * from "./resources/VocabularyElement";
 export * from "./resources/CollectionMethod";
 export * from "./resources/ProtocolElement";
 export * from "./resources/ManagedAttribute";
+export * from "./resources/CollectionModuleType";
+export * from "./resources/VocabularyElementType";
 export * from "./resources/MaterialSampleSummary";
 export * from "./resources/GeographicThesaurus";
 export * from "./resources/Expedition";

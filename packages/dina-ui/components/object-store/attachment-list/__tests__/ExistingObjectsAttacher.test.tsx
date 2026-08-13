@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, OBJECT_STORE_MAPPING } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { ExistingObjectsAttacher } from "../ExistingObjectsAttacher";
 import { screen, fireEvent, waitFor } from "@testing-library/react";
@@ -35,50 +35,6 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
     type: "metadata"
   }
 ];
-
-const MOCK_INDEX_MAPPING_RESP = {
-  data: {
-    indexName: "dina_object_store_index",
-    attributes: [
-      {
-        name: "originalFilename",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "bucket",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "createdBy",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "acCaption",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "id",
-        type: "text",
-        path: "data"
-      },
-      {
-        name: "type",
-        type: "text",
-        path: "data"
-      },
-      {
-        name: "createdOn",
-        type: "date",
-        path: "data.attributes"
-      }
-    ],
-    relationships: []
-  }
-};
 
 const TEST_ELASTIC_SEARCH_RESPONSE = {
   data: {
@@ -144,7 +100,7 @@ describe("ExistingObjectsAttacher component", () => {
     jest.clearAllMocks();
     mockGet.mockImplementation(async (path) => {
       if (path === "search-api/search-ws/mapping") {
-        return { MOCK_INDEX_MAPPING_RESP };
+        return OBJECT_STORE_MAPPING;
       }
     });
   });

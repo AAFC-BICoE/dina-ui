@@ -1,7 +1,7 @@
 import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import { useState } from "react";
 import { QueryConjunctionSwitch } from "../QueryConjunctionSwitch";
-import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 describe("QueryConjunctionSwitch component", () => {
@@ -53,14 +53,14 @@ describe("QueryConjunctionSwitch component", () => {
     expect(orButton).not.toHaveClass("activeToggle");
 
     // Click the toggle to "OR".
-    fireEvent.click(orButton);
+    await userEvent.click(orButton);
 
     // OR should now be switched.
     expect(andButton).not.toHaveClass("activeToggle");
     expect(orButton).toHaveClass("activeToggle");
 
     // Switch back to "AND"
-    fireEvent.click(andButton);
+    await userEvent.click(andButton);
 
     // AND should now be switched again.
     expect(andButton).toHaveClass("activeToggle");

@@ -12,20 +12,25 @@ import {
   dateCell,
   LoadingSpinner,
   ColumnDefinition,
-  SimpleSearchFilterBuilder
+  SimpleSearchFilterBuilder,
+  IFileWithMeta
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Alert, Button, Card, Form } from "react-bootstrap";
 import Select from "react-select";
 import { useEffect, useMemo, useState } from "react";
-import { DynamicFieldsMappingConfig } from "common-ui/lib/list-page/types";
+import {
+  DynamicFieldsMappingConfig,
+  RelationshipDynamicField
+} from "common-ui/lib/list-page/types";
 import { dynamicFieldMappingForMaterialSample } from "../collection/material-sample/list";
 import Link from "next/link";
 import FieldMappingConfig from "../../components/workbook/utils/FieldMappingConfig";
 import {
   FieldOptionType,
   generateWorkbookFieldOptions,
-  getFlattenedConfig
+  getFlattenedConfig,
+  getGeneratorColumnFromFieldName
 } from "../../components/workbook/utils/workbookMappingUtils";
 import InputGroup from "react-bootstrap/InputGroup";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
@@ -33,6 +38,10 @@ import { handleDownloadLink } from "../../components/object-store/object-store-u
 import { downloadBlobFile } from "common-ui";
 import _ from "lodash";
 import { dynamicFieldMappingForMetadata } from "../object-store/object/list";
+import { WorkbookUpload } from "../../components/workbook/WorkbookUpload";
+import { useWorkbookConversion } from "@dina-ui/components";
+import { FaCheck } from "react-icons/fa6";
+import { FaExclamationCircle } from "react-icons/fa";
 
 export interface EntityConfiguration {
   name: string;
@@ -42,27 +51,72 @@ export interface EntityConfiguration {
   requiredFields?: string[];
 }
 
+const MATERIAL_SAMPLE_GENERATOR_FIELD_EXCLUSIONS = new Set<string>([
+  "targetIdentifiableEntitySummary.managedAttributes",
+  "targetIdentifiableEntitySummary.primaryDetermination.managedAttributes"
+]);
+
+const MATERIAL_SAMPLE_RELATIONSHIP_FIELD_OVERRIDES: RelationshipDynamicField[] =
+  [
+    {
+      type: "classification",
+      label: "scientificNameDetails",
+      component: "ORGANISM",
+      path: "included.attributes.determination.scientificNameDetails",
+      referencedBy: "organism.determination",
+      referencedType: "organism",
+      apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
+    },
+
+    // Organism Managed Attributes
+    // This is where it's saved in the API, the list page references the targetIdentifiableEntitySummary instead.
+    {
+      type: "managedAttribute",
+      label: "managedAttributes",
+      component: "ORGANISM",
+      path: "included.attributes.managedAttributes",
+      referencedBy: "organism",
+      referencedType: "organism",
+      apiEndpoint: "collection-api/controlled-vocabulary-item"
+    },
+
+    // Determination Managed Attributes
+    // This is where it's saved in the API, the list page references the targetIdentifiableEntitySummary instead.
+    {
+      type: "managedAttribute",
+      label: "managedAttributes",
+      component: "DETERMINATION",
+      path: "included.attributes.determination.managedAttributes",
+      referencedBy: "organism.determination",
+      referencedType: "organism",
+      apiEndpoint: "collection-api/controlled-vocabulary-item"
+    }
+  ];
+
+export function buildMaterialSampleGeneratorDynamicConfig(
+  baseConfig: DynamicFieldsMappingConfig,
+  relationshipFieldOverrides: RelationshipDynamicField[] = MATERIAL_SAMPLE_RELATIONSHIP_FIELD_OVERRIDES
+): DynamicFieldsMappingConfig {
+  return {
+    fields: baseConfig.fields.filter(
+      (field) => !MATERIAL_SAMPLE_GENERATOR_FIELD_EXCLUSIONS.has(field.label)
+    ),
+    relationshipFields: [
+      ...baseConfig.relationshipFields,
+      ...relationshipFieldOverrides
+    ]
+  };
+}
+
 // Entities that we support to generate templates
 const ENTITY_TYPES: EntityConfiguration[] = [
   {
     name: "material-sample",
     indexName: "dina_material_sample_index",
     uniqueName: "material-sample-template-generator",
-    dynamicConfig: {
-      fields: dynamicFieldMappingForMaterialSample.fields,
-      relationshipFields: [
-        ...dynamicFieldMappingForMaterialSample.relationshipFields,
-        {
-          apiEndpoint: "collection-api/vocabulary2/taxonomicRank",
-          label: "scientificNameDetails",
-          path: "included.attributes.determination.scientificNameDetails",
-          referencedBy: "organism.determination",
-          referencedType: "organism",
-          type: "classification",
-          component: "ORGANISM"
-        }
-      ]
-    }
+    dynamicConfig: buildMaterialSampleGeneratorDynamicConfig(
+      dynamicFieldMappingForMaterialSample
+    )
   },
   {
     name: "metadata",
@@ -77,8 +131,7 @@ export function WorkbookTemplateGenerator() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
 
-  // Loading state
-  const [loading, setLoading] = useState<boolean>(false);
+  const { convertWorkbookFile, loading, setLoading } = useWorkbookConversion();
 
   // Generator errors
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -93,6 +146,15 @@ export function WorkbookTemplateGenerator() {
   const [columnsToGenerate, setColumnsToGenerate] = useState<GeneratorColumn[]>(
     []
   );
+
+  // Whether the template has been loaded from an existing file
+  const [templateLoaded, setTemplateLoaded] = useState<boolean>(false);
+
+  // Columns from the uploaded template that could not be mapped to existing fields
+  const [unmappedColumns, setUnmappedColumns] = useState<string[]>([]);
+
+  // Whether the uploaded template is invalid (e.g., missing required columns)
+  const [invalidTemplate, setInvalidTemplate] = useState<boolean>(false);
 
   const { groupNames } = useAccount();
 
@@ -114,53 +176,17 @@ export function WorkbookTemplateGenerator() {
   // Automatically add required fields when type changes
   useEffect(() => {
     if (type.requiredFields && type.requiredFields.length > 0) {
-      const requiredColumns: GeneratorColumn[] = type.requiredFields.map(
-        (fieldName) => {
-          // Search through flat options first
-          const flatOption = newFieldOptions.find(
-            (option) => !("options" in option) && option.value === fieldName
-          );
-
-          if (flatOption) {
-            return {
-              columnLabel: flatOption.label,
-              columnValue: (flatOption as any).value,
-              columnAlias: ""
-            } as GeneratorColumn;
-          }
-
-          // Search through grouped/nested options
-          for (const item of newFieldOptions) {
-            if ("options" in item) {
-              const nestedOption = item.options.find(
-                (opt) => opt.value === fieldName
-              );
-              if (nestedOption) {
-                return {
-                  columnLabel: nestedOption.label,
-                  columnValue: nestedOption.value,
-                  columnAlias: ""
-                } as GeneratorColumn;
-              }
-            }
-          }
-
-          // If not found in options, create it manually with formatted label
-          return {
-            columnLabel: fieldName
-              .split(".")
-              .map(
-                (part) =>
-                  formatMessage(`field_${part}` as any)?.trim() ||
-                  formatMessage(part as any)?.trim() ||
-                  _.startCase(part)
-              )
-              .join("."),
-            columnValue: fieldName,
-            columnAlias: ""
-          } as GeneratorColumn;
-        }
-      );
+      const requiredColumns: GeneratorColumn[] = type.requiredFields
+        .map((fieldName) =>
+          getGeneratorColumnFromFieldName(
+            fieldName,
+            newFieldOptions,
+            formatMessage,
+            "",
+            true
+          )
+        )
+        .filter((column): column is GeneratorColumn => column !== undefined);
 
       setColumnsToGenerate(requiredColumns);
     } else {
@@ -193,15 +219,6 @@ export function WorkbookTemplateGenerator() {
             // Use managed attribute key instead
             if ((col as any)?.managedAttribute?.name) {
               return (col as any)?.managedAttribute?.name;
-            }
-
-            // Special logic for scientificNameDetails.
-            if (
-              col.columnValue.startsWith(
-                "organism.determination.scientificNameDetails."
-              )
-            ) {
-              return col.columnLabel;
             }
 
             return col.columnValue;
@@ -246,6 +263,68 @@ export function WorkbookTemplateGenerator() {
 
       // Set the user-friendly error message for display
       setErrorMessage(userFriendlyErrorMessage);
+    }
+
+    setLoading(false);
+  }
+
+  async function loadExistingTemplate(files: IFileWithMeta[]) {
+    setLoading(true);
+    setErrorMessage(undefined);
+    setInvalidTemplate(false);
+
+    const responseData = await convertWorkbookFile(files);
+
+    if (responseData && templateLoaded === false) {
+      setTemplateLoaded(true);
+      setUnmappedColumns([]);
+
+      // Load the columns from the uploaded template
+      const sheets = Object.values(responseData) as any[];
+      const sheet = sheets.length > 0 ? sheets[0] : undefined;
+      const originalColumns: string[] = sheet?.originalColumns ?? [];
+      const columnAliases: string[] = sheet?.columnAliases ?? [];
+
+      // Check if it's a valid template.
+      if (originalColumns.length === 0) {
+        setInvalidTemplate(true);
+        setLoading(false);
+        return;
+      }
+
+      // Set the filename
+      const uploadedFileName = files[0]?.file?.name ?? "";
+      const safeFileName = uploadedFileName.replace(/\.[^/.]+$/, "");
+      setFileName(safeFileName);
+
+      // Map originalColumns to GeneratorColumn entries, preferring existing field options when possible
+      const loadedColumnsWithUndefined = originalColumns.map(
+        (colName: string, idx: number) => {
+          const alias = columnAliases[idx];
+
+          return getGeneratorColumnFromFieldName(
+            colName,
+            newFieldOptions,
+            formatMessage,
+            alias ?? "",
+            false
+          );
+        }
+      );
+
+      // Filter out any undefined columns and set the loaded columns to state.
+      const loadedColumns: GeneratorColumn[] =
+        loadedColumnsWithUndefined.filter(
+          (c): c is GeneratorColumn => c !== undefined && c !== null
+        );
+
+      // Determine which original columns were not mapped
+      const unmapped = originalColumns.filter(
+        (_col, idx) => loadedColumnsWithUndefined[idx] === undefined
+      );
+      setUnmappedColumns(unmapped);
+
+      setColumnsToGenerate(loadedColumns);
     }
 
     setLoading(false);
@@ -362,6 +441,63 @@ export function WorkbookTemplateGenerator() {
                 />
               </FieldWrapper>
             </div>
+          </Card.Body>
+        </Card>
+
+        <h4 className="mt-4">
+          <DinaMessage id="loadExistingTemplate" />
+        </h4>
+        <Card>
+          <Card.Body>
+            {templateLoaded && (
+              <>
+                {invalidTemplate ? (
+                  <div
+                    className="alert alert-danger d-flex align-items-center gap-2 mb-2"
+                    role="alert"
+                  >
+                    <FaExclamationCircle className="flex-shrink-0" />
+                    <span>
+                      <DinaMessage id="invalidTemplate" />
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    className="alert alert-success d-flex align-items-center gap-2 mb-2"
+                    role="alert"
+                  >
+                    <FaCheck className="flex-shrink-0" />
+                    <span>
+                      <DinaMessage id="templateLoadedSuccessfully" />
+                    </span>
+                  </div>
+                )}
+
+                {unmappedColumns.length > 0 && (
+                  <div
+                    className="alert alert-warning d-flex align-items-center gap-2 mb-2"
+                    role="alert"
+                  >
+                    <FaExclamationCircle className="flex-shrink-0" />
+                    <span>
+                      <DinaMessage
+                        id="templateColumnsUnmapped"
+                        values={{ columns: unmappedColumns.join(", ") }}
+                      />
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
+            <WorkbookUpload
+              submitData={loadExistingTemplate}
+              autoUpload={true}
+              onClear={() => {
+                setTemplateLoaded(false);
+                setUnmappedColumns([]);
+                setInvalidTemplate(false);
+              }}
+            />
           </Card.Body>
         </Card>
 

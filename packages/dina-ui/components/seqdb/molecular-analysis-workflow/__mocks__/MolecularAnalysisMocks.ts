@@ -526,33 +526,6 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_STORAGE: PersistedResource<G
     }
   ];
 
-export const TEST_MAPPING = {
-  attributes: [
-    {
-      name: "materialSampleName",
-      type: "text",
-      fields: ["keyword"],
-      path: "data.attributes"
-    }
-  ],
-  relationships: [
-    {
-      referencedBy: "collectingEvent",
-      name: "type",
-      path: "included",
-      value: "collecting-event",
-      attributes: [
-        {
-          name: "dwcOtherRecordNumbers",
-          type: "text",
-          path: "attributes"
-        }
-      ]
-    }
-  ],
-  index_name: "dina_material_sample_index"
-};
-
 export const TEST_SEARCH_RESPONSE = {
   data: {
     hits: {

@@ -797,7 +797,11 @@ export function getAttributesManagedAttributeColumn<
   const accessorKey = `${config.path}.${managedAttributeKey}`;
 
   const pathParts = config.path.split(".");
-  const fieldName = pathParts[pathParts.length - 1];
+  const attributesIndex = pathParts.indexOf("attributes");
+  const fieldName =
+    attributesIndex !== -1
+      ? pathParts.slice(attributesIndex + 1).join(".")
+      : pathParts[pathParts.length - 1];
 
   const managedAttributesColumn = {
     header: () => <FieldHeader name={managedAttribute.name} />,

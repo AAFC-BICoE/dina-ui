@@ -2,6 +2,7 @@ import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { SelectField } from "../SelectField";
 import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const PRIMER_TYPE_OPTIONS = [
@@ -65,30 +66,34 @@ describe("SelectField component", () => {
     expect(wrapper.queryByText(/itru_primer/i)).toBeInTheDocument();
   });
 
-  it("Changes the Formik field's value.", () => {
+  it("Changes the Formik field's value.", async () => {
     const wrapper = getWrapper();
 
     // Change the value that is selected...
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("combobox", { name: /test field itru primer/i }),
-      { target: { value: "FUSION_PRIMER" } }
+      "FUSION_PRIMER"
     );
-    fireEvent.click(wrapper.getByRole("option", { name: /fusion primer/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /fusion primer/i })
+    );
 
     // The new value should be re-rendered into the value-display div.
     expect(wrapper.queryByText(/fusion_primer/i)).toBeInTheDocument();
   });
 
-  it("Provides an onChange callback.", () => {
+  it("Provides an onChange callback.", async () => {
     const mockOnChange = jest.fn();
     const wrapper = getWrapper({ onChange: mockOnChange });
 
     // Change the value that is selected...
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("combobox", { name: /test field itru primer/i }),
-      { target: { value: "FUSION_PRIMER" } }
+      "FUSION_PRIMER"
     );
-    fireEvent.click(wrapper.getByRole("option", { name: /fusion primer/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /fusion primer/i })
+    );
 
     // The mock function should have been called with the new value.
     expect(mockOnChange).lastCalledWith(
@@ -103,9 +108,9 @@ describe("SelectField component", () => {
     const wrapper = getWrapper({ onChange: mockOnChange, isMulti: true });
 
     // Click the combo box to display options.
-    fireEvent.click(wrapper.getByRole("combobox"));
+    await userEvent.click(wrapper.getByRole("combobox"));
     fireEvent.keyPress(wrapper.getByRole("combobox"), { charCode: 40 });
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: /remove itru primer/i })
     );
 

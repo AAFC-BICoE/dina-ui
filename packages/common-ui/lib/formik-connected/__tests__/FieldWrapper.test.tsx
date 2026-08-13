@@ -3,6 +3,7 @@ import { mountWithAppContext } from "common-ui";
 import { DinaForm, DinaFormSection } from "../DinaForm";
 import { FieldWrapper } from "../FieldWrapper";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const mockSubmit = jest.fn();
@@ -123,7 +124,7 @@ describe("FieldWrapper component.", () => {
     expect(checkbox).not.toBeChecked();
 
     // Simulate checking the checkbox (toggle to true)
-    fireEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     // Assert that the checkbox is checked
     expect(checkbox).toBeChecked();

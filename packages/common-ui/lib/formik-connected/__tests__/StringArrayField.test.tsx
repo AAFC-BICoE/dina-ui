@@ -1,5 +1,6 @@
-import { fireEvent, waitFor } from "@testing-library/react";
-import { mountWithAppContext } from "common-ui";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { FormikButton } from "../FormikButton";
 import { StringArrayField } from "../StringArrayField";
@@ -24,11 +25,12 @@ describe("StringArrayField component", () => {
 
     expect(wrapper.getByDisplayValue(/line1 line2 line3/i)).toBeInTheDocument();
 
-    fireEvent.change(wrapper.getByRole("textbox"), {
-      target: { value: ["line1", "line2", "line3", "", "line4"].join("\n") }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox"),
+      ["line1", "line2", "line3", "", "line4"].join("\n")
+    );
 
-    fireEvent.click(wrapper.getByRole("button"));
+    await userEvent.click(wrapper.getByRole("button"));
 
     await waitFor(() => {
       expect(mockSubmit.mock.calls).toEqual([
@@ -59,12 +61,15 @@ describe("StringArrayField component", () => {
       </DinaForm>
     );
 
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: /set new field value/i })
     );
     await waitFor(() => {
-      fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      expect(
+        wrapper.getByRole("button", { name: /save/i })
+      ).toBeInTheDocument();
     });
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
       expect(mockSubmit.mock.calls).toEqual([[{ lines: ["new", "value"] }]]);

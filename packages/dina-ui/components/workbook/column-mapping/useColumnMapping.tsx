@@ -12,7 +12,8 @@ import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ControlledVocabularyItem,
   ManagedAttribute,
-  Vocabulary
+  Vocabulary,
+  VocabularyElement
 } from "../../../types/collection-api";
 import { useWorkbookContext } from "../WorkbookProvider";
 import {
@@ -122,11 +123,7 @@ export function useColumnMapping() {
   } = useQuery<ControlledVocabularyItem[]>({
     path: "collection-api/controlled-vocabulary-item",
     filter: SimpleSearchFilterBuilder.create()
-      .where(
-        "controlledVocabulary.uuid",
-        "EQ",
-        COLLECTION_OTHER_IDENTIFIERS_ID
-      )
+      .where("controlledVocabulary.uuid", "EQ", COLLECTION_OTHER_IDENTIFIERS_ID)
       .build(),
     page: { limit: 1000 }
   });
@@ -393,21 +390,21 @@ export function useColumnMapping() {
     newWorkbookColumnMap: WorkbookColumnMap
   ) {
     const originalColumnHeader = columnHeader;
-    columnHeader = columnHeader.replaceAll(".", "_");
+    const columnHeaderValue = columnHeader.replaceAll(".", "_");
 
     const fieldPath = "organism.determination.scientificNameDetails";
-    const targetTaxonomicRank = taxonomicRanks.find(
-      (item) =>
-        item.name?.toLowerCase().trim() === columnHeader.toLowerCase().trim()
-    );
+    const targetTaxonomicRank = findTaxonomicRankFromColumn({
+      columnHeader: originalColumnHeader,
+      originalColumn: originalColumnHeader
+    });
     if (targetTaxonomicRank) {
-      newWorkbookColumnMap[columnHeader] = {
+      newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
         originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
-          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+          columnUniqueValues?.[sheet]?.[columnHeaderValue] ?? {}
         ).length,
         valueMapping: {
           columnHeader: {
@@ -417,13 +414,13 @@ export function useColumnMapping() {
         }
       };
     } else {
-      newWorkbookColumnMap[columnHeader] = {
+      newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
         originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
-          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+          columnUniqueValues?.[sheet]?.[columnHeaderValue] ?? {}
         ).length,
         valueMapping: {}
       };
@@ -455,11 +452,29 @@ export function useColumnMapping() {
       return undefined;
     }
 
+    // Depending on if it's a controlled vocabulary managed attribute or legacy managed attribute,
+    // the dina component will be stored in a different part.
+    const configDataComponent =
+      config?.managedAttributeComponent ?? config?.filter?.dinaComponent;
+
+    // Find the matching managed attribute based on the key and the dina component.
     return managedAttributes.find(
       (managedAttribute) =>
         managedAttribute.key === key &&
-        (config.managedAttributeComponent === "ENTITY" ||
-          managedAttribute?.dinaComponent === config.managedAttributeComponent)
+        (configDataComponent === "ENTITY" ||
+          managedAttribute?.dinaComponent === configDataComponent)
+    );
+  }
+
+  function findTaxonomicRankFromColumn(
+    columnHeader: WorkbookColumnInfo
+  ): VocabularyElement | undefined {
+    const rankName =
+      columnHeader.originalColumn?.split(".").at(-1) ??
+      columnHeader.columnHeader;
+    return taxonomicRanks.find(
+      (item) =>
+        item.name?.toLowerCase().trim() === rankName?.toLowerCase().trim()
     );
   }
 
@@ -632,11 +647,7 @@ export function useColumnMapping() {
         );
 
         // check if the columnHeaderValue is one of taxonomicRankss
-        const targetTaxonomicRank = taxonomicRanks.find(
-          (item) =>
-            item.name?.toLowerCase().trim() ===
-            columnHeaderValue.toLowerCase().trim()
-        );
+        const targetTaxonomicRank = findTaxonomicRankFromColumn(columnHeader);
         if (targetManagedAttr) {
           if (targetManagedAttr.dinaComponent === "MATERIAL_SAMPLE") {
             map.push({
@@ -712,9 +723,15 @@ export function useColumnMapping() {
           });
         }
       } else {
+        const targetTaxonomicRank =
+          fieldPath === "organism.determination.scientificNameDetails"
+            ? findTaxonomicRankFromColumn(columnHeader)
+            : undefined;
+
         map.push({
           targetField: fieldPath,
           skipped: false,
+          targetKey: targetTaxonomicRank,
           columnHeader: columnHeader.columnHeader,
           originalColumn: columnHeader.originalColumn
         });

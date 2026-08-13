@@ -1,4 +1,4 @@
-import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { DinaForm } from "../../formik-connected/DinaForm";
 import { mountWithAppContext } from "common-ui";
 import { TextFieldWithRemoveButton } from "../TextFieldWithRemoveButton";
@@ -12,7 +12,7 @@ describe("TextFieldWithRemoveButton component", () => {
       </DinaForm>
     );
 
-    fireEvent.click(wrapper.getByRole("button"));
+    await userEvent.click(wrapper.getByRole("button"));
     expect(wrapper.queryByRole("textbox")).not.toBeInTheDocument();
     expect(wrapper.queryByRole("button")).not.toBeInTheDocument();
   });

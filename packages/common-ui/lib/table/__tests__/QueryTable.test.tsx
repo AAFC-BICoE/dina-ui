@@ -171,7 +171,7 @@ describe("QueryTable component", () => {
     ).not.toBeInTheDocument();
 
     // Click the "Next" button.
-    fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /next/i }));
 
     // Clicking "Next" should enable the loading screen.
     await waitForLoadingToDisappear();
@@ -205,13 +205,13 @@ describe("QueryTable component", () => {
     await waitForLoadingToDisappear();
 
     // Click the "Next" button.
-    fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /next/i }));
 
     // Wait for the second query to load.
     await waitForLoadingToDisappear();
 
     // Click the "Previous" button.
-    fireEvent.click(wrapper.getByRole("button", { name: /previous/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /previous/i }));
 
     // Wait for the "Previous" request to finish.
     await waitForLoadingToDisappear();
@@ -259,8 +259,8 @@ describe("QueryTable component", () => {
     });
 
     // Click the "name" header.
-    fireEvent.click(wrapper.getByText(/name/i));
-    await waitFor(() => {
+    await userEvent.click(wrapper.getByText(/name/i));
+    await waitFor(async () => {
       // The second request should have a "name" sort.
       expect(mockGet).lastCalledWith(
         "todo",
@@ -268,7 +268,7 @@ describe("QueryTable component", () => {
       );
 
       // Click the "name" header again to sort by descending order.
-      fireEvent.click(wrapper.getByText(/name/i));
+      await userEvent.click(wrapper.getByText(/name/i));
     });
     await waitFor(() => {
       // The third request should have a "-name" sort.
@@ -471,7 +471,7 @@ describe("QueryTable component", () => {
     expect(window.scrollY).toEqual(400);
 
     // Click to the next page of the table.
-    fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /next/i }));
 
     // The window should have scrolled up to Y position 0.
     expect(window.scrollY).toEqual(0);
@@ -508,7 +508,10 @@ describe("QueryTable component", () => {
       { apiContext }
     );
 
-    fireEvent.click(wrapper.getByText(/name/i));
+    // Wait until the data is loaded into the table.
+    await waitForLoadingToDisappear();
+
+    await userEvent.click(wrapper.getByText(/name/i));
     expect(mockOnSortedChange).toHaveBeenCalled();
   });
 
