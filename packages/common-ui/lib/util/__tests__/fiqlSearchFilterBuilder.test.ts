@@ -109,7 +109,7 @@ describe("FiqlSearchFilterBuilder", () => {
       const fiql = FiqlSearchFilterBuilder.create()
         .where("status", "IN", ["a", "b", "c"])
         .build();
-      expect(fiql).toBe("(status=in=a,b,c)");
+      expect(fiql).toBe("(status==a,status==b,status==c)");
     });
 
     it("collapses a single non-array value into an EQ fragment", () => {
@@ -123,7 +123,7 @@ describe("FiqlSearchFilterBuilder", () => {
       const fiql = FiqlSearchFilterBuilder.create()
         .where("status", "IN", ["a,b", "c;d"])
         .build();
-      expect(fiql).toBe("(status=in=a\\,b,c\\;d)");
+      expect(fiql).toBe("(status==a\\,b,status==c\\;d)");
     });
 
     it("skips the fragment entirely for an empty array", () => {
@@ -168,7 +168,7 @@ describe("FiqlSearchFilterBuilder", () => {
         const fiql = FiqlSearchFilterBuilder.create()
           .where("status", "IN", ["a", "b"])
           .build();
-        expect(fiql).toBe("(status=in=a,b)");
+        expect(fiql).toBe("(status==a,status==b)");
       });
     });
   });
@@ -293,7 +293,18 @@ describe("FiqlSearchFilterBuilder", () => {
       const fiql = FiqlSearchFilterBuilder.create()
         .whereIn("status", ["a", "b"])
         .build();
-      expect(fiql).toBe("(status=in=a,b)");
+      expect(fiql).toBe("(status==a,status==b)");
+    });
+
+    it("combines a standard where condition with a whereIn set using AND", () => {
+      const fiql = FiqlSearchFilterBuilder.create()
+        .where("publiclyReleasable", "EQ", true)
+        .whereIn("group", ["admin", "editor"])
+        .build();
+
+      expect(fiql).toBe(
+        "(publiclyReleasable==true);(group==admin,group==editor)"
+      );
     });
 
     it("collapses a single-item array to an EQ fragment", () => {
@@ -382,7 +393,7 @@ describe("FiqlSearchFilterBuilder", () => {
             .whereIn("tag", ["x", "y"])
         )
         .build();
-      expect(fiql).toBe("(name==foo,description==*bar*,tag=in=x,y)");
+      expect(fiql).toBe("(name==foo,description==*bar*,tag==x,tag==y)");
     });
 
     it("supports when/otherwise inside the OR group", () => {
@@ -438,6 +449,19 @@ describe("FiqlSearchFilterBuilder", () => {
         .build();
       expect(fiql).toBe("(count==0,active==false)");
     });
+
+    it("combines EQ and whereIn inside an OR group", () => {
+      const groupNames = ["admin", "editor"];
+      const fiql = FiqlSearchFilterBuilder.create()
+        .or((b) =>
+          b.where("publiclyReleasable", "EQ", true).whereIn("group", groupNames)
+        )
+        .build();
+
+      expect(fiql).toBe(
+        "(publiclyReleasable==true,group==admin,group==editor)"
+      );
+    });
   });
 
   describe("FiqlOrGroupBuilder (standalone)", () => {
@@ -478,7 +502,7 @@ describe("FiqlSearchFilterBuilder", () => {
 
       expect(fiql).toBe(
         "(type==sample);(collector==John Doe);(materialSampleName==*MS-001*);" +
-          "(tags=in=field,verified);(status==open,status==pending);" +
+          "(tags==field,tags==verified);(status==open,status==pending);" +
           "(createdOn=ge=2024-01-01);(customFragment==1)"
       );
     });

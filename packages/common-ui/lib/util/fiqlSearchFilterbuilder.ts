@@ -10,7 +10,7 @@ export type FiqlOperation =
   | "LE" // selector=le=value
   | "GT" // selector=gt=value
   | "LT" // selector=lt=value
-  | "IN" // selector=in=a,b,c
+  | "IN" // selector==a,selector==b
   | "CONTAINS"; // selector==*value*
 
 // Conservative escaping for FIQL control chars. Adjust if your API expects different escaping.
@@ -45,11 +45,8 @@ function buildFragment(
 
     case "IN": {
       const arr = Array.isArray(value) ? value : [value];
-      // A single-item IN is just an equality check.
-      if (arr.length === 1) {
-        return `${selector}==${escapeValue(arr[0])}`;
-      }
-      return `${selector}=in=${arr.map(escapeValue).join(",")}`;
+      if (arr.length === 0) return null;
+      return arr.map((item) => `${selector}==${escapeValue(item)}`).join(",");
     }
 
     case "CONTAINS": {
@@ -61,16 +58,7 @@ function buildFragment(
     case "LE":
     case "GT":
     case "LT": {
-      const map: Record<
-        Exclude<FiqlOperation, "EQ" | "NEQ" | "IN" | "CONTAINS">,
-        string
-      > = {
-        GE: "=ge=",
-        LE: "=le=",
-        GT: "=gt=",
-        LT: "=lt="
-      } as const;
-      return `${selector}${map[op]}${escapeValue(
+      return `${selector}=${op.toLowerCase()}=${escapeValue(
         value as string | number | boolean
       )}`;
     }
@@ -179,7 +167,7 @@ export class FiqlSearchFilterBuilder {
    * Generic where with explicit op.
    * - EQ: selector==value
    * - NEQ: selector!=value
-   * - IN: selector=in=a,b (collapses to selector==a when only one value is given)
+   * - IN: (selector==a,selector==b) (collapses to selector==a when only one value is given)
    * - GE/LE/GT/LT: selector=op=value (lowercase fiql operator)
    * - CONTAINS: selector==*value*
    */
