@@ -1356,11 +1356,8 @@ export function useGenericMolecularAnalysisRun({
   }
 
   async function saveSequencingRun() {
-    if (
-      !sequencingRunItems ||
-      !molecularAnalysis ||
-      sequencingRunItems.length === 0
-    ) {
+    if (!sequencingRunItems || !molecularAnalysis) {
+      setPerformSave(false);
       return;
     }
 
