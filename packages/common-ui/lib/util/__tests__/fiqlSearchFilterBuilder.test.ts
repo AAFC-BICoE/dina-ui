@@ -112,11 +112,11 @@ describe("FiqlSearchFilterBuilder", () => {
       expect(fiql).toBe("(status=in=a,b,c)");
     });
 
-    it("wraps a single non-array value into an IN list of one", () => {
+    it("collapses a single non-array value into an EQ fragment", () => {
       const fiql = FiqlSearchFilterBuilder.create()
         .where("status", "IN", "a")
         .build();
-      expect(fiql).toBe("(status=in=a)");
+      expect(fiql).toBe("(status==a)");
     });
 
     it("escapes control characters in each IN value", () => {
@@ -131,6 +131,45 @@ describe("FiqlSearchFilterBuilder", () => {
         .where("status", "IN", [])
         .build();
       expect(fiql).toBe("");
+    });
+
+    describe("single-item collapse to EQ", () => {
+      it("collapses a single-element array to an EQ fragment instead of =in=", () => {
+        const fiql = FiqlSearchFilterBuilder.create()
+          .where("status", "IN", ["a"])
+          .build();
+        expect(fiql).toBe("(status==a)");
+      });
+
+      it("collapses a single non-array value into an EQ fragment", () => {
+        const fiql = FiqlSearchFilterBuilder.create()
+          .where("status", "IN", "a")
+          .build();
+        expect(fiql).toBe("(status==a)");
+      });
+
+      it("still escapes control characters when collapsed to EQ", () => {
+        const fiql = FiqlSearchFilterBuilder.create()
+          .where("status", "IN", ["a,b;c"])
+          .build();
+        expect(fiql).toBe("(status==a\\,b\\;c)");
+      });
+
+      it("collapses a single numeric or boolean value to EQ", () => {
+        expect(
+          FiqlSearchFilterBuilder.create().where("count", "IN", [5]).build()
+        ).toBe("(count==5)");
+        expect(
+          FiqlSearchFilterBuilder.create().where("active", "IN", [true]).build()
+        ).toBe("(active==true)");
+      });
+
+      it("keeps =in= form once there are two or more values", () => {
+        const fiql = FiqlSearchFilterBuilder.create()
+          .where("status", "IN", ["a", "b"])
+          .build();
+        expect(fiql).toBe("(status=in=a,b)");
+      });
     });
   });
 
@@ -255,6 +294,13 @@ describe("FiqlSearchFilterBuilder", () => {
         .whereIn("status", ["a", "b"])
         .build();
       expect(fiql).toBe("(status=in=a,b)");
+    });
+
+    it("collapses a single-item array to an EQ fragment", () => {
+      const fiql = FiqlSearchFilterBuilder.create()
+        .whereIn("status", ["a"])
+        .build();
+      expect(fiql).toBe("(status==a)");
     });
 
     it("skips when values is undefined or an empty array", () => {

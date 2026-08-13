@@ -45,6 +45,10 @@ function buildFragment(
 
     case "IN": {
       const arr = Array.isArray(value) ? value : [value];
+      // A single-item IN is just an equality check.
+      if (arr.length === 1) {
+        return `${selector}==${escapeValue(arr[0])}`;
+      }
       return `${selector}=in=${arr.map(escapeValue).join(",")}`;
     }
 
@@ -175,7 +179,7 @@ export class FiqlSearchFilterBuilder {
    * Generic where with explicit op.
    * - EQ: selector==value
    * - NEQ: selector!=value
-   * - IN: selector=in=a,b
+   * - IN: selector=in=a,b (collapses to selector==a when only one value is given)
    * - GE/LE/GT/LT: selector=op=value (lowercase fiql operator)
    * - CONTAINS: selector==*value*
    */
