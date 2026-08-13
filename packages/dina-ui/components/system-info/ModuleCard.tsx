@@ -154,7 +154,7 @@ export function ModuleCard({ module }: { module: ApiModule }) {
               <span
                 className={
                   "small fw-semibold d-inline-flex align-items-center gap-1 " +
-                  latencyTextClass(module.latencyMs)
+                  latencyTextClass(module.latencyMs!)
                 }
               >
                 <FaStopwatch size={11} />
