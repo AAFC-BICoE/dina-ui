@@ -4,13 +4,15 @@ import {
   FaCheckCircle,
   FaTimesCircle,
   FaExclamationTriangle,
-  FaExclamationCircle
+  FaExclamationCircle,
+  FaStopwatch
 } from "react-icons/fa";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 const STATUS_CONFIG: Record<
   ModuleStatus,
   {
-    label: string;
+    labelKey: "systemInfoStatusOnline" | "systemInfoStatusOffline";
     badgeBg: string;
     borderColor: string;
     headerBg: string;
@@ -18,20 +20,29 @@ const STATUS_CONFIG: Record<
   }
 > = {
   online: {
-    label: "Online",
+    labelKey: "systemInfoStatusOnline",
     badgeBg: "success",
     borderColor: "#198754",
     headerBg: "#d1e7dd",
     icon: <FaCheckCircle />
   },
   offline: {
-    label: "Offline",
+    labelKey: "systemInfoStatusOffline",
     badgeBg: "danger",
     borderColor: "#dc3545",
     headerBg: "#f8d7da",
     icon: <FaTimesCircle />
   }
 };
+
+/** Latency thresholds (in ms) used to color the latency value. */
+function latencyTextClass(latencyMs: number) {
+  return latencyMs < 500
+    ? "text-success"
+    : latencyMs < 2000
+    ? "text-warning"
+    : "text-danger";
+}
 
 function MicroLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -46,18 +57,18 @@ function EnabledBadge({ enabled }: { enabled?: boolean }) {
   if (enabled === undefined) {
     return (
       <Badge bg="warning" text="dark" className="fw-normal">
-        Unknown
+        <DinaMessage id="systemInfoUnknown" />
       </Badge>
     );
   }
 
   return enabled ? (
     <Badge bg="success" className="fw-normal">
-      Enabled
+      <DinaMessage id="systemInfoEnabled" />
     </Badge>
   ) : (
     <Badge bg="secondary" className="fw-normal">
-      Disabled
+      <DinaMessage id="systemInfoDisabled" />
     </Badge>
   );
 }
@@ -91,7 +102,7 @@ export function ModuleCard({ module }: { module: ApiModule }) {
             bg={cfg.badgeBg}
             className="d-inline-flex align-items-center gap-1"
           >
-            {cfg.icon} {cfg.label}
+            {cfg.icon} <DinaMessage id={cfg.labelKey} />
           </Badge>
         </div>
       </div>
@@ -105,7 +116,8 @@ export function ModuleCard({ module }: { module: ApiModule }) {
             text="dark"
             className="d-inline-flex align-items-center gap-1"
           >
-            <FaExclamationCircle size={10} /> Attention Required
+            <FaExclamationCircle size={10} />{" "}
+            <DinaMessage id="systemInfoAttentionRequired" />
           </Badge>
         )}
 
@@ -124,14 +136,39 @@ export function ModuleCard({ module }: { module: ApiModule }) {
           </div>
         )}
 
-        {/* Version + Endpoint */}
+        {/* Version + Latency + Endpoint */}
         <div className="d-flex flex-wrap gap-3">
           <div>
-            <MicroLabel>Version</MicroLabel>
-            <code className="small">{module.moduleVersion}</code>
+            <MicroLabel>
+              <DinaMessage id="field_version" />
+            </MicroLabel>
+            <code className="small">
+              {module.moduleVersion ?? <DinaMessage id="systemInfoUnknown" />}
+            </code>
           </div>
+          {module.latencyMs !== undefined && (
+            <div>
+              <MicroLabel>
+                <DinaMessage id="systemInfoLatency" />
+              </MicroLabel>
+              <span
+                className={
+                  "small fw-semibold d-inline-flex align-items-center gap-1 " +
+                  latencyTextClass(module.latencyMs!)
+                }
+              >
+                <FaStopwatch size={11} />
+                <DinaMessage
+                  id="systemInfoLatencyMs"
+                  values={{ latencyMs: module.latencyMs }}
+                />
+              </span>
+            </div>
+          )}
           <div className="flex-grow-1">
-            <MicroLabel>Endpoint</MicroLabel>
+            <MicroLabel>
+              <DinaMessage id="systemInfoEndpoint" />
+            </MicroLabel>
             <div className="d-flex align-items-center gap-1">
               <code className="small text-break">
                 <>
@@ -149,13 +186,17 @@ export function ModuleCard({ module }: { module: ApiModule }) {
         {/* Message producer / consumer */}
         <div className="d-flex flex-wrap gap-3">
           <div>
-            <MicroLabel>Message Producer</MicroLabel>
+            <MicroLabel>
+              <DinaMessage id="systemInfoMessageProducer" />
+            </MicroLabel>
             <div className="d-flex align-items-center gap-1 mt-1">
               <EnabledBadge enabled={module.messageProducerEnabled} />
             </div>
           </div>
           <div>
-            <MicroLabel>Message Consumer</MicroLabel>
+            <MicroLabel>
+              <DinaMessage id="systemInfoMessageConsumer" />
+            </MicroLabel>
             <div className="d-flex align-items-center gap-1 mt-1">
               <EnabledBadge enabled={module.messageConsumerEnabled} />
             </div>
@@ -165,7 +206,9 @@ export function ModuleCard({ module }: { module: ApiModule }) {
         {/* Module info — only rendered when extra info exists */}
         {hasModuleInfo && (
           <div className="pt-2">
-            <MicroLabel>Module Info</MicroLabel>
+            <MicroLabel>
+              <DinaMessage id="systemInfoModuleInfo" />
+            </MicroLabel>
             <table className="table table-sm table-bordered mb-0 small">
               <tbody>
                 {Array.from(module.moduleInfo!.entries()).map(
