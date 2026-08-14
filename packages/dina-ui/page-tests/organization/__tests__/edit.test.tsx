@@ -1,7 +1,8 @@
 import OrganizationEditPage from "../../../pages/organization/edit";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import { fireEvent, waitFor, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { trimAliases } from "../../../components/organization/OrganizationForm";
 
@@ -57,9 +58,10 @@ describe("organization edit page", () => {
     });
 
     // Fill in English Name
-    fireEvent.change(wrapper.getByRole("textbox", { name: /english name/i }), {
-      target: { name: "name.EN", value: "test org new" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /english name/i }),
+      "test org new"
+    );
 
     // Submit the form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -99,9 +101,10 @@ describe("organization edit page", () => {
     });
 
     // Modify the aliases (Change from ["DEW", "ACE"] to just "DEW")
-    fireEvent.change(wrapper.getByRole("textbox", { name: /aliases/i }), {
-      target: { name: "aliases", value: "DEW" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /aliases/i }),
+      "DEW"
+    );
 
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
@@ -157,9 +160,10 @@ describe("organization edit page", () => {
       apiContext
     });
 
-    fireEvent.change(screen.getByRole("textbox", { name: /english name/i }), {
-      target: { value: "John Doe" }
-    });
+    await userEvent.type(
+      screen.getByRole("textbox", { name: /english name/i }),
+      "John Doe"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
