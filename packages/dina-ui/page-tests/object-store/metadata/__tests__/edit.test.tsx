@@ -11,6 +11,8 @@ const mockGet = jest.fn(async (path, params) => {
   switch (path) {
     case "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612":
       return { data: TEST_METADATA };
+    case "/objectstore-api/file/testbucket/9a85b858-f8f0-4a97-99a8-07b2cb759766":
+      return { data: "mock-blob-data" };
     case "objectstore-api/managed-attribute":
       if (params?.filter?.key?.EQ === "test_managed_attribute") {
         return Promise.resolve({
@@ -156,9 +158,11 @@ describe("Metadata single record edit page.", () => {
     expect(wrapper.getByText(/tag2/i)).toBeInTheDocument();
     expect(wrapper.getByText(/tag3/i)).toBeInTheDocument();
 
-    expect(
-      wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
+      ).toBeInTheDocument();
+    });
 
     // Set new values:
     await userEvent.click(
