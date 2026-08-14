@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
@@ -9,31 +8,34 @@ import {
   LoadingSpinner,
   ReactTable,
   ReadOnlyValue,
-  FieldSet
+  FieldSet,
+  ExternalLink
 } from "common-ui";
 import { groupCell } from "../../../components";
 import useVocabularyOptions from "../useVocabularyOptions";
 import { WORKFLOWS_COMPONENT_NAME } from "../../../types/collection-api";
+import { GenericMolecularAnalysisItem } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 
 export function MaterialSampleWorkflows({
   workflows
 }: {
-  workflows: GenericMolecularAnalysis[] | undefined;
+  workflows: GenericMolecularAnalysisItem[] | undefined;
 }) {
   const { vocabOptions, loading } = useVocabularyOptions({
     path: "seqdb-api/vocabulary/molecularAnalysisType"
   });
 
-  const WORKFLOW_TABLE_COLUMNS: ColumnDef<GenericMolecularAnalysis>[] = [
+  const WORKFLOW_TABLE_COLUMNS: ColumnDef<any>[] = [
     {
       cell: ({
         row: {
-          original: { id, name }
+          original: {
+            genericMolecularAnalysis: { id, name }
+          }
         }
       }) => (
         <Link
           href={`/seqdb/molecular-analysis-workflow/run?genericMolecularAnalysisId=${id}`}
-          legacyBehavior
         >
           {name || id}
         </Link>
@@ -44,7 +46,9 @@ export function MaterialSampleWorkflows({
     {
       cell: ({
         row: {
-          original: { analysisType }
+          original: {
+            genericMolecularAnalysis: { analysisType }
+          }
         }
       }) => (
         <>
@@ -61,17 +65,60 @@ export function MaterialSampleWorkflows({
       accessorKey: "analysisType",
       header: () => <DinaMessage id="field_analysisType" />
     },
+    {
+      cell: ({
+        row: {
+          original: {
+            molecularAnalysisRunItem: { name }
+          }
+        }
+      }) => <>{name}</>,
+      accessorKey: "runItemName",
+      header: () => (
+        <DinaMessage id="field_run-summary_items.genericMolecularAnalysisItemSummary.name" />
+      )
+    },
+    {
+      cell: ({
+        row: {
+          original: { molecularAnalysisRunItem }
+        }
+      }) => {
+        const attachments = molecularAnalysisRunItem?.result?.attachments;
+
+        if (!attachments || attachments.length === 0) {
+          return <></>;
+        }
+
+        return (
+          <>
+            {attachments.map((metadata: any, index: number) => (
+              <ExternalLink
+                href={`/object-store/object/view?id=${metadata.id}`}
+              >
+                {(metadata as any)?.filename ?? metadata.id}
+                {index < attachments.length - 1 && ", "}
+              </ExternalLink>
+            ))}
+          </>
+        );
+      },
+      accessorKey: "attachments",
+      header: () => <DinaMessage id="attachments" />
+    },
     groupCell("group"),
     {
       cell: ({
         row: {
-          original: { createdBy }
+          original: {
+            genericMolecularAnalysis: { createdBy }
+          }
         }
       }) => <ReadOnlyValue value={createdBy} />,
       accessorKey: "createdBy",
       header: () => <DinaMessage id="field_createdBy" />
     },
-    dateCell("createdOn")
+    dateCell("createdOn", "genericMolecularAnalysis.createdOn")
   ];
 
   return (
@@ -80,8 +127,8 @@ export function MaterialSampleWorkflows({
       id={WORKFLOWS_COMPONENT_NAME}
       componentName={WORKFLOWS_COMPONENT_NAME}
     >
-      <ReactTable<GenericMolecularAnalysis>
-        columns={WORKFLOW_TABLE_COLUMNS}
+      <ReactTable<GenericMolecularAnalysisItem>
+        columns={WORKFLOW_TABLE_COLUMNS as any}
         data={workflows || []}
       />
     </FieldSet>
