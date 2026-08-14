@@ -14,12 +14,12 @@ import {
 import { groupCell } from "../../../components";
 import useVocabularyOptions from "../useVocabularyOptions";
 import { WORKFLOWS_COMPONENT_NAME } from "../../../types/collection-api";
-import { GenericMolecularAnalysisItem } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 
 export function MaterialSampleWorkflows({
   workflows
 }: {
-  workflows: GenericMolecularAnalysisItem[] | undefined;
+  workflows: GenericMolecularAnalysis[] | undefined;
 }) {
   const { vocabOptions, loading } = useVocabularyOptions({
     path: "seqdb-api/vocabulary/molecularAnalysisType"
@@ -129,7 +129,7 @@ export function MaterialSampleWorkflows({
       id={WORKFLOWS_COMPONENT_NAME}
       componentName={WORKFLOWS_COMPONENT_NAME}
     >
-      <ReactTable<GenericMolecularAnalysisItem>
+      <ReactTable<GenericMolecularAnalysis>
         columns={WORKFLOW_TABLE_COLUMNS as any}
         data={workflows || []}
       />
