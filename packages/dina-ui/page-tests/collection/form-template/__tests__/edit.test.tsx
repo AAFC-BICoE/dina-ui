@@ -1,4 +1,4 @@
-import { SaveArgs } from "common-ui";
+import { clearAndType, SaveArgs } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { getComponentOrderFromTemplate } from "../../../../components/form-template/formTemplateUtils";
 import { FormTemplateEditPageLoaded } from "../../../../pages/collection/form-template/edit";
@@ -22,6 +22,7 @@ import {
   CITATIONS_COMPONENT_NAME
 } from "../../../../types/collection-api";
 import { fireEvent, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
 
@@ -178,7 +179,7 @@ async function mountForm(
 
   async function toggleDataComponent(switchElement: HTMLElement, val: boolean) {
     // Simulate click event on the checkbox
-    fireEvent.click(switchElement);
+    await userEvent.click(switchElement);
     if (!val) {
       // Click "yes" when asked Are You Sure:
       const modalForm = wrapper.container.querySelector(".modal-content form");
@@ -216,7 +217,7 @@ async function mountForm(
     const nameInput = wrapper.container.querySelector(
       ".workflow-main-details .name-field input"
     );
-    fireEvent.change(nameInput!, { target: { value: "form1" } });
+    await clearAndType(nameInput!, "form1");
 
     await waitFor(() => expect(nameInput).toHaveValue("form1"));
   }
@@ -1895,35 +1896,36 @@ describe("Form template edit page", () => {
     const includeAllCollectingDateInput = wrapper.container.querySelector(
       "#collectingDateLegend > label > input"
     );
-    fireEvent.click(includeAllCollectingDateInput!);
+    await userEvent.click(includeAllCollectingDateInput!);
 
     const verbatimEventDateTimeInput = wrapper.container.querySelector(
       ".verbatimEventDateTime-field input"
     )!;
-    fireEvent.change(verbatimEventDateTimeInput, {
-      target: { value: "test-verbatim-default-datetime" }
-    });
+    await clearAndType(
+      verbatimEventDateTimeInput,
+      "test-verbatim-default-datetime"
+    );
 
     // Set default geo assertion lat/lng:
     const latCheckbox = wrapper.container.querySelector(
       ".dwcDecimalLatitude input[type='checkbox']"
     )!;
-    fireEvent.click(latCheckbox);
+    await userEvent.click(latCheckbox);
 
     const lngCheckbox = wrapper.container.querySelector(
       ".dwcDecimalLongitude input[type='checkbox']"
     )!;
-    fireEvent.click(lngCheckbox);
+    await userEvent.click(lngCheckbox);
 
     const latInput = wrapper.container.querySelector(
       ".dwcDecimalLatitude input[type='text']"
     )!;
-    fireEvent.change(latInput, { target: { value: "1" } });
+    await clearAndType(latInput, "1");
 
     const lngInput = wrapper.container.querySelector(
       ".dwcDecimalLongitude input[type='text']"
     )!;
-    fireEvent.change(lngInput, { target: { value: "2" } });
+    await clearAndType(lngInput, "2");
     await submitForm();
     await waitFor(() => expect(mockOnSaved).toHaveBeenCalledWith(expected));
   });
