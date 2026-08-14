@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { StorageUnitForm } from "../../../../components";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../../types/collection-api";
 import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -77,11 +77,10 @@ describe("Storage Unit edit page.", () => {
     });
 
     // Change Name field value
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: {
-        value: "test-storage-unit"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "test-storage-unit"
+    );
 
     // Select Storage Unit Type
     await userEvent.click(
