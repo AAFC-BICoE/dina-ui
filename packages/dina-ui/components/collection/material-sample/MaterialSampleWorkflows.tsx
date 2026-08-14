@@ -93,20 +93,22 @@ export function MaterialSampleWorkflows({
         return (
           <>
             {attachments.map((metadata: any, index: number) => (
-              <ExternalLink
-                href={`/object-store/object/view?id=${metadata.id}`}
-              >
-                {(metadata as any)?.filename ?? metadata.id}
+              <>
+                <ExternalLink
+                  href={`/object-store/object/view?id=${metadata.id}`}
+                >
+                  {(metadata as any)?.filename ?? metadata.id}
+                </ExternalLink>
                 {index < attachments.length - 1 && ", "}
-              </ExternalLink>
+              </>
             ))}
           </>
         );
       },
       accessorKey: "attachments",
-      header: () => <DinaMessage id="attachments" />
+      header: () => <DinaMessage id="molecularAnalysisRunItemAttachments" />
     },
-    groupCell("group"),
+    groupCell("genericMolecularAnalysis.group"),
     {
       cell: ({
         row: {

@@ -1457,6 +1457,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   seqdbManagedAttributeTitle: "Sequencing",
   genericMolecularAnalysis: "Generic Molecular Analysis",
   molecularAnalysisRunItemName: "Run Item Name",
+  molecularAnalysisRunItemAttachments: "Run Item Attachments",
   qualityControlName: "Name:",
   qualityControlType: "Type:",
   collecting_event_tag_info:
