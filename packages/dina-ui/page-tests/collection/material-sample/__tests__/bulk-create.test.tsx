@@ -1,7 +1,7 @@
 import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
@@ -104,32 +104,25 @@ describe("MaterialSampleBulkCreatePage", () => {
     );
 
     // Material Samples to Create field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("spinbutton", { name: /material samples to create/i }),
-      {
-        target: {
-          value: 5
-        }
-      }
+      "5"
     );
     // Base Name field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /base name/i }), {
-      target: {
-        value: "my-sample"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /base name/i }),
+      "my-sample"
+    );
     // Start field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /start/i }), {
-      target: {
-        value: "00001"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /start/i }),
+      "00001"
+    );
     // Sperator field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /separator/i }), {
-      target: {
-        value: "-"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /separator/i }),
+      "-"
+    );
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
