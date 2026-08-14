@@ -206,7 +206,6 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/storage-unit-type":
     case "collection-api/collection":
     case "collection-api/collection-method":
-    case "collection-api/collecting-event":
     case "objectstore-api/metadata":
     case "agent-api/person":
     case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=type_status":
@@ -227,6 +226,11 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/protocol":
     case "collection-api/site":
       return { data: [] };
+    case "collection-api/collecting-event":
+      return {
+        data: [TEST_COLLECTING_EVENT_1],
+        meta: { totalResourceCount: 1, moduleVersion: "0.16" }
+      };
   }
 });
 
