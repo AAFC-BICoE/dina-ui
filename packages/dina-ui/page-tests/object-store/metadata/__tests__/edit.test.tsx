@@ -1,7 +1,7 @@
 import { PersistedResource } from "kitsu";
 import { ManagedAttribute } from "../../../../types/collection-api";
 import MetadataEditPage from "../../../../pages/object-store/metadata/edit";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";
 import { fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -107,7 +107,7 @@ const TEST_MANAGED_ATTRIBUTE: PersistedResource<ManagedAttribute> = {
   type: "managed-attribute",
   id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
   name: "test-managed-attribute",
-  key: "test_managed_attribute",
+  key: "test-managed-attribute",
   vocabularyElementType: "STRING"
 };
 
@@ -156,11 +156,9 @@ describe("Metadata single record edit page.", () => {
     expect(wrapper.getByText(/tag2/i)).toBeInTheDocument();
     expect(wrapper.getByText(/tag3/i)).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(
-        wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
-      ).toBeInTheDocument();
-    });
+    expect(
+      wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
+    ).toBeInTheDocument();
 
     // Set new values:
     await userEvent.click(
@@ -173,24 +171,24 @@ describe("Metadata single record edit page.", () => {
       wrapper.getByRole("button", { name: /remove tag3/i })
     );
 
-    fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
-      target: { value: "new tag 1" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("combobox", { name: /tags/i }),
+      "new tag 1"
+    );
     await userEvent.click(
       wrapper.getByRole("option", { name: /add "new tag 1"/i })
     );
-    fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
-      target: { value: "new tag 2" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("combobox", { name: /tags/i }),
+      "new tag 2"
+    );
     await userEvent.click(
       wrapper.getByRole("option", { name: /add "new tag 2"/i })
     );
 
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i),
-      {
-        target: { value: "new-managed-attribute-value" }
-      }
+      "new-managed-attribute-value"
     );
 
     const publiclyReleasableSelect = within(
@@ -198,7 +196,7 @@ describe("Metadata single record edit page.", () => {
     ).getByRole("combobox");
 
     fireEvent.keyDown(publiclyReleasableSelect, { key: "ArrowDown" });
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", { name: /no - not publicly releasable/i })
     );
 
@@ -208,11 +206,9 @@ describe("Metadata single record edit page.", () => {
       ).toBeInTheDocument();
     });
 
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /not publicly releasable reason/i }),
-      {
-        target: { value: "new reason for not publicly releasable" }
-      }
+      "new reason for not publicly releasable"
     );
 
     // Submit form
