@@ -3,6 +3,7 @@ import { CollectionForm } from "../../../pages/collection/collection/edit";
 import { mountWithAppContext } from "common-ui";
 import { Collection } from "../../../types/collection-api";
 import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const TEST_COLLECTION: PersistedResource<Collection> = {
@@ -63,18 +64,16 @@ describe("Collection edit page", () => {
     });
 
     // Fill in name information
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: {
-        value: "test-name"
-      }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "test-name"
+    );
 
     // Fill in code information
-    fireEvent.change(wrapper.getByRole("textbox", { name: /code/i }), {
-      target: {
-        value: "test-code"
-      }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /code/i }),
+      "test-code"
+    );
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
