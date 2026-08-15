@@ -348,13 +348,13 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       wrapper.getByRole("link", { name: /sample 1/i }).getAttribute("href")
     ).toEqual(
       "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[0].id
+      TEST_MATERIAL_SAMPLE_SUMMARY[0].id
     );
     expect(
       wrapper.getByRole("link", { name: /sample 2/i }).getAttribute("href")
     ).toEqual(
       "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[1].id
+      TEST_MATERIAL_SAMPLE_SUMMARY[1].id
     );
 
     // Ensure Tube Number is rendered:
@@ -1597,7 +1597,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
           }
         }
       });
-      fireEvent.change(dataPasteZone, { target: { value: pasteData } });
+      await userEvent.type(dataPasteZone, pasteData);
 
       // Items should be populated in:
       await waitFor(() => {
