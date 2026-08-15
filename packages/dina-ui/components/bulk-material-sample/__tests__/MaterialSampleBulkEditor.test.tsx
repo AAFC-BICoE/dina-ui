@@ -1,5 +1,9 @@
 import { deleteFromStorage } from "@rehooks/local-storage";
-import { clearAndType, DoOperationsError, waitForLoadingToDisappear } from "common-ui";
+import {
+  clearAndType,
+  DoOperationsError,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { InputResource } from "kitsu";
 import { SAMPLE_FORM_TEMPLATE_KEY } from "../..";
 import { mountWithAppContext } from "common-ui";
@@ -31,7 +35,9 @@ import {
   TEST_STORAGE_UNITS,
   TEST_COLLECTING_ORGANISM_SAMPLES,
   TEST_FORM_TEMPLATE_COMPONENTS_DISABLED,
-  TEST_MATERIAL_SAMPLES_MULTIPLE_VALUES
+  TEST_MATERIAL_SAMPLES_MULTIPLE_VALUES,
+  TEST_COLLECTING_EVENT_2,
+  TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT
 } from "../__mocks__/MaterialSampleBulkMocks";
 import { useSearchWsCustomQuery } from "../../../../common-ui/lib/search/useSearchWsCustomQuery";
 
@@ -141,6 +147,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: [] };
     case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: TEST_COLLECTING_EVENT_1 };
+    case "collection-api/collecting-event/col-event-2?include=collectors,attachment,collectionMethod,protocol,expedition,site":
+      return { data: TEST_COLLECTING_EVENT_2 };
     case "collection-api/storage-unit":
       if (params?.filter?.rsql === "parentStorageUnit.uuid==su-1") {
         return { data: [TEST_STORAGE_UNIT], meta: { totalResourceCount: 1 } };
@@ -150,6 +158,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_STORAGE_UNIT };
     case "collection-api/storage-unit/C":
       return { data: TEST_STORAGE_UNITS[2] };
+    case "collection-api/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34":
+      return { data: TEST_STORAGE_UNIT };
     case "collection-api/form-template/cd6d8297-43a0-45c6-b44e-983db917eb11":
       return { data: TEST_FORM_TEMPLATE };
     case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=019c961e-4c0d-7398-b4ae-73687826b3b5&filter[dinaComponent][EQ]=MATERIAL_SAMPLE":
@@ -202,11 +212,15 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         },
         meta: { totalResourceCount: 1, moduleVersion: "0.16" }
       };
+    case "collection-api/collecting-event":
+      return {
+        data: [TEST_COLLECTING_EVENT_1, TEST_COLLECTING_EVENT_2],
+        meta: { totalResourceCount: 2, moduleVersion: "0.16" }
+      };
     case "search-api/search-ws/mapping":
     case "collection-api/storage-unit-type":
     case "collection-api/collection":
     case "collection-api/collection-method":
-    case "collection-api/collecting-event":
     case "objectstore-api/metadata":
     case "agent-api/person":
     case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=type_status":
@@ -818,61 +832,6 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
-  it("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleBulkEditor
-        onSaved={mockOnSaved}
-        samples={TEST_NEW_SAMPLES}
-      />,
-      testCtx as any
-    );
-    await waitFor(() =>
-      expect(wrapper.getByText(/edit all/i)).toBeInTheDocument()
-    );
-
-    // Go the the bulk edit tab
-    await userEvent.click(wrapper.getByText(/edit all/i));
-
-    // Enable the collecting event section
-    const collectingEventToggle = wrapper.container.querySelectorAll(
-      ".enable-collecting-event .react-switch-bg"
-    );
-    if (!collectingEventToggle) {
-      throw new Error("Collecting event toggle needs to exist at this point.");
-    }
-    await userEvent.click(collectingEventToggle[0]);
-    await waitForLoadingToDisappear();
-    await waitFor(
-      () => {
-        expect(
-          wrapper.getByLabelText("Start Event Date Time")
-        ).toBeInTheDocument();
-      },
-      { timeout: 2000 }
-    );
-
-    // Put an invalid value in startEventDateTime. This is validated locally by yup
-    const startDateTextbox = wrapper.getByRole("textbox", {
-      name: "Start Event Date Time Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory"
-    });
-    await userEvent.type(startDateTextbox, "11111");
-
-    // Click the "Save All" button
-    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-
-    await waitForLoadingToDisappear();
-
-    await waitFor(() => expect(wrapper.getByText(/ms1/i)).toBeInTheDocument());
-    await userEvent.click(wrapper.getByText(/ms1/i));
-
-    // Shows the error message
-    expect(
-      wrapper.getByText(
-        /1 : start event date time \- start event datetime format must be a subset of: yyyy\-mm\-ddthh:mm:ss\.mmm, if datetime is present, 't' is mandatory/i
-      )
-    ).toBeInTheDocument();
-  });
-
   it("Shows an error indicator on the individual sample tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
     const mockSaveForBadColEvent = jest.fn(async () => {
       throw new DoOperationsError(
@@ -922,94 +881,7 @@ describe("MaterialSampleBulkEditor", () => {
       throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[1]);
-    await waitFor(() => { }); // Wait for UI to update after toggle, if necessary for next action
-
-    // Click the "Save All" button
-    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await waitFor(() => expect(mockSaveForBadColEvent).toHaveBeenCalled());
-
-    // The collecting event was saved separately.
-    expect(mockSaveForBadColEvent).lastCalledWith(
-      [
-        {
-          resource: {
-            type: "collecting-event",
-            dwcVerbatimCoordinateSystem: null,
-            dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-            geoReferenceAssertions: [
-              {
-                isPrimary: true
-              }
-            ],
-            group: "cnc",
-            publiclyReleasable: false
-          },
-          type: "collecting-event"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-
-    // The generic bulk submission error banner should appear
-    expect(
-      wrapper.queryByText(
-        /bulk submission error: check the tabs with a red label\./i
-      )
-    ).toBeInTheDocument();
-
-    // Shows the error message
-    expect(
-      wrapper.getByText(
-        /1 : start event date time \- invalid collecting event/i
-      )
-    ).toBeInTheDocument();
-  });
-
-  it("Shows an error indicator on the Edit All tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
-    const mockSaveForBadColEvent = jest.fn(async () => {
-      throw new DoOperationsError(
-        "",
-        { startEventDateTime: "Invalid Collecting Event" },
-        [
-          {
-            errorMessage: "",
-            fieldErrors: { startEventDateTime: "Invalid Collecting Event" },
-            index: 0
-          }
-        ]
-      );
-    });
-
-    const wrapper = mountWithAppContext(
-      <MaterialSampleBulkEditor
-        onSaved={mockOnSaved}
-        samples={TEST_NEW_SAMPLES}
-      />,
-      {
-        ...(testCtx as any),
-        apiContext: {
-          ...testCtx.apiContext,
-          // Test save error: The second sample has an error on the barcode field
-          save: mockSaveForBadColEvent
-        }
-      }
-    );
-    await waitFor(() =>
-      expect(wrapper.getByText(/edit all/i)).toBeInTheDocument()
-    );
-
-    // Go the the bulk edit tab
-    await userEvent.click(wrapper.getByText(/edit all/i));
-
-    // Enable the collecting event section
-    const collectingEventToggle = wrapper.container.querySelectorAll(
-      ".enable-collecting-event .react-switch-bg"
-    );
-    if (!collectingEventToggle) {
-      throw new Error("Collecting event toggle needs to exist at this point.");
-    }
-    await userEvent.click(collectingEventToggle[0]);
-    await waitFor(() => { }); // Wait for UI to update
+    await waitFor(() => {}); // Wait for UI to update after toggle, if necessary for next action
 
     // Click the "Save All" button
     await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
@@ -1187,7 +1059,9 @@ describe("MaterialSampleBulkEditor", () => {
         selector + " .react-switch-bg"
       );
       if (!toggle) {
-        throw new Error("Toggle for " + selector + " needs to exist at this point.");
+        throw new Error(
+          "Toggle for " + selector + " needs to exist at this point."
+        );
       }
       await userEvent.click(toggle[0]);
     }
@@ -1242,7 +1116,9 @@ describe("MaterialSampleBulkEditor", () => {
         selector + " .react-switch-bg"
       );
       if (!toggle) {
-        throw new Error("Toggle for " + selector + " needs to exist at this point.");
+        throw new Error(
+          "Toggle for " + selector + " needs to exist at this point."
+        );
       }
       await userEvent.click(toggle[0]);
     }
@@ -1271,7 +1147,7 @@ describe("MaterialSampleBulkEditor", () => {
 
       // Click "Yes" on the popup dialog.
       await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-      await waitFor(() => { }); // Wait for dialog to close and UI to update
+      await waitFor(() => {}); // Wait for dialog to close and UI to update
     }
 
     // Organisms section opens with an initial value, so it has the green indicator on the fieldset
@@ -1329,7 +1205,7 @@ describe("MaterialSampleBulkEditor", () => {
       }),
       "new-scientific-name"
     );
-    await waitFor(() => { }); // Allow for any state updates
+    await waitFor(() => {}); // Allow for any state updates
 
     // Override the scheduled acitons
     await clearAndType(
@@ -1723,7 +1599,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toHaveProperty("placeholder", "Multiple Values");
   });
 
-  it("Creates and links a unique Collecting Event to all samples", async () => {
+  it("Bulk editing material samples with no collecting event should only display the link tab", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -1732,125 +1608,120 @@ describe("MaterialSampleBulkEditor", () => {
       testCtx as any
     );
     await waitFor(() =>
-      expect(
-        wrapper.container.querySelectorAll(
-          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
-        ).length
-      ).toBeGreaterThan(0)
+      expect(wrapper.getByText(/edit all/i)).toBeInTheDocument()
     );
 
-    // Enable the collecting event section
+    // Go the the bulk edit tab:
+    await userEvent.click(wrapper.getByText(/edit all/i));
+
+    // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
-      ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+      ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
       throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    // Link existing should appear.
+    expect(
+      wrapper.getByRole("tab", { name: /link existing/i })
+    ).toBeInTheDocument();
+
+    // Create new and linked collecting event should NOT appear.
+    expect(
+      wrapper.queryByRole("tab", { name: /create new/i })
+    ).not.toBeInTheDocument();
+    expect(
+      wrapper.queryByRole("tab", { name: /linked collecting event/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it("Bulk editing material samples with no collecting event, link to an existing record", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx as any
+    );
     await waitFor(() =>
-      expect(
-        wrapper.getByRole("textbox", { name: /verbatim locality/i })
-      ).toBeInTheDocument()
+      expect(wrapper.getByText(/edit all/i)).toBeInTheDocument()
     );
 
-    // Edit a collecting event field
-    await clearAndType(
-      wrapper.getByRole("textbox", { name: /verbatim locality/i }),
-      "test locality"
+    // Go the the bulk edit tab:
+    await userEvent.click(wrapper.getByText(/edit all/i));
+
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      throw new Error("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    // Link existing should appear.
+    expect(
+      wrapper.getByRole("tab", { name: /link existing/i })
+    ).toBeInTheDocument();
+
+    await userEvent.click(wrapper.getByRole("tab", { name: /link existing/i }));
+    await waitForLoadingToDisappear();
+
+    // Select the first collecting event from the table.
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /select/i })[0]
     );
 
-    // Click the "Save All" button
+    // Save the form and ensure the network request is working correctly.
     await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(4)); // 3 events + 1 samples
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
-    // Save the collecting event, then save the 2 material samples
     expect(mockSave.mock.calls).toEqual([
       [
         [
           {
             resource: {
-              type: "collecting-event",
-              geoReferenceAssertions: [{ isPrimary: true }],
-              group: "cnc",
-              dwcVerbatimCoordinateSystem: null,
-              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: false,
-              dwcVerbatimLocality: "test locality"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
-              type: "collecting-event",
-              geoReferenceAssertions: [{ isPrimary: true }],
-              group: "cnc",
-              dwcVerbatimCoordinateSystem: null,
-              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: false,
-              dwcVerbatimLocality: "test locality"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
-              type: "collecting-event",
-              geoReferenceAssertions: [{ isPrimary: true }],
-              group: "cnc",
-              dwcVerbatimCoordinateSystem: null,
-              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: false,
-              dwcVerbatimLocality: "test locality"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
-              type: "material-sample",
+              collection: { id: "1", type: "collection" },
               materialSampleName: "MS1",
-              collection: { id: "1", type: "collection" },
-              collectingEvent: { id: "11111", type: "collecting-event" },
               relationships: {
+                collectingEvent: {
+                  data: { id: "col-event-1", type: "collecting-event" }
+                },
                 collection: { data: { id: "1", type: "collection" } }
-              }
+              },
+              type: "material-sample"
             },
             type: "material-sample"
           },
           {
             resource: {
-              type: "material-sample",
+              collection: { id: "1", type: "collection" },
               materialSampleName: "MS2",
-              collection: { id: "1", type: "collection" },
-              collectingEvent: { id: "11111", type: "collecting-event" },
               relationships: {
+                collectingEvent: {
+                  data: { id: "col-event-1", type: "collecting-event" }
+                },
                 collection: { data: { id: "1", type: "collection" } }
-              }
+              },
+              type: "material-sample"
             },
             type: "material-sample"
           },
           {
             resource: {
-              type: "material-sample",
-              materialSampleName: "MS3",
               collection: { id: "1", type: "collection" },
-              collectingEvent: { id: "11111", type: "collecting-event" },
+              materialSampleName: "MS3",
               relationships: {
+                collectingEvent: {
+                  data: { id: "col-event-1", type: "collecting-event" }
+                },
                 collection: { data: { id: "1", type: "collection" } }
-              }
+              },
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -1860,7 +1731,7 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
-  it("Shows the common Collecting Event when all samples are linked to the same one.", async () => {
+  it("Bulk edit material samples that are all linked the same collecting event, display info banner", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -1876,7 +1747,6 @@ describe("MaterialSampleBulkEditor", () => {
       ).toBeGreaterThan(0)
     );
 
-    // Enable the collecting event section
     const collectingEventToggle = wrapper.container.querySelectorAll(
       ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
     );
@@ -1884,36 +1754,779 @@ describe("MaterialSampleBulkEditor", () => {
       throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
-    await waitFor(() =>
-      expect(
-        wrapper.getAllByRole("button", { name: /detach/i })[0]
-      ).toBeInTheDocument()
-    );
+    await waitForLoadingToDisappear();
 
-    // The collecting event section has a green legend to indicate a bulk edit (event without setting a new Collecting Event)
+    // Banner should be displayed to inform the user that they are all linked to the same collecting event.
     expect(
-      wrapper.getAllByRole("button", { name: /detach/i })[0]
+      wrapper.getByText(
+        /all material samples being bulk edited share the same collecting event\./i
+      )
     ).toBeInTheDocument();
 
-    // Edit the common collecting event
-    await clearAndType(
-      wrapper.getByRole("textbox", { name: /verbatim locality/i }),
-      "bulk edited locality"
+    // Should be in read only mode...
+    expect(wrapper.getByText(/linked collecting event:/i)).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("link", { name: /col\-event\-1/i })
+    ).toBeInTheDocument();
+  });
+
+  it("Bulk edit material samples that are all linked to the same collecting event, attach existing override", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+        ).length
+      ).toBeGreaterThan(0)
     );
 
-    // Click the "Save All" button
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      throw new Error("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    // Click the "Link existing" option.
+    await userEvent.click(
+      wrapper.getAllByRole("tab", { name: /link existing/i })[0]
+    );
+    await waitForLoadingToDisappear();
+
+    // Expect the warning message to indicate it will override existing links:
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /selecting and linking a new collecting event will replace any currently linked collecting events upon saving\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Select the first option in the table.
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /select/i })[1]
+    );
+    await waitForLoadingToDisappear();
+
+    // Expect alert indicating that the selected sample will replace all material samples collecting event.
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /the selected collecting event will replace all existing collecting event links across all material samples when saved\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Save the form and ensure the network request is working correctly.
     await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
-    // Save the collecting events, no changes made to the material sample.
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Expect col-event-1 to be set to all material samples.
+    expect(mockSave).toHaveBeenCalledWith(
+      [
+        expect.objectContaining({
+          resource: expect.objectContaining({
+            id: "1",
+            relationships: {
+              collectingEvent: {
+                data: { id: "col-event-2", type: "collecting-event" }
+              }
+            }
+          })
+        }),
+        expect.objectContaining({
+          resource: expect.objectContaining({
+            id: "2",
+            relationships: {
+              collectingEvent: {
+                data: { id: "col-event-2", type: "collecting-event" }
+              }
+            }
+          })
+        })
+      ],
+      { apiBaseUrl: "/collection-api" }
+    );
+  });
+
+  it("Bulk edit material samples that are all linked the same collecting event, use unlink all functionality", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+        ).length
+      ).toBeGreaterThan(0)
+    );
+
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      throw new Error("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    // Banner should be displayed to inform the user that they are all linked to the same collecting event.
+    expect(
+      wrapper.getByText(
+        /all material samples being bulk edited share the same collecting event\./i
+      )
+    ).toBeInTheDocument();
+
+    // Click the unlink all button.
+    await userEvent.click(wrapper.getByRole("button", { name: /unlink all/i }));
+
+    // Are you sure popup should appear:
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/unlink collecting events\?/i)
+      ).toBeInTheDocument();
+    });
+
+    // Click "Yes".
+    await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+
+    // Banner should appear indiciating once the form is saved, all collecting events will be unlinked.
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /collecting event\(s\) will be unlinked from the material samples when the form is saved\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Save the form and ensure the network request is working correctly.
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Saves the new material samples with the new storage unit:
     expect(mockSave.mock.calls).toEqual([
       [
         [
           {
             resource: {
-              id: "col-event-1",
+              id: "1",
+              type: "material-sample",
+              relationships: {
+                collectingEvent: {
+                  data: null
+                }
+              }
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              id: "2",
+              type: "material-sample",
+              relationships: {
+                collectingEvent: {
+                  data: null
+                }
+              }
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Bulk edit material samples that are linked to different collecting events, attach existing override", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+        ).length
+      ).toBeGreaterThan(0)
+    );
+
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      throw new Error("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    // Click the "Link existing" option.
+    await userEvent.click(
+      wrapper.getAllByRole("tab", { name: /link existing/i })[0]
+    );
+    await waitForLoadingToDisappear();
+
+    // Expect the warning message to indicate it will override existing links:
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /selecting and linking a new collecting event will replace any currently linked collecting events upon saving\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Select the first option in the table.
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /select/i })[0]
+    );
+    await waitForLoadingToDisappear();
+
+    // Expect alert indicating that the selected sample will replace all material samples collecting event.
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /the selected collecting event will replace all existing collecting event links across all material samples when saved\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Save the form and ensure the network request is working correctly.
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Expect col-event-1 to be set to all material samples.
+    expect(mockSave).toHaveBeenCalledWith(
+      [
+        expect.objectContaining({
+          resource: expect.objectContaining({
+            id: "1",
+            relationships: {
+              collectingEvent: {
+                data: { id: "col-event-1", type: "collecting-event" }
+              }
+            }
+          })
+        }),
+        expect.objectContaining({
+          resource: expect.objectContaining({
+            id: "2",
+            relationships: {
+              collectingEvent: {
+                data: { id: "col-event-1", type: "collecting-event" }
+              }
+            }
+          })
+        })
+      ],
+      { apiBaseUrl: "/collection-api" }
+    );
+  });
+
+  it("Bulk edit material sample that are linked to different collecting events, go to individual material sample and create new collecting event", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+        ).length
+      ).toBeGreaterThan(0)
+    );
+
+    // Select the second material sample.
+    await userEvent.click(wrapper.getByText(/#2/i));
+    await waitForLoadingToDisappear();
+
+    // Click the "Create new" collecting event option.
+    await userEvent.click(
+      wrapper.getAllByRole("tab", { name: /create new/i })[1]
+    );
+    await waitForLoadingToDisappear();
+
+    // Warning should be displayed that this will replace the existing collecting event.
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /creating a new collecting event to link to this material sample will replace any currently linked collecting events upon saving\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Set a collection number.
+    await userEvent.type(
+      wrapper.getAllByRole("textbox", { name: /collection number/i })[0],
+      "Brand new collecting event"
+    );
+
+    // Save the form and ensure the network request is working correctly.
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+
+    expect(mockSave.mock.calls).toEqual([
+      // First call: Creating the new collecting event
+      [
+        [
+          {
+            resource: {
+              dwcFieldNumber: "Brand new collecting event",
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              dwcVerbatimCoordinateSystem: null,
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
+              publiclyReleasable: false,
+              group: "cnc",
+              type: "collecting-event"
+            },
+            type: "collecting-event"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ],
+      // Second call: Updating the material sample with the new event ID
+      [
+        [
+          {
+            resource: {
+              id: "2",
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "11111",
+                    type: "collecting-event"
+                  }
+                }
+              },
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Bulk edit material samples that are linked to different collecting event, display info banner", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+        ).length
+      ).toBeGreaterThan(0)
+    );
+
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      throw new Error("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    // The banner indicating that the material samples are linked to different collecting events.
+    expect(
+      wrapper.getByText(
+        /the selected material samples are linked to different collecting events\. edit the individual material samples to see the attached collecting event\./i
+      )
+    ).toBeInTheDocument();
+
+    // Switch to the "Link Existing" collecting event
+    await userEvent.click(
+      wrapper.getAllByRole("tab", { name: /link existing/i })[0]
+    );
+
+    // A warning message should appear since it will replace existing linked collecting event.
+    expect(
+      wrapper.getAllByText(
+        /selecting and linking a new collecting event will replace any currently linked collecting events upon saving\./i
+      )[0]
+    ).toBeInTheDocument();
+  });
+
+  it("Bulk edit material samples that are linked to different collecting event, use unlink all functionality", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+        ).length
+      ).toBeGreaterThan(0)
+    );
+
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      throw new Error("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    // The banner indicating that the material samples are linked to different collecting events.
+    expect(
+      wrapper.getByText(
+        /the selected material samples are linked to different collecting events\. edit the individual material samples to see the attached collecting event\./i
+      )
+    ).toBeInTheDocument();
+
+    // Click the unlink all button.
+    await userEvent.click(wrapper.getByRole("button", { name: /unlink all/i }));
+
+    // Are you sure popup should appear:
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/unlink collecting events\?/i)
+      ).toBeInTheDocument();
+    });
+
+    // Click "Yes".
+    await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+
+    // Banner should appear indiciating once the form is saved, all collecting events will be unlinked.
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /collecting event\(s\) will be unlinked from the material samples when the form is saved\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Save the form and ensure the network request is working correctly.
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Saves the new material samples with the new storage unit:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              type: "material-sample",
+              relationships: {
+                collectingEvent: {
+                  data: null
+                }
+              }
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              id: "2",
+              type: "material-sample",
+              relationships: {
+                collectingEvent: {
+                  data: null
+                }
+              }
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Bulk edit material samples that are linked to different collecting event, use unlink an individual collecting event", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+        ).length
+      ).toBeGreaterThan(0)
+    );
+
+    // Click the first material sample, to edit the individual one.
+    await userEvent.click(wrapper.getByRole("tab", { name: /#1/i }));
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/editing material sample 1 of 2/i)
+      ).toBeInTheDocument();
+    });
+
+    // Click the unlink all button.
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /unlink/i })[0]
+    );
+
+    // Are you sure popup should appear:
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/unlink collecting events\?/i)
+      ).toBeInTheDocument();
+    });
+
+    // Click "Yes".
+    await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+
+    // Banner should appear indiciating once the form is saved, all collecting events will be unlinked.
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /collecting event\(s\) will be unlinked from the material samples when the form is saved\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Save the form and ensure the network request is working correctly.
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Updates the collecting event to just unlink collecting event on the SPECIFIC material sample.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              type: "material-sample",
+              relationships: {
+                collectingEvent: {
+                  data: null
+                }
+              }
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Bulk edit material samples that are linked to different collecting event, create new collecting event from individual tab.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+        ).length
+      ).toBeGreaterThan(0)
+    );
+
+    // Click the first material sample, to edit the individual one.
+    await userEvent.click(wrapper.getByRole("tab", { name: /#1/i }));
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/editing material sample 1 of 2/i)
+      ).toBeInTheDocument();
+    });
+
+    // Create new collecting event
+    await userEvent.click(
+      wrapper.getAllByRole("tab", { name: /create new/i })[0]
+    );
+
+    // Verbatim locality should be empty since it's new.
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /verbatim locality/i })
+      ).toHaveDisplayValue("");
+    });
+
+    // Warning should appear at the top of the page.
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /creating a new collecting event to link to this material sample will replace any currently linked collecting events upon saving\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Type a new verbatim locality for this new collecting event.
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /verbatim locality/i }),
+      "brand new locality"
+    );
+
+    // Save the form and ensure the network request is working correctly.
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+
+    // Creates the new collecting event, then attaches it to the material sample that was edited.
+    expect(mockSave.mock.calls).toEqual([
+      // First call: Creating the new collecting event with verbatim locality
+      [
+        [
+          {
+            resource: {
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimLocality: "brand new locality",
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
+              group: "cnc",
+              publiclyReleasable: false,
+              type: "collecting-event"
+            },
+            type: "collecting-event"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ],
+      // Second call: Updating the material sample with the generated event ID
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "11111",
+                    type: "collecting-event"
+                  }
+                }
+              },
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Allows adding NEW nested Collecting the individual sample tabs.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx as any
+    );
+    await waitFor(() => expect(wrapper.getByText(/ms1/i)).toBeInTheDocument());
+
+    // Edit the first sample only:
+    await userEvent.click(wrapper.getByText(/ms1/i));
+
+    // Enable the collecting event section:
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelector(
+          ".sample-tabpanel-0 .enable-collecting-event .react-switch-bg"
+        )
+      ).toBeInTheDocument()
+    );
+    const toggle = wrapper.container.querySelector(
+      ".sample-tabpanel-0 .enable-collecting-event .react-switch-bg"
+    );
+    if (!toggle) {
+      throw new Error("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(toggle);
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelector(
+          ".sample-tabpanel-0 #" +
+            COLLECTING_EVENT_COMPONENT_NAME +
+            " .dwcVerbatimLocality-field input"
+        )
+      ).toBeInTheDocument()
+    );
+
+    const verbatimLocality = wrapper.container.querySelector(
+      ".sample-tabpanel-0 #" +
+        COLLECTING_EVENT_COMPONENT_NAME +
+        " .dwcVerbatimLocality-field input"
+    );
+    if (!verbatimLocality) {
+      throw new Error("Verbatim locality textbox cannot be found.");
+    }
+    await userEvent.clear(verbatimLocality);
+    await userEvent.type(verbatimLocality, "test locality");
+
+    // Click the "Save All" button:
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2)); // 1 event + 1 samples
+
+    // Saves the new material samples with the new storage unit:
+    expect(mockSave.mock.calls).toEqual([
+      // Creates the new Col Event:
+      [
+        [
+          {
+            resource: {
               type: "collecting-event",
-              dwcVerbatimLocality: "bulk edited locality",
-              group: "cnc"
+              dwcVerbatimLocality: "test locality",
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
+              group: "cnc",
+              publiclyReleasable: false
             },
             type: "collecting-event"
           }
@@ -1922,17 +2535,142 @@ describe("MaterialSampleBulkEditor", () => {
       ],
       [
         [
+          // Creates the first sample with the attached events:
           {
             resource: {
-              id: "col-event-1",
-              type: "collecting-event",
-              dwcVerbatimLocality: "bulk edited locality",
-              group: "cnc"
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS1",
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                },
+                collectingEvent: {
+                  data: {
+                    id: "11111",
+                    type: "collecting-event"
+                  }
+                }
+              },
+              type: "material-sample"
             },
-            type: "collecting-event"
+            type: "material-sample"
+          },
+          // Creates the next 2 samples without the attached events:
+          {
+            resource: {
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS2",
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
+              },
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS3",
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
+              },
+              type: "material-sample"
+            },
+            type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Bulk edit material samples with collecting events, go to an individual material sample and unswitch the collecting event", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+        ).length
+      ).toBeGreaterThan(0)
+    );
+
+    // Click the first material sample, to edit the individual one.
+    await userEvent.click(wrapper.getByRole("tab", { name: /#1/i }));
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/editing material sample 1 of 2/i)
+      ).toBeInTheDocument();
+    });
+
+    // Disable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      throw new Error("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[1]);
+
+    // Expect the "Are you sure?" popup for removing collecting event data.
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/remove collecting event data/i)
+      ).toBeInTheDocument();
+    });
+    await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+
+    // Submit the form and expect the collecting event for this one record to be removed.
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Updates the collecting event to just unlink collecting event on the SPECIFIC material sample.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              type: "material-sample",
+              relationships: {
+                collectingEvent: {
+                  data: null
+                }
+              }
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
       ]
     ]);
   });
@@ -1973,7 +2711,9 @@ describe("MaterialSampleBulkEditor", () => {
       ".tabpanel-EDIT_ALL button.remove-storage"
     );
     if (!removeStorageButton) {
-      throw new Error("Remove existing storage button doesn't exist on the page.");
+      throw new Error(
+        "Remove existing storage button doesn't exist on the page."
+      );
     }
     await userEvent.click(removeStorageButton);
     const search = screen.getByRole("search", {
@@ -2185,153 +2925,6 @@ describe("MaterialSampleBulkEditor", () => {
               hostOrganism: {
                 name: "test host organism",
                 remarks: "bulk-edit-remarks"
-              },
-              type: "material-sample"
-            },
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
-  });
-
-  it("Allows adding NEW nested Collecting the individual sample tabs.", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleBulkEditor
-        onSaved={mockOnSaved}
-        samples={TEST_NEW_SAMPLES}
-      />,
-      testCtx as any
-    );
-    await waitFor(() => expect(wrapper.getByText(/ms1/i)).toBeInTheDocument());
-
-    // Edit the first sample only
-    await userEvent.click(wrapper.getByText(/ms1/i));
-
-    // Enable the collecting event section
-    await waitFor(() =>
-      expect(
-        wrapper.container.querySelector(
-          ".sample-tabpanel-0 .enable-collecting-event .react-switch-bg"
-        )
-      ).toBeInTheDocument()
-    );
-    const toggle = wrapper.container.querySelector(
-      ".sample-tabpanel-0 .enable-collecting-event .react-switch-bg"
-    );
-    if (!toggle) {
-      throw new Error("Collecting event toggle needs to exist at this point.");
-    }
-    await userEvent.click(toggle);
-    await waitFor(() =>
-      expect(
-        wrapper.container.querySelector(
-          ".sample-tabpanel-0 #" +
-          COLLECTING_EVENT_COMPONENT_NAME +
-          " .dwcVerbatimLocality-field input"
-        )
-      ).toBeInTheDocument()
-    );
-
-    const verbatimLocality = wrapper.container.querySelector(
-      ".sample-tabpanel-0 #" +
-      COLLECTING_EVENT_COMPONENT_NAME +
-      " .dwcVerbatimLocality-field input"
-    );
-    if (!verbatimLocality) {
-      throw new Error("Verbatim locality textbox cannot be found.");
-    }
-    await clearAndType(verbatimLocality, "test locality");
-
-    // Click the "Save All" button
-    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2)); // 1 event + 1 samples
-
-    // Saves the new material samples with the new storage unit
-    expect(mockSave.mock.calls).toEqual([
-      // Creates the new Col Event
-      [
-        [
-          {
-            resource: {
-              type: "collecting-event",
-              dwcVerbatimLocality: "test locality",
-              dwcVerbatimCoordinateSystem: null,
-              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              geoReferenceAssertions: [
-                {
-                  isPrimary: true
-                }
-              ],
-              group: "cnc",
-              publiclyReleasable: false
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          // Creates the first sample with the attached events
-          {
-            resource: {
-              collectingEvent: {
-                id: "11111",
-                type: "collecting-event"
-              },
-              collection: {
-                id: "1",
-                type: "collection"
-              },
-              materialSampleName: "MS1",
-              relationships: {
-                collection: {
-                  data: {
-                    id: "1",
-                    type: "collection"
-                  }
-                }
-              },
-              type: "material-sample"
-            },
-            type: "material-sample"
-          },
-          // Creates the next 2 samples without the attached events
-          {
-            resource: {
-              collection: {
-                id: "1",
-                type: "collection"
-              },
-              materialSampleName: "MS2",
-              relationships: {
-                collection: {
-                  data: {
-                    id: "1",
-                    type: "collection"
-                  }
-                }
-              },
-              type: "material-sample"
-            },
-            type: "material-sample"
-          },
-          {
-            resource: {
-              collection: {
-                id: "1",
-                type: "collection"
-              },
-              materialSampleName: "MS3",
-              relationships: {
-                collection: {
-                  data: {
-                    id: "1",
-                    type: "collection"
-                  }
-                }
               },
               type: "material-sample"
             },
