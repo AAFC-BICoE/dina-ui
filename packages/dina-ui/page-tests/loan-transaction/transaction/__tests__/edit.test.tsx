@@ -3,6 +3,7 @@ import TransactionEditPage, {
   TransactionForm
 } from "../../../../pages/loan-transaction/transaction/edit";
 import {
+  clearAndType,
   MATERIAL_SAMPLE_MAPPING,
   mountWithAppContext,
   waitForLoadingToDisappear
@@ -156,158 +157,137 @@ describe("Transaction Form", () => {
 
     // Fill out all fields:
     // Material Out radio button
-    fireEvent.click(wrapper.getByLabelText(/material out/i));
+    await userEvent.click(wrapper.getByLabelText(/material out/i));
     // Use waitFor to assert that the radio button is checked after the click.
     await waitFor(() =>
       expect(wrapper.getByLabelText(/material out/i)).toBeChecked()
     );
 
     // To Be Returned switch button
-    fireEvent.click(wrapper.getByRole("switch", { name: "" }));
+    await userEvent.click(wrapper.getByRole("switch", { name: "" }));
     // Wait for the switch to update its state. A simple check for its role should suffice.
     await waitFor(() =>
       expect(wrapper.getByRole("switch", { name: "" })).toBeInTheDocument()
     );
 
     // Transaction Type field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /transaction type/i }),
-      {
-        target: { value: "transactionType" }
-      }
+      "transactionType"
     );
     // Transaction Number field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /transaction number/i }),
-      {
-        target: { value: "transactionNumber" }
-      }
+      "transactionNumber"
     );
     // Other Identifiers field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /other identifiers/i }),
-      {
-        target: { value: "otherIdentifiers" }
-      }
+      "otherIdentifiers"
     );
     // Transaction Status field
-    fireEvent.change(wrapper.getAllByRole("textbox", { name: /status/i })[0], {
-      target: { value: "status" }
-    });
+    await clearAndType(
+      wrapper.getAllByRole("textbox", { name: /status/i })[0],
+      "status"
+    );
     // Purpose field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /purpose/i }), {
-      target: { value: "purpose" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /purpose/i }),
+      "purpose"
+    );
     // Opened Date field
-    fireEvent.change(wrapper.getAllByRole("textbox")[5], {
-      target: { value: "2022-01-01" }
-    });
+    await clearAndType(wrapper.getAllByRole("textbox")[5], "2022-01-01");
     // Closed Date field
-    fireEvent.change(wrapper.getAllByRole("textbox")[6], {
-      target: { value: "2022-01-02" }
-    });
+    await clearAndType(wrapper.getAllByRole("textbox")[6], "2022-01-02");
     // Due Date field
-    fireEvent.change(wrapper.getAllByRole("textbox")[7], {
-      target: { value: "2022-01-03" }
-    });
+    await clearAndType(wrapper.getAllByRole("textbox")[7], "2022-01-03");
     // Transaction Remarks field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /transaction remarks/i }),
-      {
-        target: { value: "transaction remarks" }
-      }
+      "transaction remarks"
     );
     // Shipment Content Remarks field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /content remarks/i }),
-      {
-        target: { value: "shipment_contentRemarks" }
-      }
+      "shipment_contentRemarks"
     );
     // Shipment Value field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /value \(\$ cad\)/i }),
-      {
-        target: { value: "10.01" }
-      }
+      "10.01"
     );
     // Item Count field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /item count/i }), {
-      target: { value: "5" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /item count/i }),
+      "5"
+    );
     // Shipped On field
-    fireEvent.change(wrapper.getAllByRole("textbox")[12], {
-      target: { value: "2022-02-01" }
-    });
+    await clearAndType(wrapper.getAllByRole("textbox")[12], "2022-02-01");
     // Shipment Status field
-    fireEvent.change(wrapper.getAllByRole("textbox", { name: /status/i })[1], {
-      target: { value: "shipment_status" }
-    });
+    await clearAndType(
+      wrapper.getAllByRole("textbox", { name: /status/i })[1],
+      "shipment_status"
+    );
     // Shipment Packing Method field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /packing method/i }),
-      {
-        target: { value: "shipment_packingMethod" }
-      }
+      "shipment_packingMethod"
     );
     // Shipment Tracking Number field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /tracking number/i }),
-      {
-        target: { value: "shipment_trackingNumber" }
-      }
+      "shipment_trackingNumber"
     );
     // Shipment Receiver Name field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /receiver name/i }), {
-      target: { value: "shipment_address_receiverName" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /receiver name/i }),
+      "shipment_address_receiverName"
+    );
     // Shipment Company Name field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /company name/i }), {
-      target: { value: "shipment_address_companyName" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /company name/i }),
+      "shipment_address_companyName"
+    );
     // Address Line 1 field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /address line 1/i }),
-      {
-        target: { value: "shipment_address_addressLine1" }
-      }
+      "shipment_address_addressLine1"
     );
     // Address Line 2 field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /address line 2/i }),
-      {
-        target: { value: "shipment_address_addressLine2" }
-      }
+      "shipment_address_addressLine2"
     );
     // City field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /city/i }), {
-      target: { value: "shipment_address_city" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /city/i }),
+      "shipment_address_city"
+    );
     // Province State field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /province state/i }),
-      {
-        target: { value: "shipment_address_provinceState" }
-      }
+      "shipment_address_provinceState"
     );
     // Zip Code field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /zip code/i }), {
-      target: { value: "shipment_address_zipCode" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /zip code/i }),
+      "shipment_address_zipCode"
+    );
     // Country field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /country/i }), {
-      target: { value: "shipment_address_country" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /country/i }),
+      "shipment_address_country"
+    );
     // Shipment Remarks field
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /shipment remarks/i }),
-      {
-        target: { value: "shipment_shipmentRemarks" }
-      }
+      "shipment_shipmentRemarks"
     );
 
     // Add Agent
-    fireEvent.click(wrapper.getByRole("button", { name: /add new agent/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /add new agent/i })
+    );
     // Wait for the agent combobox to appear
     await waitFor(() =>
       expect(
@@ -336,9 +316,10 @@ describe("Transaction Form", () => {
         wrapper.getByRole("combobox", { name: /role\/action/i })
       ).toBeInTheDocument()
     );
-    fireEvent.change(wrapper.getByRole("combobox", { name: /role\/action/i }), {
-      target: { value: "my-role-1" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("combobox", { name: /role\/action/i }),
+      "my-role-1"
+    );
     // Wait for the "add" option to appear
     await waitFor(() =>
       expect(
@@ -354,13 +335,15 @@ describe("Transaction Form", () => {
     );
 
     // Agent Details Date field
-    fireEvent.change(wrapper.getAllByPlaceholderText(/yyyy\-mm\-dd/i)[3], {
-      target: { value: "2022-02-24" }
-    });
+    await clearAndType(
+      wrapper.getAllByPlaceholderText(/yyyy\-mm\-dd/i)[3],
+      "2022-02-24"
+    );
     // Agent Remarks
-    fireEvent.change(wrapper.getByRole("textbox", { name: /agent remarks/i }), {
-      target: { value: "test remarks" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /agent remarks/i }),
+      "test remarks"
+    );
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
