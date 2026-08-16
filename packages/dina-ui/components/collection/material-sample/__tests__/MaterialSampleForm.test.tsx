@@ -372,7 +372,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -466,7 +466,7 @@ describe("Material Sample Edit Page", () => {
       ".parent-material-sample-field"
     );
     if (!parentField) {
-      fail("Parent select field not found in form.");
+      throw new Error("Parent select field not found in form.");
     }
 
     const combo = within(parentField as any).getByRole("combobox");
@@ -509,7 +509,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -859,7 +859,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -1315,7 +1315,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-organisms .react-switch-bg"
     );
     if (!organismToggle) {
-      fail("organism toggle needs to exist at this point.");
+      throw new Error("organism toggle needs to exist at this point.");
     }
     await userEvent.click(organismToggle[0]);
     await waitFor(() =>
@@ -1650,7 +1650,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-associations .react-switch-bg"
     );
     if (!associationToggle) {
-      fail("Association toggle needs to exist at this point.");
+      throw new Error("Association toggle needs to exist at this point.");
     }
     await userEvent.click(associationToggle[0]);
     await waitFor(() =>
@@ -1704,7 +1704,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-associations .react-switch-bg"
     );
     if (!associationToggle) {
-      fail("Association toggle needs to exist at this point.");
+      throw new Error("Association toggle needs to exist at this point.");
     }
     await userEvent.click(associationToggle[0]);
     await waitFor(() =>
@@ -1763,7 +1763,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-organisms .react-switch-bg"
     );
     if (!organismToggle) {
-      fail("organism toggle needs to exist at this point.");
+      throw new Error("organism toggle needs to exist at this point.");
     }
     await userEvent.click(organismToggle[0]);
     await waitFor(() =>
@@ -1920,7 +1920,7 @@ describe("Material Sample Edit Page", () => {
     const expandButtons =
       wrapper.container.querySelectorAll(".expand-organism");
     if (!expandButtons || expandButtons.length !== 3) {
-      fail("Missing 3 expand buttons in the organism section.");
+      throw new Error("Missing 3 expand buttons in the organism section.");
     }
     expandButtons.forEach(async (button) => {
       await userEvent.click(button);
@@ -2980,7 +2980,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -3024,7 +3024,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-organisms .react-switch-bg"
     );
     if (!organismToggle) {
-      fail("organism toggle needs to exist at this point.");
+      throw new Error("organism toggle needs to exist at this point.");
     }
     await userEvent.click(organismToggle[0]);
     await waitFor(() =>
@@ -3342,7 +3342,7 @@ describe("Material Sample Edit Page", () => {
         ".enable-associations .react-switch-bg"
       );
       if (!associationToggle) {
-        fail("Association toggle needs to exist at this point.");
+        throw new Error("Association toggle needs to exist at this point.");
       }
       await userEvent.click(associationToggle[0]);
 
@@ -3800,7 +3800,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
@@ -3926,7 +3928,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
@@ -4164,7 +4168,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
@@ -4178,12 +4184,14 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       const manualSwitchBg =
         manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
       if (!manualSwitchBg) {
-        fail(
+        throw new Error(
           "Manual geography switch background needs to exist at this point."
         );
       }
@@ -4276,12 +4284,14 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       const manualSwitchBg =
         manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
       if (!manualSwitchBg) {
-        fail(
+        throw new Error(
           "Manual geography switch background needs to exist at this point."
         );
       }
@@ -4357,12 +4367,14 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       const manualSwitchBg =
         manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
       if (!manualSwitchBg) {
-        fail(
+        throw new Error(
           "Manual geography switch background needs to exist at this point."
         );
       }
@@ -4435,7 +4447,9 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       expect(manualSwitchInput).toBeChecked();
     });
@@ -4472,7 +4486,9 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       expect(manualSwitchInput).not.toBeChecked();
     });
@@ -4492,7 +4508,9 @@ describe("Material Sample Edit Page", () => {
       );
 
       if (!scheduledActionToggle) {
-        fail("Scheduled action toggle needs to exist at this point.");
+        throw new Error(
+          "Scheduled action toggle needs to exist at this point."
+        );
       }
       await userEvent.click(scheduledActionToggle[0]);
 
@@ -4563,7 +4581,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
