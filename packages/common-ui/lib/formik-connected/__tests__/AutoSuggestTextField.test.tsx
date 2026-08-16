@@ -476,23 +476,26 @@ describe("AutoSuggestTextField", () => {
       });
 
       // JSON API should be tried first but fails, then Elastic Search is used.
+      // The suggestion assertions must stay inside the waitFor: the mocks are
+      // called before the Elastic Search response has been rendered, so
+      // asserting synchronously after the mock calls is a race.
       await waitFor(() => {
         // mockGetFailure should be called once for "p"
         expect(mockGetFailure).toHaveBeenCalledTimes(1);
         // mockGetAxios should be called once as the fallback for "p"
         expect(mockGetAxios).toHaveBeenCalledTimes(1);
-      });
 
-      // Assert suggestions after the first search term
-      expect(
-        wrapper.queryByText(/person1\-elastic\-search/i)
-      ).toBeInTheDocument();
-      expect(
-        wrapper.queryByText(/person2\-elastic\-search/i)
-      ).toBeInTheDocument();
-      expect(
-        wrapper.queryByText(/person3\-elastic\-search/i)
-      ).toBeInTheDocument();
+        // Assert suggestions after the first search term
+        expect(
+          wrapper.queryByText(/person1\-elastic\-search/i)
+        ).toBeInTheDocument();
+        expect(
+          wrapper.queryByText(/person2\-elastic\-search/i)
+        ).toBeInTheDocument();
+        expect(
+          wrapper.queryByText(/person3\-elastic\-search/i)
+        ).toBeInTheDocument();
+      });
 
       // Simulate typing "pe" (append "e" so the value changes from "p" to "pe")
       await act(async () => {
