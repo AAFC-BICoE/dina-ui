@@ -618,7 +618,7 @@ describe("QueryBuilderTextSearch", () => {
       });
     });
 
-    describe("Equals operation", () => {
+    describe("Equals operation with boolean-like values", () => {
       test("With relationship as field", async () => {
         expect(
           transformTextSearchToDSL({
