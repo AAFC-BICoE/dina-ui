@@ -38,7 +38,7 @@ export function useMetadataThumbnailPath<TData extends KitsuResource>(
     derivatives = (original as any)?.metadata
       ? (original as any)?.metadata.derivatives
       : (original as any)?.derivatives;
-    thumbnailDerivative = derivatives?.find(
+    thumbnailDerivative = derivatives?.find?.(
       (derivative) => derivative.derivativeType === "THUMBNAIL_IMAGE"
     );
     filePath = thumbnailDerivative
