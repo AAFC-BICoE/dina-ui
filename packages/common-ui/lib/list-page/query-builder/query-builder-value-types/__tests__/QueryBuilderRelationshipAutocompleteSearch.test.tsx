@@ -163,9 +163,7 @@ describe("QueryBuilderRelationshipAutocompleteSearch", () => {
       });
 
       // Wait for options to appear
-      await waitFor(() => {
-        expect(findByText("John Doe")).toBeTruthy();
-      });
+      expect(await findByText("John Doe")).toBeInTheDocument();
     });
 
     it("should call setValue when an option is selected", async () => {
