@@ -1,7 +1,8 @@
 import { FieldWrapper, FieldWrapperProps, useQuery } from "common-ui";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 import Link from "next/link";
+import _ from "lodash";
 
 export type GroupFieldViewProps = Omit<FieldWrapperProps, "children">;
 
@@ -33,9 +34,10 @@ export function GroupLabel({ groupName }) {
 export function groupCell(accessorKey: string) {
   return {
     cell: ({ row: { original } }) => {
-      const groupName = original[accessorKey];
+      const groupName = _.get(original, accessorKey);
       return <GroupLabel groupName={groupName} />;
     },
+    header: () => <DinaMessage id="field_group" />,
     accessorKey
   };
 }
