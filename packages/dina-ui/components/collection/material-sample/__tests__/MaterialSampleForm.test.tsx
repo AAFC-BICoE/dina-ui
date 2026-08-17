@@ -4892,5 +4892,51 @@ describe("Material Sample Edit Page", () => {
         "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111"
       );
     });
+
+    it("Pressing Enter in a text field submits the form as a normal Save, not Save & Copy to Next.", async () => {
+      (useRouter as jest.Mock).mockReturnValue({
+        query: {},
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+      // Type into the Primary ID field and press Enter, simulating a user
+      // hitting Enter instead of clicking a button.
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /primary id/i }),
+        "Sample1{enter}"
+      );
+
+      // Only 1 save call: no collecting event was enabled, just the sample.
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                group: "aafc",
+                materialSampleName: "Sample1",
+                publiclyReleasable: false
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+
+      // Assure that the submitted button was just the save and not the copy to next action.
+      // If it was normal save, the user is directed to the view page.
+      expect(routerPushMock).toHaveBeenCalledWith(
+        "/collection/material-sample/view?id=11111111-1111-1111-1111-111111111111"
+      );
+      expect(routerPushMock).not.toHaveBeenCalledWith(
+        expect.stringContaining("copyFromId")
+      );
+    });
   });
 });
