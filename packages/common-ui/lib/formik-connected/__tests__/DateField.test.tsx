@@ -217,7 +217,7 @@ describe("DateField component", () => {
     });
 
     // Ensure form submission is not triggered with the invalid value.
-    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 });
