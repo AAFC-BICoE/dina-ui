@@ -13,6 +13,10 @@ import { act, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
+// Increased timeout to accommodate slow Formik re-renders in "Submits a Transaction"
+// Prevents CI test timeouts and leftover userEvent keystrokes leaking into subsequent tests
+jest.setTimeout(120_000);
+
 const routerQuery: Record<string, string | undefined> = {};
 
 jest.mock("next/router", () => ({
