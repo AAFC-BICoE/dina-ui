@@ -1,5 +1,5 @@
 import { DinaForm, waitForLoadingToDisappear } from "common-ui";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { ScheduledActionsField } from "../ScheduledActionsField";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -164,8 +164,7 @@ describe("ScheduledActionsField", () => {
     await waitFor(() =>
       expect(wrapper.getByRole("button", { name: /save/i })).toBeInTheDocument()
     );
-    await userEvent.clear(wrapper.getByRole("textbox", { name: /remarks/i }));
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /remarks/i }),
       "edited-remarks-1"
     );
