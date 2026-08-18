@@ -170,7 +170,7 @@ describe("organization edit page", () => {
 
     // Test expected error
     await waitFor(() => {
-      expect(wrapper.getByText("test error"));
+      expect(wrapper.getByText("test error")).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
     });
   });
@@ -187,7 +187,9 @@ describe("organization edit page", () => {
 
     // Test expected error
     await waitFor(() => {
-      expect(wrapper.getByText("At least one organization name is required."));
+      expect(
+        wrapper.getByText("At least one organization name is required.")
+      ).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
     });
   });
