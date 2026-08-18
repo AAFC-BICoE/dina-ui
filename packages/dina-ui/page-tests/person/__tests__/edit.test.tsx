@@ -179,7 +179,7 @@ describe("person edit page", () => {
 
     // Test expected error
     await waitFor(() => {
-      expect(wrapper.getByText("test error"));
+      expect(wrapper.getByText("test error")).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
     });
   });
@@ -205,7 +205,7 @@ describe("person edit page", () => {
         wrapper.getByText(
           /1 : display name \- the display name field is required\./i
         )
-      );
+      ).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
     });
   });
