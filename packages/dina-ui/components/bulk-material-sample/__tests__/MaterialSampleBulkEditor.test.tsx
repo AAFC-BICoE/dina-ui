@@ -881,7 +881,7 @@ describe("MaterialSampleBulkEditor", () => {
       throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[1]);
-    await waitFor(() => {}); // Wait for UI to update after toggle, if necessary for next action
+    await waitFor(() => { }); // Wait for UI to update after toggle, if necessary for next action
 
     // Click the "Save All" button
     await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
@@ -1147,7 +1147,7 @@ describe("MaterialSampleBulkEditor", () => {
 
       // Click "Yes" on the popup dialog.
       await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-      await waitFor(() => {}); // Wait for dialog to close and UI to update
+      await waitFor(() => { }); // Wait for dialog to close and UI to update
     }
 
     // Organisms section opens with an initial value, so it has the green indicator on the fieldset
@@ -1205,7 +1205,7 @@ describe("MaterialSampleBulkEditor", () => {
       }),
       "new-scientific-name"
     );
-    await waitFor(() => {}); // Allow for any state updates
+    await waitFor(() => { }); // Allow for any state updates
 
     // Override the scheduled acitons
     await clearAndType(
@@ -2488,22 +2488,21 @@ describe("MaterialSampleBulkEditor", () => {
       expect(
         wrapper.container.querySelector(
           ".sample-tabpanel-0 #" +
-            COLLECTING_EVENT_COMPONENT_NAME +
-            " .dwcVerbatimLocality-field input"
+          COLLECTING_EVENT_COMPONENT_NAME +
+          " .dwcVerbatimLocality-field input"
         )
       ).toBeInTheDocument()
     );
 
     const verbatimLocality = wrapper.container.querySelector(
       ".sample-tabpanel-0 #" +
-        COLLECTING_EVENT_COMPONENT_NAME +
-        " .dwcVerbatimLocality-field input"
+      COLLECTING_EVENT_COMPONENT_NAME +
+      " .dwcVerbatimLocality-field input"
     );
     if (!verbatimLocality) {
       throw new Error("Verbatim locality textbox cannot be found.");
     }
-    await userEvent.clear(verbatimLocality);
-    await userEvent.type(verbatimLocality, "test locality");
+    await clearAndType(verbatimLocality, "test locality");
 
     // Click the "Save All" button:
     await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
@@ -2767,15 +2766,17 @@ describe("MaterialSampleBulkEditor", () => {
       )
     ).toBeInTheDocument();
 
-    // New linked storage unit is indicated
-    waitFor(
-      () => {
-        expect(
-          wrapper.getByRole("link", { name: /test unit child \(test\)/i })
-        ).toBeInTheDocument();
-      },
-      { timeout: 20000 }
-    );
+    // WHAT: Wait for the component to fetch metadata for the newly selected storage unit.
+    // WHY:  The mocked API response is static (always returns the same dummy storage unit),
+    //       meaning the UI text won't visually change to reflect the new selection. We must
+    //       verify the underlying behavior instead of relying on the DOM state.
+    // HOW:  Inspect the `mockGet` call history to assert that an API request was explicitly
+    //       made for the newly assigned storage unit's unique ID.
+    await waitFor(() => {
+      expect(mockGet.mock.calls.map((call) => call[0])).toContain(
+        "collection-api/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34"
+      );
+    });
 
     // Click the "Save All" button
     await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
