@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { CollectionForm } from "../../../pages/collection/collection/edit";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { Collection } from "../../../types/collection-api";
 import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -114,11 +114,11 @@ describe("Collection edit page", () => {
     });
 
     // Change code field value
-    fireEvent.change(wrapper.getByRole("textbox", { name: /code/i }), {
-      target: {
-        value: "edited code"
-      }
-    });
+    // The code field has noSpace enabled, so use a value without spaces.
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /code/i }),
+      "edited-code"
+    );
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -135,7 +135,7 @@ describe("Collection edit page", () => {
                 name: "test institution",
                 type: "institution"
               },
-              code: "edited code" // Only this was edited.
+              code: "edited-code" // Only this was edited.
             }),
             type: "collection"
           }
