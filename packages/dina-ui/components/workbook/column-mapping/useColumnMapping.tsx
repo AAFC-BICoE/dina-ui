@@ -629,7 +629,7 @@ export function useColumnMapping() {
       const columnHeaderValue =
         columnHeader.originalColumn ?? columnHeader.columnHeader;
       const fieldPath = findMatchField(columnHeader, newFieldOptions, type);
-      if (fieldPath === undefined) {
+      if (fieldPath === undefined || fieldPath.endsWith("managedAttributes")) {
         // check if the columnHeaderValue is one of managedAttributes
         const targetManagedAttr =
           findManagedAttributeMatchFromTemplate(columnHeaderValue) ??
