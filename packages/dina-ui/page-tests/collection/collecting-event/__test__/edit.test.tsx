@@ -460,8 +460,10 @@ describe("collecting-event edit page", () => {
 
     // There should be 2 assertion tabs:
     expect(wrapper.getAllByRole("tab")).toHaveLength(2);
-    expect(wrapper.getByRole("tab", { name: /1/i }));
-    expect(wrapper.getByRole("tab", { name: /2 \(primary\)/i }));
+    expect(wrapper.getByRole("tab", { name: /1/i })).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("tab", { name: /2 \(primary\)/i })
+    ).toBeInTheDocument();
   });
 
   it("Removes the coordinate system if there are no coordinates set.", async () => {
