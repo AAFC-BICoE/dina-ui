@@ -63,6 +63,21 @@ export default function MaterialSampleEditPage() {
     enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar className="mb-3">
+        {/*
+         * Dummy submit button, kept first in DOM order.
+         * Browsers implicitly activate the first type="submit" button in the form when the user
+         * presses Enter, regardless of visual position. Without this, Enter would trigger
+         * the "Save and Copy to Next" button below since it's declared before the plain "Save"
+         * button.
+         */}
+        <button
+          type="submit"
+          className="visually-hidden"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={() => setSaveRedirect("VIEW")}
+        />
+
         <div className="col-md-3 col-sm-12 mt-2">
           <BackButton entityId={id} entityLink="/collection/material-sample" />
         </div>
