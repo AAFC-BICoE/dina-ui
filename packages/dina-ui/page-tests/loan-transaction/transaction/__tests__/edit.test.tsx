@@ -450,8 +450,7 @@ describe("Transaction Form", () => {
     const transactionNumberField = wrapper.getByRole("textbox", {
       name: /transaction number/i
     });
-    await userEvent.clear(transactionNumberField);
-    await userEvent.type(transactionNumberField, "new transaction number");
+    await clearAndType(transactionNumberField, "new transaction number");
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -508,8 +507,7 @@ describe("Transaction Form", () => {
     const transactionNumberField = wrapper.getByRole("textbox", {
       name: /transaction number/i
     });
-    await userEvent.clear(transactionNumberField);
-    await userEvent.type(transactionNumberField, "new transaction number");
+    await clearAndType(transactionNumberField, "new transaction number");
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
