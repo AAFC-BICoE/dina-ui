@@ -1,6 +1,7 @@
 import {
   ColumnDefinition,
   CreateButton,
+  ListLayoutFilterType,
   ListPageLayout,
   useAccount
 } from "common-ui";
@@ -81,6 +82,10 @@ export default function GroupListPage() {
       <ListPageLayout<Group>
         defaultSort={[{ id: "name", desc: false }]}
         id="group-list"
+        filterType={ListLayoutFilterType.FREE_TEXT}
+        filterAttributes={GROUP_FILTER_ATTRIBUTES}
+        enableInMemoryFilter={true}
+        filterFn={groupFilterFn}
         queryTableProps={{
           columns: groupTableColumns,
           path: "user-api/group"
