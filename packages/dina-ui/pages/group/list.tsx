@@ -6,8 +6,9 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { Group } from "../../types/user-api";
 
-const GROUP_TABLE_COLUMNS: ColumnDefinition<any>[] = [
+const GROUP_TABLE_COLUMNS: ColumnDefinition<Group>[] = [
   {
     cell: ({
       row: {
@@ -40,7 +41,7 @@ export default function GroupListPage() {
 
   return (
     <PageLayout titleId="groupListTitle" buttonBarContent={buttonBarContent}>
-      <ListPageLayout
+      <ListPageLayout<Group>
         defaultSort={[{ id: "name", desc: false }]}
         id="group-list"
         queryTableProps={{
