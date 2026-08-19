@@ -134,6 +134,15 @@ export interface QueryTableProps<TData extends KitsuResource> {
 }
 
 const DEFAULT_PAGE_SIZE = 25;
+
+/**
+ * Number of records fetched when in-memory filtering is enabled.
+ * Matches the back-end's maximum page limit (requesting more falls back to the
+ * back-end's small default limit). Filtering, sorting and pagination all happen
+ * client-side on this single fetched dataset.
+ */
+const IN_MEMORY_FETCH_LIMIT = 1000;
+
 /**
  * Table component that fetches data from the backend API.
  */
@@ -252,13 +261,15 @@ export function QueryTable<TData extends KitsuResource>({
 
   let query: JsonApiQuerySpec;
   if (enableInMemoryFilter) {
+    // Load the whole dataset once as using the table's page size here
+    // would cap the filterable records to a single table page
     query = {
       path,
       fields,
       fiql,
       filter,
       include,
-      page: { limit: page.limit, offset: 0 },
+      page: { limit: IN_MEMORY_FETCH_LIMIT, offset: 0 },
       sort
     };
   } else {
@@ -302,8 +313,9 @@ export function QueryTable<TData extends KitsuResource>({
 
   const { error, loading: queryIsLoading, response } = queryState;
 
-  const lastSuccessfulResponse =
-    useRef<KitsuResponse<TData[], MetaWithTotal> | undefined>(undefined);
+  const lastSuccessfulResponse = useRef<
+    KitsuResponse<TData[], MetaWithTotal> | undefined
+  >(undefined);
 
   if (response) {
     if (enableInMemoryFilter) {
