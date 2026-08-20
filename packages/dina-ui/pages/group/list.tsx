@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   ColumnDefinition,
   CreateButton,
@@ -12,6 +13,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 
 const GROUP_FILTER_ATTRIBUTES = ["name", "path", "labels"];
+const DEFAULT_SORT = [{ id: "name", desc: false }];
 
 /**
  * Case-insensitive text search across the group's name, path and multilingual labels.
@@ -40,36 +42,39 @@ export default function GroupListPage() {
   const { isAdmin } = useAccount();
   const { locale } = useDinaIntl();
 
-  const groupTableColumns: ColumnDefinition<Group>[] = [
-    {
-      cell: ({
-        row: {
-          original: { id, name }
-        }
-      }) => (
-        <Link href={`/group/view?id=${id}`} legacyBehavior>
-          {name}
-        </Link>
-      ),
-      accessorKey: "name"
-    },
-    {
-      id: "label",
-      header: () => <DinaMessage id="groupLabel" />,
-      cell: ({ row: { original } }) => (
-        <>{original.labels?.[locale] ?? ""}</>
-      ),
-      enableSorting: false
-    },
-    {
-      cell: ({
-        row: {
-          original: { path }
-        }
-      }) => path,
-      accessorKey: "path"
-    }
-  ];
+  const groupTableColumns: ColumnDefinition<Group>[] = useMemo(
+    () => [
+      {
+        cell: ({
+          row: {
+            original: { id, name }
+          }
+        }) => (
+          <Link href={`/group/view?id=${id}`} legacyBehavior>
+            {name}
+          </Link>
+        ),
+        accessorKey: "name"
+      },
+      {
+        id: "label",
+        header: () => <DinaMessage id="groupLabel" />,
+        cell: ({ row: { original } }) => (
+          <>{original.labels?.[locale] ?? ""}</>
+        ),
+        enableSorting: false
+      },
+      {
+        cell: ({
+          row: {
+            original: { path }
+          }
+        }) => path,
+        accessorKey: "path"
+      }
+    ],
+    [locale]
+  );
 
   const buttonBarContent = (
     <div className="flex d-flex ms-auto">
@@ -77,19 +82,24 @@ export default function GroupListPage() {
     </div>
   );
 
+  const queryTableProps = useMemo(
+    () => ({
+      columns: groupTableColumns,
+      path: "user-api/group"
+    }),
+    [groupTableColumns]
+  );
+
   return (
     <PageLayout titleId="groupListTitle" buttonBarContent={buttonBarContent}>
       <ListPageLayout<Group>
-        defaultSort={[{ id: "name", desc: false }]}
+        defaultSort={DEFAULT_SORT}
         id="group-list"
         filterType={ListLayoutFilterType.FREE_TEXT}
         filterAttributes={GROUP_FILTER_ATTRIBUTES}
         enableInMemoryFilter={true}
         filterFn={groupFilterFn}
-        queryTableProps={{
-          columns: groupTableColumns,
-          path: "user-api/group"
-        }}
+        queryTableProps={queryTableProps}
       />
     </PageLayout>
   );
