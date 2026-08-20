@@ -153,3 +153,4 @@ export * from "./file-dropzone/FileTypes";
 export * from "./link/ExternalLink";
 export * from "./list-page/__mocks__/IndexMappingMocks";
 export * from "./util/fiqlSearchFilterbuilder";
+export * from "./resource-select/ScopedResourceSelect";
