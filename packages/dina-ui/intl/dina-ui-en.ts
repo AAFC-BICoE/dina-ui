@@ -560,7 +560,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_organizationMandatoryFieldsError:
     "At least one organization name is required.",
   field_orientation: "Orientation",
-  field_path: "Path",
   field_orientation_tooltip:
     "Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8.",
   field_orientation_tooltipAlt:
@@ -572,6 +571,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",
   field_parentStorageUnit: "Location",
   field_participants: "Participants",
+  field_path: "Path",
   field_personMandatoryFieldsError: "The display name field is required.",
   field_personIdentifierTypeError: "Identifier type is required.",
   field_personIdentifierValueError: "Identifier value is required.",
