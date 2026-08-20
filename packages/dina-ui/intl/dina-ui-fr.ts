@@ -351,6 +351,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "L’ellipsoïde, le datum géodésique ou le système de référence spatiale (SRS) sur lesquels sont basées les coordonnées données dans verbatimLatitude et verbatimLongitude, ou verbatimCoordinates. La meilleure pratique recommandée est d’utiliser le code EPSG du SRS, s’il est connu. Exemples : EPSG:4326, WGS84, NAD27",
   field_editableBuiltInAttributes: "Attributs intégrés",
   field_email: "Courriel",
+  field_emailAddress: "Adresse courriel",
   field_enableGrid: "Activer la grille",
   field_enableGrid_tooltip:
     "Créer une grille permettant de stocker le contenu. Aucune table enfant ne peut être créée pour les unités de stockage.",
@@ -423,6 +424,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_otherRecordNumbers_tooltip:
     "Autres numéros ou identifiants associés à l’événement de collecte qui permettent de le distinguer. N’incluez PAS les identifiants basés sur les spécimens, tels que les numéros d’accession.",
   field_parentStorageUnit: "Emplacement",
+  field_path: "Chemin",
   field_preparationDate: "Date de la préparation",
   field_preparationFixative: "Solution de fixation de la préparation",
   field_preparationFixative_tooltip:
@@ -535,6 +537,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   governmentOfCanada: "Gouvernement du Canada",
   governmentOfCanadaSymbol: "Symbole du gouvernement du Canada",
   group: "Groupe",
+  groupLabel: "Étiquette",
   groupMustBeSelected: "Un groupe doit être sélectionné ",
   hostOrganismLegend: "Organisme hôte",
   http403ForbiddenError: "Accès refusé",

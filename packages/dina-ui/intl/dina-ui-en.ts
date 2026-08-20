@@ -488,6 +488,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_email: "Email",
+  field_emailAddress: "Email Address",
   field_enableGrid: "Enable Grid",
   field_enableGrid_tooltip:
     "Create a grid to store contents. Cannot have child storage units.",
@@ -559,6 +560,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_organizationMandatoryFieldsError:
     "At least one organization name is required.",
   field_orientation: "Orientation",
+  field_path: "Path",
   field_orientation_tooltip:
     "Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8.",
   field_orientation_tooltipAlt:
@@ -710,6 +712,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   governmentOfCanada: "Government of Canada",
   governmentOfCanadaSymbol: "Symbol of the Government of Canada",
   groupName: "Name",
+  groupLabel: "Label",
   groupListTitle: "Groups",
   editGroupTitle: "Edit Group",
   group: "Group",
