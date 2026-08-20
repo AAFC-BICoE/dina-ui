@@ -5,7 +5,8 @@ import Select, {
   MenuListProps,
   ActionMeta,
   SingleValue,
-  MultiValue
+  MultiValue,
+  GroupBase
 } from "react-select";
 import { useDebounce } from "use-debounce";
 import { JsonApiQuerySpec, useQuery } from "../api-client/useQuery";
@@ -92,6 +93,13 @@ export interface ScopedResourceSelectProps<TData extends KitsuResource> {
    * e.g. "name", which will add a search like ?filter[name][eq]= to the api endpoint defined.
    */
   searchField?: string;
+
+  /**
+   * Define an attribute on the entity to group options by in the dropdown list.
+   *
+   * e.g. "group"
+   */
+  groupBy?: string;
 
   /**
    * Define how the search options should appear in the list.
@@ -276,6 +284,13 @@ const ScopedMenuList = (props: MenuListProps<any, boolean>) => {
 };
 
 /**
+ * Helper function to retrieve nested attributes from an object.
+ */
+function getNestedValue(obj: any, path: string): any {
+  return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+}
+
+/**
  * A generalized, asynchronously loaded resource select component powered by `react-select` that
  * contains customizable search filters within the dropdown menu.
  *
@@ -297,6 +312,7 @@ export function ScopedResourceSelect<TData extends KitsuResource>({
   apiEndpoint,
   scopes,
   searchField,
+  groupBy,
   optionLabel,
   value,
   onChange,
@@ -380,16 +396,44 @@ export function ScopedResourceSelect<TData extends KitsuResource>({
     }
   }, [queryIsLoading, response?.data, onOptionListLoaded]);
 
-  // Map backend response to option format
-  const options: ResourceOption<TData>[] = useMemo(() => {
-    return (
-      response?.data?.map((resource) => ({
-        label: optionLabel(resource as any) ?? String((resource as any).id),
-        value: String(resource.id),
-        resource: resource as any
-      })) ?? []
-    );
-  }, [response?.data, optionLabel]);
+  // Map backend response to option format or grouped option format
+  const options = useMemo<
+    ResourceOption<TData>[] | GroupBase<ResourceOption<TData>>[]
+  >(() => {
+    const rawData = response?.data;
+    if (!rawData) return [];
+
+    const flatOptions: ResourceOption<TData>[] = rawData.map((resource) => ({
+      label: optionLabel(resource as any) ?? String((resource as any).id),
+      value: String(resource.id),
+      resource: resource as any
+    }));
+
+    if (!groupBy) {
+      return flatOptions;
+    }
+
+    const groupedMap = new Map<string, ResourceOption<TData>[]>();
+
+    flatOptions.forEach((opt) => {
+      const groupKey =
+        String(getNestedValue(opt.resource, groupBy) ?? "") || "Other";
+      if (!groupedMap.has(groupKey)) {
+        groupedMap.set(groupKey, []);
+      }
+      groupedMap.get(groupKey)!.push(opt);
+    });
+
+    const groupedOptions: GroupBase<ResourceOption<TData>>[] = [];
+    groupedMap.forEach((opts, label) => {
+      groupedOptions.push({
+        label,
+        options: opts
+      });
+    });
+
+    return groupedOptions;
+  }, [response?.data, optionLabel, groupBy]);
 
   // Transform controlled `value` prop into option objects
   const selectValue = useMemo(() => {
@@ -433,6 +477,32 @@ export function ScopedResourceSelect<TData extends KitsuResource>({
     }));
   };
 
+  // Custom styling rules
+  const customStyle: any = {
+    multiValueLabel: (base) => ({ ...base, cursor: "move" }),
+    placeholder: (base) => ({ ...base, color: "rgb(87,120,94)" }),
+    control: (base) => ({
+      ...base
+    }),
+    menu: (base) => ({ ...base, zIndex: 9001 }),
+    // Make the menu's height fit the resource options and the action options:
+    menuList: (base) => ({ ...base, maxHeight: "600px" }),
+    // Grouped options (relationships) should be indented.
+    option: (baseStyle, { data }) => {
+      if (data?.resource) {
+        return {
+          ...baseStyle,
+          paddingLeft: "25px"
+        };
+      }
+
+      // Default style for everything else.
+      return {
+        ...baseStyle
+      };
+    }
+  };
+
   return (
     <Select<ResourceOption<TData>, boolean>
       isMulti={isMulti}
@@ -450,6 +520,8 @@ export function ScopedResourceSelect<TData extends KitsuResource>({
       onChange={handleChange}
       filterOption={() => true}
       components={{ MenuList: ScopedMenuList }}
+      styles={customStyle}
+      classNamePrefix="react-select"
       {...selectProps}
       {...({
         scopes,

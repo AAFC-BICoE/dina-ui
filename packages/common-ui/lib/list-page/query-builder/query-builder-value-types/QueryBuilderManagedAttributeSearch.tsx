@@ -335,6 +335,7 @@ export default function QueryRowManagedAttributeSearch({
         placeholder={formatMessage({
           id: "queryBuilder_managedAttribute_placeholder"
         })}
+        groupBy="group"
         pageSize={15}
         value={managedAttributeSelected}
         onOptionListLoaded={(data) => {
@@ -449,7 +450,7 @@ export default function QueryRowManagedAttributeSearch({
           captureMenuScroll: true,
           menuPlacement: isInColumnSelector ? "bottom" : "auto",
           menuShouldScrollIntoView: false,
-          minMenuHeight: 600,
+          minMenuHeight: 800,
           onMenuOpen: () => {
             setIsMenuOpen(true);
           },
