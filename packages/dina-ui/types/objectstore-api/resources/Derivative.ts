@@ -11,6 +11,7 @@ export interface DerivativeAttributes {
   fileIdentifier: string;
   fileExtension: string;
   dcType: string;
+  dcFormat: string;
   acHashFunction: string;
   acHashValue: string;
   createdBy: string;
