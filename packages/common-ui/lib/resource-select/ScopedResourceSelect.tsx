@@ -1,5 +1,5 @@
 import { KitsuResource, FilterParam } from "kitsu";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Select, {
   components,
   MenuListProps,
@@ -114,6 +114,13 @@ export interface ScopedResourceSelectProps<TData extends KitsuResource> {
     value: TData | TData[] | null,
     actionMeta?: ActionMeta<ResourceOption<TData>>
   ) => void;
+
+  /**
+   * Callback triggered when option data finishes loading from the API query.
+   *
+   * @param data List of resources retrieved from the API response payload.
+   */
+  onOptionListLoaded?: (data: TData[]) => void;
 
   /**
    * Programmically set what the default scope values should be.
@@ -293,6 +300,7 @@ export function ScopedResourceSelect<TData extends KitsuResource>({
   optionLabel,
   value,
   onChange,
+  onOptionListLoaded,
   defaultScopes,
   isMulti = false,
   isDisabled = false,
@@ -364,6 +372,13 @@ export function ScopedResourceSelect<TData extends KitsuResource>({
 
   const { loading: queryIsLoading, response } = useQuery<TData[]>(querySpec);
   const isLoading = queryIsLoading || inputValue !== searchValue;
+
+  // Trigger callback whenever options finish loading
+  useEffect(() => {
+    if (!queryIsLoading && response?.data) {
+      onOptionListLoaded?.(response?.data as any);
+    }
+  }, [queryIsLoading, response?.data, onOptionListLoaded]);
 
   // Map backend response to option format
   const options: ResourceOption<TData>[] = useMemo(() => {

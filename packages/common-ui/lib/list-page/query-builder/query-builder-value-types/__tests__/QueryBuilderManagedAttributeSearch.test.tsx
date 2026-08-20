@@ -99,7 +99,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
               setValue={jest.fn()}
               managedAttributeConfig={MOCK_MANAGED_ATTRIBUTE_CONFIG}
               indexMap={INDEX_MAP}
-              isInColumnSelector={false} // Set to true for this test
+              isInColumnSelector={false}
             />
           </QueryBuilderContextProvider>
         </DinaForm>,

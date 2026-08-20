@@ -331,12 +331,30 @@ export default function QueryRowManagedAttributeSearch({
       {/* Managed Attribute Selection */}
       <ScopedResourceSelect<ManagedAttribute>
         apiEndpoint={managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""}
-        searchField="name"
+        searchField={managedAttributeState.preloadId ? undefined : "name"}
         placeholder={formatMessage({
           id: "queryBuilder_managedAttribute_placeholder"
         })}
         pageSize={15}
         value={managedAttributeSelected}
+        onOptionListLoaded={(data) => {
+          // Handle preloading auto-selection when data is returned from the API
+          if (managedAttributeState.preloadId && data?.length === 1) {
+            const resource = data[0] as PersistedResource<ManagedAttribute>;
+            const fieldPath =
+              (managedAttributeConfig?.path ?? "") + "." + (resource.key ?? "");
+
+            setManagedAttributeState((prevState) => ({
+              ...prevState,
+              selectedManagedAttribute: resource,
+              selectedManagedAttributeConfig: fieldValueToIndexSettings(
+                fieldPath,
+                indexMap ?? []
+              ),
+              preloadId: undefined // Clear preloadId so future searches operate normally
+            }));
+          }
+        }}
         // Base filters applied across all scopes (preload & vocabulary checks)
         additionalFilter={SimpleSearchFilterBuilder.create<ManagedAttribute>()
           // Either preload by ID or search by name.
