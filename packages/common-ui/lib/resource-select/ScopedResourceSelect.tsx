@@ -214,11 +214,12 @@ const ScopedMenuList = (props: MenuListProps<any, boolean>) => {
                       {scope.label}
                     </div>
                   )}
-                  <div
-                    style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}
-                  >
-                    {scope.options.map((option) => {
+                  <div style={{ display: "flex", flexWrap: "wrap" }}>
+                    {scope.options.map((option, index) => {
                       const isActive = activeScopes[scope.id] === option.id;
+                      const isFirst = index === 0;
+                      const isLast = index === scope.options.length - 1;
+
                       return (
                         <button
                           key={option.id}
@@ -231,7 +232,14 @@ const ScopedMenuList = (props: MenuListProps<any, boolean>) => {
                           onClick={() => onScopeChange(scope.id, option.id)}
                           style={{
                             padding: "3px 10px",
-                            borderRadius: "12px",
+                            borderRadius: isFirst
+                              ? "6px 0 0 6px"
+                              : isLast
+                              ? "0 6px 6px 0"
+                              : "0",
+                            marginLeft: isFirst ? 0 : "-1px",
+                            position: "relative",
+                            zIndex: isActive ? 1 : 0,
                             fontSize: "12px",
                             cursor: "pointer",
                             border: isActive
@@ -270,7 +278,7 @@ const ScopedMenuList = (props: MenuListProps<any, boolean>) => {
  * ```text
  * ┌──────────────────────────┐
  * │ Scope                    │
- * │ [My Groups][All Groups]  │
+ * │ (My Groups | All Groups) │
  * ├──────────────────────────┤
  * │ Item A                   │
  * │ Item B                   │
