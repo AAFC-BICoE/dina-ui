@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { StorageUnitTypeForm } from "../../../../pages/collection/storage-unit-type/edit";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -42,9 +42,10 @@ describe("Storage Unit Type form.", () => {
     });
 
     // Change Name field value
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: { value: "test-storage-type" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "test-storage-type"
+    );
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -93,9 +94,10 @@ describe("Storage Unit Type form.", () => {
     });
 
     // Change Name field value
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: { value: "edited-name" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "edited-name"
+    );
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);

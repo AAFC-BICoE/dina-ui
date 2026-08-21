@@ -1,6 +1,6 @@
 import { OperationsResponse } from "common-ui";
 import { ObjectSubtypeEditPage } from "../../../pages/object-store/object-subtype/edit";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -66,14 +66,9 @@ describe("Object subtype edit page", () => {
     ).toHaveLength(1);
 
     // Edit the subtype name.
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /object subtype/i }),
-      {
-        target: {
-          name: "acSubtype",
-          value: "libre office word"
-        }
-      }
+      "libre office word"
     );
 
     // Submit the form.
@@ -131,14 +126,9 @@ describe("Object subtype edit page", () => {
     });
 
     // Modify the acSubtype value.
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /object subtype/i }),
-      {
-        target: {
-          name: "acSubtype",
-          value: "new subtype value"
-        }
-      }
+      "new subtype value"
     );
 
     // Submit the form.

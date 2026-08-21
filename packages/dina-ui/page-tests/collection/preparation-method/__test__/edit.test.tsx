@@ -4,6 +4,7 @@ import PreparationMethodEditPage, {
 } from "../../../../pages/collection/preparation-method/edit";
 import { mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -103,21 +104,15 @@ describe("preparation-method edit page", () => {
     });
 
     // Change value of the Name field
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: {
-        name: "name",
-        value: "updated Name"
-      }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "updated Name"
+    );
 
     // Change value of the Eng Description field
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /english description/i }),
-      {
-        target: {
-          value: "test english description"
-        }
-      }
+      "test english description"
     );
 
     // Submit the form.
@@ -178,13 +173,9 @@ describe("preparation-method edit page", () => {
       ).toHaveDisplayValue("test english description");
     });
 
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /french description/i }),
-      {
-        target: {
-          value: "test french description"
-        }
-      }
+      "test french description"
     );
 
     // Submit form

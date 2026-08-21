@@ -61,12 +61,11 @@ export function DateField(props: DateFieldProps) {
             return formatMessage({ id: "dateMustBeFormattedYyyyMmDd" });
           }
         }
+      }
 
-        // Check for invalid dates like 2021-02-29
-        const parsed = moment(value, true);
-        if (!parsed.isValid()) {
-          return `${formatMessage({ id: "invalidDate" })}: ${value}`;
-        }
+      const parsed = showTime ? moment(value) : moment(value, true);
+      if (!parsed.isValid()) {
+        return `${formatMessage({ id: "invalidDate" })}: ${value}`;
       }
     }
   }

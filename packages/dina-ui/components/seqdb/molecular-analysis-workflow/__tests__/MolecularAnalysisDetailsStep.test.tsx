@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import {
   MolecularAnalysisDetailsStep,
   MolecularAnalysisDetailsStepProps
@@ -194,8 +194,7 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
     await userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
 
     // Set the name for the new molecular analysis.
-    await userEvent.clear(wrapper.getByRole("textbox", { name: /name/i }));
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /name/i }),
       "New Molecular Analysis Name"
     );

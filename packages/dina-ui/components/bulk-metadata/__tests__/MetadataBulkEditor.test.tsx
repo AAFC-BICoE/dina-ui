@@ -1,6 +1,6 @@
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear, clearAndType } from "common-ui";
 import { MetadataBulkEditor } from "../MetadataBulkEditor";
-import { waitFor, within } from "@testing-library/dom";
+import { waitFor, within } from "@testing-library/react";
 import {
   BUCKET,
   DC_RIGHTS,
@@ -251,10 +251,7 @@ describe("MetadataBulkEditor", () => {
       const upload1Tab = wrapper.getByRole("tabpanel", {
         name: /upload1/i
       });
-      await userEvent.clear(
-        within(upload1Tab).getByRole("textbox", { name: /caption/i })
-      );
-      await userEvent.type(
+      await clearAndType(
         within(upload1Tab).getByRole("textbox", { name: /caption/i }),
         "Caption for Upload 1"
       );
@@ -264,10 +261,7 @@ describe("MetadataBulkEditor", () => {
       const upload2Tab = wrapper.getByRole("tabpanel", {
         name: /upload2/i
       });
-      await userEvent.clear(
-        within(upload2Tab).getByRole("textbox", { name: /caption/i })
-      );
-      await userEvent.type(
+      await clearAndType(
         within(upload2Tab).getByRole("textbox", { name: /caption/i }),
         "Caption for Upload 2"
       );
@@ -277,10 +271,7 @@ describe("MetadataBulkEditor", () => {
       const upload3Tab = wrapper.getByRole("tabpanel", {
         name: /upload3/i
       });
-      await userEvent.clear(
-        within(upload3Tab).getByRole("textbox", { name: /caption/i })
-      );
-      await userEvent.type(
+      await clearAndType(
         within(upload3Tab).getByRole("textbox", { name: /caption/i }),
         "Caption for Upload 3"
       );
@@ -506,10 +497,7 @@ describe("MetadataBulkEditor", () => {
       const editAllTab = wrapper.getByRole("tabpanel", { name: /edit all/i });
 
       // Change Caption for all records
-      await userEvent.clear(
-        within(editAllTab).getByRole("textbox", { name: "Caption No Changes" })
-      );
-      await userEvent.type(
+      await clearAndType(
         within(editAllTab).getByRole("textbox", { name: "Caption No Changes" }),
         "Bulk Updated Caption"
       );
@@ -574,10 +562,7 @@ describe("MetadataBulkEditor", () => {
       // Edit bulkEdit1.jpg
       await userEvent.click(wrapper.getByText(/bulkEdit1/i));
       const tab1 = wrapper.getByRole("tabpanel", { name: /bulkEdit1/i });
-      await userEvent.clear(
-        within(tab1).getByRole("textbox", { name: /caption/i })
-      );
-      await userEvent.type(
+      await clearAndType(
         within(tab1).getByRole("textbox", { name: /caption/i }),
         "Individual Caption 1"
       );
@@ -585,10 +570,7 @@ describe("MetadataBulkEditor", () => {
       // Edit bulkEdit2.jpg
       await userEvent.click(wrapper.getByText(/bulkEdit2/i));
       const tab2 = wrapper.getByRole("tabpanel", { name: /bulkEdit2/i });
-      await userEvent.clear(
-        within(tab2).getByRole("textbox", { name: /caption/i })
-      );
-      await userEvent.type(
+      await clearAndType(
         within(tab2).getByRole("textbox", { name: /caption/i }),
         "Individual Caption 2"
       );
@@ -596,10 +578,7 @@ describe("MetadataBulkEditor", () => {
       // Edit bulkEdit3.jpg
       await userEvent.click(wrapper.getByText(/bulkEdit3/i));
       const tab3 = wrapper.getByRole("tabpanel", { name: /bulkEdit3/i });
-      await userEvent.clear(
-        within(tab3).getByRole("textbox", { name: /caption/i })
-      );
-      await userEvent.type(
+      await clearAndType(
         within(tab3).getByRole("textbox", { name: /caption/i }),
         "Individual Caption 3"
       );

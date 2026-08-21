@@ -60,7 +60,7 @@ describe("MetadataRevisionListPage", () => {
       expect(table).not.toBeNull();
     });
     if (!table) {
-      fail("Table should exist at this point...");
+      throw new Error("Table should exist at this point...");
     }
 
     // Renders the 2 revision rows:

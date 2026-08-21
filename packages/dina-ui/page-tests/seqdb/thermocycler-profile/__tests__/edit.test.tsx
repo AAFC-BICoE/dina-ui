@@ -2,7 +2,7 @@ import { writeStorage } from "@rehooks/local-storage";
 import { waitForLoadingToDisappear } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { ThermocyclerProfileEditPage } from "../../../../pages/seqdb/thermocycler-profile/edit";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -60,9 +60,10 @@ describe("ThermocyclerProfile edit page", () => {
     );
 
     // Edit the profile name.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: { name: "name", value: "New ThermocyclerProfile" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "New ThermocyclerProfile"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -114,9 +115,10 @@ describe("ThermocyclerProfile edit page", () => {
     expect(wrapper.getByDisplayValue("PCR of ITS regions")).toBeInTheDocument();
 
     // Modify the application value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /application/i }), {
-      target: { name: "application", value: "new app value" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /application/i }),
+      "new app value"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);

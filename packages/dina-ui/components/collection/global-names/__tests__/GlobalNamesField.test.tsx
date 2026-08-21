@@ -4,6 +4,7 @@ import { mountWithAppContext } from "common-ui";
 import { GlobalNamesSearchResult } from "../global-names-search-result-type";
 import { GlobalNamesField } from "../GlobalNamesField";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const mockOnChange = jest.fn((val, form) =>
@@ -42,7 +43,10 @@ describe("GlobalNamesField component", () => {
 
     // Simulate input change for the global name
     const input = container.querySelector("input.global-name-input");
-    fireEvent.change(input!, { target: { value: "  monodon  " } });
+    await userEvent.type(input!, "  monodon  ");
+
+    // The typed text should have been passed to onChange
+    expect(mockOnChange).lastCalledWith("  monodon  ", expect.anything());
 
     // Simulate clicking the search button
     const searchButton = screen.getByRole("button", {
@@ -51,7 +55,7 @@ describe("GlobalNamesField component", () => {
     await waitFor(() => {
       expect(searchButton).toBeInTheDocument();
     });
-    fireEvent.click(searchButton);
+    await userEvent.click(searchButton);
 
     await waitFor(() => {
       const searchResults = screen.getAllByText(
@@ -64,28 +68,26 @@ describe("GlobalNamesField component", () => {
     const selectButton = screen.getByRole("button", {
       name: /select/i
     });
-    fireEvent.click(selectButton);
+    await userEvent.click(selectButton);
 
-    expect(mockOnChange.mock.calls).toEqual([
-      ["  monodon  ", expect.anything()],
+    // The selected name should have been passed to onChange
+    expect(mockOnChange).lastCalledWith(
       [
-        [
-          {
-            labelHtml: "Monodontidae: Monodon Linnaeus, 1758",
-            recordedOn: "2021-12-16",
-            sourceUrl: "https://www.catalogueoflife.org/data/taxon/63DDW",
-            currentName: "Monodon Linnaeus, 1758",
-            isSynonym: false,
-            classificationPath:
-              "Biota|Animalia|Chordata|Mammalia|Theria|Eutheria|Cetacea|Odontoceti|Monodontidae|Monodon",
-            classificationRanks:
-              "unranked|kingdom|phylum|class|subclass|infraclass|order|suborder|family|genus"
-          },
-          expect.anything()
-        ],
+        {
+          labelHtml: "Monodontidae: Monodon Linnaeus, 1758",
+          recordedOn: "2021-12-16",
+          sourceUrl: "https://www.catalogueoflife.org/data/taxon/63DDW",
+          currentName: "Monodon Linnaeus, 1758",
+          isSynonym: false,
+          classificationPath:
+            "Biota|Animalia|Chordata|Mammalia|Theria|Eutheria|Cetacea|Odontoceti|Monodontidae|Monodon",
+          classificationRanks:
+            "unranked|kingdom|phylum|class|subclass|infraclass|order|suborder|family|genus"
+        },
         expect.anything()
-      ]
-    ]);
+      ],
+      expect.anything()
+    );
 
     expect(mockFetchJson).lastCalledWith(
       "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false&all_matches=true"
