@@ -174,70 +174,6 @@ export default function ExportPage<TData extends KitsuResource>() {
     } as ESIndexMapping);
   }
 
-  /**
-   * Retrieves all the metadatas and includes the derivatives.
-   *
-   * Eventually this logic should be replaced with the bulkLoadResources and move away from the bulk
-   * get function.
-   */
-  async function getMetadataWithDerivatives(): Promise<any[]> {
-    if (!localStorageExportObjectIds.length) {
-      return [];
-    }
-
-    // Still request the include so we get the derivative id stubs on each metadata.
-    const metadataPaths = localStorageExportObjectIds.map(
-      (id) => `metadata/${id}?include=derivatives`
-    );
-    const metadatas: PersistedResource<Metadata>[] = await bulkGet(
-      metadataPaths,
-      { apiBaseUrl: "/objectstore-api" }
-    );
-
-    // Collect every unique derivative id referenced across all metadata.
-    const derivativeIds = Array.from(
-      new Set(
-        metadatas.flatMap((metadata) => {
-          const derivatives = (metadata as any)?.derivatives?.data ?? [];
-          return derivatives.map((derivative: any) => derivative.id);
-        })
-      )
-    ).filter(Boolean);
-
-    if (!derivativeIds.length) {
-      return metadatas;
-    }
-
-    // Fetch the unique derivative resources.
-    const derivativePaths = derivativeIds.map((id) => `derivative/${id}`);
-    const derivatives: PersistedResource<any>[] = await bulkGet(
-      derivativePaths,
-      { apiBaseUrl: "/objectstore-api" }
-    );
-
-    const derivativesById = new Map(
-      derivatives
-        .filter(Boolean)
-        .map((derivative) => [derivative.id, derivative])
-    );
-
-    // Go through all the metadatas and put the full derivative for the relationships.
-    return metadatas.map((metadata) => {
-      const stubDerivatives = (metadata as any)?.derivatives?.data ?? [];
-      if (!stubDerivatives.length) {
-        return metadata;
-      }
-      const fullDerivatives = stubDerivatives
-        .map((stub: any) => derivativesById.get(stub.id) ?? stub)
-        .filter(Boolean);
-
-      return {
-        ...metadata,
-        derivatives: { data: fullDerivatives }
-      };
-    });
-  }
-
   // Check if all selected objects (or their large image derivatives) are JPEGs when switching to OBJECT_ARCHIVE export
   useEffect(() => {
     async function checkJpegEligibility() {
@@ -246,7 +182,15 @@ export default function ExportPage<TData extends KitsuResource>() {
         localStorageExportObjectIds.length > 0
       ) {
         try {
-          const metadatas = await getMetadataWithDerivatives();
+          const paths = localStorageExportObjectIds.map(
+            (id) => `metadata/${id}?include=derivatives`
+          );
+          const metadatas: PersistedResource<Metadata>[] = await bulkGet(
+            paths,
+            {
+              apiBaseUrl: "/objectstore-api"
+            }
+          );
 
           const isAllJpeg = metadatas.every((meta) => {
             // Check if a LARGE_IMAGE derivative exists first
@@ -388,7 +332,12 @@ export default function ExportPage<TData extends KitsuResource>() {
       // Clear error message.
       setDataExportError(undefined);
 
-      const metadatas = await getMetadataWithDerivatives();
+      const paths = localStorageExportObjectIds.map(
+        (id) => `metadata/${id}?include=derivatives`
+      );
+      const metadatas: PersistedResource<Metadata>[] = await bulkGet(paths, {
+        apiBaseUrl: "/objectstore-api"
+      });
 
       const fileIdentifiers = metadatas.map((metadata) => {
         // If the metadata is for an image and has derivatives, return the large image derivative fileIdentifier if present
