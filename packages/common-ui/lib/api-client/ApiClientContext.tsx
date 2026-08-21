@@ -670,49 +670,6 @@ export class ApiClientImpl implements ApiClientI {
       (response as AxiosResponse).data
     );
 
-    // In Kitsu 11.1.0, deserialise promotes relationships to top level but wraps them in {data: {...}}.
-    // For bulkLoadResources, move promoted relationships back into the relationships object while
-    // retaining the fully deserialized resources (including attributes resolved from 'included').
-    const items = Array.isArray((response as AxiosResponse).data.data)
-      ? (response as AxiosResponse).data.data
-      : [(response as AxiosResponse).data.data];
-
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (!item) continue;
-
-      // Find properties that look like promoted relationships (have {data: ...} structure)
-      const relationshipsToMove: string[] = [];
-      for (const key in item) {
-        if (
-          key === "id" ||
-          key === "type" ||
-          key === "relationships" ||
-          key === "links" ||
-          key === "meta"
-        ) {
-          continue;
-        }
-        const value = item[key];
-        // Check if this looks like a promoted relationship with {data: ...} wrapper
-        if (value && typeof value === "object" && "data" in value) {
-          relationshipsToMove.push(key);
-        }
-      }
-
-      // Move promoted relationships back into the relationships object,
-      // retaining deserialized attributes from included resources
-      if (relationshipsToMove.length > 0) {
-        if (!item.relationships) {
-          item.relationships = {};
-        }
-        for (const key of relationshipsToMove) {
-          item.relationships[key] = item[key];
-          delete item[key];
-        }
-      }
-    }
-
     // If there are missing IDs, fill in the gaps with nulls.
     if (missingIds.length !== 0) {
       for (const id of originalIds) {
@@ -728,69 +685,6 @@ export class ApiClientImpl implements ApiClientI {
     }
 
     return response;
-  }
-
-  /**
-   * Restores JSON:API relationship structure after Kitsu 11.1.0 deserialization.
-   * Kitsu 11.1.0 promotes relationships to top level but wraps them in {data: {...}}.
-   * This function moves them back into the relationships object and preserves nested attributes.
-   */
-  private restoreRelationshipsStructure(
-    deserializedData: any,
-    rawData: any
-  ): void {
-    const items = Array.isArray(deserializedData.data)
-      ? deserializedData.data
-      : [deserializedData.data];
-
-    const rawItems = Array.isArray(rawData?.data)
-      ? rawData.data
-      : [rawData?.data];
-
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const rawItem = rawItems[i];
-      if (!item) continue;
-
-      // Find properties that look like promoted relationships (have {data: ...} structure)
-      const relationshipsToMove: string[] = [];
-      for (const key in item) {
-        if (
-          key === "id" ||
-          key === "type" ||
-          key === "relationships" ||
-          key === "links" ||
-          key === "meta"
-        ) {
-          continue;
-        }
-        const value = item[key];
-        // Check if this looks like a promoted relationship with {data: ...} wrapper
-        if (value && typeof value === "object" && "data" in value) {
-          relationshipsToMove.push(key);
-        }
-      }
-
-      // Move promoted relationships back into the relationships object
-      // and restore nested attributes structure for resources inside relationships
-      if (relationshipsToMove.length > 0) {
-        if (!item.relationships) {
-          item.relationships = {};
-        }
-        for (const key of relationshipsToMove) {
-          const rawRelationship = rawItem?.relationships?.[key];
-
-          // Restore the original nested attributes structure from raw data
-          if (rawRelationship?.data) {
-            item.relationships[key] = { data: rawRelationship.data };
-          } else {
-            // Fallback to the deserialized version if raw data not available
-            item.relationships[key] = item[key];
-          }
-          delete item[key];
-        }
-      }
-    }
   }
 
   /**
@@ -820,9 +714,7 @@ export class ApiClientImpl implements ApiClientI {
         }
       }
     );
-    const rawResponseData = JSON.parse(JSON.stringify(response.data));
     response.data = await deserialise(response.data);
-    this.restoreRelationshipsStructure(response.data, rawResponseData);
     return response;
   }
 
@@ -853,9 +745,7 @@ export class ApiClientImpl implements ApiClientI {
         }
       }
     );
-    const rawResponseData = JSON.parse(JSON.stringify(response.data));
     response.data = await deserialise(response.data);
-    this.restoreRelationshipsStructure(response.data, rawResponseData);
     return response;
   }
 
