@@ -665,32 +665,20 @@ export class ApiClientImpl implements ApiClientI {
     let responseCounter = 0;
     const newResponseData: any[] = [];
 
-    // Save raw data before deserialization to preserve nested attributes structure
-    const rawResponseData = JSON.parse(
-      JSON.stringify((response as AxiosResponse).data)
-    );
-
     // Deserialize the response data.
     (response as AxiosResponse).data = await deserialise(
       (response as AxiosResponse).data
     );
 
     // In Kitsu 11.1.0, deserialise promotes relationships to top level but wraps them in {data: {...}}.
-    // For bulkLoadResources, we want to keep the original JSON:API structure with relationships
-    // in the relationships object. Move any promoted relationships back.
-    // Also, Kitsu 11.1.0 flattens attributes for ALL resources, but we need to keep attributes
-    // nested for resources inside relationship data.
+    // For bulkLoadResources, move promoted relationships back into the relationships object while
+    // retaining the fully deserialized resources (including attributes resolved from 'included').
     const items = Array.isArray((response as AxiosResponse).data.data)
       ? (response as AxiosResponse).data.data
       : [(response as AxiosResponse).data.data];
 
-    const rawItems = Array.isArray(rawResponseData?.data)
-      ? rawResponseData.data
-      : [rawResponseData?.data];
-
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-      const rawItem = rawItems[i];
       if (!item) continue;
 
       // Find properties that look like promoted relationships (have {data: ...} structure)
@@ -712,29 +700,21 @@ export class ApiClientImpl implements ApiClientI {
         }
       }
 
-      // Move promoted relationships back into the relationships object
-      // and restore nested attributes structure for resources inside relationships
+      // Move promoted relationships back into the relationships object,
+      // retaining deserialized attributes from included resources
       if (relationshipsToMove.length > 0) {
         if (!item.relationships) {
           item.relationships = {};
         }
         for (const key of relationshipsToMove) {
-          const rawRelationship = rawItem?.relationships?.[key];
-
-          // Restore the original nested attributes structure from raw data
-          if (rawRelationship?.data) {
-            item.relationships[key] = { data: rawRelationship.data };
-          } else {
-            // Fallback to the deserialized version if raw data not available
-            item.relationships[key] = item[key];
-          }
+          item.relationships[key] = item[key];
           delete item[key];
         }
       }
     }
 
-    // If there are missing IDs, we need to fill in the gaps with nulls.
-    if (missingIds.length != 0) {
+    // If there are missing IDs, fill in the gaps with nulls.
+    if (missingIds.length !== 0) {
       for (const id of originalIds) {
         if (missingIds.includes(id)) {
           newResponseData.push(null);
@@ -946,7 +926,9 @@ export class ApiClientImpl implements ApiClientI {
     const resources: (TReturnNull extends true
       ? PersistedResource<T> | null
       : PersistedResource<T>)[] = (
-      await Promise.all(responses.map((response) => deserialise(response)))
+      await Promise.all(
+        responses.map(async (response) => await deserialise(response))
+      )
     ).map((res) => res.data);
 
     for (const joinSpec of joinSpecs) {
