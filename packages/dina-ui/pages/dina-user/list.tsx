@@ -25,6 +25,8 @@ const USER_TABLE_COLUMNS: ColumnDefinition<DinaUserWithAgent>[] = [
     accessorKey: "username"
   },
   {
+    // Same terminology as the user view page
+    header: () => <DinaMessage id="associatedAgent" />,
     cell: ({
       row: {
         original: { agent }
@@ -38,17 +40,31 @@ const USER_TABLE_COLUMNS: ColumnDefinition<DinaUserWithAgent>[] = [
     accessorKey: "agent.displayName",
     enableSorting: false
   },
+  "emailAddress",
   {
     cell: ({
       row: {
-        original: { rolesPerGroup }
+        original: { rolesPerGroup, adminRoles }
       }
     }) => (
-      <RolesPerGroupTable
-        rolesPerGroup={rolesPerGroup ?? {}}
-        hideTitle={true}
-        hideTable={!rolesPerGroup || Object.keys(rolesPerGroup).length === 0}
-      />
+      <>
+        <RolesPerGroupTable
+          rolesPerGroup={rolesPerGroup ?? {}}
+          hideTitle={true}
+          hideTable={!rolesPerGroup || Object.keys(rolesPerGroup).length === 0}
+        />
+        {/* Realm-level admin roles are not part of rolesPerGroup; show them too so
+            results of the admin role filters are visible in the table. */}
+        {!!adminRoles?.length && (
+          <div>
+            {adminRoles.map((role) => (
+              <span key={role} className="badge bg-primary me-1">
+                {role}
+              </span>
+            ))}
+          </div>
+        )}
+      </>
     ),
     accessorKey: "rolesPerGroup",
     enableSorting: false
