@@ -1,6 +1,7 @@
 import { ColumnDefinition, ListLayoutFilterType, ListPageLayout } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
+import { GroupSelectField } from "../../components";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
@@ -31,8 +32,8 @@ export function userFilterFn(
   filterForm: any,
   user: PersistedResource<DinaUserWithAgent>
 ): boolean {
-  const searchText: string =
-    filterForm?.filterBuilderModel?.value?.trim()?.toLowerCase() ?? "";
+  const searchText: string = filterForm?.filterBuilderModel?.value?.trim()?.toLowerCase() ?? "";
+  const group: string | undefined = filterForm?.group || undefined;
 
   if (searchText) {
     const matchesText = [
@@ -46,6 +47,12 @@ export function userFilterFn(
     if (!matchesText) {
       return false;
     }
+  }
+
+  const rolesPerGroup = user.rolesPerGroup ?? {};
+
+  if (group && !Object.keys(rolesPerGroup).includes(group)) {
+    return false;
   }
 
   return true;
@@ -133,6 +140,17 @@ export default function DinaUserListPage() {
           filterAttributes={USER_FILTER_ATTRIBUTES}
           enableInMemoryFilter={true}
           filterFn={userFilterFn}
+          filterFormchildren={({ submitForm }) => (
+            <div className="d-flex gap-3 flex-wrap mb-3">
+              <div style={{ width: "300px" }}>
+                <GroupSelectField
+                  onChange={() => setImmediate(submitForm)}
+                  name="group"
+                  showAnyOption={true}
+                />
+              </div>
+            </div>
+          )}
           queryTableProps={USER_TABLE_QUERY_PROPS}
           defaultSort={DEFAULT_SORT}
         />
