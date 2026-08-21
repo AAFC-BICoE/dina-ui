@@ -1,6 +1,6 @@
 import { ColumnDefinition, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../components";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
@@ -68,25 +68,14 @@ const USER_TABLE_QUERY_PROPS = {
   ]
 };
 
-export default function AgentListPage() {
-  const { formatMessage } = useDinaIntl();
-
+export default function DinaUserListPage() {
   return (
-    <div>
-      <Head title={formatMessage("userListTitle")} />
-      <Nav />
-
-      <main className="container-fluid" role="main">
-        <h1 id="wb-cont">
-          <DinaMessage id="userListTitle" />
-        </h1>
+    <PageLayout titleId="userListTitle">
         <ListPageLayout<DinaUserWithAgent>
           id="user-list"
           queryTableProps={USER_TABLE_QUERY_PROPS}
           defaultSort={DEFAULT_SORT}
         />
-      </main>
-      <Footer />
-    </div>
+    </PageLayout>
   );
 }
