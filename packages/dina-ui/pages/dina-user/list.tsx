@@ -2,9 +2,16 @@ import { ColumnDefinition, ListPageLayout } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Person } from "../../types/objectstore-api";
+import { DinaUser } from "../../types/user-api/resources/DinaUser";
 import { RolesPerGroupTable } from "./view";
 
-const USER_TABLE_COLUMNS: ColumnDefinition<any>[] = [
+/* DinaUser with the Person record joined in client-side. */
+type DinaUserWithAgent = DinaUser & { agent?: Person };
+
+const DEFAULT_SORT = [{ id: "username", desc: false }];
+
+const USER_TABLE_COLUMNS: ColumnDefinition<DinaUserWithAgent>[] = [
   {
     cell: ({
       row: {
@@ -38,17 +45,28 @@ const USER_TABLE_COLUMNS: ColumnDefinition<any>[] = [
       }
     }) => (
       <RolesPerGroupTable
-        rolesPerGroup={rolesPerGroup}
+        rolesPerGroup={rolesPerGroup ?? {}}
         hideTitle={true}
-        hideTable={
-          !Object.keys(rolesPerGroup) || Object.keys(rolesPerGroup).length === 0
-        }
+        hideTable={!rolesPerGroup || Object.keys(rolesPerGroup).length === 0}
       />
     ),
     accessorKey: "rolesPerGroup",
     enableSorting: false
   }
 ];
+
+const USER_TABLE_QUERY_PROPS = {
+  columns: USER_TABLE_COLUMNS,
+  path: "user-api/user",
+  joinSpecs: [
+    {
+      apiBaseUrl: "/agent-api",
+      idField: "agentId",
+      joinField: "agent",
+      path: (user) => `person/${user.agentId}`
+    }
+  ]
+};
 
 export default function AgentListPage() {
   const { formatMessage } = useDinaIntl();
@@ -62,21 +80,10 @@ export default function AgentListPage() {
         <h1 id="wb-cont">
           <DinaMessage id="userListTitle" />
         </h1>
-        <ListPageLayout
+        <ListPageLayout<DinaUserWithAgent>
           id="user-list"
-          queryTableProps={{
-            columns: USER_TABLE_COLUMNS,
-            path: "user-api/user",
-            joinSpecs: [
-              {
-                apiBaseUrl: "/agent-api",
-                idField: "agentId",
-                joinField: "agent",
-                path: (user) => `person/${user.agentId}`
-              }
-            ]
-          }}
-          defaultSort={[{ id: "username", desc: false }]}
+          queryTableProps={USER_TABLE_QUERY_PROPS}
+          defaultSort={DEFAULT_SORT}
         />
       </main>
       <Footer />
