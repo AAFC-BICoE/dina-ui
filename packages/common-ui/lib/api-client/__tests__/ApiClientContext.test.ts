@@ -825,6 +825,215 @@ describe("API client context", () => {
         { type: "primer", id: "200" }
       ]);
     });
+
+    it("bulkGet with includes should be merging the data into one response", async () => {
+      const bulkApiResponse = {
+        data: [
+          {
+            id: "3a0538a4-a483-4d4b-813b-2ceadd310bee",
+            type: "metadata",
+            attributes: {
+              originalFilename: "RAWCANON-30D.CR2",
+              filename: "rawr",
+              dcFormat: "image/CR2"
+            },
+            relationships: {
+              derivatives: {
+                data: [
+                  {
+                    id: "ee69dd9f-862c-4034-bc20-dde0b52ff56e",
+                    type: "derivative"
+                  },
+                  {
+                    id: "77f87eb5-ac8e-41bc-b195-b7f4e0c00592",
+                    type: "derivative"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            id: "b8a9f92b-cf04-461b-b4b4-d439fd47dac3",
+            type: "metadata",
+            attributes: {
+              originalFilename: "profile_picture.jpg",
+              filename: "profile_picture.jpg",
+              dcFormat: "image/jpeg"
+            },
+            relationships: {
+              derivatives: {
+                data: [
+                  {
+                    id: "7648ba7b-0145-4a12-9912-ef8675b762c9",
+                    type: "derivative"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            id: "3f5cc46b-a247-4195-a3d7-9e4334ece945",
+            type: "metadata",
+            attributes: {
+              originalFilename: "RAWCANON-30D.CR2",
+              filename: "RAWCANON-30D.CR2",
+              dcFormat: "image/CR2"
+            },
+            relationships: {
+              derivatives: {
+                data: [
+                  {
+                    id: "63d2fd88-6d92-45cb-b8fe-2c1d795d1bee",
+                    type: "derivative"
+                  },
+                  {
+                    id: "2feaca8b-34eb-475e-b449-f981e0275b6c",
+                    type: "derivative"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        included: [
+          {
+            id: "7648ba7b-0145-4a12-9912-ef8675b762c9",
+            type: "derivative",
+            attributes: {
+              derivativeType: "THUMBNAIL_IMAGE",
+              fileExtension: ".jpg"
+            }
+          },
+          {
+            id: "77f87eb5-ac8e-41bc-b195-b7f4e0c00592",
+            type: "derivative",
+            attributes: {
+              filename: "IMG_3064.JPG",
+              derivativeType: "LARGE_IMAGE"
+            }
+          },
+          {
+            id: "2feaca8b-34eb-475e-b449-f981e0275b6c",
+            type: "derivative",
+            attributes: {
+              filename: "IMG_2992_2.JPG",
+              derivativeType: "LARGE_IMAGE"
+            }
+          },
+          {
+            id: "ee69dd9f-862c-4034-bc20-dde0b52ff56e",
+            type: "derivative",
+            attributes: {
+              derivativeType: "THUMBNAIL_IMAGE",
+              fileExtension: ".jpg"
+            }
+          },
+          {
+            id: "63d2fd88-6d92-45cb-b8fe-2c1d795d1bee",
+            type: "derivative",
+            attributes: {
+              derivativeType: "THUMBNAIL_IMAGE",
+              fileExtension: ".jpg"
+            }
+          }
+        ]
+      };
+
+      mockPost.mockImplementationOnce(async () => ({
+        status: 200,
+        data: bulkApiResponse
+      }));
+
+      const paths = [
+        "metadata/3a0538a4-a483-4d4b-813b-2ceadd310bee?include=derivatives",
+        "metadata/b8a9f92b-cf04-461b-b4b4-d439fd47dac3?include=derivatives",
+        "metadata/3f5cc46b-a247-4195-a3d7-9e4334ece945?include=derivatives"
+      ];
+
+      const response = await bulkGet(paths, {
+        apiBaseUrl: "/objectstore-api"
+      });
+
+      // Verify the bulk-load request URL and body batching
+      expect(mockPost).toHaveBeenCalledTimes(1);
+      expect(mockPost.mock.calls[0][0]).toBe(
+        "/objectstore-api/metadata/bulk-load?include=derivatives"
+      );
+      expect(mockPost.mock.calls[0][1]).toEqual({
+        data: [
+          { type: "metadata", id: "3a0538a4-a483-4d4b-813b-2ceadd310bee" },
+          { type: "metadata", id: "b8a9f92b-cf04-461b-b4b4-d439fd47dac3" },
+          { type: "metadata", id: "3f5cc46b-a247-4195-a3d7-9e4334ece945" }
+        ]
+      });
+
+      // Verify response order and merged includes
+      expect(response).toEqual([
+        {
+          dcFormat: "image/CR2",
+          derivatives: {
+            data: [
+              {
+                id: "ee69dd9f-862c-4034-bc20-dde0b52ff56e",
+                type: "derivative",
+                derivativeType: "THUMBNAIL_IMAGE",
+                fileExtension: ".jpg"
+              },
+              {
+                id: "77f87eb5-ac8e-41bc-b195-b7f4e0c00592",
+                type: "derivative",
+                filename: "IMG_3064.JPG",
+                derivativeType: "LARGE_IMAGE"
+              }
+            ]
+          },
+          filename: "rawr",
+          id: "3a0538a4-a483-4d4b-813b-2ceadd310bee",
+          originalFilename: "RAWCANON-30D.CR2",
+          type: "metadata"
+        },
+        {
+          dcFormat: "image/jpeg",
+          derivatives: {
+            data: [
+              {
+                id: "7648ba7b-0145-4a12-9912-ef8675b762c9",
+                type: "derivative",
+                derivativeType: "THUMBNAIL_IMAGE",
+                fileExtension: ".jpg"
+              }
+            ]
+          },
+          filename: "profile_picture.jpg",
+          id: "b8a9f92b-cf04-461b-b4b4-d439fd47dac3",
+          originalFilename: "profile_picture.jpg",
+          type: "metadata"
+        },
+        {
+          dcFormat: "image/CR2",
+          derivatives: {
+            data: [
+              {
+                id: "63d2fd88-6d92-45cb-b8fe-2c1d795d1bee",
+                type: "derivative",
+                derivativeType: "THUMBNAIL_IMAGE",
+                fileExtension: ".jpg"
+              },
+              {
+                id: "2feaca8b-34eb-475e-b449-f981e0275b6c",
+                type: "derivative",
+                filename: "IMG_2992_2.JPG",
+                derivativeType: "LARGE_IMAGE"
+              }
+            ]
+          },
+          filename: "RAWCANON-30D.CR2",
+          id: "3f5cc46b-a247-4195-a3d7-9e4334ece945",
+          originalFilename: "RAWCANON-30D.CR2",
+          type: "metadata"
+        }
+      ]);
+    });
   });
 
   describe("getErrorMessages and error message handling", () => {
