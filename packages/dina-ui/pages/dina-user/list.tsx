@@ -1,4 +1,5 @@
-import { ColumnDefinition, ListLayoutFilterType, ListPageLayout } from "common-ui";
+import { ColumnDefinition, ListLayoutFilterType, ListPageLayout, SelectField } from "common-ui";
+import { DINA_ADMIN, GUEST, READ_ONLY, READ_ONLY_ADMIN, SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { GroupSelectField } from "../../components";
@@ -21,8 +22,22 @@ const USER_FILTER_ATTRIBUTES = [
 
 const DEFAULT_SORT = [{ id: "username", desc: false }];
 
+/* Group-based role names as they appear in rolesPerGroup values. */
+const GROUP_BASED_ROLES = [SUPER_USER, USER, GUEST, READ_ONLY];
+
+/* Realm-level admin role names, stored in adminRoles instead of rolesPerGroup. */
+const ADMIN_BASED_ROLES = [DINA_ADMIN, READ_ONLY_ADMIN];
+
+const ROLE_OPTIONS = [
+  { label: "<any>", value: undefined },
+  ...[...GROUP_BASED_ROLES, ...ADMIN_BASED_ROLES].map((roleName) => ({
+    label: roleName,
+    value: roleName
+  }))
+];
+
 /**
- * Applies the free-text search to a user.
+ * Applies the free-text search and the group/role dropdown filters to a user.
  *
  * Filtering is done in-memory: the User API is Keycloak-backed in production, so the
  * visible user list is loaded once and filtered client-side. The back-end already
@@ -32,8 +47,10 @@ export function userFilterFn(
   filterForm: any,
   user: PersistedResource<DinaUserWithAgent>
 ): boolean {
-  const searchText: string = filterForm?.filterBuilderModel?.value?.trim()?.toLowerCase() ?? "";
+  const searchText: string =
+    filterForm?.filterBuilderModel?.value?.trim()?.toLowerCase() ?? "";
   const group: string | undefined = filterForm?.group || undefined;
+  const role: string | undefined = filterForm?.role || undefined;
 
   if (searchText) {
     const matchesText = [
@@ -43,7 +60,6 @@ export function userFilterFn(
       user.emailAddress,
       user.agent?.displayName
     ].some((text) => text?.toLowerCase().includes(searchText));
-
     if (!matchesText) {
       return false;
     }
@@ -53,6 +69,22 @@ export function userFilterFn(
 
   if (group && !Object.keys(rolesPerGroup).includes(group)) {
     return false;
+  }
+
+  if (role) {
+    if (ADMIN_BASED_ROLES.includes(role)) {
+      if (!user.adminRoles?.includes(role)) {
+        return false;
+      }
+    } else {
+      // Group-based role: check within the selected group, or any group if none selected.
+      const groupRoles = group
+        ? rolesPerGroup[group] ?? []
+        : Object.values(rolesPerGroup).flatMap((roles) => roles ?? []);
+      if (!groupRoles.includes(role)) {
+        return false;
+      }
+    }
   }
 
   return true;
@@ -132,28 +164,38 @@ const USER_TABLE_QUERY_PROPS = {
 };
 
 export default function DinaUserListPage() {
+  const { formatMessage } = useDinaIntl();
+
   return (
     <PageLayout titleId="userListTitle">
-        <ListPageLayout<DinaUserWithAgent>
-          id="user-list"
-          filterType={ListLayoutFilterType.FREE_TEXT}
-          filterAttributes={USER_FILTER_ATTRIBUTES}
-          enableInMemoryFilter={true}
-          filterFn={userFilterFn}
-          filterFormchildren={({ submitForm }) => (
-            <div className="d-flex gap-3 flex-wrap mb-3">
-              <div style={{ width: "300px" }}>
-                <GroupSelectField
-                  onChange={() => setImmediate(submitForm)}
-                  name="group"
-                  showAnyOption={true}
-                />
-              </div>
+      <ListPageLayout<DinaUserWithAgent>
+        id="user-list"
+        filterType={ListLayoutFilterType.FREE_TEXT}
+        filterAttributes={USER_FILTER_ATTRIBUTES}
+        enableInMemoryFilter={true}
+        filterFn={userFilterFn}
+        filterFormchildren={({ submitForm }) => (
+          <div className="d-flex gap-3 flex-wrap mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+              />
             </div>
-          )}
-          queryTableProps={USER_TABLE_QUERY_PROPS}
-          defaultSort={DEFAULT_SORT}
-        />
+            <div style={{ width: "300px" }}>
+              <SelectField
+                onChange={() => setImmediate(submitForm)}
+                name="role"
+                label={formatMessage("role")}
+                options={ROLE_OPTIONS}
+              />
+            </div>
+          </div>
+        )}
+        queryTableProps={USER_TABLE_QUERY_PROPS}
+        defaultSort={DEFAULT_SORT}
+      />
     </PageLayout>
   );
 }
