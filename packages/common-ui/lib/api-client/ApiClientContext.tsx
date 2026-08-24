@@ -11,7 +11,7 @@ import { deserialise, error as kitsuError } from "kitsu-core";
 import _ from "lodash";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { OperationsResponse } from "..";
+import { deserialize, OperationsResponse } from "..";
 import { serialize } from "../util/serialize";
 import {
   normalizeJsonApiPointer,
@@ -392,7 +392,7 @@ export class ApiClientImpl implements ApiClientI {
               optfields,
               returnNullForMissingResource
             });
-            responses = getResponse.data.data.map((response) => ({
+            responses = getResponse.data.map((response) => ({
               data: response,
               included: getResponse.data.included,
               status: response ? getResponse.status : 404
@@ -429,7 +429,7 @@ export class ApiClientImpl implements ApiClientI {
               apiBaseUrl,
               resourceType
             });
-            responses = postResponse.data.data.map((response) => ({
+            responses = postResponse.data.map((response) => ({
               data: response,
               included: postResponse.data.included,
               status: response ? postResponse.status : 404
@@ -451,7 +451,7 @@ export class ApiClientImpl implements ApiClientI {
               }
             );
 
-            responses = patchResponse.data.data.map((response) => ({
+            responses = patchResponse.data.map((response) => ({
               data: response,
               included: patchResponse.data.included,
               status: response ? patchResponse.status : 404
@@ -666,7 +666,7 @@ export class ApiClientImpl implements ApiClientI {
     const newResponseData: any[] = [];
 
     // Deserialize the response data.
-    (response as AxiosResponse).data = await deserialise(
+    (response as AxiosResponse).data = await deserialize(
       (response as AxiosResponse).data
     );
 
@@ -676,12 +676,12 @@ export class ApiClientImpl implements ApiClientI {
         if (missingIds.includes(id)) {
           newResponseData.push(null);
         } else {
-          newResponseData.push(response?.data.data[responseCounter]);
+          newResponseData.push(response?.data[responseCounter]);
           responseCounter++;
         }
       }
 
-      (response as AxiosResponse).data.data = newResponseData;
+      (response as AxiosResponse).data = newResponseData;
     }
 
     return response;
@@ -714,7 +714,7 @@ export class ApiClientImpl implements ApiClientI {
         }
       }
     );
-    response.data = await deserialise(response.data);
+    response.data = await deserialize(response.data);
     return response;
   }
 
@@ -745,7 +745,7 @@ export class ApiClientImpl implements ApiClientI {
         }
       }
     );
-    response.data = await deserialise(response.data);
+    response.data = await deserialize(response.data);
     return response;
   }
 
