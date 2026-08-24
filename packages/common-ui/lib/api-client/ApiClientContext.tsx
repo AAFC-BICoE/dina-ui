@@ -257,9 +257,12 @@ export class ApiClientImpl implements ApiClientI {
         switch (operation.op.toUpperCase()) {
           case "GET":
             const getResponse = await axios.get(url, { headers });
+            const deserializedGet = getResponse?.data
+              ? await deserialize(getResponse.data)
+              : undefined;
             responses = [
               {
-                data: getResponse?.data?.data,
+                data: deserializedGet ?? getResponse?.data?.data,
                 included: getResponse?.data?.included,
                 status: getResponse?.status
               }

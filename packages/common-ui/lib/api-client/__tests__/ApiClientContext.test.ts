@@ -826,7 +826,100 @@ describe("API client context", () => {
       ]);
     });
 
-    it("bulkGet with includes should be merging the data into one response", async () => {
+    it("bulkGet single includes should be merging the data into one response", async () => {
+      const bulkApiResponse = {
+        data: {
+          id: "3f5cc46b-a247-4195-a3d7-9e4334ece945",
+          type: "metadata",
+          attributes: {
+            originalFilename: "RAWCANON-30D.CR2",
+            filename: "rawr",
+            dcFormat: "image/CR2"
+          },
+          relationships: {
+            derivatives: {
+              data: [
+                {
+                  id: "63d2fd88-6d92-45cb-b8fe-2c1d795d1bee",
+                  type: "derivative"
+                },
+                {
+                  id: "2feaca8b-34eb-475e-b449-f981e0275b6c",
+                  type: "derivative"
+                }
+              ]
+            }
+          }
+        },
+        included: [
+          {
+            id: "2feaca8b-34eb-475e-b449-f981e0275b6c",
+            type: "derivative",
+            attributes: {
+              derivativeType: "LARGE_IMAGE",
+              fileExtension: ".jpg"
+            }
+          },
+          {
+            id: "63d2fd88-6d92-45cb-b8fe-2c1d795d1bee",
+            type: "derivative",
+            attributes: {
+              derivativeType: "THUMBNAIL_IMAGE",
+              fileExtension: ".jpg"
+            }
+          }
+        ],
+        meta: {
+          moduleVersion: "1.36"
+        }
+      };
+
+      mockGet.mockImplementationOnce(async () => ({
+        status: 200,
+        data: bulkApiResponse
+      }));
+
+      const paths = [
+        "metadata/3f5cc46b-a247-4195-a3d7-9e4334ece945?include=derivatives"
+      ];
+
+      const response = await bulkGet(paths, {
+        apiBaseUrl: "/objectstore-api"
+      });
+
+      // Verify the bulk-load request URL and body batching
+      expect(mockGet).toHaveBeenCalledTimes(1);
+      expect(mockGet.mock.calls[0][0]).toBe(
+        "/objectstore-api/metadata/3f5cc46b-a247-4195-a3d7-9e4334ece945?include=derivatives"
+      );
+
+      // Verify response order and merged includes
+      expect(response).toEqual([
+        {
+          dcFormat: "image/CR2",
+          derivatives: [
+            {
+              derivativeType: "THUMBNAIL_IMAGE",
+              fileExtension: ".jpg",
+              id: "63d2fd88-6d92-45cb-b8fe-2c1d795d1bee",
+              type: "derivative"
+            },
+            {
+              derivativeType: "LARGE_IMAGE",
+              fileExtension: ".jpg",
+              id: "2feaca8b-34eb-475e-b449-f981e0275b6c",
+              type: "derivative"
+            }
+          ],
+          filename: "rawr",
+          id: "3f5cc46b-a247-4195-a3d7-9e4334ece945",
+          originalFilename: "RAWCANON-30D.CR2",
+          type: "metadata"
+        }
+      ]);
+    });
+
+    it("bulkGet multiple includes should be merging the data into one response", async () => {
       const bulkApiResponse = {
         data: [
           {

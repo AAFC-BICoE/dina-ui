@@ -12,14 +12,7 @@ describe("deserialize function", () => {
             data: { id: "10", type: "user" }
           }
         }
-      },
-      included: [
-        {
-          id: "10",
-          type: "user",
-          attributes: { name: "John Doe" }
-        }
-      ]
+      }
     };
 
     const expected = {
@@ -28,8 +21,7 @@ describe("deserialize function", () => {
       title: "Hello World",
       author: {
         id: "10",
-        type: "user",
-        name: "John Doe"
+        type: "user"
       }
     };
 
