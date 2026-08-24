@@ -194,7 +194,7 @@ export default function ExportPage<TData extends KitsuResource>() {
 
           const isAllJpeg = metadatas.every((meta) => {
             // Check if a LARGE_IMAGE derivative exists first
-            const derivatives = (meta as any)?.derivatives?.data ?? [];
+            const derivatives = meta?.derivatives ?? [];
             if (meta.dcType === "IMAGE" && derivatives?.length) {
               const largeImageDerivative = derivatives.find(
                 (derivative) => derivative.derivativeType === "LARGE_IMAGE"
@@ -341,7 +341,7 @@ export default function ExportPage<TData extends KitsuResource>() {
 
       const fileIdentifiers = metadatas.map((metadata) => {
         // If the metadata is for an image and has derivatives, return the large image derivative fileIdentifier if present
-        const derivatives = (metadata as any)?.derivatives?.data ?? [];
+        const derivatives = metadata?.derivatives ?? [];
         if (metadata.dcType === "IMAGE" && derivatives?.length) {
           const largeImageDerivative = derivatives.find(
             (derivative) => derivative.derivativeType === "LARGE_IMAGE"
@@ -358,7 +358,7 @@ export default function ExportPage<TData extends KitsuResource>() {
 
       if (selectedFilenameAliasField) {
         metadatas.forEach((metadata) => {
-          const derivatives = (metadata as any)?.derivatives?.data ?? [];
+          const derivatives = metadata?.derivatives ?? [];
           const filenameAlias: string =
             selectedFilenameAliasField.label === "managedAttributes" &&
             dynamicFieldValue
