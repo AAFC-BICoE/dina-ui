@@ -11,6 +11,7 @@ import { GUEST, READ_ONLY, SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { RoleBadges } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 
@@ -27,6 +28,7 @@ const ROLE_OPTIONS = [
     value: roleName
   }))
 ];
+
 /** "membership" filter values. */
 export const MEMBER = "member";
 export const NON_MEMBER = "nonMember";
@@ -34,6 +36,9 @@ export const NON_MEMBER = "nonMember";
 /** "labelStatus" filter values. */
 export const HAS_LABEL = "hasLabel";
 export const MISSING_LABEL = "missingLabel";
+
+/** Placeholder shown in empty table cells. */
+const EMPTY_CELL = <span className="text-muted">—</span>;
 
 /** The current user's account details the filters depend on. */
 export interface GroupFilterContext {
@@ -128,19 +133,17 @@ export default function GroupListPage() {
       {
         id: "label",
         header: () => <DinaMessage id="groupLabel" />,
-        // The accessor makes the column sortable client-side 
+        // The accessor makes the column sortable client-side
         // (sorting is in-memory on this page, like the filtering).
         accessorFn: (group) => group.labels?.[locale] ?? "",
-        cell: ({ row: { original } }) => (
-          <>{original.labels?.[locale] ?? ""}</>
-        )
+        cell: ({ getValue }) => getValue<string>() || EMPTY_CELL
       },
       {
         cell: ({
           row: {
             original: { path }
           }
-        }) => path,
+        }) => <span className="font-monospace">{path}</span>,
         accessorKey: "path"
       },
       {
@@ -152,15 +155,10 @@ export default function GroupListPage() {
           row: {
             original: { name }
           }
-        }) => (
-          <>
-            {(rolesPerGroup?.[name] ?? []).map((role) => (
-              <span key={role} className="badge bg-primary me-1">
-                {role}
-              </span>
-            ))}
-          </>
-        ),
+        }) => {
+          const myRoles = rolesPerGroup?.[name];
+          return myRoles?.length ? <RoleBadges roles={myRoles} /> : EMPTY_CELL;
+        },
         enableSorting: false
       }
     ],
@@ -213,11 +211,14 @@ export default function GroupListPage() {
         id="group-list"
         filterType={ListLayoutFilterType.FREE_TEXT}
         filterAttributes={GROUP_FILTER_ATTRIBUTES}
+        filterFormClassName="list-filter-panel"
+        filterPlaceholder={formatMessage("groupSearchPlaceholder")}
+        liveSearch={true}
         enableInMemoryFilter={true}
         filterFn={filterFn}
         filterFormchildren={({ submitForm }) => (
-          <div className="d-flex gap-3 flex-wrap mb-3">
-            <div style={{ width: "300px" }}>
+          <div className="d-flex gap-3 flex-wrap">
+            <div style={{ width: "230px" }}>
               <SelectField
                 onChange={() => setImmediate(submitForm)}
                 name="membership"
@@ -225,7 +226,7 @@ export default function GroupListPage() {
                 options={membershipOptions}
               />
             </div>
-            <div style={{ width: "300px" }}>
+            <div style={{ width: "230px" }}>
               <SelectField
                 onChange={() => setImmediate(submitForm)}
                 name="role"
@@ -233,7 +234,7 @@ export default function GroupListPage() {
                 options={ROLE_OPTIONS}
               />
             </div>
-            <div style={{ width: "300px" }}>
+            <div style={{ width: "230px" }}>
               <SelectField
                 onChange={() => setImmediate(submitForm)}
                 name="labelStatus"
@@ -244,6 +245,7 @@ export default function GroupListPage() {
           </div>
         )}
         queryTableProps={queryTableProps}
+        wrapTable={(table) => <div className="dina-list-table">{table}</div>}
       />
     </PageLayout>
   );
