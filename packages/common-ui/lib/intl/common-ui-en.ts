@@ -164,6 +164,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   subjectTermsForPage:
     "government information, scientific information, scientific research",
   submitBtnText: "Save",
+  tableFilteredFromCount: "filtered from {totalCount} total",
   tableSelectedCount: "Total selected records: {totalCount}",
   tableTotalCount: "Total matched records: {totalCount}",
   targetField: "Target Field",
