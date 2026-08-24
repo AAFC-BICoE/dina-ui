@@ -20,8 +20,13 @@ const DEFAULT_SORT = [{ id: "name", desc: false }];
 /** Roles a user can hold within a group, as they appear in rolesPerGroup values. */
 const GROUP_BASED_ROLES = [SUPER_USER, USER, GUEST, READ_ONLY];
 
-
-
+const ROLE_OPTIONS = [
+  { label: "<any>", value: undefined },
+  ...GROUP_BASED_ROLES.map((roleName) => ({
+    label: roleName,
+    value: roleName
+  }))
+];
 /** "membership" filter values. */
 export const MEMBER = "member";
 export const NON_MEMBER = "nonMember";
