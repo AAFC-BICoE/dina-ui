@@ -332,6 +332,23 @@ export function QueryTable<TData extends KitsuResource>({
   const totalCount =
     lastSuccessfulResponse.current?.meta?.totalResourceCount ?? 0;
 
+  // In-memory mode, how many records were loaded before the client-side filter
+  // narrowed them down, so the user can tell a filtered list from a short one.
+  const unfilteredCount = enableInMemoryFilter
+    ? response?.data?.length
+    : undefined;
+  const filteredFromCountElement =
+    unfilteredCount !== undefined && unfilteredCount > totalCount ? (
+      <span className="text-muted ms-2 filtered-from-count">
+        (
+        <CommonMessage
+          id="tableFilteredFromCount"
+          values={{ totalCount: formatNumber(unfilteredCount) }}
+        />
+        )
+      </span>
+    ) : null;
+
   const numberOfPages = totalCount
     ? Math.ceil(totalCount / page.limit)
     : undefined;
@@ -377,12 +394,15 @@ export function QueryTable<TData extends KitsuResource>({
     >
       <div className="d-flex align-items-end mb-1">
         {!omitPaging && (
-          <span>
-            <CommonMessage
-              id="tableTotalCount"
-              values={{ totalCount: formatNumber(totalCount) }}
-            />
-          </span>
+          <>
+            <span>
+              <CommonMessage
+                id="tableTotalCount"
+                values={{ totalCount: formatNumber(totalCount) }}
+              />
+            </span>
+            {filteredFromCountElement}
+          </>
         )}
         <div className="ms-auto">
           <div>{topRightCorner}</div>
@@ -448,6 +468,7 @@ export function QueryTable<TData extends KitsuResource>({
               values={{ totalCount: formatNumber(totalCount) }}
             />
           </span>
+          {filteredFromCountElement}
         </div>
       )}
     </div>
