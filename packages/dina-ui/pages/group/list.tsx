@@ -165,8 +165,6 @@ export default function GroupListPage() {
     [locale, rolesPerGroup]
   );
 
-
-
   // Keyed on the locale rather than on formatMessage, which is a new function on
   // every render and would defeat the memoization.
   const membershipOptions = useMemo(
@@ -186,6 +184,7 @@ export default function GroupListPage() {
     ],
     [locale]
   );
+
   const filterFn = useMemo(
     () => groupFilterFn({ myGroupNames: groupNames, rolesPerGroup, locale }),
     [groupNames, rolesPerGroup, locale]
@@ -214,7 +213,34 @@ export default function GroupListPage() {
         filterAttributes={GROUP_FILTER_ATTRIBUTES}
         enableInMemoryFilter={true}
         filterFn={filterFn}
-
+        filterFormchildren={({ submitForm }) => (
+          <div className="d-flex gap-3 flex-wrap mb-3">
+            <div style={{ width: "300px" }}>
+              <SelectField
+                onChange={() => setImmediate(submitForm)}
+                name="membership"
+                label={formatMessage("groupMembership")}
+                options={membershipOptions}
+              />
+            </div>
+            <div style={{ width: "300px" }}>
+              <SelectField
+                onChange={() => setImmediate(submitForm)}
+                name="role"
+                label={formatMessage("myRoleInGroup")}
+                options={ROLE_OPTIONS}
+              />
+            </div>
+            <div style={{ width: "300px" }}>
+              <SelectField
+                onChange={() => setImmediate(submitForm)}
+                name="labelStatus"
+                label={formatMessage("groupLabelStatus")}
+                options={labelStatusOptions}
+              />
+            </div>
+          </div>
+        )}
         queryTableProps={queryTableProps}
       />
     </PageLayout>
