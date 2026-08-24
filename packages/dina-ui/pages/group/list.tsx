@@ -39,7 +39,7 @@ export function groupFilterFn(
 }
 
 export default function GroupListPage() {
-  const { isAdmin } = useAccount();
+  const { isAdmin, rolesPerGroup } = useAccount();
   const { locale } = useDinaIntl();
 
   const groupTableColumns: ColumnDefinition<Group>[] = useMemo(
@@ -71,9 +71,29 @@ export default function GroupListPage() {
           }
         }) => path,
         accessorKey: "path"
+      },
+      {
+        id: "myRoles",
+        header: () => <DinaMessage id="myRoleInGroup" />,
+        // Shown so the results of the membership and role filters are visible
+        // in the table instead of only narrowing the rows.
+        cell: ({
+          row: {
+            original: { name }
+          }
+        }) => (
+          <>
+            {(rolesPerGroup?.[name] ?? []).map((role) => (
+              <span key={role} className="badge bg-primary me-1">
+                {role}
+              </span>
+            ))}
+          </>
+        ),
+        enableSorting: false
       }
     ],
-    [locale]
+    [locale, rolesPerGroup]
   );
 
   const buttonBarContent = (
