@@ -6,7 +6,7 @@ import UploadPage, {
   BULK_ADD_FILES_KEY
 } from "../../../pages/object-store/upload";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -124,14 +124,8 @@ describe("Upload page", () => {
       wrapper.container.querySelector<HTMLInputElement>('input[type="file"]');
     expect(fileInput).toBeInTheDocument();
 
-    // Mock the `FileList` containing the files:
-    Object.defineProperty(fileInput, "files", {
-      value: mockAcceptedFiles,
-      configurable: true
-    });
-
     // Simulate the file selection
-    fireEvent.change(fileInput!);
+    await userEvent.upload(fileInput!, mockAcceptedFiles);
 
     // Await the processing of the file uploads
     await waitFor(() => {
@@ -204,6 +198,9 @@ describe("Upload page", () => {
       }))
     );
     const mockGet = jest.fn((path) => {
+      if (path === "user-api/group") {
+        return { data: [{ name: "example-group" }] };
+      }
       if (path === "objectstore-api/config/file-upload") {
         return {
           data: {
@@ -251,14 +248,8 @@ describe("Upload page", () => {
       wrapper.container.querySelector<HTMLInputElement>('input[type="file"]');
     expect(fileInput).toBeInTheDocument();
 
-    // Mock the `FileList` containing the files:
-    Object.defineProperty(fileInput, "files", {
-      value: mockAcceptedFiles,
-      configurable: true
-    });
-
     // Simulate the file selection
-    fireEvent.change(fileInput!);
+    await userEvent.upload(fileInput!, mockAcceptedFiles);
     await waitForLoadingToDisappear();
 
     // Await the processing of the file uploads

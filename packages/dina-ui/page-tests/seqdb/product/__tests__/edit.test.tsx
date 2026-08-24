@@ -1,6 +1,6 @@
 import { waitForLoadingToDisappear } from "common-ui";
 import { ProductEditPage } from "../../../../pages/seqdb/product/edit";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
 import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
@@ -71,12 +71,10 @@ describe("Product edit page", () => {
     );
 
     // Edit the product name.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: {
-        name: "name",
-        value: "New Product"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "New Product"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -145,12 +143,10 @@ describe("Product edit page", () => {
     });
 
     // Modify the "description" value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /description/i }), {
-      target: {
-        name: "description",
-        value: "new desc for product 10, was a null value"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /description/i }),
+      "new desc for product 10, was a null value"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);

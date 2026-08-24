@@ -2,6 +2,7 @@ import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { ParseVerbatimToRangeButton } from "../ParseVerbatimToRangeButton";
 import { waitFor, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const mockSubmit = jest.fn();
@@ -27,7 +28,7 @@ describe("ParseVerbatimToRangeButton component", () => {
 
     // Simulate button click
     const button = wrapper.getByRole("button");
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // Submit the form using querySelector
     const form = wrapper.container.querySelector("form");
@@ -57,7 +58,7 @@ describe("ParseVerbatimToRangeButton component", () => {
     );
 
     const button = wrapper.getByRole("button");
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // Submit the form using querySelector
     const form = wrapper.container.querySelector("form");
@@ -88,7 +89,7 @@ describe("ParseVerbatimToRangeButton component", () => {
 
     // Simulate button click
     const button = wrapper.getByRole("button");
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // Submit the form using querySelector
     const form = wrapper.container.querySelector("form");
@@ -118,7 +119,7 @@ describe("ParseVerbatimToRangeButton component", () => {
     );
 
     const button = wrapper.getByRole("button", { name: /buttonText/i });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // Expect error feedback message in the UI
     await waitFor(() => {
@@ -152,7 +153,7 @@ describe("ParseVerbatimToRangeButton component", () => {
     );
 
     const button = wrapper.getByRole("button", { name: /buttonText/i });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await waitFor(() => {
       expect(wrapper.getByText(/Field is empty/i)).toBeInTheDocument();

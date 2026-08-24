@@ -14,7 +14,7 @@ import {
   QueryTableProps,
   waitForLoadingToDisappear
 } from "../..";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { fireEvent, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
@@ -167,7 +167,7 @@ describe("QueryTable component", () => {
     // To do 24 should exist but not 25.
     expect(wrapper.getByRole("cell", { name: /todo 24/i })).toBeInTheDocument();
     expect(
-      await wrapper.queryByRole("cell", { name: /todo 25/i })
+      wrapper.queryByRole("cell", { name: /todo 25/i })
     ).not.toBeInTheDocument();
 
     // Click the "Next" button.
@@ -260,16 +260,16 @@ describe("QueryTable component", () => {
 
     // Click the "name" header.
     await userEvent.click(wrapper.getByText(/name/i));
-    await waitFor(async () => {
+    await waitFor(() => {
       // The second request should have a "name" sort.
       expect(mockGet).lastCalledWith(
         "todo",
         objectContaining({ sort: "name" })
       );
-
-      // Click the "name" header again to sort by descending order.
-      await userEvent.click(wrapper.getByText(/name/i));
     });
+
+    // Click the "name" header again to sort by descending order.
+    await userEvent.click(wrapper.getByText(/name/i));
     await waitFor(() => {
       // The third request should have a "-name" sort.
       expect(mockGet).lastCalledWith(
@@ -443,7 +443,7 @@ describe("QueryTable component", () => {
     ).toBeInTheDocument();
 
     // Expect correct custom cell content in the 3rd data cell.
-    expect(wrapper.getByRole("cell", { name: "TODO 0" }));
+    expect(wrapper.getByRole("cell", { name: "TODO 0" })).toBeInTheDocument();
   });
 
   it("Scrolls to the top of the table when the page is changed.", async () => {
@@ -643,22 +643,19 @@ describe("QueryTable component", () => {
     expect(onPageChangeMock).toBeCalledTimes(0);
 
     // Change it to 12.
-    await userEvent.clear(pageSelector);
-    await userEvent.type(pageSelector, "12");
+    await clearAndType(pageSelector, "12");
     fireEvent.blur(pageSelector);
     expect(pageSelector).toHaveDisplayValue("12");
     expect(onPageChangeMock).toBeCalledTimes(1);
 
     // Change it to 8.
-    await userEvent.clear(pageSelector);
-    await userEvent.type(pageSelector, "8");
+    await clearAndType(pageSelector, "8");
     fireEvent.blur(pageSelector);
     expect(pageSelector).toHaveDisplayValue("8");
     expect(onPageChangeMock).toBeCalledTimes(2);
 
     // Change it to 13, invalid.
-    await userEvent.clear(pageSelector);
-    await userEvent.type(pageSelector, "13");
+    await clearAndType(pageSelector, "13");
     fireEvent.blur(pageSelector);
     expect(pageSelector).toHaveDisplayValue("1");
     expect(onPageChangeMock).toBeCalledTimes(3);

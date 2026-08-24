@@ -10,12 +10,26 @@ describe("Index page", () => {
     const wrapper = mountWithAppContext(<IndexPage />);
 
     // Test headings to make sure the page rendered
-    expect(wrapper.getByRole("heading", { name: /collection/i }));
-    expect(wrapper.getByRole("heading", { name: /transactions/i }));
-    expect(wrapper.getByRole("heading", { name: /object store/i }));
-    expect(wrapper.getByRole("heading", { name: /agents/i }));
-    expect(wrapper.getByRole("heading", { name: /sequencing/i }));
-    expect(wrapper.getByRole("heading", { name: /controlled vocabulary/i }));
-    expect(wrapper.getByRole("heading", { name: /configuration/i }));
+    expect(
+      wrapper.getByRole("heading", { name: /collection/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("heading", { name: /transactions/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("heading", { name: /object store/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("heading", { name: /agents/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("heading", { name: /sequencing/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("heading", { name: /controlled vocabulary/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("heading", { name: /configuration/i })
+    ).toBeInTheDocument();
   });
 });

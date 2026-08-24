@@ -2,7 +2,8 @@ import { PersistedResource } from "kitsu";
 import { mountWithAppContext, OBJECT_STORE_MAPPING } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { ExistingObjectsAttacher } from "../ExistingObjectsAttacher";
-import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
@@ -121,13 +122,13 @@ describe("ExistingObjectsAttacher component", () => {
     });
 
     // Select all 3 metadatas to attach.
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("checkbox", {
         name: /check all/i
       })
     );
     // click Attach button
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("button", {
         name: /attach selected/i
       })

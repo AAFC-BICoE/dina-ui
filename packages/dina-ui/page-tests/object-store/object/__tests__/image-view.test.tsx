@@ -2,7 +2,7 @@ import ImageViewer from "../../../../pages/object-store/object/image-view";
 import { useRouter } from "next/router";
 import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import "@testing-library/jest-dom";
-import { waitFor } from "@testing-library/dom";
+import { waitFor } from "@testing-library/react";
 
 // Mock next/router
 jest.mock("next/router", () => ({
@@ -40,7 +40,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 
     // Loading case
     case "objectstore-api/object-upload/loading":
-      return new Promise(() => {});
+      return new Promise(() => { });
 
     // Derivative fallback cases
     case "objectstore-api/derivative":
