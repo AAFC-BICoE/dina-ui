@@ -167,6 +167,25 @@ export default function GroupListPage() {
 
 
 
+  // Keyed on the locale rather than on formatMessage, which is a new function on
+  // every render and would defeat the memoization.
+  const membershipOptions = useMemo(
+    () => [
+      { label: "<any>", value: undefined },
+      { label: formatMessage("groupsIBelongTo"), value: MEMBER },
+      { label: formatMessage("groupsIDoNotBelongTo"), value: NON_MEMBER }
+    ],
+    [locale]
+  );
+
+  const labelStatusOptions = useMemo(
+    () => [
+      { label: "<any>", value: undefined },
+      { label: formatMessage("groupHasLabel"), value: HAS_LABEL },
+      { label: formatMessage("groupMissingLabel"), value: MISSING_LABEL }
+    ],
+    [locale]
+  );
   const filterFn = useMemo(
     () => groupFilterFn({ myGroupNames: groupNames, rolesPerGroup, locale }),
     [groupNames, rolesPerGroup, locale]
