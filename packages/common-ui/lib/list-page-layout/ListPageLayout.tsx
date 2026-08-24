@@ -46,6 +46,19 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
   ) => boolean;
   filterAttributes?: FilterAttribute[];
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
+
+  /* CSS classes added to the filter form's layout wrapper, e.g. "list-filter-panel". */
+  filterFormClassName?: string;
+
+  /* Placeholder text for the free-text search input (FREE_TEXT filter type only). */
+  filterPlaceholder?: string;
+
+  /**
+   * Re-filters the list as the user types in the free-text search (FREE_TEXT filter type only).
+   * Intended for in-memory filtered lists, where re-filtering is cheap.
+   */
+  liveSearch?: boolean;
+
   id: string;
   queryTableProps:
     | QueryTableProps<TData>
@@ -76,6 +89,9 @@ export function ListPageLayout<TData extends KitsuResource>({
   filterFn = () => true,
   filterAttributes,
   filterFormchildren,
+  filterFormClassName,
+  filterPlaceholder,
+  liveSearch,
   id,
   queryTableProps,
   wrapTable = (children) => children,
@@ -233,12 +249,22 @@ export function ListPageLayout<TData extends KitsuResource>({
     <div>
       {filterAttributes &&
         filterType === ListLayoutFilterType.FILTER_BUILDER && (
-          <FilterForm filterAttributes={filterAttributes} id={id}>
+          <FilterForm
+            filterAttributes={filterAttributes}
+            id={id}
+            className={filterFormClassName}
+          >
             {filterFormchildren}
           </FilterForm>
         )}
       {filterAttributes && filterType === ListLayoutFilterType.FREE_TEXT && (
-        <FreeTextFilterForm filterAttributes={filterAttributes} id={id}>
+        <FreeTextFilterForm
+          filterAttributes={filterAttributes}
+          id={id}
+          className={filterFormClassName}
+          placeholder={filterPlaceholder}
+          liveSearch={liveSearch}
+        >
           {filterFormchildren}
         </FreeTextFilterForm>
       )}
