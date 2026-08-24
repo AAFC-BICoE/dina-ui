@@ -128,10 +128,12 @@ export default function GroupListPage() {
       {
         id: "label",
         header: () => <DinaMessage id="groupLabel" />,
+        // The accessor makes the column sortable client-side 
+        // (sorting is in-memory on this page, like the filtering).
+        accessorFn: (group) => group.labels?.[locale] ?? "",
         cell: ({ row: { original } }) => (
           <>{original.labels?.[locale] ?? ""}</>
-        ),
-        enableSorting: false
+        )
       },
       {
         cell: ({
