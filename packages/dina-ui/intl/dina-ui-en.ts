@@ -1253,6 +1253,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   userMissingAgent: "Unlinked",
   userMustBelongToGroup: "User must belong to a Group",
   userSearchPlaceholder: "Search by username, name, email or agent",
+  userSearchPlaceholderWithoutAgent: "Search by username, name or email",
   userViewTitle: "User",
   valueCad: "Value ($ CAD)",
   verbatimDeterminationLegend: "Verbatim Determination",
