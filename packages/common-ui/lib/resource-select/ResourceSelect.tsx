@@ -423,7 +423,7 @@ export function ResourceSelectInner<TData extends KitsuResource>({
 
   /** An option the user can select to set the relationship to null. */
   const NULL_OPTION = Object.seal({
-    label: <>{formatMessage({ id: "none" })}</>,
+    label: <>{formatMessage({ id: "noneOption" })}</>,
     resource: Object.seal({ id: null }),
     value: null
   });
