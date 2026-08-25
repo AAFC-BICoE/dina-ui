@@ -4,6 +4,7 @@ import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { AttachmentsField } from "../AttachmentsField";
 import { screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
@@ -125,7 +126,7 @@ describe("AttachmentsField component", () => {
       expect(button).toBeInTheDocument();
       return button;
     });
-    fireEvent.click(addButton);
+    await userEvent.click(addButton);
 
     await waitFor(() => {
       expect(
@@ -133,7 +134,7 @@ describe("AttachmentsField component", () => {
       ).toBeInTheDocument();
     });
 
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("tab", {
         name: /attach existing objects/i
       })
@@ -145,13 +146,13 @@ describe("AttachmentsField component", () => {
     });
 
     // Simulate saving the attachments
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("checkbox", {
         name: /check all/i
       })
     );
 
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("button", {
         name: /attach selected/i
       })
@@ -205,7 +206,7 @@ describe("AttachmentsField component", () => {
       expect(button).toBeInTheDocument();
       return button;
     });
-    fireEvent.click(addButton);
+    await userEvent.click(addButton);
 
     await waitFor(() => {
       expect(
@@ -213,7 +214,7 @@ describe("AttachmentsField component", () => {
       ).toBeInTheDocument();
     });
 
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("tab", {
         name: /attach existing objects/i
       })
@@ -225,13 +226,13 @@ describe("AttachmentsField component", () => {
     });
 
     // Simulate saving the attachments
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("checkbox", {
         name: /check all/i
       })
     );
 
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("button", {
         name: /attach selected/i
       })
@@ -247,7 +248,7 @@ describe("AttachmentsField component", () => {
       expect(button).toBeInTheDocument();
       return button;
     });
-    fireEvent.click(addButton2);
+    await userEvent.click(addButton2);
 
     await waitFor(() => {
       expect(
@@ -256,7 +257,7 @@ describe("AttachmentsField component", () => {
     });
 
     // Add metadatas again
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("tab", {
         name: /attach existing objects/i
       })
@@ -267,13 +268,13 @@ describe("AttachmentsField component", () => {
       ).toBeInTheDocument();
     });
 
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("checkbox", {
         name: /check all/i
       })
     );
 
-    fireEvent.click(
+    await userEvent.click(
       screen.getByRole("button", {
         name: /attach selected/i
       })
@@ -326,7 +327,7 @@ describe("AttachmentsField component", () => {
     });
 
     const removeButtons = screen.getAllByRole("button", { name: /unlink/i });
-    fireEvent.click(removeButtons[0]);
+    await userEvent.click(removeButtons[0]);
 
     await waitFor(() => {
       expect(container.querySelectorAll("tbody tr").length).toEqual(1);

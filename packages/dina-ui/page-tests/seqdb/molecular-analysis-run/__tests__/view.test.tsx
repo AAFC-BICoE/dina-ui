@@ -247,7 +247,7 @@ describe("Molecular Analysis Run View", () => {
     });
 
     // Test loading spinner to render
-    expect(wrapper.getByText(/loading\.\.\./i));
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Renders the molecular analysis run details for generic molecular analysis", async () => {
@@ -304,7 +304,7 @@ describe("Molecular Analysis Run View", () => {
       // Ensure the quality control section is displayed.
       expect(
         wrapper.getByRole("heading", { name: "Sequencing Quality Control:" })
-      );
+      ).toBeInTheDocument();
 
       // Expect Quality Control 1 to be displayed:
       expect(wrapper.getByText("Quality Control 1")).toBeInTheDocument();

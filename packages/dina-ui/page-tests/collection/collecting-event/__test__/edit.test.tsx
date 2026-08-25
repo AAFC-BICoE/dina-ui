@@ -1,4 +1,4 @@
-import { OperationsResponse, makeAxiosErrorMoreReadable } from "common-ui";
+import { OperationsResponse, clearAndType, makeAxiosErrorMoreReadable } from "common-ui";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../../types/agent-api/resources/Person";
@@ -169,25 +169,15 @@ describe("collecting-event edit page", () => {
     });
 
     // Edit the verbatim datetime
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
-      {
-        target: {
-          name: "verbatimEventDateTime",
-          value: "From 2019,12,21 4pm to 2019,12,22 5pm"
-        }
-      }
+      "From 2019,12,21 4pm to 2019,12,22 5pm"
     );
 
     // Edit the otherRecordNumbers
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /additional collection numbers/i }),
-      {
-        target: {
-          name: "otherRecordNumbers",
-          value: "12\n23"
-        }
-      }
+      "12\n23"
     );
 
     // Submit the form.
@@ -241,41 +231,25 @@ describe("collecting-event edit page", () => {
     });
 
     // Edit the verbatim datetime
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
-      {
-        target: {
-          value: "From 2019,12,21 4pm to 2019,12,22 5pm"
-        }
-      }
+      "From 2019,12,21 4pm to 2019,12,22 5pm"
     );
 
     // Change georeference values
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /decimal latitude/i }),
-      {
-        target: {
-          value: "45.394728"
-        }
-      }
+      "45.394728"
     );
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /decimal longitude/i }),
-      {
-        target: {
-          value: "-75.701452"
-        }
-      }
+      "-75.701452"
     );
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", {
         name: /coordinate uncertainty in meters/i
       }),
-      {
-        target: {
-          value: "5"
-        }
-      }
+      "5"
     );
 
     // Submit form
@@ -340,14 +314,9 @@ describe("collecting-event edit page", () => {
     });
 
     // Modify the value.
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
-      {
-        target: {
-          name: "verbatimEventDateTime",
-          value: "From 2019,12,21 4pm to 2019,12,22 6pm"
-        }
-      }
+      "From 2019,12,21 4pm to 2019,12,22 6pm"
     );
 
     // Submit the form.
@@ -400,9 +369,7 @@ describe("collecting-event edit page", () => {
     });
 
     // Set the field to be empty.
-    fireEvent.change(wrapper.getByDisplayValue("12 13 14"), {
-      target: { value: "" }
-    });
+    await userEvent.clear(wrapper.getByDisplayValue("12 13 14"));
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -442,16 +409,11 @@ describe("collecting-event edit page", () => {
 
     // Change verbatimEventDateTime value to indicate error should be triggered.
 
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", {
         name: /verbatim event datetime/i
       }),
-      {
-        target: {
-          name: "verbatimEventDateTime",
-          value: "error_trigger"
-        }
-      }
+      "error_trigger"
     );
 
     // Submit the form.
@@ -498,8 +460,10 @@ describe("collecting-event edit page", () => {
 
     // There should be 2 assertion tabs:
     expect(wrapper.getAllByRole("tab")).toHaveLength(2);
-    expect(wrapper.getByRole("tab", { name: /1/i }));
-    expect(wrapper.getByRole("tab", { name: /2 \(primary\)/i }));
+    expect(wrapper.getByRole("tab", { name: /1/i })).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("tab", { name: /2 \(primary\)/i })
+    ).toBeInTheDocument();
   });
 
   it("Removes the coordinate system if there are no coordinates set.", async () => {
@@ -686,7 +650,7 @@ describe("collecting-event edit page", () => {
 
     const removeButtons = wrapper.getAllByRole("button", { name: /remove/i });
     for (const button of removeButtons) {
-      fireEvent.click(button);
+      await userEvent.click(button);
     }
 
     // Verify collectors are gone.

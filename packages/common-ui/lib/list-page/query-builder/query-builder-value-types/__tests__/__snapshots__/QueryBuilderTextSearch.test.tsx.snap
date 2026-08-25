@@ -287,7 +287,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation Normal field 2`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation with boolean-like values Normal field 1`] = `
 {
   "term": {
     "data.attributes.textField": "true",
@@ -319,7 +319,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation With relationship as field 2`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation with boolean-like values With relationship as field 1`] = `
 {
   "nested": {
     "path": "included",

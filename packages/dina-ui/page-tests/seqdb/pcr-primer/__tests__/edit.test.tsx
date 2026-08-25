@@ -1,7 +1,7 @@
 import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { PcrPrimerEditPage } from "../../../../pages/seqdb/pcr-primer/edit";
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import { clearAndType, mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -56,11 +56,10 @@ describe("PcrPrimer edit page", () => {
     );
 
     // Edit the primer name.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: {
-        value: "New PcrPrimer"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "New PcrPrimer"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -123,12 +122,10 @@ describe("PcrPrimer edit page", () => {
     });
 
     // Modify the "seq"/Primer Sequence (5' - 3') value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /seq/i }), {
-      target: {
-        name: "seq",
-        value: "new seq value"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /seq/i }),
+      "new seq value"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);

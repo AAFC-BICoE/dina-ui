@@ -35,7 +35,7 @@ describe("Region details page", () => {
     });
 
     // Test loading spinner to render
-    expect(wrapper.getByText(/loading\.\.\./i));
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Render the gene region details", async () => {

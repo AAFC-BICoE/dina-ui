@@ -283,16 +283,12 @@ it("should save form data", async () => {
     expect(wrapper.getByRole("textbox", { name: /name/i })).toBeInTheDocument();
   });
 
-  // Fill form using fireEvent
-  fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-    target: { value: "John" }
-  });
+  // Fill the form with userEvent (always awaited). Use clearAndType() when the
+  // field may already have a value, it clears the input before typing.
+  await clearAndType(wrapper.getByRole("textbox", { name: /name/i }), "John");
 
-  // Or use userEvent for more realistic interactions
-  userEvent.click(wrapper.getByRole("button", { name: /submit/i }));
-
-  // Submit form
-  fireEvent.submit(wrapper.container.querySelector("form")!);
+  // Submit the form by clicking the Save button, like a user would.
+  await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
   // Wait for save to complete
   await waitFor(() => {
@@ -319,21 +315,19 @@ it("should handle user interactions", async () => {
   });
 
   // Click button
-  userEvent.click(wrapper.getByRole("button", { name: /add tag/i }));
+  await userEvent.click(wrapper.getByRole("button", { name: /add tag/i }));
 
-  // Change input
-  fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
-    target: { value: "new tag" }
-  });
+  // Type into an input (creatable select shown here)
+  await userEvent.type(wrapper.getByRole("combobox", { name: /tags/i }), "new tag");
 
   // Select option
-  userEvent.click(wrapper.getByRole("option", { name: /add "new tag"/i }));
+  await userEvent.click(wrapper.getByRole("option", { name: /add "new tag"/i }));
 
   // Toggle switch
-  userEvent.click(wrapper.getByRole("switch"));
+  await userEvent.click(wrapper.getByRole("switch"));
 
   // Remove item
-  userEvent.click(wrapper.getByRole("button", { name: /remove tag1/i }));
+  await userEvent.click(wrapper.getByRole("button", { name: /remove tag1/i }));
 
   // Wait for new element to appear
   await waitFor(() => {
@@ -354,10 +348,10 @@ it("should update dropdown selection", async () => {
   });
 
   // Open dropdown
-  userEvent.click(wrapper.getByRole("combobox", { name: /license/i }));
+  await userEvent.click(wrapper.getByRole("combobox", { name: /license/i }));
 
   // Select option
-  userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
+  await userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
 
   // Verify selection
   expect(wrapper.getByRole("combobox", { name: /license/i })).toHaveDisplayValue("");
@@ -427,14 +421,47 @@ it("should fetch data with hook", async () => {
 
 == Best Practices
 
-=== Always use waitFor for async operations
+=== Simulate the user with `userEvent`, not `fireEvent`
+
+Use `@testing-library/user-event` for interactions and always `await` it. It
+dispatches the full sequence of events a real user produces (pointer, focus,
+keyboard, input, change) and waits for React to settle, which avoids the
+"works locally, flaky in CI" class of failures.
 
 [source,typescript]
 ----
+import userEvent from "@testing-library/user-event";
+import { clearAndType, mountWithAppContext } from "common-ui";
+
+await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+await userEvent.type(wrapper.getByRole("textbox", { name: /name/i }), "John");
+
+// Replace an existing value (userEvent.clear + userEvent.type):
+await clearAndType(wrapper.getByRole("textbox", { name: /name/i }), "New name");
+----
+
+* `fireEvent.change()` -> `await userEvent.type()` / `await clearAndType()`
+* `fireEvent.click()` -> `await userEvent.click()`
+* `fireEvent.submit(form)` -> `await userEvent.click(saveButton)`
+* `fail("...")` (deprecated jasmine global) -> `throw new Error("...")`
+
+=== Always use waitFor (or findBy*) for async operations
+
+[source,typescript]
+----
+// Wait for an element to appear:
+expect(await wrapper.findByText("Loaded")).toBeInTheDocument();
+
+// Wait for a non-DOM condition, e.g. an API mock being called:
 await waitFor(() => {
-  expect(wrapper.getByText("Loaded")).toBeInTheDocument();
+  expect(mockSave).toHaveBeenCalledTimes(1);
 });
 ----
+
+Keep user actions (`userEvent.*`) and other side effects *outside* of `waitFor`
+callbacks: the callback is retried until it passes, so an action inside it can
+run more than once. Never use `await new Promise((r) => setTimeout(r, N))` to
+"wait a bit" - wait for the actual condition instead.
 
 === Use appropriate queries
 

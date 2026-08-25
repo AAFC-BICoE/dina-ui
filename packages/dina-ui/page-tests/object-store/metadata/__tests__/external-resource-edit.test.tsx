@@ -139,23 +139,20 @@ describe("Metadata external resource edit page.", () => {
     );
 
     // Set values:
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /file extension/i }),
-      {
-        target: { value: ".jpg" }
-      }
+      ".jpg"
     );
 
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /resource external url/i }),
-      {
-        target: { value: "http://agr.gc.ca" }
-      }
+      "http://agr.gc.ca"
     );
 
-    fireEvent.change(wrapper.getByRole("textbox", { name: /caption/i }), {
-      target: { value: "test caption" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /caption/i }),
+      "test caption"
+    );
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);

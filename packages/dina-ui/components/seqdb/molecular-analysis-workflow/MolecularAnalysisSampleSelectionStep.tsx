@@ -219,7 +219,7 @@ export function MolecularAnalysisSampleSelectionStep({
       resourceType: "material-sample-summary"
     });
     const sorted = sortMaterialSamples(
-      (response.data.data as PersistedResource<MaterialSampleSummary>[]) ?? []
+      (response.data as PersistedResource<MaterialSampleSummary>[]) ?? []
     );
     setSelectedResources(sorted);
   }
@@ -230,7 +230,7 @@ export function MolecularAnalysisSampleSelectionStep({
         [molecularAnalysisId],
         { apiBaseUrl: "/seqdb-api", resourceType: "generic-molecular-analysis" }
       );
-      const genericMolecularAnalysis = genericMolecularAnalysisResponse.data
+      const genericMolecularAnalysis = genericMolecularAnalysisResponse
         .data[0] as GenericMolecularAnalysis;
 
       // Convert to UUID arrays to compare the two arrays.
@@ -291,8 +291,8 @@ export function MolecularAnalysisSampleSelectionStep({
               resourceType: "molecular-analysis-run-item"
             }
           );
-          molecularRunItemsCreated = createdRunItemsResponse.data
-            .data as MolecularAnalysisRunItem[];
+          molecularRunItemsCreated =
+            createdRunItemsResponse.data as MolecularAnalysisRunItem[];
         }
 
         await bulkCreateResources(

@@ -4,6 +4,7 @@ import { FormTemplate } from "../../../types/collection-api";
 import { mountWithAppContext } from "common-ui";
 import { ManagedAttributesEditor } from "../ManagedAttributesEditor";
 import { waitFor, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
@@ -209,7 +210,7 @@ describe("ManagedAttributesEditor component", () => {
     );
 
     if (removeButton) {
-      fireEvent.click(removeButton);
+      await userEvent.click(removeButton);
     }
 
     // Verify the field is removed
