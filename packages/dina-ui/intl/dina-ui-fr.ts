@@ -961,9 +961,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   useCollectorGroupLabel: "Utiliser le groupe de collecteurs",
   useLastSelectedOrderView:
     "Utiliser la dernière vue des commandes sélectionnées",
-  userHasAgent: "Lié à un agent",
+  userHasAgent: "Lié",
   userListTitle: "Utilisateurs",
-  userMissingAgent: "Non lié à un agent",
+  userMissingAgent: "Non lié",
   userMustBelongToGroup: "L’utilisateur doit appartenir à un groupe",
   userSearchPlaceholder: "Rechercher par nom d’utilisateur, nom, courriel ou agent",
   userViewTitle: "Utilisateur",
