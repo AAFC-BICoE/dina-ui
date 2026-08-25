@@ -1,5 +1,5 @@
 import RegionListPage from "../../../../pages/seqdb/region/list";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -50,11 +50,10 @@ describe("Region list page", () => {
     const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
 
     // Enter a search value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /filter/i }), {
-      target: {
-        value: "omni"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /filter/i }),
+      "omni"
+    );
 
     // Submit the search form.
     fireEvent.submit(wrapper.container.querySelector("form")!);

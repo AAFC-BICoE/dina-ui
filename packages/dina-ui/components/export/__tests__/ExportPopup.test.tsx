@@ -2,7 +2,7 @@ import { ExportPopup } from "../ExportPopup";
 import { mountWithAppContext } from "common-ui";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import { waitFor } from "@testing-library/dom";
+import { waitFor } from "@testing-library/react";
 
 const mockTarget = document.createElement("button");
 document.body.appendChild(mockTarget);

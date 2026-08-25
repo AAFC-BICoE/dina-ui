@@ -1,6 +1,10 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  mountWithAppContext,
+  waitForLoadingToDisappear,
+  clearAndType
+} from "common-ui";
 import {
   blankMaterialSample,
   CollectingEvent,
@@ -372,7 +376,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -466,7 +470,7 @@ describe("Material Sample Edit Page", () => {
       ".parent-material-sample-field"
     );
     if (!parentField) {
-      fail("Parent select field not found in form.");
+      throw new Error("Parent select field not found in form.");
     }
 
     const combo = within(parentField as any).getByRole("combobox");
@@ -509,7 +513,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -603,10 +607,7 @@ describe("Material Sample Edit Page", () => {
     await userEvent.click(selectExistingButton);
 
     // Make an unrelated change to the material sample.
-    await userEvent.clear(
-      wrapper.getByRole("textbox", { name: /primary id/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
@@ -665,8 +666,7 @@ describe("Material Sample Edit Page", () => {
     const collectionNumberField = wrapper.getAllByRole("textbox", {
       name: /collection number/i
     })[1];
-    await userEvent.clear(collectionNumberField);
-    await userEvent.type(collectionNumberField, "new collection number 123");
+    await clearAndType(collectionNumberField, "new collection number 123");
 
     // Save the material sample form
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -816,10 +816,7 @@ describe("Material Sample Edit Page", () => {
     expect(editAllVerbatimEventDateTime).toHaveDisplayValue("2021-04-13");
 
     // Update the Primary ID.
-    await userEvent.clear(
-      wrapper.getByRole("textbox", { name: /primary id/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
@@ -859,7 +856,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -875,10 +872,7 @@ describe("Material Sample Edit Page", () => {
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
       "2019-12-21T16:00"
     );
-    await userEvent.clear(
-      wrapper.getByRole("textbox", { name: /primary id/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
@@ -1315,7 +1309,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-organisms .react-switch-bg"
     );
     if (!organismToggle) {
-      fail("organism toggle needs to exist at this point.");
+      throw new Error("organism toggle needs to exist at this point.");
     }
     await userEvent.click(organismToggle[0]);
     await waitFor(() =>
@@ -1650,7 +1644,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-associations .react-switch-bg"
     );
     if (!associationToggle) {
-      fail("Association toggle needs to exist at this point.");
+      throw new Error("Association toggle needs to exist at this point.");
     }
     await userEvent.click(associationToggle[0]);
     await waitFor(() =>
@@ -1704,7 +1698,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-associations .react-switch-bg"
     );
     if (!associationToggle) {
-      fail("Association toggle needs to exist at this point.");
+      throw new Error("Association toggle needs to exist at this point.");
     }
     await userEvent.click(associationToggle[0]);
     await waitFor(() =>
@@ -1763,7 +1757,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-organisms .react-switch-bg"
     );
     if (!organismToggle) {
-      fail("organism toggle needs to exist at this point.");
+      throw new Error("organism toggle needs to exist at this point.");
     }
     await userEvent.click(organismToggle[0]);
     await waitFor(() =>
@@ -1920,7 +1914,7 @@ describe("Material Sample Edit Page", () => {
     const expandButtons =
       wrapper.container.querySelectorAll(".expand-organism");
     if (!expandButtons || expandButtons.length !== 3) {
-      fail("Missing 3 expand buttons in the organism section.");
+      throw new Error("Missing 3 expand buttons in the organism section.");
     }
     expandButtons.forEach(async (button) => {
       await userEvent.click(button);
@@ -1937,14 +1931,10 @@ describe("Material Sample Edit Page", () => {
     const lastLifestageField = wrapper.getAllByRole("textbox", {
       name: /life stage/i
     })[2];
-    await userEvent.clear(lastLifestageField);
-    await userEvent.type(lastLifestageField, "This should be removed...");
+    await clearAndType(lastLifestageField, "This should be removed...");
 
     // Reduce the organisms to 1:
-    await userEvent.clear(
-      wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("spinbutton", { name: /organisms quantity/i }),
       "1"
     );
@@ -2133,8 +2123,7 @@ describe("Material Sample Edit Page", () => {
     expect(organismQuantity).toHaveDisplayValue("1");
 
     // Set to 0.
-    await userEvent.clear(organismQuantity);
-    await userEvent.type(organismQuantity, "0");
+    await clearAndType(organismQuantity, "0");
 
     // Save the form
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -2290,14 +2279,10 @@ describe("Material Sample Edit Page", () => {
     expect(organismQuantity).toHaveDisplayValue("1");
 
     // Change it to 3.
-    await userEvent.clear(organismQuantity);
-    await userEvent.type(organismQuantity, "3");
+    await clearAndType(organismQuantity, "3");
 
     // Update the life stage.
-    await userEvent.clear(
-      wrapper.getByRole("textbox", { name: /life stage/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /life stage/i }),
       "common-life-stage"
     );
@@ -2440,10 +2425,7 @@ describe("Material Sample Edit Page", () => {
     await userEvent.click(expandButtons[2]);
 
     // Edit the lifeStage field:
-    await userEvent.clear(
-      wrapper.getByRole("textbox", { name: /life stage/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /life stage/i }),
       "lifestage 3 edited"
     );
@@ -2923,8 +2905,7 @@ describe("Material Sample Edit Page", () => {
 
     // Set a new value for attribute 2:
     const attribute2 = wrapper.getByDisplayValue(/attribute 2 value/i);
-    await userEvent.clear(attribute2);
-    await userEvent.type(attribute2, "new attribute 2 value");
+    await clearAndType(attribute2, "new attribute 2 value");
 
     // Save the form
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -2980,7 +2961,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -3024,7 +3005,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-organisms .react-switch-bg"
     );
     if (!organismToggle) {
-      fail("organism toggle needs to exist at this point.");
+      throw new Error("organism toggle needs to exist at this point.");
     }
     await userEvent.click(organismToggle[0]);
     await waitFor(() =>
@@ -3252,13 +3233,11 @@ describe("Material Sample Edit Page", () => {
       const hostOrganismTextfield = wrapper.getByRole("textbox", {
         name: /name search/i
       });
-      await userEvent.clear(hostOrganismTextfield);
-      await userEvent.type(hostOrganismTextfield, "Updated host name");
+      await clearAndType(hostOrganismTextfield, "Updated host name");
 
       // Change the remarks field
       const remarksTextbox = wrapper.getByText(/original remarks/i);
-      await userEvent.clear(remarksTextbox);
-      await userEvent.type(remarksTextbox, "Update host remarks");
+      await clearAndType(remarksTextbox, "Update host remarks");
 
       // Save the form
       await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -3342,7 +3321,7 @@ describe("Material Sample Edit Page", () => {
         ".enable-associations .react-switch-bg"
       );
       if (!associationToggle) {
-        fail("Association toggle needs to exist at this point.");
+        throw new Error("Association toggle needs to exist at this point.");
       }
       await userEvent.click(associationToggle[0]);
 
@@ -3418,8 +3397,7 @@ describe("Material Sample Edit Page", () => {
       const hostOrganismTextfield = wrapper.getByRole("textbox", {
         name: /name search/i
       });
-      await userEvent.clear(hostOrganismTextfield);
-      await userEvent.type(hostOrganismTextfield, "New Host Organism");
+      await clearAndType(hostOrganismTextfield, "New Host Organism");
 
       // Save the form
       await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -3800,7 +3778,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
@@ -3926,7 +3906,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
@@ -4164,7 +4146,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
@@ -4178,12 +4162,14 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       const manualSwitchBg =
         manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
       if (!manualSwitchBg) {
-        fail(
+        throw new Error(
           "Manual geography switch background needs to exist at this point."
         );
       }
@@ -4276,29 +4262,27 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       const manualSwitchBg =
         manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
       if (!manualSwitchBg) {
-        fail(
+        throw new Error(
           "Manual geography switch background needs to exist at this point."
         );
       }
       await userEvent.click(manualSwitchBg);
 
       // Set the State/Province field:
-      await userEvent.clear(
-        wrapper.getByRole("textbox", { name: /state\/province/i })
-      );
-      await userEvent.type(
+      await clearAndType(
         wrapper.getByRole("textbox", { name: /state\/province/i }),
         "Ontario"
       );
 
       // Set the Country field:
-      await userEvent.clear(wrapper.getByRole("textbox", { name: /country/i }));
-      await userEvent.type(
+      await clearAndType(
         wrapper.getByRole("textbox", { name: /country/i }),
         "Canada"
       );
@@ -4357,29 +4341,27 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       const manualSwitchBg =
         manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
       if (!manualSwitchBg) {
-        fail(
+        throw new Error(
           "Manual geography switch background needs to exist at this point."
         );
       }
       await userEvent.click(manualSwitchBg);
 
       // Set the State/Province field:
-      await userEvent.clear(
-        wrapper.getByRole("textbox", { name: /state\/province/i })
-      );
-      await userEvent.type(
+      await clearAndType(
         wrapper.getByRole("textbox", { name: /state\/province/i }),
         "Bavaria"
       );
 
       // Set the Country field:
-      await userEvent.clear(wrapper.getByRole("textbox", { name: /country/i }));
-      await userEvent.type(
+      await clearAndType(
         wrapper.getByRole("textbox", { name: /country/i }),
         "Germany"
       );
@@ -4435,7 +4417,9 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       expect(manualSwitchInput).toBeChecked();
     });
@@ -4472,7 +4456,9 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       expect(manualSwitchInput).not.toBeChecked();
     });
@@ -4492,7 +4478,9 @@ describe("Material Sample Edit Page", () => {
       );
 
       if (!scheduledActionToggle) {
-        fail("Scheduled action toggle needs to exist at this point.");
+        throw new Error(
+          "Scheduled action toggle needs to exist at this point."
+        );
       }
       await userEvent.click(scheduledActionToggle[0]);
 
@@ -4563,7 +4551,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
@@ -4872,7 +4862,6 @@ describe("Material Sample Edit Page", () => {
         "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111"
       );
     });
-
     it("Pressing Enter in a text field submits the form as a normal Save, not Save & Copy to Next.", async () => {
       (useRouter as jest.Mock).mockReturnValue({
         query: {},
@@ -4885,10 +4874,11 @@ describe("Material Sample Edit Page", () => {
 
       // Type into the Primary ID field and press Enter, simulating a user
       // hitting Enter instead of clicking a button.
-      await userEvent.type(
-        wrapper.getByRole("textbox", { name: /primary id/i }),
-        "Sample1{enter}"
-      );
+      const primaryIdInput = wrapper.getByRole("textbox", {
+        name: /primary id/i
+      });
+      await clearAndType(primaryIdInput, "Sample1");
+      await userEvent.type(primaryIdInput, "{enter}");
 
       // Only 1 save call: no collecting event was enabled, just the sample.
       await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));

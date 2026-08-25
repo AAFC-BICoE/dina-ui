@@ -1,9 +1,8 @@
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import DerivativeEditPage from "../../../../pages/object-store/derivative/edit";
-import { cleanup } from "@testing-library/react";
 
 const mockGet = jest.fn(async (path) => {
   switch (path) {
@@ -114,7 +113,6 @@ jest.mock("next/router", () => ({
 
 describe("Derivative single record edit page.", () => {
   afterEach(() => {
-    cleanup();
     jest.restoreAllMocks();
   });
 
@@ -141,15 +139,17 @@ describe("Derivative single record edit page.", () => {
       wrapper.getByRole("button", { name: /remove paleontology/i })
     );
 
-    fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
-      target: { value: "new tag 1" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("combobox", { name: /tags/i }),
+      "new tag 1"
+    );
     await userEvent.click(
       wrapper.getByRole("option", { name: /add "new tag 1"/i })
     );
-    fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
-      target: { value: "new tag 2" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("combobox", { name: /tags/i }),
+      "new tag 2"
+    );
     await userEvent.click(
       wrapper.getByRole("option", { name: /add "new tag 2"/i })
     );
@@ -160,7 +160,7 @@ describe("Derivative single record edit page.", () => {
 
     fireEvent.keyDown(publiclyReleasableSelect, { key: "ArrowDown" });
 
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", { name: /yes - publicly releasable/i })
     );
 
@@ -207,15 +207,17 @@ describe("Derivative single record edit page.", () => {
       wrapper.getByRole("button", { name: /remove paleontology/i })
     );
 
-    fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
-      target: { value: "new tag 1" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("combobox", { name: /tags/i }),
+      "new tag 1"
+    );
     await userEvent.click(
       wrapper.getByRole("option", { name: /add "new tag 1"/i })
     );
-    fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
-      target: { value: "new tag 2" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("combobox", { name: /tags/i }),
+      "new tag 2"
+    );
     await userEvent.click(
       wrapper.getByRole("option", { name: /add "new tag 2"/i })
     );
@@ -226,7 +228,7 @@ describe("Derivative single record edit page.", () => {
 
     fireEvent.keyDown(publiclyReleasableSelect, { key: "ArrowDown" });
 
-    fireEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", { name: /no - not publicly releasable/i })
     );
 
@@ -236,11 +238,9 @@ describe("Derivative single record edit page.", () => {
       ).toBeInTheDocument();
     });
 
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /not publicly releasable reason/i }),
-      {
-        target: { value: "new reason for not publicly releasable" }
-      }
+      "new reason for not publicly releasable"
     );
 
     // Submit form

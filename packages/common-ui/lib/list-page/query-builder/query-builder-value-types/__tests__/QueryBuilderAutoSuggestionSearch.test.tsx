@@ -1,6 +1,7 @@
 import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import { QueryBuilderAutoSuggestionTextSearchMemo } from "../QueryBuilderAutoSuggestionSearch";
 import { waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { ESIndexMapping } from "../../../types";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
@@ -205,9 +206,9 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       );
 
       // Wait for the auto-suggestion element to be loaded in.
-      await waitFor(() =>
-        expect(autoSuggestionComponent.findByRole("textbox")).not.toBeNull()
-      );
+      expect(
+        await autoSuggestionComponent.findByRole("textbox")
+      ).toBeInTheDocument();
 
       // Wait for the api call to be made.
       await waitFor(() => expect(mockAutoSuggestionRequest).toBeCalledTimes(1));
@@ -238,8 +239,8 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       autoSuggestionComponent.getByRole("textbox").focus();
 
       // Wait for the component to update after focus change
-      await waitFor(
-        () => expect(autoSuggestionComponent.getByRole("textbox")).toHaveFocus
+      await waitFor(() =>
+        expect(autoSuggestionComponent.getByRole("textbox")).toHaveFocus()
       );
 
       // Get each suggestion item and assert its content

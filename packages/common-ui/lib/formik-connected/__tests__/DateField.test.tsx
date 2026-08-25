@@ -205,9 +205,14 @@ describe("DateField component", () => {
 
     // Type an invalid date string.
     await clearAndType(textbox, "this-is-not-a-date");
-    fireEvent.blur(textbox);
-    // Close the date-picker popup, which blurs the input with the typed text.
-    await userEvent.keyboard("{Escape}");
+
+    // Tab away from the input: this closes the date-picker popup and blurs the
+    // input with the typed text, which triggers validation.
+    // Note: Escape is deliberately not used here. In showTime mode react-datepicker
+    // discards unparseable typed text when it closes and re-focuses the (now empty)
+    // input, so a subsequent real click on Save would blur it again and clear the
+    // field, allowing the submission.
+    await userEvent.tab();
 
     // An error message should be displayed.
     await waitFor(() => {
@@ -217,7 +222,10 @@ describe("DateField component", () => {
     });
 
     // Ensure form submission is not triggered with the invalid value.
-    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     expect(mockOnSubmit).not.toHaveBeenCalled();
+    expect(
+      wrapper.getAllByText(/invalid date: this-is-not-a-date/i)
+    ).toHaveLength(2);
   });
 });

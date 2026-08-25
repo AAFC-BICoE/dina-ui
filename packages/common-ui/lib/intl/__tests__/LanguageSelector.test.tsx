@@ -49,7 +49,7 @@ describe("LanguageSelector component", () => {
       apiContext
     });
 
-    expect(await component.queryByText("English")).not.toBeInTheDocument();
+    expect(component.queryByText("English")).not.toBeInTheDocument();
     expect(await component.findByText("Français")).toBeInTheDocument();
   });
 
@@ -64,10 +64,10 @@ describe("LanguageSelector component", () => {
 
     await userEvent.click(langButton);
 
-    waitFor(async () => {
-      // The locale should have been changed to "fr":
-      expect(await component.findByText("English")).toBeInTheDocument();
-      expect(await component.findByText("Français")).not.toBeInTheDocument();
+    // The locale should have been changed to "fr":
+    expect(await component.findByText("English")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(component.queryByText("Français")).not.toBeInTheDocument();
     });
   });
 });

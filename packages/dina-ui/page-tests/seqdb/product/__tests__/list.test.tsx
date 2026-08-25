@@ -1,5 +1,5 @@
 import ProductListPage from "../../../../pages/seqdb/product/list";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -46,9 +46,10 @@ describe("Product list page", () => {
     const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
 
     // Enter a search value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
-      target: { value: "omni" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /filter value/i }),
+      "omni"
+    );
 
     // Submit the search form.
     fireEvent.submit(wrapper.container.querySelector("form")!);

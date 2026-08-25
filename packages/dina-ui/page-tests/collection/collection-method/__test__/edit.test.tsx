@@ -1,4 +1,8 @@
-import { OperationsResponse, makeAxiosErrorMoreReadable } from "common-ui";
+import {
+  OperationsResponse,
+  clearAndType,
+  makeAxiosErrorMoreReadable
+} from "common-ui";
 import CollectionMethodEditPage, {
   CollectionMethodForm
 } from "../../../../pages/collection/collection-method/edit";
@@ -115,14 +119,12 @@ describe("collection-method edit page", () => {
       expect(nameInput).toBeInTheDocument();
     });
 
-    fireEvent.change(nameInput, { target: { value: "updated Name" } });
+    await clearAndType(nameInput, "updated Name");
     // Simulate changing the English description textarea
     const descriptionTextarea = screen.getByRole("textbox", {
       name: /english description/i
     });
-    fireEvent.change(descriptionTextarea, {
-      target: { value: "test english description" }
-    });
+    await clearAndType(descriptionTextarea, "test english description");
 
     // Submit the form
     const form = container.querySelector("form");
@@ -180,15 +182,11 @@ describe("collection-method edit page", () => {
 
     // Simulate changing the French description textarea
     const frenchDescriptionTextarea = getByLabelText(/french description/i);
-    fireEvent.change(frenchDescriptionTextarea, {
-      target: { value: "test french description" }
-    });
+    await clearAndType(frenchDescriptionTextarea, "test french description");
 
     // Simulate changing the name input
     const nameInput = getByLabelText(/name/i);
-    fireEvent.change(nameInput, {
-      target: { value: "updated Name" }
-    });
+    await clearAndType(nameInput, "updated Name");
 
     // Submit the form
     const form = container.querySelector("form");

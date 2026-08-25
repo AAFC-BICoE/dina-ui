@@ -1,6 +1,7 @@
 import SystemInfoPage from "../../../pages/admin/system-info";
 import { mountWithAppContext } from "common-ui";
-import { screen, waitFor, within, fireEvent } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app
@@ -309,7 +310,7 @@ describe("System Info page", () => {
     await screen.findByText("Collection API");
     mockGet.mockClear();
 
-    fireEvent.click(screen.getByRole("button", { name: /refresh/i }));
+    await userEvent.click(screen.getByRole("button", { name: /refresh/i }));
 
     // One new api-info request per module
     await waitFor(() =>

@@ -1,5 +1,5 @@
 import { ProjectForm } from "../../../../pages/collection/project/edit";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
@@ -89,20 +89,15 @@ describe("ProjectForm.", () => {
     });
 
     // Change Name field value
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: {
-        value: "test-project"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "test-project"
+    );
 
     // Change Eng Description field value
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /english description/i }),
-      {
-        target: {
-          value: "test eng desc"
-        }
-      }
+      "test eng desc"
     );
 
     // Submit form
@@ -191,20 +186,15 @@ describe("ProjectForm.", () => {
     });
 
     // Change Name field value
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: {
-        value: "edited-name"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "edited-name"
+    );
 
     // Change French Description field value
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /french description/i }),
-      {
-        target: {
-          value: "test-fr-desc"
-        }
-      }
+      "test-fr-desc"
     );
 
     // Submit form

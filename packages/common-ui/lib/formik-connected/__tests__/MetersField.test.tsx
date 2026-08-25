@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { FormikButton } from "../FormikButton";
 import { MetersField, toMeters } from "../MetersField";
@@ -109,8 +109,7 @@ describe("MetersField component", () => {
     expect(screen.queryByText(/invalid/i)).not.toBeInTheDocument();
 
     // Change input value to "1 ft"
-    await userEvent.clear(input);
-    await userEvent.type(input, "1 ft");
+    await clearAndType(input, "1 ft");
     fireEvent.blur(input); // Simulate onBlur
     expect(input).toHaveValue("0.30");
 
@@ -147,8 +146,7 @@ describe("MetersField component", () => {
     await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledTimes(0));
 
     // Change to a valid input:
-    await userEvent.clear(input);
-    await userEvent.type(input, "1ft");
+    await clearAndType(input, "1ft");
 
     // No error message on valid input:
     expect(screen.queryByText("Invalid meters value")).not.toBeInTheDocument();
