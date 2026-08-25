@@ -148,21 +148,24 @@ export const ScopedMenuList = (props: MenuListProps<any, boolean>) => {
  * Simple Group Scope filter, adds a toggle to let you select from all groups or the groups you are
  * currently in.
  */
-export const GROUP_SCOPE = (groupNames: string[]): ScopeOption => ({
+export const GROUP_SCOPE = (
+  groupNames: string[],
+  formatMessage: any
+): ScopeOption => ({
   id: "groupFilter",
   type: "toggle",
-  label: "Group",
+  label: formatMessage({ id: "group" }),
   options: [
     {
       id: "myGroups",
-      label: "My Groups",
+      label: formatMessage({ id: "myGroups" }),
       applyFilter: (builder) => {
         builder.whereIn("group", groupNames);
       }
     },
     {
       id: "allGroups",
-      label: "All Groups",
+      label: formatMessage({ id: "allGroups" }),
       applyFilter: _.noop
     }
   ]

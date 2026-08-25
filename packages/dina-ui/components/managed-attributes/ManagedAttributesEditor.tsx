@@ -21,6 +21,7 @@ import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
 import { useManagedAttributeQueries } from "./useManagedAttributeQueries";
 import _ from "lodash";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "../controlled-vocabulary/controlledVocabularyItemUtils";
+import { useIntl } from "react-intl";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -241,6 +242,7 @@ export function DynamicResourceSelect<
   pageSize?: number;
 }) {
   const { groupNames } = useAccount();
+  const { formatMessage } = useIntl();
 
   const {
     onChange,
@@ -342,7 +344,7 @@ export function DynamicResourceSelect<
         onInputChange: handleInputChange
       }}
       groupBy="group"
-      scopes={[GROUP_SCOPE(groupNames ?? [])]}
+      scopes={[GROUP_SCOPE(groupNames ?? [], formatMessage)]}
     />
   );
 }

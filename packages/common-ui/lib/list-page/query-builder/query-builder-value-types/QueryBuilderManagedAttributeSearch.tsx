@@ -370,7 +370,7 @@ export default function QueryRowManagedAttributeSearch({
         }
         model={managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""}
         groupBy="group"
-        scopes={[GROUP_SCOPE(groupNames ?? [])]}
+        scopes={[GROUP_SCOPE(groupNames ?? [], formatMessage)]}
         optionLabel={(attribute) => {
           // Attempt to display the multilingual title if it exists, otherwise fallback to name, key, or id.
           if ((attribute as any)?.multilingualTitle?.titles?.length) {
