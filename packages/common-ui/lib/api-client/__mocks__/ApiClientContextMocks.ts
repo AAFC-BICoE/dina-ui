@@ -66,35 +66,29 @@ export const MOCK_BULK_GET_RESPONSE = {
 };
 
 export const MOCK_BULK_GET_RESPONSE_DESERIALIZED = {
-  data: {
-    data: [
-      {
-        displayName: "person 1",
-        relationships: {
-          organizations: {
-            data: [
-              {
-                id: "12345678-1234-1234-1234-123456789012",
-                type: "organization"
-              }
-            ]
-          }
-        },
-        id: "1",
-        type: "person"
-      },
-      {
-        displayName: "person 2",
-        id: "2",
-        type: "person"
-      },
-      {
-        displayName: "person 3",
-        id: "3",
-        type: "person"
-      }
-    ]
-  },
+  data: [
+    {
+      displayName: "person 1",
+      organizations: [
+        {
+          id: "12345678-1234-1234-1234-123456789012",
+          type: "organization"
+        }
+      ],
+      id: "1",
+      type: "person"
+    },
+    {
+      displayName: "person 2",
+      id: "2",
+      type: "person"
+    },
+    {
+      displayName: "person 3",
+      id: "3",
+      type: "person"
+    }
+  ],
   status: 200
 };
 
@@ -108,17 +102,7 @@ export const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS = {
             data: [
               {
                 id: "12345678-1234-1234-1234-123456789012",
-                type: "organization",
-                attributes: {
-                  createdBy: "dina-admin",
-                  createdOn: "2023-10-01T00:00:00Z",
-                  names: [
-                    {
-                      languageCode: "EN",
-                      name: "Test Organization"
-                    }
-                  ]
-                }
+                type: "organization"
               }
             ]
           }
@@ -136,51 +120,59 @@ export const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS = {
         id: "3",
         type: "person"
       }
+    ],
+    included: [
+      {
+        id: "12345678-1234-1234-1234-123456789012",
+        type: "organization",
+        attributes: {
+          createdBy: "dina-admin",
+          createdOn: "2023-10-01T00:00:00Z",
+          names: [
+            {
+              languageCode: "EN",
+              name: "Test Organization"
+            }
+          ]
+        }
+      }
     ]
   },
   status: 200
 };
 
 export const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS_DESERIALIZED = {
-  data: {
-    data: [
-      {
-        displayName: "person 1",
-        relationships: {
-          organizations: {
-            data: [
-              {
-                id: "12345678-1234-1234-1234-123456789012",
-                type: "organization",
-                attributes: {
-                  createdBy: "dina-admin",
-                  createdOn: "2023-10-01T00:00:00Z",
-                  names: [
-                    {
-                      languageCode: "EN",
-                      name: "Test Organization"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        id: "1",
-        type: "person"
-      },
-      {
-        displayName: "person 2",
-        id: "2",
-        type: "person"
-      },
-      {
-        displayName: "person 3",
-        id: "3",
-        type: "person"
-      }
-    ]
-  },
+  data: [
+    {
+      displayName: "person 1",
+      organizations: [
+        {
+          id: "12345678-1234-1234-1234-123456789012",
+          type: "organization",
+          createdBy: "dina-admin",
+          createdOn: "2023-10-01T00:00:00Z",
+          names: [
+            {
+              languageCode: "EN",
+              name: "Test Organization"
+            }
+          ]
+        }
+      ],
+      id: "1",
+      type: "person"
+    },
+    {
+      displayName: "person 2",
+      id: "2",
+      type: "person"
+    },
+    {
+      displayName: "person 3",
+      id: "3",
+      type: "person"
+    }
+  ],
   status: 200
 };
 
@@ -305,25 +297,23 @@ export const MOCK_BULK_UPDATE_RESPONSE = {
 };
 
 export const MOCK_BULK_UPDATE_RESPONSE_DESERIALIZED = {
-  data: {
-    data: [
-      {
-        displayName: "updated person 1",
-        id: "1",
-        type: "person"
-      },
-      {
-        displayName: "updated person 2",
-        id: "2",
-        type: "person"
-      },
-      {
-        displayName: "updated person 3",
-        id: "3",
-        type: "person"
-      }
-    ]
-  },
+  data: [
+    {
+      displayName: "updated person 1",
+      id: "1",
+      type: "person"
+    },
+    {
+      displayName: "updated person 2",
+      id: "2",
+      type: "person"
+    },
+    {
+      displayName: "updated person 3",
+      id: "3",
+      type: "person"
+    }
+  ],
   status: 200
 };
 
@@ -450,39 +440,31 @@ export const MOCK_BULK_GET_404_RESPONSE = {
 };
 
 export const MOCK_BULK_GET_404_RESPONSE_DESERIALIZED = {
-  data: {
-    data: [
-      {
-        displayName: "person 1",
-        relationships: {
-          organizations: {
-            data: [
-              {
-                id: "12345678-1234-1234-1234-123456789012",
-                type: "organization"
-              }
-            ]
-          }
-        },
-        id: "1",
-        type: "person"
-      },
-
-      null,
-      {
-        displayName: "person 2",
-        id: "2",
-        type: "person"
-      },
-
-      null,
-      {
-        displayName: "person 3",
-        id: "3",
-        type: "person"
-      }
-    ]
-  },
+  data: [
+    {
+      displayName: "person 1",
+      organizations: [
+        {
+          id: "12345678-1234-1234-1234-123456789012",
+          type: "organization"
+        }
+      ],
+      id: "1",
+      type: "person"
+    },
+    null,
+    {
+      displayName: "person 2",
+      id: "2",
+      type: "person"
+    },
+    null,
+    {
+      displayName: "person 3",
+      id: "3",
+      type: "person"
+    }
+  ],
   status: 200
 };
 
@@ -599,37 +581,31 @@ export const MOCK_BULK_GET_410_RESPONSE = {
 };
 
 export const MOCK_BULK_GET_410_RESPONSE_DESERIALIZED = {
-  data: {
-    data: [
-      {
-        displayName: "person 1",
-        relationships: {
-          organizations: {
-            data: [
-              {
-                id: "12345678-1234-1234-1234-123456789012",
-                type: "organization"
-              }
-            ]
-          }
-        },
-        id: "1",
-        type: "person"
-      },
-      null,
-      {
-        displayName: "person 2",
-        id: "2",
-        type: "person"
-      },
-      null,
-      {
-        displayName: "person 3",
-        id: "3",
-        type: "person"
-      }
-    ]
-  },
+  data: [
+    {
+      displayName: "person 1",
+      organizations: [
+        {
+          id: "12345678-1234-1234-1234-123456789012",
+          type: "organization"
+        }
+      ],
+      id: "1",
+      type: "person"
+    },
+    null,
+    {
+      displayName: "person 2",
+      id: "2",
+      type: "person"
+    },
+    null,
+    {
+      displayName: "person 3",
+      id: "3",
+      type: "person"
+    }
+  ],
   status: 200
 };
 
@@ -667,76 +643,67 @@ export const MOCK_BULK_GET_410_404_ERROR_INPUT = {
 };
 
 export const MOCK_BULK_GET_410_404_RESPONSE = {
-  data: {
-    data: [
-      null,
-      {
-        attributes: { displayName: "person 1" },
-        relationships: {
-          organizations: {
-            data: [
-              {
-                id: "12345678-1234-1234-1234-123456789012",
-                type: "organization"
-              }
-            ]
-          }
-        },
-        id: "1",
-        type: "person"
+  data: [
+    null,
+    {
+      attributes: { displayName: "person 1" },
+      relationships: {
+        organizations: {
+          data: [
+            {
+              id: "12345678-1234-1234-1234-123456789012",
+              type: "organization"
+            }
+          ]
+        }
       },
-      null,
-      {
-        attributes: { displayName: "person 2" },
-        id: "2",
-        type: "person"
-      },
-      null,
-      {
-        attributes: { displayName: "person 3" },
-        id: "3",
-        type: "person"
-      },
-      null
-    ]
-  },
+      id: "1",
+      type: "person"
+    },
+    null,
+    {
+      attributes: { displayName: "person 2" },
+      id: "2",
+      type: "person"
+    },
+    null,
+    {
+      attributes: { displayName: "person 3" },
+      id: "3",
+      type: "person"
+    },
+    null
+  ],
   status: 200
 };
 
 export const MOCK_BULK_GET_410_404_RESPONSE_DESERIALIZED = {
-  data: {
-    data: [
-      null,
-      {
-        displayName: "person 1",
-        relationships: {
-          organizations: {
-            data: [
-              {
-                id: "12345678-1234-1234-1234-123456789012",
-                type: "organization"
-              }
-            ]
-          }
-        },
-        id: "1",
-        type: "person"
-      },
-
-      null,
-      {
-        displayName: "person 2",
-        id: "2",
-        type: "person"
-      },
-      null,
-      {
-        displayName: "person 3",
-        id: "3",
-        type: "person"
-      },
-      null
-    ]
-  },
+  data: [
+    null,
+    {
+      displayName: "person 1",
+      organizations: [
+        {
+          id: "12345678-1234-1234-1234-123456789012",
+          type: "organization"
+        }
+      ],
+      id: "1",
+      type: "person"
+    },
+    null,
+    {
+      displayName: "person 2",
+      id: "2",
+      type: "person"
+    },
+    null,
+    {
+      displayName: "person 3",
+      id: "3",
+      type: "person"
+    },
+    null
+  ],
   status: 200
 };

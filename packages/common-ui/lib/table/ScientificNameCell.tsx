@@ -11,17 +11,19 @@ export function scientificNameCell(): TableColumn<MaterialSample> {
 
       if (original?.type === "material-sample") {
         let determinations: Determination[] = [];
-        (original as any)?.included?.organism?.forEach((org) => {
+        (original as any)?.included?.organism?.forEach?.((org) => {
           determinations = determinations.concat(
             org?.determination ?? org?.attributes?.determination
           );
         });
-        const organism = (original as any)?.included?.organism?.map((org) => ({
-          id: org?.id,
-          type: org?.type,
-          determination: org?.determination ?? org?.attributes?.determination,
-          isTarget: org?.isTarget ?? org?.attributes?.isTarget
-        }));
+        const organism = (original as any)?.included?.organism?.map?.(
+          (org) => ({
+            id: org?.id,
+            type: org?.type,
+            determination: org?.determination ?? org?.attributes?.determination,
+            isTarget: org?.isTarget ?? org?.attributes?.isTarget
+          })
+        );
         const materialSample: MaterialSample = {
           type: "material-sample",
           materialSampleName: (original as any)?.data?.attributes
