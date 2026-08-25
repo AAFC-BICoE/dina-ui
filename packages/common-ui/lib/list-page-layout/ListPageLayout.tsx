@@ -61,8 +61,8 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
 
   id: string;
   queryTableProps:
-    | QueryTableProps<TData>
-    | ((context: ListPageLayoutContext<TData>) => QueryTableProps<TData>);
+  | QueryTableProps<TData>
+  | ((context: ListPageLayoutContext<TData>) => QueryTableProps<TData>);
   wrapTable?: (children: ReactNode) => ReactNode;
 
   /** Adds the bulk edit button and the row checkboxes. */
@@ -119,10 +119,10 @@ export function ListPageLayout<TData extends KitsuResource>({
   let filterParam: FilterParam | undefined;
   let inMemoryFilter:
     | ((
-        value: PersistedResource<TData>,
-        index?: number,
-        array?: PersistedResource<TData>[]
-      ) => boolean)
+      value: PersistedResource<TData>,
+      index?: number,
+      array?: PersistedResource<TData>[]
+    ) => boolean)
     | undefined;
 
   if (enableInMemoryFilter) {
@@ -136,7 +136,16 @@ export function ListPageLayout<TData extends KitsuResource>({
   } else {
     let filterBuilderFiql = "";
     try {
-      filterBuilderFiql = fiql(filterForm.filterBuilderModel);
+      // The free-text search is applied to the attributes currently passed by the page, 
+      // not to the ones saved with the filter form in localStorage, which may be stale 
+      // (e.g. the page's searchable attributes changed since the form was last submitted).
+      const filterBuilderModel =
+        filterType === ListLayoutFilterType.FREE_TEXT &&
+          filterForm.filterBuilderModel?.type === "FREE_TEXT_SEARCH_FILTER" &&
+          filterAttributes
+          ? { ...filterForm.filterBuilderModel, filterAttributes }
+          : filterForm.filterBuilderModel;
+      filterBuilderFiql = fiql(filterBuilderModel);
     } catch (error) {
       // If there is an error, ignore the filter form instead of crashing the page.
       console.error(error);
@@ -194,16 +203,16 @@ export function ListPageLayout<TData extends KitsuResource>({
   const columns: ColumnDefinition<TData>[] = [
     ...(showRowCheckboxes
       ? [
-          {
-            cell: ({ row: { original: resource } }) => (
-              <CheckBoxField key={resource.id} resource={resource} />
-            ),
-            header: () => CheckBoxHeader,
-            enableSorting: false,
-            size: 200,
-            id: "checkbox_column"
-          }
-        ]
+        {
+          cell: ({ row: { original: resource } }) => (
+            <CheckBoxField key={resource.id} resource={resource} />
+          ),
+          header: () => CheckBoxHeader,
+          enableSorting: false,
+          size: 200,
+          id: "checkbox_column"
+        }
+      ]
       : []),
     ...resolvedQueryTableProps.columns
   ];
