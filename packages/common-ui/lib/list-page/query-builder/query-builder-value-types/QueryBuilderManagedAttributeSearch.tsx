@@ -4,10 +4,9 @@ import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
 import {
-  ScopedResourceSelect,
+  ResourceSelect,
   SelectOption,
-  SimpleSearchFilterBuilder,
-  useAccount
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { ManagedAttribute } from "@dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
@@ -90,7 +89,6 @@ export default function QueryRowManagedAttributeSearch({
   isInColumnSelector
 }: QueryBuilderManagedAttributeSearchProps) {
   const { formatMessage, locale } = useIntl();
-  const { groupNames } = useAccount();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
   const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
@@ -329,79 +327,45 @@ export default function QueryRowManagedAttributeSearch({
   return (
     <div className={isInColumnSelector ? "" : "row d-flex flex-row"}>
       {/* Managed Attribute Selection */}
-      <ScopedResourceSelect<ManagedAttribute>
-        apiEndpoint={managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""}
-        searchField={managedAttributeState.preloadId ? undefined : "name"}
-        placeholder={formatMessage({
-          id: "queryBuilder_managedAttribute_placeholder"
-        })}
-        groupBy="group"
-        pageSize={15}
-        value={managedAttributeSelected}
-        onOptionListLoaded={(data) => {
-          // Handle preloading auto-selection when data is returned from the API
-          if (managedAttributeState.preloadId && data?.length === 1) {
-            const resource = data[0] as PersistedResource<ManagedAttribute>;
-            const fieldPath =
-              (managedAttributeConfig?.path ?? "") + "." + (resource.key ?? "");
+      <ResourceSelect<ManagedAttribute>
+        filter={(input: string) =>
+          SimpleSearchFilterBuilder.create<ManagedAttribute>()
+            // Either preload by ID or search by name.
+            .when(
+              managedAttributeState.preloadId !== undefined,
 
-            setManagedAttributeState((prevState) => ({
-              ...prevState,
-              selectedManagedAttribute: resource,
-              selectedManagedAttributeConfig: fieldValueToIndexSettings(
-                fieldPath,
-                indexMap ?? []
-              ),
-              preloadId: undefined // Clear preloadId so future searches operate normally
-            }));
-          }
-        }}
-        // Base filters applied across all scopes (preload & vocabulary checks)
-        additionalFilter={SimpleSearchFilterBuilder.create<ManagedAttribute>()
-          // Either preload by ID or search by name.
-          .when(
-            managedAttributeState.preloadId !== undefined,
+              // If TRUE (preloadId exists), filter by UUID.
+              (builder) =>
+                builder.where("uuid", "EQ", managedAttributeState.preloadId!),
 
-            // If TRUE (preloadId exists), filter by UUID.
-            (builder) =>
-              builder.where("uuid", "EQ", managedAttributeState.preloadId!)
-          )
-          .when(
-            !!managedAttributeConfig?.dynamicField?.component &&
-              managedAttributeConfig?.dynamicField?.component !== "ENTITY",
-            // If TRUE, add the component filter.
-            // NOTE: Since Object Store is still using Managed Attributes and not controlled
-            // vocabulary, we will temporarly just add the controlledVocabulary filter here. Once
-            // object store is also migrated, this should be moved to the root query.
-            (builder) =>
-              builder.where(
-                "controlledVocabulary.uuid" as any,
-                "EQ",
-                COLLECTION_MANAGED_ATTRIBUTE_ID
-              )
-          )
-          .build()}
-        scopes={[
-          {
-            id: "groupFilter",
-            type: "toggle",
-            label: "Group",
-            options: [
-              {
-                id: "myGroups",
-                label: "My Groups",
-                applyFilter: (builder) => {
-                  builder.whereIn("group", groupNames);
-                }
-              },
-              {
-                id: "allGroups",
-                label: "All Groups",
-                applyFilter: _.noop
-              }
-            ]
-          }
-        ]}
+              // If FALSE (no preloadId), use the searchFilter for the input.
+              (builder) => builder.searchFilter("name", input)
+            )
+
+            // Managed attribute component is not used for object store for example.
+            .when(
+              !!managedAttributeConfig?.dynamicField?.component &&
+                managedAttributeConfig?.dynamicField?.component !== "ENTITY",
+              // If TRUE, add the component filter.
+              // NOTE: Since Object Store is still using Managed Attributes and not controlled
+              // vocabulary, we will temporarly just add the controlledVocabulary filter here. Once
+              // object store is also migrated, this should be moved to the root query.
+              (builder) =>
+                builder
+                  .where(
+                    "dinaComponent" as any,
+                    "EQ",
+                    managedAttributeConfig?.dynamicField?.component
+                  )
+                  .where(
+                    "controlledVocabulary.uuid" as any,
+                    "EQ",
+                    COLLECTION_MANAGED_ATTRIBUTE_ID
+                  )
+            )
+            .build()
+        }
+        model={managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""}
         optionLabel={(attribute) => {
           // Attempt to display the multilingual title if it exists, otherwise fallback to name, key, or id.
           if ((attribute as any)?.multilingualTitle?.titles?.length) {
@@ -421,16 +385,31 @@ export default function QueryRowManagedAttributeSearch({
             ""
           );
         }}
+        isMulti={false}
+        placeholder={formatMessage({
+          id: "queryBuilder_managedAttribute_placeholder"
+        })}
+        pageSize={15}
+        onDataLoaded={(data) => {
+          if (managedAttributeState.preloadId) {
+            if (managedAttributeState.preloadId && data?.length === 1) {
+              setManagedAttributeState({
+                ...managedAttributeState,
+                selectedManagedAttribute: data[0]
+              });
+            }
+          }
+        }}
         onChange={(newValue) => {
-          if (!newValue) return;
-
-          const resource = newValue as PersistedResource<ManagedAttribute>;
           const fieldPath =
-            (managedAttributeConfig?.path ?? "") + "." + (resource.key ?? "");
+            (managedAttributeConfig?.path ?? "") +
+            "." +
+            ((newValue as PersistedResource<ManagedAttribute>).key ?? "");
 
           setManagedAttributeState({
             ...managedAttributeState,
-            selectedManagedAttribute: resource,
+            selectedManagedAttribute:
+              newValue as PersistedResource<ManagedAttribute>,
             selectedManagedAttributeConfig: fieldValueToIndexSettings(
               fieldPath,
               indexMap ?? []
@@ -440,6 +419,7 @@ export default function QueryRowManagedAttributeSearch({
             searchValue: ""
           });
         }}
+        value={managedAttributeSelected}
         selectProps={{
           controlShouldRenderValue: true,
           isClearable: false,
@@ -450,7 +430,7 @@ export default function QueryRowManagedAttributeSearch({
           captureMenuScroll: true,
           menuPlacement: isInColumnSelector ? "bottom" : "auto",
           menuShouldScrollIntoView: false,
-          minMenuHeight: 800,
+          minMenuHeight: 600,
           onMenuOpen: () => {
             setIsMenuOpen(true);
           },
@@ -458,6 +438,7 @@ export default function QueryRowManagedAttributeSearch({
             setIsMenuOpen(false);
           }
         }}
+        omitNullOption={true}
       />
 
       {/* Operator */}
