@@ -65,7 +65,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
       };
 
     // Offline module returning a structured error from the api
-    case "search-api/api-info": {
+    case "loan-transaction-api/api-info": {
       const error: any = new Error("Request failed with status code 503");
       error.cause = {
         status: "503",
@@ -74,6 +74,31 @@ const mockGet = jest.fn<any, any>(async (path) => {
       };
       throw error;
     }
+
+    // Offline module returning a structured error from the api
+    case "search-api/api-info":
+      return {
+        data: {
+          id: "0.57",
+          type: "api-info",
+          messageProducer: false,
+          messageConsumer: false,
+          attentionRequired: false,
+          moduleInfo: {
+            indices: {
+              dina_collecting_event_index: {
+                schemaVersion: "1.4",
+                online: true
+              },
+              dina_material_sample_index: {
+                schemaVersion: "2.10",
+                online: false
+              }
+            },
+            isSearchIndexReachable: true
+          }
+        }
+      };
 
     // Offline module with a plain network error
     case "seqdb-api/api-info":
@@ -133,9 +158,7 @@ describe("System Info page", () => {
 
     // The loading indicator goes away once the module statuses are fetched
     expect(await screen.findByText("Collection API")).toBeInTheDocument();
-    expect(
-      screen.queryByText(/fetching system info/i)
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/fetching system info/i)).not.toBeInTheDocument();
   });
 
   it("Redirects non-admin users to the home page without requesting anything.", async () => {
@@ -172,8 +195,9 @@ describe("System Info page", () => {
     }
 
     // 6 modules online, 2 offline
-    expect(screen.getAllByText(/^online$/i)).toHaveLength(6);
-    expect(screen.getAllByText(/^offline$/i)).toHaveLength(2);
+    // 1 indicies online, 1 offline
+    expect(screen.getAllByText(/^online$/i)).toHaveLength(7);
+    expect(screen.getAllByText(/^offline$/i)).toHaveLength(3);
 
     // The last refreshed time is displayed
     expect(screen.getByText(/last refreshed/i)).toBeInTheDocument();
@@ -199,9 +223,9 @@ describe("System Info page", () => {
     ).toBeInTheDocument();
 
     // Message producer and consumer are both enabled
-    expect(collectionCard.getAllByText(/^enabled$/i).length).toBeGreaterThanOrEqual(
-      2
-    );
+    expect(
+      collectionCard.getAllByText(/^enabled$/i).length
+    ).toBeGreaterThanOrEqual(2);
 
     // Module info table is rendered with the extra info
     expect(collectionCard.getByText(/module info/i)).toBeInTheDocument();
@@ -226,10 +250,10 @@ describe("System Info page", () => {
       apiContext,
       accountContext: adminAccount
     });
-    await screen.findByText("Search WS API");
+    await screen.findByText("Loan Transaction API");
 
     // Structured API error with status code and message
-    const searchCard = getCard("Search WS API");
+    const searchCard = getCard("Loan Transaction API");
     expect(searchCard.getByText(/^offline$/i)).toBeInTheDocument();
     expect(searchCard.getByText(/attention required/i)).toBeInTheDocument();
     expect(searchCard.getByText(/503 Service Unavailable/)).toBeInTheDocument();
@@ -297,5 +321,36 @@ describe("System Info page", () => {
 
     // The module cards are still displayed after the refresh
     expect(await screen.findByText("Collection API")).toBeInTheDocument();
+  });
+
+  it("Displays elastic search info for the indicies.", async () => {
+    mountWithAppContext(<SystemInfoPage />, {
+      apiContext,
+      accountContext: adminAccount
+    });
+    await screen.findByText("Search WS API");
+
+    const searchCard = getCard("Search WS API");
+
+    // Verify index names and versions render inside full-width index cards
+    expect(
+      await searchCard.findByText("dina_collecting_event_index")
+    ).toBeVisible();
+    expect(searchCard.getByText("v1.4")).toBeVisible();
+
+    expect(searchCard.getByText("dina_material_sample_index")).toBeVisible();
+    expect(searchCard.getByText("v2.10")).toBeVisible();
+
+    // Check inner status badges for online/offline indices within the card
+    const onlineBadges = searchCard.getAllByText(/^online$/i);
+    const offlineBadges = searchCard.getAllByText(/^offline$/i);
+    expect(onlineBadges.length).toBeGreaterThanOrEqual(1);
+    expect(offlineBadges.length).toBeGreaterThanOrEqual(1);
+
+    // Verify top-level scalar values inside moduleInfo (e.g. isSearchIndexReachable) render correctly
+    expect(searchCard.getByText("isSearchIndexReachable")).toBeVisible();
+    expect(searchCard.getAllByText(/^enabled$/i).length).toBeGreaterThanOrEqual(
+      1
+    );
   });
 });
