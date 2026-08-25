@@ -74,6 +74,129 @@ function EnabledBadge({ enabled }: { enabled?: boolean }) {
 }
 
 /**
+ * Render standard scalar values cleanly
+ */
+function ScalarValue({ value }: { value: unknown }) {
+  if (typeof value === "boolean") {
+    return <EnabledBadge enabled={value} />;
+  }
+  return <code>{String(value)}</code>;
+}
+
+/**
+ * Specialized card for Elasticsearch/Search index objects
+ */
+function IndexCard({
+  name,
+  data
+}: {
+  name: string;
+  data: { online?: boolean; schemaVersion?: string };
+}) {
+  return (
+    <div className="p-2 border rounded bg-white shadow-sm d-flex align-items-center justify-content-between gap-2">
+      <div className="lh-sm">
+        <code className="fw-bold text-dark" style={{ fontSize: "0.8rem" }}>
+          {name}
+        </code>
+        {data.schemaVersion && (
+          <div className="text-muted mt-1" style={{ fontSize: "0.75rem" }}>
+            <DinaMessage id="field_version" />:{" "}
+            <code>v{data.schemaVersion}</code>
+          </div>
+        )}
+      </div>
+      {data.online !== undefined && (
+        <Badge
+          bg={data.online ? "success" : "danger"}
+          className="d-inline-flex align-items-center gap-1 fw-normal flex-shrink-0"
+        >
+          {data.online ? <FaCheckCircle /> : <FaTimesCircle />}
+          <DinaMessage
+            id={
+              data.online ? "systemInfoStatusOnline" : "systemInfoStatusOffline"
+            }
+          />
+        </Badge>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Main Module Info renderer
+ */
+export function ModuleInfoSection({
+  moduleInfo
+}: {
+  moduleInfo: Map<string, any>;
+}) {
+  return (
+    <div className="pt-2 d-flex flex-column gap-2">
+      <MicroLabel>
+        <DinaMessage id="systemInfoModuleInfo" />
+      </MicroLabel>
+
+      {Array.from(moduleInfo.entries()).map(([key, value]) => {
+        // If the value is a complex nested object (e.g., indices)
+        if (
+          typeof value === "object" &&
+          value !== null &&
+          !Array.isArray(value)
+        ) {
+          return (
+            <div key={key} className="border rounded bg-light p-2">
+              <div
+                className="fw-bold text-muted mb-2 text-uppercase"
+                style={{ fontSize: "0.7rem" }}
+              >
+                {key}
+              </div>
+              <div className="d-flex flex-column gap-2">
+                {Object.entries(value).map(([subKey, subValue]) => {
+                  // Index shape check
+                  if (typeof subValue === "object" && subValue !== null) {
+                    return (
+                      <IndexCard
+                        key={subKey}
+                        name={subKey}
+                        data={subValue as any}
+                      />
+                    );
+                  }
+
+                  // Fallback for simple nested key-values
+                  return (
+                    <div
+                      key={subKey}
+                      className="d-flex justify-content-between align-items-center small"
+                    >
+                      <span className="text-muted">{subKey}:</span>
+                      <ScalarValue value={subValue} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+
+        // Standard top-level scalar property row
+        return (
+          <div
+            key={key}
+            className="d-flex justify-content-between align-items-center border-bottom pb-1 small"
+          >
+            <span className="fw-semibold text-muted">{key}</span>
+            <ScalarValue value={value} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
  * Used to display each module's status and info on the System Info page.
  * The card's styling and content will adapt based on the module's status and available info.
  *
@@ -204,36 +327,7 @@ export function ModuleCard({ module }: { module: ApiModule }) {
         </div>
 
         {/* Module info — only rendered when extra info exists */}
-        {hasModuleInfo && (
-          <div className="pt-2">
-            <MicroLabel>
-              <DinaMessage id="systemInfoModuleInfo" />
-            </MicroLabel>
-            <table className="table table-sm table-bordered mb-0 small">
-              <tbody>
-                {Array.from(module.moduleInfo!.entries()).map(
-                  ([key, value]) => (
-                    <tr key={key}>
-                      <td
-                        className="fw-semibold text-muted bg-light text-nowrap"
-                        style={{ width: "40%" }}
-                      >
-                        {key}
-                      </td>
-                      <td>
-                        {typeof value === "boolean" ? (
-                          <EnabledBadge enabled={value} />
-                        ) : (
-                          String(value)
-                        )}
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+        {hasModuleInfo && <ModuleInfoSection moduleInfo={module.moduleInfo!} />}
       </div>
     </div>
   );
