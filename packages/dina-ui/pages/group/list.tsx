@@ -4,19 +4,31 @@ import {
   CreateButton,
   ListLayoutFilterType,
   ListPageLayout,
+  LoadingSpinner,
   SelectField,
-  useAccount
+  useAccount,
+  useInstanceContext
 } from "common-ui";
 import { GUEST, READ_ONLY, SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { RoleBadges } from "../../components";
+import PageLayout from "../../components/page/PageLayout";
+import { RoleBadges, useUserApiFilteringSupport } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 
-const GROUP_FILTER_ATTRIBUTES = ["name", "path", "labels"];
+/**
+ * Attributes searched by the free-text search. The labels are a map keyed by language code,
+ * which the User API can only search by path, so one attribute per supported language.
+ */
+function groupFilterAttributes(languages: string[]): string[] {
+  return ["name", "path", ...languages.map((language) => `labels.${language}`)];
+}
+
 const DEFAULT_SORT = [{ id: "name", desc: false }];
+
+/** fiql that matches no group (names are never blank), for filters that can't match anything. */
+const NO_GROUP_FIQL = 'name==""';
 
 /** Roles a user can hold within a group, as they appear in rolesPerGroup values. */
 const GROUP_BASED_ROLES = [SUPER_USER, USER, GUEST, READ_ONLY];
@@ -52,13 +64,10 @@ export interface GroupFilterContext {
 
 /**
  * Builds the predicate applied to each group by the free-text search and the
- * membership / role / label-status dropdowns.
+ * membership / role / label-status dropdowns, when filtering in-memory (see
+ * useUserApiFilteringSupport) the full group list is loaded once and filtered client-side.
  *
- * Filtering is done in-memory: the User API (Keycloak-backed in production) ignores
- * fiql filters and only applies simple filters within the already-fetched page, so
- * the full group list is loaded once and filtered client-side instead. The membership
- * and role filters are only derivable client-side anyway, since they compare each
- * group against the signed-in user's own Keycloak token.
+ * Must stay equivalent to groupFiqlFilter, which is used when the User API filters server-side.
  */
 export function groupFilterFn({
   myGroupNames,
@@ -112,9 +121,79 @@ export function groupFilterFn({
   };
 }
 
+/**
+ * Converts the membership / role / label-status dropdowns to fiql, for when the User API
+ * filters server-side. (The free-text search is converted to fiql by the ListPageLayout.)
+ *
+ * The membership and role filters compare each group against the signed-in user's own
+ * Keycloak token, so they are expressed as the names of the matching groups.
+ *
+ * Must stay equivalent to groupFilterFn, which is used when filtering in-memory.
+ */
+export function groupFiqlFilter({
+  myGroupNames,
+  rolesPerGroup,
+  locale
+}: GroupFilterContext) {
+  return (filterForm: any): string => {
+    const membership: string | undefined = filterForm?.membership || undefined;
+    const role: string | undefined = filterForm?.role || undefined;
+    const labelStatus: string | undefined =
+      filterForm?.labelStatus || undefined;
+
+    const clauses: string[] = [];
+
+    if (membership) {
+      const names = myGroupNames ?? [];
+      if (membership === MEMBER) {
+        clauses.push(
+          names.length ? `name=in=(${names.join(",")})` : NO_GROUP_FIQL
+        );
+      } else if (names.length) {
+        clauses.push(names.map((name) => `name!=${name}`).join(";"));
+      }
+    }
+
+    if (role) {
+      const names = Object.entries(rolesPerGroup ?? {})
+        .filter(([, roles]) => roles?.includes(role))
+        .map(([name]) => name);
+      clauses.push(
+        names.length ? `name=in=(${names.join(",")})` : NO_GROUP_FIQL
+      );
+    }
+
+    if (labelStatus) {
+      // A missing label is either absent from the map or blank. (Unlike in-memory,
+      // a whitespace-only label counts as present.)
+      const label = `labels.${locale}`;
+      clauses.push(
+        labelStatus === HAS_LABEL
+          ? `${label}!=null;${label}!=""`
+          : `(${label}==null,${label}=="")`
+      );
+    }
+
+    return clauses.join(";");
+  };
+}
+
 export default function GroupListPage() {
   const { isAdmin, groupNames, rolesPerGroup } = useAccount();
   const { formatMessage, locale } = useDinaIntl();
+  const instanceContext = useInstanceContext();
+
+  // Filter server-side when the User API supports it, in-memory otherwise.
+  const { loading: filteringSupportLoading, serverSideFiltering } =
+    useUserApiFilteringSupport();
+
+  const filterAttributes = useMemo(
+    () =>
+      groupFilterAttributes(
+        instanceContext?.supportedLanguages?.split(",") ?? [locale]
+      ),
+    [instanceContext?.supportedLanguages, locale]
+  );
 
   const groupTableColumns: ColumnDefinition<Group>[] = useMemo(
     () => [
@@ -131,10 +210,10 @@ export default function GroupListPage() {
         accessorKey: "name"
       },
       {
-        id: "label",
+        // The id is the User API's path to the label of the current locale, so the column
+        // is sortable server-side. The accessor makes it sortable in-memory.
+        id: `labels.${locale}`,
         header: () => <DinaMessage id="groupLabel" />,
-        // The accessor makes the column sortable client-side
-        // (sorting is in-memory on this page, like the filtering).
         accessorFn: (group) => group.labels?.[locale] ?? "",
         cell: ({ getValue }) => getValue<string>() || EMPTY_CELL
       },
@@ -189,6 +268,10 @@ export default function GroupListPage() {
     () => groupFilterFn({ myGroupNames: groupNames, rolesPerGroup, locale }),
     [groupNames, rolesPerGroup, locale]
   );
+  const fiqlFilter = useMemo(
+    () => groupFiqlFilter({ myGroupNames: groupNames, rolesPerGroup, locale }),
+    [groupNames, rolesPerGroup, locale]
+  );
 
   const buttonBarContent = (
     <div className="flex d-flex ms-auto">
@@ -204,18 +287,30 @@ export default function GroupListPage() {
     [groupTableColumns]
   );
 
+  // Mount the list once the filtering mode is known, so the list isn't requested twice.
+  if (filteringSupportLoading) {
+    return (
+      <PageLayout titleId="groupListTitle" buttonBarContent={buttonBarContent}>
+        <LoadingSpinner loading={true} />
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout titleId="groupListTitle" buttonBarContent={buttonBarContent}>
       <ListPageLayout<Group>
         defaultSort={DEFAULT_SORT}
         id="group-list"
         filterType={ListLayoutFilterType.FREE_TEXT}
-        filterAttributes={GROUP_FILTER_ATTRIBUTES}
+        filterAttributes={filterAttributes}
         filterFormClassName="list-filter-panel"
         filterPlaceholder={formatMessage("groupSearchPlaceholder")}
-        liveSearch={true}
-        enableInMemoryFilter={true}
+        // Re-filtering as the user types is only cheap in-memory, server-side each search is a request.
+        liveSearch={!serverSideFiltering}
+        enableInMemoryFilter={!serverSideFiltering}
         filterFn={filterFn}
+        // Ignored in in-memory mode.
+        additionalFiqlFilters={fiqlFilter}
         filterFormchildren={({ submitForm }) => (
           <div className="d-flex gap-3 flex-wrap">
             <div style={{ width: "230px" }}>
