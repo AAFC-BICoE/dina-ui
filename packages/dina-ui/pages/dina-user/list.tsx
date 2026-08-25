@@ -21,7 +21,7 @@ import _ from "lodash";
 import Link from "next/link";
 import { useMemo } from "react";
 import { GroupSelectField, RoleBadges, useUserApiFilteringSupport } from "../../components";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "../../components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { Group } from "../../types/user-api";

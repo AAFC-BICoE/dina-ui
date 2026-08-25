@@ -323,7 +323,7 @@ describe("Dina user list page", () => {
     });
 
     // Only alice has an agentId:
-    await selectOption(wrapper, ".agentLink-field", /^linked to an agent$/i);
+    await selectOption(wrapper, ".agentLink-field", /^linked$/i);
 
     await waitFor(() => {
       expect(wrapper.getByText("alice")).toBeInTheDocument();
@@ -331,11 +331,7 @@ describe("Dina user list page", () => {
       expect(wrapper.queryByText("legacy-user")).not.toBeInTheDocument();
     });
 
-    await selectOption(
-      wrapper,
-      ".agentLink-field",
-      /^not linked to an agent$/i
-    );
+    await selectOption(wrapper, ".agentLink-field", /^unlinked$/i);
 
     await waitFor(() => {
       expect(wrapper.getByText("bob")).toBeInTheDocument();
@@ -465,11 +461,7 @@ describe("Dina user list page with a User API that filters server-side", () => {
     // Admin-based roles are stored in adminRoles; the group is then a membership check.
     // The agent link is based on the agentId
     await selectOption(wrapper, ".role-field", "dina-admin");
-    await selectOption(
-      wrapper,
-      ".agentLink-field",
-      /^not linked to an agent$/i
-    );
+    await selectOption(wrapper, ".agentLink-field", /^unlinked$/i);
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(
         "user-api/user",
