@@ -1,9 +1,10 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { SetDefaultSampleName } from "../SetDefaultSampleName";
 import { CollectionSelectSection } from "../../CollectionSelectSection";
 import { MaterialSampleIdentifiersSection } from "../MaterialSampleIdentifiersSection";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import React from "react";
 
@@ -53,9 +54,7 @@ describe("SetDefaultSampleName", () => {
     expect(input.value).toEqual("INITIAL-CODE");
 
     // Change input value:
-    fireEvent.change(input, {
-      target: { value: "INITIAL-CODE-my_custom_name" }
-    });
+    await clearAndType(input, "INITIAL-CODE-my_custom_name");
     // Check the updated value:
     expect(input.value).toEqual("INITIAL-CODE-my_custom_name");
 
@@ -72,7 +71,7 @@ describe("SetDefaultSampleName", () => {
 
     // Select the new option (assuming the new option is rendered as expected)
     const option = await screen.findByRole("option", { name: /TEST_CODE_2/i });
-    fireEvent.click(option);
+    await userEvent.click(option);
 
     // Wait for the expected change in input value
     await waitFor(() => {

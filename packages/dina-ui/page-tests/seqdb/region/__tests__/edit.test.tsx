@@ -1,5 +1,5 @@
 import { RegionEditPage } from "../../../../pages/seqdb/region/edit";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
 import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
@@ -56,9 +56,10 @@ describe("Region edit page", () => {
     );
 
     // Edit the region name.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: { name: "name", value: "New Region" }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "New Region"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -110,12 +111,10 @@ describe("Region edit page", () => {
     });
 
     // Modify the "symbol" value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /symbol/i }), {
-      target: {
-        name: "symbol",
-        value: "new symbol"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /symbol/i }),
+      "new symbol"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);

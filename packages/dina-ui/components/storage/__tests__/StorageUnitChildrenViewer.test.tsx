@@ -461,17 +461,10 @@ describe("StorageUnitChildrenViewer component", () => {
     );
     await waitForLoadingToDisappear();
 
-    await waitFor(() => {
-      const row = screen.getByRole("row", {
-        name: /test unit child 2 opens in new tab test opens in new tab test unit aafc dina\-admin 2025\-07\-18, 7:08:21 p\.m\. select/i
-      });
-
-      const row_button = within(row).getByRole("button", {
-        name: /select/i
-      });
-
-      userEvent.click(row_button);
+    const row = await screen.findByRole("row", {
+      name: /test unit child 2 opens in new tab test opens in new tab test unit aafc dina\-admin 2025\-07\-18, 7:08:21 p\.m\. select/i
     });
+    await userEvent.click(within(row).getByRole("button", { name: /select/i }));
 
     await waitFor(() => {
       // Updates B to set X as the new parent:

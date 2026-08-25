@@ -506,7 +506,7 @@ describe("BulkEditTabWarning", () => {
       SAMPLES_WITH_SAME_DETERMINATIONS.every((sample) =>
         _.isEqual(sample.organism, SAMPLES_WITH_SAME_DETERMINATIONS[0].organism)
       )
-    );
+    ).toBe(true);
     await waitFor(() => {
       expect(
         wrapper.container.querySelector(".enable-organisms .react-switch-bg")

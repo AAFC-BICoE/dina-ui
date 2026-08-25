@@ -3,6 +3,7 @@ import { ProtocolForm } from "../../../../components/collection/protocol/Protoco
 import ProtocolEditPage from "../../../../pages/collection/protocol/edit";
 import { mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -224,21 +225,15 @@ describe("protocol edit page", () => {
     });
 
     // Change Protocol Name field value
-    fireEvent.change(wrapper.getByRole("textbox", { name: /protocol name/i }), {
-      target: {
-        name: "name",
-        value: "updated Name"
-      }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /protocol name/i }),
+      "updated Name"
+    );
 
     // Change English Description field value
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /english description/i }),
-      {
-        target: {
-          value: "test english description"
-        }
-      }
+      "test english description"
     );
 
     // Submit the form.
@@ -306,13 +301,9 @@ describe("protocol edit page", () => {
     });
 
     // Change French Description field value
-    fireEvent.change(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /french description/i }),
-      {
-        target: {
-          value: "test french description"
-        }
-      }
+      "test french description"
     );
 
     // Submit the form.

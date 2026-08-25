@@ -1,8 +1,9 @@
 import { Person } from "../../../types/agent-api/resources/Person";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import PersonEditPage from "../../../pages/person/edit";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -72,12 +73,10 @@ describe("person edit page", () => {
     ).toHaveLength(1);
 
     // Edit the displayName.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
-      target: {
-        name: "person",
-        value: "test person updated"
-      }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "test person updated"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -129,12 +128,10 @@ describe("person edit page", () => {
     });
 
     // Modify the displayName value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
-      target: {
-        name: "displayName",
-        value: "new test person"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "new test person"
+    );
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -175,14 +172,14 @@ describe("person edit page", () => {
     const displayNameField = screen.getByRole("textbox", {
       name: /display name/i
     }); // adjust label as needed
-    fireEvent.change(displayNameField, { target: { value: "John Doe" } });
+    await userEvent.type(displayNameField, "John Doe");
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Test expected error
     await waitFor(() => {
-      expect(wrapper.getByText("test error"));
+      expect(wrapper.getByText("test error")).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
     });
   });
@@ -208,7 +205,7 @@ describe("person edit page", () => {
         wrapper.getByText(
           /1 : display name \- the display name field is required\./i
         )
-      );
+      ).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
     });
   });
