@@ -9,7 +9,14 @@ import { ComponentProps, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { ActionMeta, StylesConfig } from "react-select";
 import { useDebounce } from "use-debounce";
-import { SelectOption, useAccount } from "../..";
+import {
+  getNestedValue,
+  ScopedMenuList,
+  ScopeOption,
+  SelectOption,
+  SimpleSearchFilterBuilder,
+  useAccount
+} from "../..";
 import { JsonApiQuerySpec, useQuery } from "../api-client/useQuery";
 import { useBulkGet } from "./useBulkGet";
 import { SortableSelect } from "common-ui";
@@ -64,14 +71,29 @@ export interface ResourceSelectBaseProps<TData extends KitsuResource> {
   /** If true, disable the dropdown when the selected option is the only one available */
   cannotBeChanged?: boolean;
 
-  showGroupCategary?: boolean;
-
   /** The model type to select resources from. */
   model: string;
 
   selectProps?: Partial<ComponentProps<typeof SortableSelect>>;
 
   filterList?: (item: any | undefined) => boolean;
+
+  /**
+   * List of scope definitions (e.g. toggles) sticky-rendered inside the select dropdown menu.
+   */
+  scopes?: ScopeOption[];
+
+  /**
+   * Programmically set what the default scope values should be.
+   */
+  defaultScopes?: Record<string, string>;
+
+  /**
+   * Define an attribute on the entity to group options by in the dropdown list.
+   *
+   * e.g. "group"
+   */
+  groupBy?: string;
 }
 
 export interface ResourceSelectProps<TData extends KitsuResource>
@@ -105,6 +127,8 @@ export interface ResourceSelectInnerProps<TData extends KitsuResource>
   inputValue: string;
   setInputValue: (value: string) => void;
   searchValue?: string;
+  activeScopes?: Record<string, string>;
+  onScopeChange?: (scopeId: string, optionId: string) => void;
 }
 
 type ResourceSelectValue<TData extends KitsuResource> =
@@ -141,7 +165,9 @@ export function ResourceSelect<TData extends KitsuResource>(
     additionalSort,
     pageSize,
     removeDefaultSort,
-    include
+    include,
+    scopes,
+    defaultScopes
   } = props;
 
   /** The value of the input element. */
@@ -150,9 +176,30 @@ export function ResourceSelect<TData extends KitsuResource>(
   /** The debounced input value passed to the fetcher. */
   const [searchValue] = useDebounce(inputValue, 250);
 
+  // Initialize active states for all scopes
+  const [activeScopes, setActiveScopes] = useState<Record<string, string>>(
+    () => {
+      const initialState = { ...defaultScopes };
+      scopes?.forEach((scope) => {
+        if (
+          scope.type === "toggle" &&
+          !initialState[scope.id] &&
+          scope.options.length > 0
+        ) {
+          initialState[scope.id] = scope.options[0].id; // Default to first toggle option
+        }
+      });
+      return initialState;
+    }
+  );
+
   // Omit blank/null filters:
-  const filterParam = _.omitBy(filter(searchValue), (val) =>
-    ["", undefined].includes(val as string)
+  const filterParam = _.omitBy(
+    SimpleSearchFilterBuilder.create<any>()
+      .add(filter(searchValue))
+      .applyScopes(scopes, activeScopes)
+      .build(),
+    (val) => ["", undefined].includes(val as string)
   );
 
   // "6" is chosen here to give enough room for the main options, the <none> option, and the
@@ -181,7 +228,11 @@ export function ResourceSelect<TData extends KitsuResource>(
     setInputValue,
     queryIsLoading,
     response,
-    searchValue
+    searchValue,
+    activeScopes,
+    onScopeChange: (scopeId, optionId) => {
+      setActiveScopes((prev) => ({ ...prev, [scopeId]: optionId }));
+    }
   });
 }
 
@@ -201,13 +252,33 @@ export function ResourceSelectCustomQuery<TData extends KitsuResource>(
     removeDefaultSort,
     include,
     filter,
-    model
+    model,
+    scopes,
+    defaultScopes
   } = props;
+
   /** The value of the input element. */
   const [inputValue, setInputValue] = useState("");
 
   /** The debounced input value passed to the fetcher. */
   const [searchValue] = useDebounce(inputValue, 250);
+
+  // Initialize active states for all scopes
+  const [activeScopes, setActiveScopes] = useState<Record<string, string>>(
+    () => {
+      const initialState = { ...defaultScopes };
+      scopes?.forEach((scope) => {
+        if (
+          scope.type === "toggle" &&
+          !initialState[scope.id] &&
+          scope.options.length > 0
+        ) {
+          initialState[scope.id] = scope.options[0].id; // Default to first toggle option
+        }
+      });
+      return initialState;
+    }
+  );
 
   // Omit blank/null filters:
   const filterParam = _.omitBy(filter(searchValue), (val) =>
@@ -245,7 +316,11 @@ export function ResourceSelectCustomQuery<TData extends KitsuResource>(
     setInputValue,
     queryIsLoading,
     response,
-    searchValue
+    searchValue,
+    activeScopes,
+    onScopeChange: (scopeId, optionId) => {
+      setActiveScopes((prev) => ({ ...prev, [scopeId]: optionId }));
+    }
   });
 }
 
@@ -272,14 +347,17 @@ export function ResourceSelectInner<TData extends KitsuResource>({
   placeholder,
   isLoading: loadingProp,
   cannotBeChanged,
-  showGroupCategary = false,
+  groupBy,
   onDataLoaded,
   queryIsLoading,
   response,
   inputValue,
   setInputValue,
   searchValue,
-  filterList
+  filterList,
+  scopes,
+  activeScopes,
+  onScopeChange
 }: ResourceSelectInnerProps<TData>) {
   const { formatMessage } = useIntl();
   const { isAdmin, groupNames } = useAccount();
@@ -313,9 +391,13 @@ export function ResourceSelectInner<TData extends KitsuResource>({
         return 0;
       }) ?? [];
 
-  const groupedResourceOptions = showGroupCategary
+  const groupedResourceOptions = groupBy
     ? _.chain(resourceOptions)
-        .groupBy((item) => (item.resource as any).group)
+        .groupBy((item) =>
+          groupBy
+            ? String(getNestedValue(item.resource, groupBy) ?? "") || "Other"
+            : (item.resource as any).group
+        )
         .map((items, label) => ({
           label,
           options: items
@@ -338,9 +420,10 @@ export function ResourceSelectInner<TData extends KitsuResource>({
         })
         .value()
     : resourceOptions;
+
   /** An option the user can select to set the relationship to null. */
   const NULL_OPTION = Object.seal({
-    label: `<${formatMessage({ id: "none" })}>`,
+    label: <>{formatMessage({ id: "none" })}</>,
     resource: Object.seal({ id: null }),
     value: null
   });
@@ -352,7 +435,7 @@ export function ResourceSelectInner<TData extends KitsuResource>({
       : formatMessage({ id: "typeToSearchOrChooseFromNewest" }),
     options: [
       ...(!isMulti && !searchValue && !omitNullOption ? [NULL_OPTION] : []),
-      ...(!showGroupCategary ? resourceOptions : [])
+      ...(!groupBy ? resourceOptions : [])
     ]
   };
 
@@ -366,7 +449,7 @@ export function ResourceSelectInner<TData extends KitsuResource>({
     ? []
     : _.compact([
         mainOptions,
-        ...(showGroupCategary ? groupedResourceOptions : []),
+        ...(groupBy ? groupedResourceOptions : []),
         actionOptions
       ]);
 
@@ -485,6 +568,7 @@ export function ResourceSelectInner<TData extends KitsuResource>({
       };
     }
   };
+
   return (
     <SortableSelect
       // react-select props:
@@ -502,7 +586,12 @@ export function ResourceSelectInner<TData extends KitsuResource>({
       filterOption={({ data }) => filterList?.((data as any)?.resource) ?? true}
       isDisabled={isDisabled}
       {...selectProps}
+      components={{
+        MenuList: ScopedMenuList,
+        ...(selectProps?.components || {})
+      }}
       onInputChange={(newVal) => setInputValue(newVal)}
+      {...({ scopes, activeScopes, onScopeChange } as any)}
     />
   );
 }

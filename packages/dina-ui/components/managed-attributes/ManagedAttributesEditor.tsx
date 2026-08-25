@@ -4,6 +4,7 @@ import {
   FieldSpy,
   ResourceSelect,
   SimpleSearchFilterBuilder,
+  useAccount,
   useBulkEditTabContext,
   useDinaFormContext
 } from "common-ui";
@@ -238,6 +239,8 @@ export function DynamicResourceSelect<
   filterList?: (item?: PersistedResource<TData>) => boolean;
   pageSize?: number;
 }) {
+  const { groupNames } = useAccount();
+
   const {
     onChange,
     onDataLoaded,
@@ -337,6 +340,28 @@ export function DynamicResourceSelect<
         isSearchable: true,
         onInputChange: handleInputChange
       }}
+      groupBy="group"
+      scopes={[
+        {
+          id: "groupFilter",
+          type: "toggle",
+          label: "Group",
+          options: [
+            {
+              id: "myGroups",
+              label: "My Groups",
+              applyFilter: (builder) => {
+                builder.whereIn("group", groupNames);
+              }
+            },
+            {
+              id: "allGroups",
+              label: "All Groups",
+              applyFilter: _.noop
+            }
+          ]
+        }
+      ]}
     />
   );
 }
