@@ -2,6 +2,7 @@ import {
   FieldSet,
   FieldSetProps,
   FieldSpy,
+  GROUP_SCOPE,
   ResourceSelect,
   SimpleSearchFilterBuilder,
   useAccount,
@@ -341,27 +342,7 @@ export function DynamicResourceSelect<
         onInputChange: handleInputChange
       }}
       groupBy="group"
-      scopes={[
-        {
-          id: "groupFilter",
-          type: "toggle",
-          label: "Group",
-          options: [
-            {
-              id: "myGroups",
-              label: "My Groups",
-              applyFilter: (builder) => {
-                builder.whereIn("group", groupNames);
-              }
-            },
-            {
-              id: "allGroups",
-              label: "All Groups",
-              applyFilter: _.noop
-            }
-          ]
-        }
-      ]}
+      scopes={[GROUP_SCOPE(groupNames ?? [])]}
     />
   );
 }

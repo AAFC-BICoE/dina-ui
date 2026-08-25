@@ -4,9 +4,11 @@ import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
 import {
+  GROUP_SCOPE,
   ResourceSelect,
   SelectOption,
-  SimpleSearchFilterBuilder
+  SimpleSearchFilterBuilder,
+  useAccount
 } from "common-ui";
 import { ManagedAttribute } from "@dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
@@ -89,6 +91,7 @@ export default function QueryRowManagedAttributeSearch({
   isInColumnSelector
 }: QueryBuilderManagedAttributeSearchProps) {
   const { formatMessage, locale } = useIntl();
+  const { groupNames } = useAccount();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
   const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
@@ -366,6 +369,8 @@ export default function QueryRowManagedAttributeSearch({
             .build()
         }
         model={managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""}
+        groupBy="group"
+        scopes={[GROUP_SCOPE(groupNames ?? [])]}
         optionLabel={(attribute) => {
           // Attempt to display the multilingual title if it exists, otherwise fallback to name, key, or id.
           if ((attribute as any)?.multilingualTitle?.titles?.length) {

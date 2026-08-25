@@ -1,5 +1,6 @@
 import { components, MenuListProps } from "react-select";
 import { SimpleSearchFilterBuilder } from "../util/simpleSearchFilterBuilder";
+import _ from "lodash";
 
 /**
  * Definition for a Toggle scope option.
@@ -138,3 +139,31 @@ export const ScopedMenuList = (props: MenuListProps<any, boolean>) => {
     </components.MenuList>
   );
 };
+
+//
+// Commonly Used Scopes
+//
+
+/**
+ * Simple Group Scope filter, adds a toggle to let you select from all groups or the groups you are
+ * currently in.
+ */
+export const GROUP_SCOPE = (groupNames: string[]): ScopeOption => ({
+  id: "groupFilter",
+  type: "toggle",
+  label: "Group",
+  options: [
+    {
+      id: "myGroups",
+      label: "My Groups",
+      applyFilter: (builder) => {
+        builder.whereIn("group", groupNames);
+      }
+    },
+    {
+      id: "allGroups",
+      label: "All Groups",
+      applyFilter: _.noop
+    }
+  ]
+});
