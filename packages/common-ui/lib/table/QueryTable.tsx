@@ -262,15 +262,16 @@ export function QueryTable<TData extends KitsuResource>({
   let query: JsonApiQuerySpec;
   if (enableInMemoryFilter) {
     // Load the whole dataset once as using the table's page size here
-    // would cap the filterable records to a single table page
+    // would cap the filterable records to a single table page.
+    // Sorting is done in-memory too (manualSorting is off), so no sort param is sent.
+    // The sortable columns don't have to be attributes the back-end can sort by.
     query = {
       path,
       fields,
       fiql,
       filter,
       include,
-      page: { limit: IN_MEMORY_FETCH_LIMIT, offset: 0 },
-      sort
+      page: { limit: IN_MEMORY_FETCH_LIMIT, offset: 0 }
     };
   } else {
     query = {
