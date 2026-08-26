@@ -29,7 +29,9 @@ export function UserNotification({
     loading,
     error,
     markAsRead,
-    markAllAsRead
+    markAllAsRead,
+    deleteNotification
+    // deleteAllNotifications
   } = useNotification({ pollingInterval });
 
   // Initialize React state from global module memory
@@ -121,6 +123,7 @@ export function UserNotification({
         key={notification.id}
         notification={notification}
         onMarkAsRead={markAsRead}
+        onDeleted={deleteNotification}
       />
     ));
   }, [notifications, loading, error, markAsRead]);
@@ -171,6 +174,7 @@ export function UserNotification({
                 showToast={shownToastIds.includes(notification.id)}
                 onDismissToast={() => dismissToast(notification.id)}
                 onMarkAsRead={markAsRead}
+                onDeleted={deleteNotification}
               />
             </div>
           );
