@@ -7,7 +7,6 @@ import { FaBell, FaTrash } from "react-icons/fa6";
 
 // persists across next.js page transitions, resets on hard refresh
 const sessionKnownIds = new Set<string>();
-let isSessionInitialized = false;
 let globalShownToastIds: string[] = [];
 
 export interface UserNotificationProps {
@@ -23,6 +22,9 @@ export function UserNotification({
 }: UserNotificationProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Tracks whether we have processed the initial batch of notifications for this component instance
+  const isInitializedRef = useRef(false);
 
   const {
     notifications,
@@ -42,12 +44,13 @@ export function UserNotification({
 
   // Detect new notifications and queue them as toasts
   useEffect(() => {
-    if (!notifications || notifications.length === 0) return;
+    // Wait until loading finishes and notifications exist
+    if (loading || !notifications) return;
 
-    // Handle initial mount or hard refresh: seed known IDs without showing toasts
-    if (!isSessionInitialized) {
+    // Handle initial fetch: seed existing IDs without triggering toasts
+    if (!isInitializedRef.current) {
       notifications.forEach((n) => sessionKnownIds.add(n.id));
-      isSessionInitialized = true;
+      isInitializedRef.current = true;
       return;
     }
 
@@ -59,13 +62,20 @@ export function UserNotification({
     if (newlyArrived.length > 0) {
       const newIds = newlyArrived.map((n) => n.id);
       newIds.forEach((id) => sessionKnownIds.add(id));
+
+      // Keep global state and React state aligned
       globalShownToastIds = [...globalShownToastIds, ...newIds];
       setShownToastIds(globalShownToastIds);
     }
-  }, [notifications]);
+  }, [notifications, loading]);
 
   const dismissToast = (id: string) => {
-    setShownToastIds((prev) => prev.filter((shownId) => shownId !== id));
+    // Remove from module global reference to prevent resurrection on future runs
+    globalShownToastIds = globalShownToastIds.filter(
+      (shownId) => shownId !== id
+    );
+    // Remove from active React state
+    setShownToastIds(globalShownToastIds);
   };
 
   // Close dropdown when clicking outside
@@ -135,7 +145,7 @@ export function UserNotification({
         onDeleted={deleteNotification}
       />
     ));
-  }, [notifications, loading, error, markAsRead]);
+  }, [notifications, loading, error, markAsRead, deleteNotification]);
 
   // Derive the full notification objects for the active toasts
   const toastNotifications = useMemo(
