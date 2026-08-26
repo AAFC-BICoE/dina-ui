@@ -3,7 +3,6 @@ import { FaBell, FaCheck } from "react-icons/fa";
 import { useNotification } from "./useNotification";
 import { NotificationCard } from "./NotificationCard";
 import { CommonMessage } from "../intl/common-ui-intl";
-import useLocalStorage from "@rehooks/local-storage";
 
 export interface UserNotificationProps {
   /**
@@ -28,61 +27,40 @@ export function UserNotification({
     markAllAsRead
   } = useNotification({ pollingInterval });
 
-  const [activeToastIds, setActiveToastIds] = useLocalStorage<string[]>(
-    "active-toast-ids",
-    []
-  );
+  const [shownToastIds, setShownToastIds] = useState<string[]>([]);
 
-  const [shownToastIds, setShownToastIds] = useLocalStorage<string[]>(
-    "shown-toast-ids",
-    []
-  );
-
-  const [seenNotificationIds, setSeenNotificationIds] = useLocalStorage<
-    string[]
-  >("seen-notification-ids", []);
+  const knownNotificationIdsRef = useRef<Set<string>>(new Set());
+  const isInitialLoadRef = useRef(true);
 
   // Detect new notifications and queue them as toasts
   useEffect(() => {
-    if (!notifications?.length) return;
+    if (!notifications || notifications.length === 0) return;
 
-    const currentIds = notifications.map((n) => n.id);
-    const seen = seenNotificationIds ?? [];
-
-    const newIds = currentIds.filter((id) => !seen.includes(id));
-
-    if (newIds.length > 0) {
-      setActiveToastIds([...new Set([...(activeToastIds ?? []), ...newIds])]);
-
-      // Defer so the DOM elements are mounted before we trigger the
-      // "shown" state that drives the CSS enter transition.
-      setTimeout(() => {
-        setShownToastIds([...new Set([...(shownToastIds ?? []), ...newIds])]);
-      }, 0);
+    // Handle initial mount or hard refresh: seed known IDs without showing toasts
+    if (isInitialLoadRef.current) {
+      notifications.forEach((n) => knownNotificationIdsRef.current.add(n.id));
+      isInitialLoadRef.current = false;
+      return;
     }
 
-    // Prune seenNotificationIds to only IDs still present in the
-    // current notification list, preventing unbounded growth.
-    const prunedSeen = seen.filter((id) => currentIds.includes(id));
-    const mergedSeen = [...new Set([...prunedSeen, ...currentIds])];
+    // Identify incoming notifications that haven't been seen in this session
+    const newlyArrived = notifications.filter(
+      (n) => !knownNotificationIdsRef.current.has(n.id) && n.status === "NEW"
+    );
 
-    // Only write if something actually changed to avoid render loops
-    if (
-      mergedSeen.length !== seen.length ||
-      mergedSeen.some((id) => !seen.includes(id))
-    ) {
-      setSeenNotificationIds(mergedSeen);
+    if (newlyArrived.length > 0) {
+      const newIds = newlyArrived.map((n) => n.id);
+
+      // Register new IDs into known ref
+      newIds.forEach((id) => knownNotificationIdsRef.current.add(id));
+
+      // Append new notifications to active and shown toast state
+      setShownToastIds((prev) => [...prev, ...newIds]);
     }
-  }, [notifications, activeToastIds, shownToastIds, seenNotificationIds]);
+  }, [notifications]);
 
   const dismissToast = (id: string) => {
-    setShownToastIds((shownToastIds ?? []).filter((shownId) => shownId !== id));
-    // Remove from active list after the dismiss animation has time to play
-    setTimeout(() => {
-      setActiveToastIds(
-        (activeToastIds ?? []).filter((activeId) => activeId !== id)
-      );
-    }, 300);
+    setShownToastIds((prev) => prev.filter((shownId) => shownId !== id));
   };
 
   // Close dropdown when clicking outside
@@ -148,10 +126,8 @@ export function UserNotification({
   // Derive the full notification objects for the active toasts
   const toastNotifications = useMemo(
     () =>
-      (notifications ?? []).filter((n) =>
-        (activeToastIds ?? []).includes(n.id)
-      ),
-    [notifications, activeToastIds]
+      (notifications ?? []).filter((n) => (shownToastIds ?? []).includes(n.id)),
+    [notifications, shownToastIds]
   );
 
   return (
@@ -174,21 +150,29 @@ export function UserNotification({
       </button>
 
       {/* New notification toasts */}
-      <div
-        className="notification-toast-container"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {toastNotifications.map((notification) => (
-          <NotificationCard
-            key={notification.id}
-            notification={notification}
-            onMarkAsRead={markAsRead}
-            displayAsToast={true}
-            showToast={(shownToastIds ?? []).includes(notification.id)}
-            onDismissToast={() => dismissToast(notification.id)}
-          />
-        ))}
+      <div className="notification-toast-container">
+        {toastNotifications.map((notification, index) => {
+          // Latest notification gets index 0 (front card). Older notifications receive higher numbers.
+          const stackIndex = toastNotifications.length - 1 - index;
+
+          return (
+            <div
+              key={notification.id}
+              className={`toast-stack-item ${
+                stackIndex === 0 ? "toast-stack-item--active" : ""
+              }`}
+              style={{ "--stack-index": stackIndex } as React.CSSProperties}
+            >
+              <NotificationCard
+                notification={notification}
+                displayAsToast={true}
+                showToast={shownToastIds.includes(notification.id)}
+                onDismissToast={() => dismissToast(notification.id)}
+                onMarkAsRead={markAsRead}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Notification dropdown */}
