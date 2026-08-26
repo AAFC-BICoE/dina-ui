@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { FaBell, FaCheck } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import { useNotification } from "./useNotification";
 import { NotificationCard } from "./NotificationCard";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { FaBell, FaTrash } from "react-icons/fa6";
 
 // persists across next.js page transitions, resets on hard refresh
 const sessionKnownIds = new Set<string>();
@@ -30,8 +31,8 @@ export function UserNotification({
     error,
     markAsRead,
     markAllAsRead,
-    deleteNotification
-    // deleteAllNotifications
+    deleteNotification,
+    deleteAllNotifications
   } = useNotification({ pollingInterval });
 
   // Initialize React state from global module memory
@@ -112,9 +113,17 @@ export function UserNotification({
 
     if (notifications?.length === 0) {
       return (
-        <li className="list-group-item text-center p-4 text-muted">
-          <CommonMessage id="noNotifications" />
-        </li>
+        <div className="text-center py-5 text-muted">
+          <div className="mb-3 fs-1 bell-ring-wrapper">
+            <FaBell className="bell-ring" />
+          </div>
+          <h6 className="fw-bold mb-1">
+            <CommonMessage id="noNotifications" />
+          </h6>
+          <p className="small text-secondary mb-0">
+            <CommonMessage id="noNotificationsMessage" />
+          </p>
+        </div>
       );
     }
 
@@ -135,6 +144,8 @@ export function UserNotification({
     [notifications, shownToastIds]
   );
 
+  const newNotifications = unreadCount > 0;
+
   return (
     <div className="notification-container" ref={dropdownRef}>
       {/* Bell icon button */}
@@ -144,9 +155,13 @@ export function UserNotification({
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Notifications"
       >
-        <FaBell className="notification-bell-icon" />
+        <FaBell
+          className={
+            "notification-bell-icon " + (newNotifications ? "bell-ring" : "")
+          }
+        />
         {/* Unread count badge */}
-        {unreadCount > 0 && (
+        {newNotifications && (
           <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
             {unreadCount}
             <span className="visually-hidden">unread notifications</span>
@@ -189,7 +204,7 @@ export function UserNotification({
             <h6 className="mb-0 fw-bold">
               <CommonMessage id="notifications" />
             </h6>
-            {unreadCount > 0 && (
+            {unreadCount > 0 ? (
               <button
                 type="button"
                 className="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1 notification-mark-all-button"
@@ -198,6 +213,19 @@ export function UserNotification({
                 <FaCheck className="notification-mark-all-icon" />
                 <CommonMessage id="markAllAsRead" />
               </button>
+            ) : (
+              <>
+                {notifications?.length !== 0 && (
+                  <button
+                    type="button"
+                    className="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1 notification-mark-all-delete-button"
+                    onClick={deleteAllNotifications}
+                  >
+                    <FaTrash className="notification-mark-all-icon" />
+                    <CommonMessage id="deleteAllButtonText" />
+                  </button>
+                )}
+              </>
             )}
           </div>
 

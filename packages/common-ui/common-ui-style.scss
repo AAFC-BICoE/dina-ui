@@ -701,3 +701,23 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   
   pointer-events: none !important;
 }
+
+.bell-ring-wrapper {
+  display: inline-block;
+}
+
+.bell-ring {
+  transform-origin: 50% 0%;
+  animation: bell-ring 10s ease-in-out infinite;
+}
+
+@keyframes bell-ring {
+  0%   { transform: rotate(0deg); }
+  1%   { transform: rotate(14deg); }
+  2%   { transform: rotate(-10deg); }
+  3%   { transform: rotate(8deg); }
+  4%   { transform: rotate(-6deg); }
+  5%   { transform: rotate(3deg); }
+  6%   { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}

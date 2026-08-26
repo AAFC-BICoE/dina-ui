@@ -144,39 +144,42 @@ export function useNotification({
   );
 
   // Delete a single notification
-  const deleteNotification = useCallback(async (id: string) => {
-    if (!userId) {
-      throw new Error("User ID is required to delete a notification");
-    }
+  const deleteNotification = useCallback(
+    async (id: string) => {
+      if (!userId) {
+        throw new Error("User ID is required to delete a notification");
+      }
 
-    if (!id) {
-      throw new Error("UUID required in order to delete a notification");
-    }
+      if (!id) {
+        throw new Error("UUID required in order to delete a notification");
+      }
 
-    try {
-      await save<Notification>(
-        [
-          {
-            delete: {
-              id: id,
-              type: "notification"
+      try {
+        await save<Notification>(
+          [
+            {
+              delete: {
+                id: id,
+                type: "notification"
+              }
             }
+          ],
+          {
+            apiBaseUrl: "/user-api"
           }
-        ],
-        {
-          apiBaseUrl: "/user-api"
-        }
-      );
+        );
 
-      // Refresh the cache
-      await mutate(cacheKey);
-    } catch (error) {
-      console.error("Error deleting notification:", error);
-      throw error;
-    }
-  }, []);
+        // Refresh the cache
+        await mutate(cacheKey);
+      } catch (error) {
+        console.error("Error deleting notification: ", error);
+        throw error;
+      }
+    },
+    [userId]
+  );
 
-  // Delete all available notification
+  // Delete all available notifications
   const deleteAllNotifications = useCallback(async () => {
     if (!userId) {
       throw new Error(
@@ -184,25 +187,28 @@ export function useNotification({
       );
     }
 
+    // Check if there is anything to be deleted.
+    if (!notifications || notifications.length === 0) {
+      return;
+    }
+
     try {
-      // await save<Notification>(
-      //   [
-      //     {
-      //       delete: {
-      //         id: id,
-      //         type: "notification"
-      //       }
-      //     }
-      //   ],
-      //   {
-      //     apiBaseUrl: "/user-api"
-      //   }
-      // );
+      const deletePayload: Operation[] = notifications.map((notification) => ({
+        op: "DELETE",
+        path: "notification/" + notification.id
+      }));
+
+      await doOperations(deletePayload, {
+        apiBaseUrl: "/user-api"
+      });
+
+      // Refresh the cache
+      await mutate(cacheKey);
     } catch (error) {
-      console.error("Error deleting notification:", error);
+      console.error("Error deleting notifications: ", error);
       throw error;
     }
-  }, []);
+  }, [userId, notifications]);
 
   // Mark as read
   const markAsRead = useCallback(
