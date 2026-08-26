@@ -151,7 +151,7 @@ export function WorkbookFieldSelectField({
               isDisabled={disabled}
               additionalSort={"name"}
               showGroupCategary={true}
-              model={"objectstore-api/managed-attribute"}
+              model={"objectstore-api/controlled-vocabulary-item"}
               optionLabel={(ma) => {
                 const multiDescription =
                   ma?.multilingualDescription?.descriptions?.find(
