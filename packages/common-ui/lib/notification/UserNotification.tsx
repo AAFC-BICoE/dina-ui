@@ -4,6 +4,11 @@ import { useNotification } from "./useNotification";
 import { NotificationCard } from "./NotificationCard";
 import { CommonMessage } from "../intl/common-ui-intl";
 
+// persists across next.js page transitions, resets on hard refresh
+const sessionKnownIds = new Set<string>();
+let isSessionInitialized = false;
+let globalShownToastIds: string[] = [];
+
 export interface UserNotificationProps {
   /**
    * Polling interval in milliseconds.
@@ -27,35 +32,32 @@ export function UserNotification({
     markAllAsRead
   } = useNotification({ pollingInterval });
 
-  const [shownToastIds, setShownToastIds] = useState<string[]>([]);
-
-  const knownNotificationIdsRef = useRef<Set<string>>(new Set());
-  const isInitialLoadRef = useRef(true);
+  // Initialize React state from global module memory
+  const [shownToastIds, setShownToastIds] = useState<string[]>(
+    () => globalShownToastIds
+  );
 
   // Detect new notifications and queue them as toasts
   useEffect(() => {
     if (!notifications || notifications.length === 0) return;
 
     // Handle initial mount or hard refresh: seed known IDs without showing toasts
-    if (isInitialLoadRef.current) {
-      notifications.forEach((n) => knownNotificationIdsRef.current.add(n.id));
-      isInitialLoadRef.current = false;
+    if (!isSessionInitialized) {
+      notifications.forEach((n) => sessionKnownIds.add(n.id));
+      isSessionInitialized = true;
       return;
     }
 
     // Identify incoming notifications that haven't been seen in this session
     const newlyArrived = notifications.filter(
-      (n) => !knownNotificationIdsRef.current.has(n.id) && n.status === "NEW"
+      (n) => !sessionKnownIds.has(n.id) && n.status === "NEW"
     );
 
     if (newlyArrived.length > 0) {
       const newIds = newlyArrived.map((n) => n.id);
-
-      // Register new IDs into known ref
-      newIds.forEach((id) => knownNotificationIdsRef.current.add(id));
-
-      // Append new notifications to active and shown toast state
-      setShownToastIds((prev) => [...prev, ...newIds]);
+      newIds.forEach((id) => sessionKnownIds.add(id));
+      globalShownToastIds = [...globalShownToastIds, ...newIds];
+      setShownToastIds(globalShownToastIds);
     }
   }, [notifications]);
 
