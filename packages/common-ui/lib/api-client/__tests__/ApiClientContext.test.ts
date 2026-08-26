@@ -38,7 +38,7 @@ import {
   MOCK_BULK_GET_410_404_RESPONSE_DESERIALIZED,
   MOCK_GET_ERROR
 } from "../__mocks__/ApiClientContextMocks";
-import { waitFor } from "@testing-library/dom";
+import { waitFor } from "@testing-library/react";
 import { buildMemoryStorage, setupCache } from "axios-cache-interceptor";
 
 /** Mock of Axios' patch function. */

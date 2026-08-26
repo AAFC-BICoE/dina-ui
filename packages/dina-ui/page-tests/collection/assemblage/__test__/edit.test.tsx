@@ -1,5 +1,5 @@
 import { AssemblageForm } from "../../../../pages/collection/assemblage/edit";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
@@ -93,39 +93,25 @@ describe("AssemblageForm", () => {
     });
 
     // Fill form with test values
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /assemblage name/i }),
-      {
-        target: {
-          value: "test-assemblage"
-        }
-      }
+      "test-assemblage"
     );
-    fireEvent.change(wrapper.getByRole("textbox", { name: /english title/i }), {
-      target: {
-        value: "test english title"
-      }
-    });
-    fireEvent.change(wrapper.getByRole("textbox", { name: /french title/i }), {
-      target: {
-        value: "test french title"
-      }
-    });
-    fireEvent.change(
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /english title/i }),
+      "test english title"
+    );
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /french title/i }),
+      "test french title"
+    );
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /english description/i }),
-      {
-        target: {
-          value: "test english description"
-        }
-      }
+      "test english description"
     );
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /french description/i }),
-      {
-        target: {
-          value: "test french description"
-        }
-      }
+      "test french description"
     );
 
     // Submit form
@@ -248,27 +234,18 @@ describe("AssemblageForm", () => {
     });
 
     // Edit form values
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /assemblage name/i }),
-      {
-        target: {
-          value: "edited-name"
-        }
-      }
+      "edited-name"
     );
-    fireEvent.change(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /french description/i }),
-      {
-        target: {
-          value: "test-fr-desc"
-        }
-      }
+      "test-fr-desc"
     );
-    fireEvent.change(wrapper.getByRole("textbox", { name: /english title/i }), {
-      target: {
-        value: "test-eng-title-updated"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /english title/i }),
+      "test-eng-title-updated"
+    );
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);

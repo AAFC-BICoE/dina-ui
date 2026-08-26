@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 import { mountWithAppContext, SimpleSearchFilterBuilder } from "common-ui";
 import { AutoSuggestTextField } from "../AutoSuggestTextField";
 import { DinaForm } from "../DinaForm";
-import { act, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { simpleSearchFilterToFiql } from "../../filter-builder/fiql";
@@ -470,34 +470,33 @@ describe("AutoSuggestTextField", () => {
       });
 
       // Simulate typing "p"
-      await act(async () => {
-        fireEvent.focus(textField);
-        await userEvent.type(textField, "p");
-      });
+      fireEvent.focus(textField);
+      await userEvent.type(textField, "p");
 
       // JSON API should be tried first but fails, then Elastic Search is used.
+      // The suggestion assertions must stay inside the waitFor: the mocks are
+      // called before the Elastic Search response has been rendered, so
+      // asserting synchronously after the mock calls is a race.
       await waitFor(() => {
         // mockGetFailure should be called once for "p"
         expect(mockGetFailure).toHaveBeenCalledTimes(1);
         // mockGetAxios should be called once as the fallback for "p"
         expect(mockGetAxios).toHaveBeenCalledTimes(1);
-      });
 
-      // Assert suggestions after the first search term
-      expect(
-        wrapper.queryByText(/person1\-elastic\-search/i)
-      ).toBeInTheDocument();
-      expect(
-        wrapper.queryByText(/person2\-elastic\-search/i)
-      ).toBeInTheDocument();
-      expect(
-        wrapper.queryByText(/person3\-elastic\-search/i)
-      ).toBeInTheDocument();
+        // Assert suggestions after the first search term
+        expect(
+          wrapper.queryByText(/person1\-elastic\-search/i)
+        ).toBeInTheDocument();
+        expect(
+          wrapper.queryByText(/person2\-elastic\-search/i)
+        ).toBeInTheDocument();
+        expect(
+          wrapper.queryByText(/person3\-elastic\-search/i)
+        ).toBeInTheDocument();
+      });
 
       // Simulate typing "pe" (append "e" so the value changes from "p" to "pe")
-      await act(async () => {
-        await userEvent.type(textField, "e");
-      });
+      await userEvent.type(textField, "e");
 
       // JSON API should *not* be called again for "pe" because it failed previously and should have switched permanently to Elastic Search.
       // Elastic Search should be called a second time for the new "pe" search term.

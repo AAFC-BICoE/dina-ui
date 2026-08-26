@@ -1,6 +1,7 @@
 import SystemInfoPage from "../../../pages/admin/system-info";
 import { mountWithAppContext } from "common-ui";
-import { screen, waitFor, within, fireEvent } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app
@@ -133,9 +134,7 @@ describe("System Info page", () => {
 
     // The loading indicator goes away once the module statuses are fetched
     expect(await screen.findByText("Collection API")).toBeInTheDocument();
-    expect(
-      screen.queryByText(/fetching system info/i)
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/fetching system info/i)).not.toBeInTheDocument();
   });
 
   it("Redirects non-admin users to the home page without requesting anything.", async () => {
@@ -199,9 +198,9 @@ describe("System Info page", () => {
     ).toBeInTheDocument();
 
     // Message producer and consumer are both enabled
-    expect(collectionCard.getAllByText(/^enabled$/i).length).toBeGreaterThanOrEqual(
-      2
-    );
+    expect(
+      collectionCard.getAllByText(/^enabled$/i).length
+    ).toBeGreaterThanOrEqual(2);
 
     // Module info table is rendered with the extra info
     expect(collectionCard.getByText(/module info/i)).toBeInTheDocument();
@@ -285,7 +284,7 @@ describe("System Info page", () => {
     await screen.findByText("Collection API");
     mockGet.mockClear();
 
-    fireEvent.click(screen.getByRole("button", { name: /refresh/i }));
+    await userEvent.click(screen.getByRole("button", { name: /refresh/i }));
 
     // One new api-info request per module
     await waitFor(() =>

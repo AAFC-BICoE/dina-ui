@@ -9,7 +9,7 @@ import QueryRowClassificationSearch, {
   transformClassificationToDSL
 } from "../QueryBuilderClassificationSearch";
 
-export const TEST_CLASSIFICATIONS: Vocabulary = {
+const TEST_CLASSIFICATIONS: Vocabulary = {
   id: "taxonomicRank",
   type: "vocabulary",
   vocabularyElements: [
