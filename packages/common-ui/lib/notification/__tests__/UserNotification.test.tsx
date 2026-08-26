@@ -328,7 +328,7 @@ describe("UserNotification", () => {
       await userEvent.click(button);
 
       await waitFor(() => {
-        expect(wrapper.getByText(/No notifications/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/All caught up!/i)).toBeInTheDocument();
       });
     });
 
