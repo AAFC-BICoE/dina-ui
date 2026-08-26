@@ -31,6 +31,7 @@ import { ReactNode, Ref } from "react";
 import { InputResource } from "kitsu";
 import { connect, FormikProps } from "formik";
 import MetadataBadges from "./MetadataBadges";
+import { OBJECT_STORE_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 // When the acDcType is changed, the acSubType needs to be cleared
 const DcTypeSelectorComponent = connect(({ formik }) => {
@@ -195,7 +196,9 @@ export function MetadataForm({
       <ManagedAttributesEditor
         valuesPath="managedAttributes"
         values={metadata?.managedAttributes}
-        managedAttributeApiPath="objectstore-api/managed-attribute"
+        managedAttributeApiPath="objectstore-api/controlled-vocabulary-item"
+        isControlledVocabulary={true}
+        controlledVocabularyId={OBJECT_STORE_MANAGED_ATTRIBUTE_ID}
         fieldSetProps={{
           legend: <DinaMessage id="managedAttributes" />
         }}

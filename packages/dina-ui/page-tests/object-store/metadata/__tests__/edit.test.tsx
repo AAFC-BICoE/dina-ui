@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { ManagedAttribute } from "../../../../types/collection-api";
+import { ControlledVocabularyItem } from "../../../../types/collection-api";
 import MetadataEditPage from "../../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "common-ui";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";
@@ -11,7 +11,7 @@ const mockGet = jest.fn(async (path, params) => {
   switch (path) {
     case "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612":
       return { data: TEST_METADATA };
-    case "objectstore-api/managed-attribute":
+    case "objectstore-api/controlled-vocabulary-item":
       if (params?.filter?.key?.EQ === "test_managed_attribute") {
         return Promise.resolve({
           data: [
@@ -19,7 +19,9 @@ const mockGet = jest.fn(async (path, params) => {
               id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
               name: "test-managed-attribute",
               key: "test_managed_attribute",
-              vocabularyElementType: "STRING"
+              type: "controlled-vocabulary-item",
+              group: "system",
+              dinaComponent: "METADATA"
             }
           ]
         });
@@ -103,11 +105,13 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   ]
 };
 
-const TEST_MANAGED_ATTRIBUTE: PersistedResource<ManagedAttribute> = {
-  type: "managed-attribute",
+const TEST_MANAGED_ATTRIBUTE: PersistedResource<ControlledVocabularyItem> = {
+  type: "controlled-vocabulary-item",
   id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
   name: "test-managed-attribute",
   key: "test_managed_attribute",
+  group: "system",
+  dinaComponent: "METADATA",
   vocabularyElementType: "STRING"
 };
 

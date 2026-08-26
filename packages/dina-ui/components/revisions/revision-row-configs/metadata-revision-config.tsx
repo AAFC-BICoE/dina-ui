@@ -70,7 +70,7 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
     }) => (
       <ManagedAttributesViewer
         values={value}
-        managedAttributeApiPath="objectstore-api/managed-attribute"
+        managedAttributeApiPath="objectstore-api/controlled-vocabulary-item"
       />
     )
   }
