@@ -126,6 +126,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   no: "No",
   noRowsFound: "No Rows Found",
   none: "None",
+  noneOption: "<None>",
   of: "of",
   oneValuePerLine: "One value per line",
   oneValuePerLineTooltip:
