@@ -150,7 +150,7 @@ export function WorkbookFieldSelectField({
               }
               isDisabled={disabled}
               additionalSort={"name"}
-              showGroupCategary={true}
+              groupBy="group"
               model={"objectstore-api/controlled-vocabulary-item"}
               optionLabel={(ma) => {
                 const multiDescription =
@@ -201,7 +201,7 @@ export function WorkbookFieldSelectField({
               }
               isDisabled={disabled}
               additionalSort={"name"}
-              showGroupCategary={true}
+              groupBy="group"
               model={"collection-api/controlled-vocabulary-item"}
               optionLabel={(ma) => {
                 const multiDescription =
