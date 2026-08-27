@@ -2,8 +2,10 @@ import {
   FieldSet,
   FieldSetProps,
   FieldSpy,
+  GROUP_SCOPE,
   ResourceSelect,
   SimpleSearchFilterBuilder,
+  useAccount,
   useBulkEditTabContext,
   useDinaFormContext
 } from "common-ui";
@@ -19,6 +21,7 @@ import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
 import { useManagedAttributeQueries } from "./useManagedAttributeQueries";
 import _ from "lodash";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "../controlled-vocabulary/controlledVocabularyItemUtils";
+import { useIntl } from "react-intl";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -238,6 +241,9 @@ export function DynamicResourceSelect<
   filterList?: (item?: PersistedResource<TData>) => boolean;
   pageSize?: number;
 }) {
+  const { groupNames } = useAccount();
+  const { formatMessage } = useIntl();
+
   const {
     onChange,
     onDataLoaded,
@@ -337,6 +343,8 @@ export function DynamicResourceSelect<
         isSearchable: true,
         onInputChange: handleInputChange
       }}
+      groupBy="group"
+      scopes={[GROUP_SCOPE(groupNames ?? [], formatMessage)]}
     />
   );
 }

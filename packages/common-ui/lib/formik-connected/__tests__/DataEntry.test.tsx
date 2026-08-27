@@ -1,8 +1,13 @@
 import { DinaForm } from "../DinaForm";
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  clearAndType,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { DataEntryField } from "../data-entry/DataEntryField";
 import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const blockOptions = {
@@ -100,7 +105,7 @@ describe("DataEntry", () => {
 
     // Click the "+" icon to add a new field.
     const addSection = wrapper.getByRole("button");
-    fireEvent.click(addSection);
+    await userEvent.click(addSection);
 
     // Expect block option 1 to be created:
     expect(wrapper.getByText(/block_option_1/i)).toBeInTheDocument();
@@ -108,24 +113,26 @@ describe("DataEntry", () => {
     const typeSelect = wrapper.getAllByRole("combobox", {
       name: /select\.\.\./i
     })[0];
-    fireEvent.change(typeSelect, { target: { value: "TYPE_OPTION_1" } });
-    fireEvent.click(wrapper.getByRole("option", { name: /type_option_1/i }));
+    await userEvent.type(typeSelect, "TYPE_OPTION_1");
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /type_option_1/i })
+    );
 
     // Expect type option 1 to be selected.
-    expect(wrapper.getByText(/type_option_1/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/type_option_1/i)[0]).toBeInTheDocument();
 
     // unit select option
     const unitSelect = wrapper.getByRole("combobox", { name: /select\.\.\./i });
-    fireEvent.change(unitSelect, { target: { value: "UNIT_OPTION_1" } });
-    fireEvent.click(wrapper.getByRole("option", { name: /unit option 1/i }));
+    await userEvent.type(unitSelect, "UNIT_OPTION_1");
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /unit option 1/i })
+    );
 
     // Expect unit option 1 to be selected.
-    expect(wrapper.getByText(/unit option 1/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/unit option 1/i)[0]).toBeInTheDocument();
 
     // Change the value
-    fireEvent.change(wrapper.getByRole("textbox"), {
-      target: { value: "VALUE_1" }
-    });
+    await clearAndType(wrapper.getByRole("textbox"), "VALUE_1");
 
     // Submit the form.
     fireEvent.submit(wrapper.getByRole("group"));
@@ -149,32 +156,34 @@ describe("DataEntry", () => {
     });
 
     // Add another row:
-    fireEvent.click(wrapper.getByTestId("add row button"));
+    await userEvent.click(wrapper.getByTestId("add row button"));
 
     // Change the type for this new row.
     const typeSelect2 = wrapper.getAllByRole("combobox", {
       name: /select\.\.\./i
     })[0];
-    fireEvent.change(typeSelect2, { target: { value: "TYPE_OPTION_2" } });
-    fireEvent.click(wrapper.getByRole("option", { name: /type_option_2/i }));
+    await userEvent.type(typeSelect2, "TYPE_OPTION_2");
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /type_option_2/i })
+    );
 
     // Expect type option 1 to be selected.
-    expect(wrapper.getByText(/type_option_2/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/type_option_2/i)[0]).toBeInTheDocument();
 
     // unit select option
     const unitSelect2 = wrapper.getByRole("combobox", {
       name: /select\.\.\./i
     });
-    fireEvent.change(unitSelect2, { target: { value: "UNIT_OPTION_2" } });
-    fireEvent.click(wrapper.getByRole("option", { name: /unit option 2/i }));
+    await userEvent.type(unitSelect2, "UNIT_OPTION_2");
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /unit option 2/i })
+    );
 
     // Expect unit option 1 to be selected.
-    expect(wrapper.getByText(/unit option 2/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/unit option 2/i)[0]).toBeInTheDocument();
 
     // Change the value
-    fireEvent.change(wrapper.getAllByRole("textbox")[1], {
-      target: { value: "VALUE_2" }
-    });
+    await clearAndType(wrapper.getAllByRole("textbox")[1], "VALUE_2");
 
     // Submit the form.
     fireEvent.submit(wrapper.getByRole("group"));
@@ -203,33 +212,35 @@ describe("DataEntry", () => {
       });
     });
 
-    fireEvent.click(addSection);
+    await userEvent.click(addSection);
     expect(wrapper.getByText(/block_option_2/i)).toBeInTheDocument();
 
     // type select option
     const typeSelect3 = wrapper.getAllByRole("combobox", {
       name: /select\.\.\./i
     })[0];
-    fireEvent.change(typeSelect3, { target: { value: "TYPE_OPTION_3" } });
-    fireEvent.click(wrapper.getByRole("option", { name: /type_option_3/i }));
+    await userEvent.type(typeSelect3, "TYPE_OPTION_3");
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /type_option_3/i })
+    );
 
     // Expect type option 1 to be selected.
-    expect(wrapper.getByText(/type_option_3/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/type_option_3/i)[0]).toBeInTheDocument();
 
     // unit select option
     const unitSelect3 = wrapper.getByRole("combobox", {
       name: /select\.\.\./i
     });
-    fireEvent.change(unitSelect3, { target: { value: "UNIT_OPTION_3" } });
-    fireEvent.click(wrapper.getByRole("option", { name: /unit option 3/i }));
+    await userEvent.type(unitSelect3, "UNIT_OPTION_3");
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /unit option 3/i })
+    );
 
     // Expect unit option 1 to be selected.
-    expect(wrapper.getByText(/unit option 3/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/unit option 3/i)[0]).toBeInTheDocument();
 
     // Change the value
-    fireEvent.change(wrapper.getAllByRole("textbox")[2], {
-      target: { value: "VALUE_3" }
-    });
+    await clearAndType(wrapper.getAllByRole("textbox")[2], "VALUE_3");
 
     // form submission
     fireEvent.submit(wrapper.getByRole("group"));

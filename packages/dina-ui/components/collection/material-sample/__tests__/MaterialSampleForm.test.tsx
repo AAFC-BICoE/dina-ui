@@ -1,6 +1,10 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  mountWithAppContext,
+  waitForLoadingToDisappear,
+  clearAndType
+} from "common-ui";
 import {
   blankMaterialSample,
   CollectingEvent,
@@ -10,6 +14,8 @@ import { waitFor, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
+import MaterialSampleEditPage from "@dina-ui/pages/collection/material-sample/edit";
+import { useRouter } from "next/router";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -17,6 +23,13 @@ jest.mock("next/dynamic", () => () => {
     return <div>Mock dynamic component</div>;
   };
 });
+
+const routerPushMock = jest.fn();
+
+// Mock the next router
+jest.mock("next/router", () => ({
+  useRouter: jest.fn()
+}));
 
 /**
  * Reusable mock block for tests that render components using `useSearchWsCustomQuery`.
@@ -154,6 +167,20 @@ function testMaterialSample(): InputResource<MaterialSample> {
   };
 }
 
+function testCopiedMaterialSample(): InputResource<MaterialSample> {
+  return {
+    id: "2",
+    type: "material-sample",
+    group: "test group",
+    materialSampleName: "Sample1",
+    collectingEvent: {
+      id: "1",
+      type: "collecting-event"
+    },
+    ...blankMaterialSample()
+  };
+}
+
 function testMaterialSampleNoCollectingEvent(): InputResource<MaterialSample> {
   return {
     id: "1",
@@ -236,6 +263,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       };
     case "collection-api/material-sample/1":
       return { data: testMaterialSample() };
+    case "collection-api/material-sample/2":
+      return { data: testCopiedMaterialSample() };
     case "collection-api/material-sample":
       return {
         data: [
@@ -327,6 +356,12 @@ describe("Material Sample Edit Page", () => {
     window.fetch = jest
       .fn()
       .mockResolvedValue(mockFetchResponse(mockGeographicSearchResults));
+
+    (useRouter as jest.Mock).mockReturnValue({
+      query: {},
+      push: routerPushMock,
+      pathname: "/collection/material-sample/edit"
+    });
   });
 
   it("Submits a new material-sample with a new CollectingEvent.", async () => {
@@ -341,7 +376,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -435,7 +470,7 @@ describe("Material Sample Edit Page", () => {
       ".parent-material-sample-field"
     );
     if (!parentField) {
-      fail("Parent select field not found in form.");
+      throw new Error("Parent select field not found in form.");
     }
 
     const combo = within(parentField as any).getByRole("combobox");
@@ -478,7 +513,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -572,10 +607,7 @@ describe("Material Sample Edit Page", () => {
     await userEvent.click(selectExistingButton);
 
     // Make an unrelated change to the material sample.
-    await userEvent.clear(
-      wrapper.getByRole("textbox", { name: /primary id/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
@@ -634,8 +666,7 @@ describe("Material Sample Edit Page", () => {
     const collectionNumberField = wrapper.getAllByRole("textbox", {
       name: /collection number/i
     })[1];
-    await userEvent.clear(collectionNumberField);
-    await userEvent.type(collectionNumberField, "new collection number 123");
+    await clearAndType(collectionNumberField, "new collection number 123");
 
     // Save the material sample form
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -785,10 +816,7 @@ describe("Material Sample Edit Page", () => {
     expect(editAllVerbatimEventDateTime).toHaveDisplayValue("2021-04-13");
 
     // Update the Primary ID.
-    await userEvent.clear(
-      wrapper.getByRole("textbox", { name: /primary id/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
@@ -828,7 +856,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -844,10 +872,7 @@ describe("Material Sample Edit Page", () => {
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
       "2019-12-21T16:00"
     );
-    await userEvent.clear(
-      wrapper.getByRole("textbox", { name: /primary id/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
@@ -1284,7 +1309,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-organisms .react-switch-bg"
     );
     if (!organismToggle) {
-      fail("organism toggle needs to exist at this point.");
+      throw new Error("organism toggle needs to exist at this point.");
     }
     await userEvent.click(organismToggle[0]);
     await waitFor(() =>
@@ -1619,7 +1644,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-associations .react-switch-bg"
     );
     if (!associationToggle) {
-      fail("Association toggle needs to exist at this point.");
+      throw new Error("Association toggle needs to exist at this point.");
     }
     await userEvent.click(associationToggle[0]);
     await waitFor(() =>
@@ -1673,7 +1698,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-associations .react-switch-bg"
     );
     if (!associationToggle) {
-      fail("Association toggle needs to exist at this point.");
+      throw new Error("Association toggle needs to exist at this point.");
     }
     await userEvent.click(associationToggle[0]);
     await waitFor(() =>
@@ -1732,7 +1757,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-organisms .react-switch-bg"
     );
     if (!organismToggle) {
-      fail("organism toggle needs to exist at this point.");
+      throw new Error("organism toggle needs to exist at this point.");
     }
     await userEvent.click(organismToggle[0]);
     await waitFor(() =>
@@ -1889,7 +1914,7 @@ describe("Material Sample Edit Page", () => {
     const expandButtons =
       wrapper.container.querySelectorAll(".expand-organism");
     if (!expandButtons || expandButtons.length !== 3) {
-      fail("Missing 3 expand buttons in the organism section.");
+      throw new Error("Missing 3 expand buttons in the organism section.");
     }
     expandButtons.forEach(async (button) => {
       await userEvent.click(button);
@@ -1906,14 +1931,10 @@ describe("Material Sample Edit Page", () => {
     const lastLifestageField = wrapper.getAllByRole("textbox", {
       name: /life stage/i
     })[2];
-    await userEvent.clear(lastLifestageField);
-    await userEvent.type(lastLifestageField, "This should be removed...");
+    await clearAndType(lastLifestageField, "This should be removed...");
 
     // Reduce the organisms to 1:
-    await userEvent.clear(
-      wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("spinbutton", { name: /organisms quantity/i }),
       "1"
     );
@@ -2102,8 +2123,7 @@ describe("Material Sample Edit Page", () => {
     expect(organismQuantity).toHaveDisplayValue("1");
 
     // Set to 0.
-    await userEvent.clear(organismQuantity);
-    await userEvent.type(organismQuantity, "0");
+    await clearAndType(organismQuantity, "0");
 
     // Save the form
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -2259,14 +2279,10 @@ describe("Material Sample Edit Page", () => {
     expect(organismQuantity).toHaveDisplayValue("1");
 
     // Change it to 3.
-    await userEvent.clear(organismQuantity);
-    await userEvent.type(organismQuantity, "3");
+    await clearAndType(organismQuantity, "3");
 
     // Update the life stage.
-    await userEvent.clear(
-      wrapper.getByRole("textbox", { name: /life stage/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /life stage/i }),
       "common-life-stage"
     );
@@ -2409,10 +2425,7 @@ describe("Material Sample Edit Page", () => {
     await userEvent.click(expandButtons[2]);
 
     // Edit the lifeStage field:
-    await userEvent.clear(
-      wrapper.getByRole("textbox", { name: /life stage/i })
-    );
-    await userEvent.type(
+    await clearAndType(
       wrapper.getByRole("textbox", { name: /life stage/i }),
       "lifestage 3 edited"
     );
@@ -2892,8 +2905,7 @@ describe("Material Sample Edit Page", () => {
 
     // Set a new value for attribute 2:
     const attribute2 = wrapper.getByDisplayValue(/attribute 2 value/i);
-    await userEvent.clear(attribute2);
-    await userEvent.type(attribute2, "new attribute 2 value");
+    await clearAndType(attribute2, "new attribute 2 value");
 
     // Save the form
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -2949,7 +2961,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-collecting-event .react-switch-bg"
     );
     if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
+      throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
@@ -2993,7 +3005,7 @@ describe("Material Sample Edit Page", () => {
       ".enable-organisms .react-switch-bg"
     );
     if (!organismToggle) {
-      fail("organism toggle needs to exist at this point.");
+      throw new Error("organism toggle needs to exist at this point.");
     }
     await userEvent.click(organismToggle[0]);
     await waitFor(() =>
@@ -3221,13 +3233,11 @@ describe("Material Sample Edit Page", () => {
       const hostOrganismTextfield = wrapper.getByRole("textbox", {
         name: /name search/i
       });
-      await userEvent.clear(hostOrganismTextfield);
-      await userEvent.type(hostOrganismTextfield, "Updated host name");
+      await clearAndType(hostOrganismTextfield, "Updated host name");
 
       // Change the remarks field
       const remarksTextbox = wrapper.getByText(/original remarks/i);
-      await userEvent.clear(remarksTextbox);
-      await userEvent.type(remarksTextbox, "Update host remarks");
+      await clearAndType(remarksTextbox, "Update host remarks");
 
       // Save the form
       await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -3311,7 +3321,7 @@ describe("Material Sample Edit Page", () => {
         ".enable-associations .react-switch-bg"
       );
       if (!associationToggle) {
-        fail("Association toggle needs to exist at this point.");
+        throw new Error("Association toggle needs to exist at this point.");
       }
       await userEvent.click(associationToggle[0]);
 
@@ -3387,8 +3397,7 @@ describe("Material Sample Edit Page", () => {
       const hostOrganismTextfield = wrapper.getByRole("textbox", {
         name: /name search/i
       });
-      await userEvent.clear(hostOrganismTextfield);
-      await userEvent.type(hostOrganismTextfield, "New Host Organism");
+      await clearAndType(hostOrganismTextfield, "New Host Organism");
 
       // Save the form
       await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -3769,7 +3778,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
@@ -3895,7 +3906,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
@@ -4133,7 +4146,9 @@ describe("Material Sample Edit Page", () => {
         ".enable-collecting-event .react-switch-bg"
       );
       if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
       }
       await userEvent.click(collectingEventToggle[0]);
       await waitForLoadingToDisappear();
@@ -4147,12 +4162,14 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       const manualSwitchBg =
         manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
       if (!manualSwitchBg) {
-        fail(
+        throw new Error(
           "Manual geography switch background needs to exist at this point."
         );
       }
@@ -4245,29 +4262,27 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       const manualSwitchBg =
         manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
       if (!manualSwitchBg) {
-        fail(
+        throw new Error(
           "Manual geography switch background needs to exist at this point."
         );
       }
       await userEvent.click(manualSwitchBg);
 
       // Set the State/Province field:
-      await userEvent.clear(
-        wrapper.getByRole("textbox", { name: /state\/province/i })
-      );
-      await userEvent.type(
+      await clearAndType(
         wrapper.getByRole("textbox", { name: /state\/province/i }),
         "Ontario"
       );
 
       // Set the Country field:
-      await userEvent.clear(wrapper.getByRole("textbox", { name: /country/i }));
-      await userEvent.type(
+      await clearAndType(
         wrapper.getByRole("textbox", { name: /country/i }),
         "Canada"
       );
@@ -4326,29 +4341,27 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       const manualSwitchBg =
         manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
       if (!manualSwitchBg) {
-        fail(
+        throw new Error(
           "Manual geography switch background needs to exist at this point."
         );
       }
       await userEvent.click(manualSwitchBg);
 
       // Set the State/Province field:
-      await userEvent.clear(
-        wrapper.getByRole("textbox", { name: /state\/province/i })
-      );
-      await userEvent.type(
+      await clearAndType(
         wrapper.getByRole("textbox", { name: /state\/province/i }),
         "Bavaria"
       );
 
       // Set the Country field:
-      await userEvent.clear(wrapper.getByRole("textbox", { name: /country/i }));
-      await userEvent.type(
+      await clearAndType(
         wrapper.getByRole("textbox", { name: /country/i }),
         "Germany"
       );
@@ -4404,7 +4417,9 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       expect(manualSwitchInput).toBeChecked();
     });
@@ -4441,7 +4456,9 @@ describe("Material Sample Edit Page", () => {
         "#manualGeographyInput"
       );
       if (!manualSwitchInput) {
-        fail("Manual geography switch needs to exist at this point.");
+        throw new Error(
+          "Manual geography switch needs to exist at this point."
+        );
       }
       expect(manualSwitchInput).not.toBeChecked();
     });
@@ -4461,7 +4478,9 @@ describe("Material Sample Edit Page", () => {
       );
 
       if (!scheduledActionToggle) {
-        fail("Scheduled action toggle needs to exist at this point.");
+        throw new Error(
+          "Scheduled action toggle needs to exist at this point."
+        );
       }
       await userEvent.click(scheduledActionToggle[0]);
 
@@ -4518,6 +4537,375 @@ describe("Material Sample Edit Page", () => {
             { apiBaseUrl: "/collection-api" }
           ]
         ])
+      );
+    });
+  });
+
+  describe("save and copy to next functionality", () => {
+    it("When creating a new material sample, save and copy to next, should save the current material sample and go to the next form", async () => {
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+      // Enable the collecting event section:
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
+      }
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
+
+      await waitFor(() =>
+        expect(
+          wrapper.getByLabelText(/verbatim event datetime/i)
+        ).toBeInTheDocument()
+      );
+
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /primary id/i }),
+        "Sample1"
+      );
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
+        "2019-12-21T16:00"
+      );
+
+      // Click the "Save & copy to next" button
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /save & copy to next/i })
+      );
+
+      // Wait for the save to be called twice (once for the collecting event, once for the material sample)
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+
+      // Saves the Collecting Event and the Material Sampl properly.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          // New collecting-event:
+          [
+            {
+              resource: {
+                dwcVerbatimCoordinateSystem: null,
+                dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+                group: "aafc",
+                geoReferenceAssertions: [
+                  {
+                    isPrimary: true
+                  }
+                ],
+                verbatimEventDateTime: "2019-12-21T16:00",
+                publiclyReleasable: false, // Default value
+                type: "collecting-event"
+              },
+              type: "collecting-event"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ],
+        [
+          // New material-sample:
+          [
+            {
+              resource: {
+                group: "aafc",
+                relationships: {
+                  collectingEvent: {
+                    data: {
+                      id: "11111111-1111-1111-1111-111111111111",
+                      type: "collecting-event"
+                    }
+                  }
+                },
+                materialSampleName: "Sample1",
+                publiclyReleasable: false
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+
+      // The next router should have pushed to the edit page for the new material sample.
+      expect(routerPushMock).toHaveBeenCalledWith(
+        "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111"
+      );
+
+      // Now we will simiulate a new page load with these query params, the ids are different to match a mock but the previous
+      // expectation is to ensure it's the correct one.
+      jest.clearAllMocks();
+      (useRouter as jest.Mock).mockReturnValue({
+        query: {
+          copyFromId: "2"
+        },
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+      wrapper.rerender(<MaterialSampleEditPage />);
+      await waitForLoadingToDisappear();
+
+      // Ensure success message appears...
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(
+            /you are now working on a new copy based on "sample1"\. this copy will not be created until it's saved\./i
+          )
+        ).toBeInTheDocument();
+      });
+
+      // Ensure the primary id was incremented.
+      await waitFor(() => {
+        expect(
+          wrapper.getByRole("textbox", { name: /primary id/i })
+        ).toHaveValue("Sample2");
+      });
+
+      // Saving should create a new material sample with a link to the existing collecting event.
+      await userEvent.click(wrapper.getByRole("button", { name: "Save" }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      expect(mockSave.mock.calls).toEqual([
+        // New material-sample:
+        [
+          [
+            {
+              resource: expect.objectContaining({
+                group: "test group",
+                relationships: expect.objectContaining({
+                  collectingEvent: {
+                    data: {
+                      id: "1",
+                      type: "collecting-event"
+                    }
+                  }
+                }),
+                materialSampleName: "Sample2",
+                publiclyReleasable: false
+              }),
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
+
+    it("When editing an existing material sample, save and copy to next, should save the current material sample and open a new form with the same values.", async () => {
+      jest.clearAllMocks();
+      (useRouter as jest.Mock).mockReturnValue({
+        query: {
+          id: "2"
+        },
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Expect "Sample1" in the form since no copy from has been done yet.
+      expect(
+        wrapper.getByRole("textbox", { name: /primary id/i })
+      ).toHaveDisplayValue("Sample1");
+
+      // Make a change to the barcode.
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /barcode/i }),
+        "barcode1"
+      );
+
+      // Click the "Save & copy to next" button
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /save & copy to next/i })
+      );
+
+      // Material sample should be updated before preceeding to copy from it.
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Saves the Collecting Event and the Material Sampl properly.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          // Update the EXISTING material sample
+          [
+            {
+              resource: {
+                id: "2",
+                type: "material-sample",
+                barcode: "barcode1"
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+
+      // The next router should have pushed to the edit page for the new material sample.
+      expect(routerPushMock).toHaveBeenCalledWith(
+        "/collection/material-sample/edit?copyFromId=2"
+      );
+    });
+
+    it("When editing an existing material sample, save and copy to next, make no changes, expect no save request but continue the copy to next one.", async () => {
+      jest.clearAllMocks();
+      (useRouter as jest.Mock).mockReturnValue({
+        query: {
+          id: "2"
+        },
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Expect "Sample1" in the form since no copy from has been done yet.
+      expect(
+        wrapper.getByRole("textbox", { name: /primary id/i })
+      ).toHaveDisplayValue("Sample1");
+
+      // Click the "Save & copy to next" button
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /save & copy to next/i })
+      );
+
+      // Material sample should be updated before preceeding to copy from it.
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(0));
+
+      // The next router should have pushed to the edit page for the new material sample.
+      expect(routerPushMock).toHaveBeenCalledWith(
+        "/collection/material-sample/edit?copyFromId=2"
+      );
+    });
+
+    it("Attachments should provide an alert to ask if you would like to include it in from a copy", async () => {
+      (useRouter as jest.Mock).mockReturnValue({
+        query: {
+          copyFromId: "1"
+        },
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Expect an alert at the top indicating that the attachment was not automatically copied over.
+      expect(
+        wrapper.getByText(
+          /the "attachment" data component was not automatically copied over since it's specific to the previous material sample\. would you like to duplicate it anyway\?/i
+        )
+      ).toBeInTheDocument();
+
+      // Since the "next" primary id could not be detected, just supply our own.
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /primary id/i }),
+        "Sample-10"
+      );
+
+      // Select the duplicate option
+      await userEvent.click(
+        wrapper.getByRole("button", {
+          name: /duplicate attachment from "my\-sample\-name"/i
+        })
+      );
+      await waitForLoadingToDisappear();
+
+      // Click "Save & Copy to Next".
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /save & copy to next/i })
+      );
+
+      // Material sample should be updated before preceeding to copy from it.
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Saves the Collecting Event and the Material Sampl properly.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          // Create the new material sample.
+          [
+            {
+              resource: expect.objectContaining({
+                materialSampleName: "Sample-10",
+                group: "test group",
+                relationships: expect.objectContaining({
+                  // Attachment copied over.
+                  attachment: {
+                    data: [
+                      {
+                        id: "attach-1",
+                        type: "metadata"
+                      }
+                    ]
+                  },
+
+                  // Collecting event automatically copied over.
+                  collectingEvent: {
+                    data: {
+                      id: "1",
+                      type: "collecting-event"
+                    }
+                  }
+                })
+              }),
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+
+      // The next router should have pushed to the edit page for the new material sample.
+      expect(routerPushMock).toHaveBeenCalledWith(
+        "/collection/material-sample/edit?copyFromId=11111111-1111-1111-1111-111111111111"
+      );
+    });
+    it("Pressing Enter in a text field submits the form as a normal Save, not Save & Copy to Next.", async () => {
+      (useRouter as jest.Mock).mockReturnValue({
+        query: {},
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+      // Type into the Primary ID field and press Enter, simulating a user
+      // hitting Enter instead of clicking a button.
+      const primaryIdInput = wrapper.getByRole("textbox", {
+        name: /primary id/i
+      });
+      await clearAndType(primaryIdInput, "Sample1");
+      await userEvent.type(primaryIdInput, "{enter}");
+
+      // Only 1 save call: no collecting event was enabled, just the sample.
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                group: "aafc",
+                materialSampleName: "Sample1",
+                publiclyReleasable: false
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+
+      // Assure that the submitted button was just the save and not the copy to next action.
+      // If it was normal save, the user is directed to the view page.
+      expect(routerPushMock).toHaveBeenCalledWith(
+        "/collection/material-sample/view?id=11111111-1111-1111-1111-111111111111"
+      );
+      expect(routerPushMock).not.toHaveBeenCalledWith(
+        expect.stringContaining("copyFromId")
       );
     });
   });

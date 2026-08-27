@@ -2,7 +2,7 @@
 
 // The "setimmediate" package from NPM doesn't wait long enough during tests.
 // Manually polyfill here:
-global.setImmediate = (fn) => global.setTimeout(fn, 0);
+global.setImmediate = jest.requireActual("timers").setImmediate;
 
 // Let tests pretend they are running in the browser:
 process.browser = true;
@@ -13,11 +13,7 @@ process.browser = true;
  */
 const consoleError = console.error;
 jest.spyOn(console, "error").mockImplementation((...args) => {
-  if (
-    !String(args?.[0])?.includes?.(
-      "Warning: An update to %s inside a test was not wrapped in act"
-    )
-  ) {
+  if (!String(args?.[0])?.includes?.("was not wrapped in act")) {
     consoleError(...args);
   }
 });

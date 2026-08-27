@@ -50,7 +50,7 @@ import {
   ScientificNameSource,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
-import { Person } from "../../../types/objectstore-api";
+import { Metadata, Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
@@ -60,6 +60,7 @@ import { Alert } from "react-bootstrap";
 import CollectingEventEditAlert from "../collecting-event/CollectingEventEditAlert";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { Association } from "../../../types/collection-api/resources/Association";
+import { MolecularAnalysisRunItem } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet, apiClient } = useApiClient();
@@ -92,7 +93,7 @@ export function useMaterialSampleQuery(id?: string | null) {
         const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
           `seqdb-api/generic-molecular-analysis-item`,
           {
-            include: "genericMolecularAnalysis,materialSample",
+            include: "genericMolecularAnalysis,molecularAnalysisRunItem",
             filter: SimpleSearchFilterBuilder.create()
               .where("materialSample.id", "EQ", data.id)
               .build(),
@@ -100,15 +101,66 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         );
 
-        // Retrieve workflows linked to the material sample
-        if (workflowItems) {
-          data.workflows = [
-            ...new Set(
-              _.compact(workflowItems.data).map(
-                (item: any) => item.genericMolecularAnalysis
+        const runItemIds = _.compact(
+          workflowItems.data.map(
+            (item: any) => item.molecularAnalysisRunItem?.id
+          )
+        );
+
+        if (runItemIds.length > 0) {
+          const runItemsWithResult = await bulkGet<MolecularAnalysisRunItem>(
+            runItemIds.map(
+              (id) => `/molecular-analysis-run-item/${id}?include=result`
+            ),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+
+          // Map by id for quick lookup when merging back in
+          const runItemsById = _.keyBy(_.compact(runItemsWithResult), "id");
+
+          // Attach the loaded result onto the original workflowItems.data
+          workflowItems.data.forEach((item: any) => {
+            const runItemId = item.molecularAnalysisRunItem?.id;
+            if (runItemId && runItemsById[runItemId]) {
+              item.molecularAnalysisRunItem = runItemsById[runItemId];
+            }
+          });
+
+          // Collect every attachment id across every result
+          const attachmentIds = _.compact(
+            _.uniq(
+              workflowItems.data.flatMap(
+                (item: any) =>
+                  item.molecularAnalysisRunItem?.result?.attachments?.map(
+                    (attachment: any) => attachment.id
+                  ) ?? []
               )
             )
-          ];
+          );
+
+          if (attachmentIds.length > 0) {
+            const metadataAttachments = await bulkGet<Metadata>(
+              attachmentIds.map((id) => `/metadata/${id}`),
+              { apiBaseUrl: "/objectstore-api" }
+            );
+
+            const metadataById = _.keyBy(_.compact(metadataAttachments), "id");
+
+            // Replace the {id, type} attachment stubs with full metadata
+            workflowItems.data.forEach((item: any) => {
+              const result = item.molecularAnalysisRunItem?.result;
+              if (result?.attachments) {
+                result.attachments = result.attachments.map(
+                  (attachment: any) => metadataById[attachment.id] ?? attachment
+                );
+              }
+            });
+          }
+        }
+
+        // Retrieve workflows linked to the material sample
+        if (workflowItems) {
+          data.workflows = [...new Set(_.compact(workflowItems.data))];
         }
 
         for (const organism of data.organism ?? []) {
@@ -1281,6 +1333,7 @@ export function useMaterialSampleSave({
     delete msInputWithRelationships.associations;
     delete msInputWithRelationships.organismsIndividualEntry;
     delete msInputWithRelationships.organismsQuantity;
+    delete msInputWithRelationships.workflows;
 
     // Delete these since they have been moved to the relationship section.
     delete msInputWithRelationships.collectingEvent;

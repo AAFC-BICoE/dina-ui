@@ -1,4 +1,8 @@
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  mountWithAppContext,
+  waitForLoadingToDisappear,
+  clearAndType
+} from "common-ui";
 import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
 import _ from "lodash";
 import { waitFor } from "@testing-library/react";
@@ -473,12 +477,10 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     const sequencingRunNameInput = wrapper.container.querySelector(
       'input[name="sequencingRunName"]'
     );
-    await userEvent.clear(sequencingRunNameInput!);
-    await userEvent.type(sequencingRunNameInput!, "Updated run name");
+    await clearAndType(sequencingRunNameInput!, "Updated run name");
 
     // Update the two run iten name
-    await userEvent.clear(wrapper.getAllByRole("textbox")[1]);
-    await userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    await clearAndType(wrapper.getAllByRole("textbox")[1], "Run item name 1");
 
     // Click the save button.
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));

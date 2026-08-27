@@ -174,7 +174,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     } as ESIndexMapping);
   }
 
-  // Check if all selected objects are JPEGs when switching to OBJECT_ARCHIVE export
+  // Check if all selected objects (or their large image derivatives) are JPEGs when switching to OBJECT_ARCHIVE export
   useEffect(() => {
     async function checkJpegEligibility() {
       if (
@@ -183,7 +183,7 @@ export default function ExportPage<TData extends KitsuResource>() {
       ) {
         try {
           const paths = localStorageExportObjectIds.map(
-            (id) => `metadata/${id}`
+            (id) => `metadata/${id}?include=derivatives`
           );
           const metadatas: PersistedResource<Metadata>[] = await bulkGet(
             paths,
@@ -192,12 +192,32 @@ export default function ExportPage<TData extends KitsuResource>() {
             }
           );
 
-          const isAllJpeg = metadatas.every(
-            (meta) =>
-              meta.dcFormat === "image/jpeg" ||
-              meta.fileExtension?.toLowerCase() === ".jpg" ||
-              meta.fileExtension?.toLowerCase() === ".jpeg"
-          );
+          const isAllJpeg = metadatas.every((meta) => {
+            // Check if a LARGE_IMAGE derivative exists first
+            const derivatives = meta?.derivatives ?? [];
+            if (meta.dcType === "IMAGE" && derivatives?.length) {
+              const largeImageDerivative = derivatives.find(
+                (derivative) => derivative.derivativeType === "LARGE_IMAGE"
+              );
+
+              if (largeImageDerivative) {
+                const dcFormat = largeImageDerivative.dcFormat;
+                const ext = largeImageDerivative.fileExtension?.toLowerCase();
+
+                return (
+                  dcFormat === "image/jpeg" || ext === ".jpg" || ext === ".jpeg"
+                );
+              }
+            }
+
+            // Fallback to checking the primary metadata object
+            const dcFormat = meta.dcFormat;
+            const ext = meta.fileExtension?.toLowerCase();
+
+            return (
+              dcFormat === "image/jpeg" || ext === ".jpg" || ext === ".jpeg"
+            );
+          });
 
           setAllObjectsAreJpeg(isAllJpeg);
         } catch {
@@ -321,8 +341,9 @@ export default function ExportPage<TData extends KitsuResource>() {
 
       const fileIdentifiers = metadatas.map((metadata) => {
         // If the metadata is for an image and has derivatives, return the large image derivative fileIdentifier if present
-        if (metadata.dcType === "IMAGE" && metadata.derivatives) {
-          const largeImageDerivative = metadata?.derivatives?.find?.(
+        const derivatives = metadata?.derivatives ?? [];
+        if (metadata.dcType === "IMAGE" && derivatives?.length) {
+          const largeImageDerivative = derivatives.find(
             (derivative) => derivative.derivativeType === "LARGE_IMAGE"
           );
           if (largeImageDerivative) {
@@ -337,6 +358,7 @@ export default function ExportPage<TData extends KitsuResource>() {
 
       if (selectedFilenameAliasField) {
         metadatas.forEach((metadata) => {
+          const derivatives = metadata?.derivatives ?? [];
           const filenameAlias: string =
             selectedFilenameAliasField.label === "managedAttributes" &&
             dynamicFieldValue
@@ -346,15 +368,13 @@ export default function ExportPage<TData extends KitsuResource>() {
                     .label
                 )
               : get(metadata, selectedFilenameAliasField.label);
-          if (metadata?.derivatives?.find) {
+          if (derivatives?.length) {
             // If image has derivative, use large image derivative fileIdentifier
-            const largeImageDerivative = metadata.derivatives.find(
-              (derivative) => {
-                if (derivative.derivativeType === "LARGE_IMAGE") {
-                  return true;
-                }
+            const largeImageDerivative = derivatives.find((derivative) => {
+              if (derivative.derivativeType === "LARGE_IMAGE") {
+                return true;
               }
-            );
+            });
             if (largeImageDerivative) {
               filenameAliases[largeImageDerivative.fileIdentifier] =
                 filenameAlias;

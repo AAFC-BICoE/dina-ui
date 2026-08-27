@@ -34,7 +34,6 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
    *  - -description
    */
   additionalSort?: string;
-  showGroupCategary?: boolean;
 }
 
 export interface ResourceSelectFieldCustomQueryProps<
@@ -56,20 +55,14 @@ export interface ResourceSelectFieldCustomQueryProps<
    *  - -description
    */
   additionalSort?: string;
-  showGroupCategary?: boolean;
 }
 
 /** Formik-connected Dropdown select input for selecting a resource from the API. */
 export function ResourceSelectField<TData extends KitsuResource>(
   resourceSelectFieldProps: ResourceSelectFieldProps<TData>
 ) {
-  const {
-    onChange,
-    readOnlyRender,
-    showGroupCategary = false,
-    additionalSort,
-    ...resourceSelectProps
-  } = resourceSelectFieldProps;
+  const { onChange, readOnlyRender, additionalSort, ...resourceSelectProps } =
+    resourceSelectFieldProps;
 
   const defaultReadOnlyRender = (
     value?: SingleOrArray<PersistedResource<TData> | null>
@@ -100,7 +93,6 @@ export function ResourceSelectField<TData extends KitsuResource>(
               invalid={invalid}
               onChange={onChangeInternal}
               value={value}
-              showGroupCategary={showGroupCategary}
               additionalSort={additionalSort}
               optionLabel={resourceSelectProps.optionLabel}
               placeholder={placeholder ?? resourceSelectProps?.placeholder}
@@ -115,13 +107,8 @@ export function ResourceSelectField<TData extends KitsuResource>(
 export function ResourceSelectFieldCustomQuery<TData extends KitsuResource>(
   resourceSelectFieldCustomQueryProps: ResourceSelectFieldCustomQueryProps<TData>
 ) {
-  const {
-    onChange,
-    readOnlyRender,
-    showGroupCategary = false,
-    additionalSort,
-    ...resourceSelectProps
-  } = resourceSelectFieldCustomQueryProps;
+  const { onChange, readOnlyRender, additionalSort, ...resourceSelectProps } =
+    resourceSelectFieldCustomQueryProps;
 
   const defaultReadOnlyRender = (
     value?: SingleOrArray<PersistedResource<TData> | null>
@@ -152,7 +139,6 @@ export function ResourceSelectFieldCustomQuery<TData extends KitsuResource>(
               invalid={invalid}
               onChange={onChangeInternal}
               value={value}
-              showGroupCategary={showGroupCategary}
               additionalSort={additionalSort}
               optionLabel={resourceSelectProps.optionLabel}
               placeholder={placeholder ?? resourceSelectProps?.placeholder}

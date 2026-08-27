@@ -73,7 +73,7 @@ export function SangerPcrReactionStep({
           { apiBaseUrl: "/seqdb-api", resourceType: "pcr-batch-item" }
         );
         const newItems = [...pcrBatchItems];
-        for (const rst of savedResult.data.data) {
+        for (const rst of savedResult.data) {
           const found = newItems.find((itm) => itm.id === rst.id);
           if (found) {
             found.result = rst.result;

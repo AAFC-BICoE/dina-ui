@@ -1,7 +1,7 @@
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { FormattedTextField } from "../FormattedTextField";
-import { fireEvent, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 describe("FormattedTextField component", () => {
@@ -19,7 +19,7 @@ describe("FormattedTextField component", () => {
     ).toEqual("2020");
   });
 
-  it("Changes the field's value.", () => {
+  it("Changes the field's value.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: "2020" } }}>
         {({
@@ -36,11 +36,11 @@ describe("FormattedTextField component", () => {
     );
 
     // Simulate changing the input value to "201912"
-    fireEvent.change(
+    await clearAndType(
       screen.getByRole("textbox", {
         name: /test object test field/i
       }),
-      { target: { value: "201912" } }
+      "201912"
     );
 
     // Check if the displayed value is updated to "2019-12"
@@ -48,11 +48,11 @@ describe("FormattedTextField component", () => {
       wrapper.container.querySelector(".value-display")?.textContent
     ).toEqual("2019-12");
 
-    fireEvent.change(
+    await clearAndType(
       screen.getByRole("textbox", {
         name: /test object test field/i
       }),
-      { target: { value: "2019we" } }
+      "2019we"
     );
     expect(
       wrapper.container.querySelector(".value-display")?.textContent

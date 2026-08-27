@@ -88,7 +88,7 @@ describe("Multilingual-Cell components", () => {
 
     // Row 1 expectations (both provided):
     expect(
-      englishRender.queryByText("Row 1: English Title")
+      await englishRender.findByText("Row 1: English Title")
     ).toBeInTheDocument();
     expect(
       englishRender.queryByText("Row 1: English Description")

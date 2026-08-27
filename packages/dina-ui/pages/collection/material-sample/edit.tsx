@@ -15,6 +15,7 @@ import {
   NotCopiedOverWarning
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { FaCopy } from "react-icons/fa6";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -23,7 +24,6 @@ export default function MaterialSampleEditPage() {
 
   const id = router.query.id?.toString();
   const copyFromId = router.query.copyFromId?.toString();
-  const lastCreatedId = router.query.lastCreatedId?.toString();
 
   const { formatMessage } = useDinaIntl();
 
@@ -42,9 +42,7 @@ export default function MaterialSampleEditPage() {
   }
 
   async function moveToNextSamplePage(savedId: string) {
-    await router.push(
-      `/collection/material-sample/edit?copyFromId=${savedId}&lastCreatedId=${savedId}`
-    );
+    await router.push(`/collection/material-sample/edit?copyFromId=${savedId}`);
   }
 
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
@@ -65,6 +63,21 @@ export default function MaterialSampleEditPage() {
     enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar className="mb-3">
+        {/*
+         * Dummy submit button, kept first in DOM order.
+         * Browsers implicitly activate the first type="submit" button in the form when the user
+         * presses Enter, regardless of visual position. Without this, Enter would trigger
+         * the "Save and Copy to Next" button below since it's declared before the plain "Save"
+         * button.
+         */}
+        <button
+          type="submit"
+          className="visually-hidden"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={() => setSaveRedirect("VIEW")}
+        />
+
         <div className="col-md-3 col-sm-12 mt-2">
           <BackButton entityId={id} entityLink="/collection/material-sample" />
         </div>
@@ -78,16 +91,16 @@ export default function MaterialSampleEditPage() {
         </div>
         <div className="col-md-3 flex-grow-1 d-flex gap-2">
           <div className="ms-auto" />
-          {!id && (
-            <SubmitButton
-              buttonProps={() => ({
-                style: { width: "13rem" },
-                onClick: () => setSaveRedirect("CREATE_NEXT")
-              })}
-            >
-              <DinaMessage id="saveAndCopyToNext" />
-            </SubmitButton>
-          )}
+          <SubmitButton
+            buttonProps={() => ({
+              style: { width: "13rem" },
+              onClick: () => setSaveRedirect("CREATE_NEXT")
+            })}
+            showSaveIcon={false}
+          >
+            <FaCopy className="me-2" />
+            <DinaMessage id="saveAndCopyToNext" />
+          </SubmitButton>
           <SubmitButton
             buttonProps={() => ({ onClick: () => setSaveRedirect("VIEW") })}
           />
@@ -155,7 +168,7 @@ export default function MaterialSampleEditPage() {
                 value={{
                   originalSample,
                   notCopiedOverWarnings: copyWarnings ?? [],
-                  lastCreatedId: lastCreatedId ?? "",
+                  copyFromId: copyFromId ?? "",
                   removeWarning
                 }}
               >

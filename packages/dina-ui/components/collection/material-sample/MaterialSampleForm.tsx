@@ -559,25 +559,25 @@ export function MaterialSampleForm({
       onSubmit={onSubmit}
       isBulkEditAllTab={isBulkEditAllTab}
     >
+      {buttonBar}
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {copyFromNextSample && (
         <>
+          <h1 id="wb-cont">
+            <DinaMessage id={"addMaterialSampleTitle"} />
+          </h1>
           <SaveAndCopyToNextSuccessAlert
-            id={copyFromNextSample.lastCreatedId ?? ""}
+            id={copyFromNextSample.copyFromId ?? ""}
             displayName={
               !!copyFromNextSample.originalSample.materialSampleName?.length
                 ? copyFromNextSample.originalSample.materialSampleName
-                : copyFromNextSample.lastCreatedId ?? ""
+                : copyFromNextSample.copyFromId ?? ""
             }
             entityPath={"collection/material-sample"}
             dataComponentState={dataComponentState}
           />
-          <h1 id="wb-cont">
-            <DinaMessage id={"addMaterialSampleTitle"} />
-          </h1>
         </>
       )}
-      {buttonBar}
       {formLayout}
     </DinaForm>
   );

@@ -452,11 +452,17 @@ export function useColumnMapping() {
       return undefined;
     }
 
+    // Depending on if it's a controlled vocabulary managed attribute or legacy managed attribute,
+    // the dina component will be stored in a different part.
+    const configDataComponent =
+      config?.managedAttributeComponent ?? config?.filter?.dinaComponent;
+
+    // Find the matching managed attribute based on the key and the dina component.
     return managedAttributes.find(
       (managedAttribute) =>
         managedAttribute.key === key &&
-        (config.managedAttributeComponent === "ENTITY" ||
-          managedAttribute?.dinaComponent === config.managedAttributeComponent)
+        (configDataComponent === "ENTITY" ||
+          managedAttribute?.dinaComponent === configDataComponent)
     );
   }
 
@@ -623,7 +629,7 @@ export function useColumnMapping() {
       const columnHeaderValue =
         columnHeader.originalColumn ?? columnHeader.columnHeader;
       const fieldPath = findMatchField(columnHeader, newFieldOptions, type);
-      if (fieldPath === undefined) {
+      if (fieldPath === undefined || fieldPath.endsWith("managedAttributes")) {
         // check if the columnHeaderValue is one of managedAttributes
         const targetManagedAttr =
           findManagedAttributeMatchFromTemplate(columnHeaderValue) ??

@@ -25,6 +25,8 @@ describe("SubmitButton component", () => {
       </DinaForm>
     );
 
+    // keeping fireEvent here as the test asserts the transient "submitting" state
+    // which is already resolved by the time an awaited userEvent.click returns
     fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     expect(wrapper.queryByText(/loading\.\.\./i)).toBeInTheDocument();

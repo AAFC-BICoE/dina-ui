@@ -2,7 +2,7 @@ import ImageViewer from "../../../../pages/object-store/object/image-view";
 import { useRouter } from "next/router";
 import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import "@testing-library/jest-dom";
-import { waitFor } from "@testing-library/dom";
+import { waitFor } from "@testing-library/react";
 
 // Mock next/router
 jest.mock("next/router", () => ({

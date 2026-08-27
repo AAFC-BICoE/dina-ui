@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { FilterBuilder, FilterBuilderProps } from "../FilterBuilder";
 import { FilterGroupModel } from "../FilterGroup";
 import "@testing-library/jest-dom";
-import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 describe("FilterBuilder component", () => {
   const filterAttributes = ["name", "description"];
@@ -27,12 +28,12 @@ describe("FilterBuilder component", () => {
     expect(wrapper.getByText(/partial match/i)).toBeInTheDocument();
   });
 
-  it("Adds a FilterRow in an AND group when the FilterRow's AND button is clicked.", () => {
+  it("Adds a FilterRow in an AND group when the FilterRow's AND button is clicked.", async () => {
     const wrapper = mountFilterBuilder();
 
     // Click the AND button...
     const andButton = wrapper.getByRole("button", { name: /and/i });
-    fireEvent.click(andButton);
+    await userEvent.click(andButton);
 
     // Expect 2 names.
     expect(wrapper.getAllByText(/name/i).length).toBe(2);
@@ -44,12 +45,12 @@ describe("FilterBuilder component", () => {
     expect(wrapper.getAllByText(/partial match/i).length).toBe(2);
   });
 
-  it("Adds a FilterRow in an OR group when the FilterRow's OR button is clicked.", () => {
+  it("Adds a FilterRow in an OR group when the FilterRow's OR button is clicked.", async () => {
     const wrapper = mountFilterBuilder();
 
     // Click the OR button...
     const orButton = wrapper.getByRole("button", { name: /or/i });
-    fireEvent.click(orButton);
+    await userEvent.click(orButton);
 
     // Expect 2 names.
     expect(wrapper.getAllByText(/name/i).length).toBe(2);
@@ -61,16 +62,16 @@ describe("FilterBuilder component", () => {
     expect(wrapper.getAllByText(/partial match/i).length).toBe(2);
   });
 
-  it("Nests filter groups.", () => {
+  it("Nests filter groups.", async () => {
     const wrapper = mountFilterBuilder();
 
     // Click the OR button...
     const orButton = wrapper.getByRole("button", { name: /or/i });
-    fireEvent.click(orButton);
+    await userEvent.click(orButton);
 
     // Find the 2nd AND button and click it.
     const andButtons = screen.getAllByRole("button", { name: /and/i });
-    fireEvent.click(andButtons[1]);
+    await userEvent.click(andButtons[1]);
 
     // Expect 3 names.
     expect(wrapper.getAllByText(/name/i).length).toBe(3);
@@ -82,23 +83,21 @@ describe("FilterBuilder component", () => {
     expect(wrapper.getAllByText(/partial match/i).length).toBe(3);
   });
 
-  it("Inserts a new filter row immediately after the clicked AND button's row.", () => {
+  it("Inserts a new filter row immediately after the clicked AND button's row.", async () => {
     const wrapper = mountFilterBuilder();
 
     // Click the AND button...
     const andButton = wrapper.getByRole("button", { name: /and/i });
-    fireEvent.click(andButton);
+    await userEvent.click(andButton);
 
     const textboxes = wrapper.getAllByRole("textbox", {
       name: /filter value/i
     });
-    fireEvent.change(textboxes[0], { target: { value: "first filter value" } });
-    fireEvent.change(textboxes[1], {
-      target: { value: "second filter value" }
-    });
+    await clearAndType(textboxes[0], "first filter value");
+    await clearAndType(textboxes[1], "second filter value");
 
     // Click the first filter row's button again.
-    fireEvent.click(andButton);
+    await userEvent.click(andButton);
 
     // The blank filter row should be inserted between the two existing filter rows.
     const textboxesAgain = wrapper.getAllByRole("textbox", {
@@ -109,24 +108,22 @@ describe("FilterBuilder component", () => {
     expect(textboxesAgain[2].value).toEqual("second filter value");
   });
 
-  it("Removes a filter row when the '-' button is clicked.", () => {
+  it("Removes a filter row when the '-' button is clicked.", async () => {
     const wrapper = mountFilterBuilder();
 
     // Click the AND button...
     const andButton = wrapper.getByRole("button", { name: /and/i });
-    fireEvent.click(andButton);
+    await userEvent.click(andButton);
 
     const textboxes = wrapper.getAllByRole("textbox", {
       name: /filter value/i
     });
-    fireEvent.change(textboxes[0], { target: { value: "first filter value" } });
-    fireEvent.change(textboxes[1], {
-      target: { value: "second filter value" }
-    });
+    await clearAndType(textboxes[0], "first filter value");
+    await clearAndType(textboxes[1], "second filter value");
 
     // Click the first row's "-" button.
     const deleteRowButton = wrapper.getAllByRole("button", { name: /\-/i })[0];
-    fireEvent.click(deleteRowButton);
+    await userEvent.click(deleteRowButton);
 
     // The second filter should only exist since we deleted the first one.
     const textboxesAgain = wrapper.getAllByRole("textbox", {
@@ -136,30 +133,28 @@ describe("FilterBuilder component", () => {
     expect(textboxesAgain[0].value).toEqual("second filter value");
   });
 
-  it("Removes a filter group that only has one child after a filter row is removed.", () => {
+  it("Removes a filter group that only has one child after a filter row is removed.", async () => {
     const wrapper = mountFilterBuilder();
 
     // Click the AND button of the first filter row
     const firstAndButton = wrapper.getByRole("button", { name: /and/i });
-    fireEvent.click(firstAndButton);
+    await userEvent.click(firstAndButton);
 
     // Click the OR button of the second filter row
     const secondOrButton = wrapper.getAllByRole("button", { name: /or/i })[1];
-    fireEvent.click(secondOrButton);
+    await userEvent.click(secondOrButton);
 
     // Insert text into all the text fields.
     const textboxes = wrapper.getAllByRole("textbox", {
       name: /filter value/i
     });
-    fireEvent.change(textboxes[0], { target: { value: "first filter value" } });
-    fireEvent.change(textboxes[1], {
-      target: { value: "second filter value" }
-    });
-    fireEvent.change(textboxes[2], { target: { value: "third filter value" } });
+    await clearAndType(textboxes[0], "first filter value");
+    await clearAndType(textboxes[1], "second filter value");
+    await clearAndType(textboxes[2], "third filter value");
 
     // Click the "-" button of the third filter row
     const thirdDeleteButton = wrapper.getAllByRole("button", { name: /-/i })[2];
-    fireEvent.click(thirdDeleteButton);
+    await userEvent.click(thirdDeleteButton);
 
     const textboxesAgain = wrapper.getAllByRole("textbox", {
       name: /filter value/i
@@ -176,7 +171,7 @@ describe("FilterBuilder component", () => {
     expect(deleteButtons.length).toBe(0);
   });
 
-  it("Hides the FilterGroup's remove button when it is the top-level group.", () => {
+  it("Hides the FilterGroup's remove button when it is the top-level group.", async () => {
     const wrapper = mountFilterBuilder();
 
     // Top-level group shouldn't have a remove button
@@ -185,30 +180,30 @@ describe("FilterBuilder component", () => {
 
     // Click the first AND button to create a nested group
     const firstAndButton = wrapper.getByRole("button", { name: /and/i });
-    fireEvent.click(firstAndButton);
+    await userEvent.click(firstAndButton);
 
     // Click the OR button to create a complex structure
     const secondOrButton = wrapper.getAllByRole("button", { name: /or/i })[1];
-    fireEvent.click(secondOrButton);
+    await userEvent.click(secondOrButton);
 
     // 3 delete buttons for each row, and one for the lower group.
     expect(wrapper.queryAllByRole("button", { name: /-/i }).length).toBe(4);
     expect(wrapper.getAllByTestId("group-delete-button").length).toBe(1);
   });
 
-  it("Removes a filter group when the '-' button is clicked.", () => {
+  it("Removes a filter group when the '-' button is clicked.", async () => {
     const wrapper = mountFilterBuilder();
 
     // Click the first AND button to create a nested group
     const firstAndButton = wrapper.getByRole("button", { name: /and/i });
-    fireEvent.click(firstAndButton);
+    await userEvent.click(firstAndButton);
 
     // Click the OR button to create a complex structure
     const secondOrButton = wrapper.getAllByRole("button", { name: /or/i })[1];
-    fireEvent.click(secondOrButton);
+    await userEvent.click(secondOrButton);
 
     // Click the group remove button.
-    fireEvent.click(wrapper.getByTestId("group-delete-button"));
+    await userEvent.click(wrapper.getByTestId("group-delete-button"));
 
     const textboxesAgain = wrapper.getAllByRole("textbox", {
       name: /filter value/i
@@ -223,8 +218,9 @@ describe("FilterBuilder component", () => {
 
     // Change a text input
     const firstInput = wrapper.getByRole("textbox", { name: /filter value/i });
-    fireEvent.change(firstInput, { target: { value: "first filter value" } });
-    expect(onChange).toHaveBeenCalledTimes(1);
+    // clearAndType fires one change for the clear, then one per typed character (18 characters).
+    await clearAndType(firstInput, "first filter value");
+    expect(onChange).toHaveBeenCalledTimes(19);
     expect(onChange).lastCalledWith({
       children: [
         {
@@ -243,8 +239,8 @@ describe("FilterBuilder component", () => {
 
     // Click the AND button
     const firstAndButton = wrapper.getByRole("button", { name: /and/i });
-    fireEvent.click(firstAndButton);
-    expect(onChange).toHaveBeenCalledTimes(2);
+    await userEvent.click(firstAndButton);
+    expect(onChange).toHaveBeenCalledTimes(20);
     expect(onChange).lastCalledWith({
       children: [
         {
@@ -271,8 +267,8 @@ describe("FilterBuilder component", () => {
 
     // Click the OR button
     const orButton = wrapper.getAllByRole("button", { name: /or/i })[1];
-    fireEvent.click(orButton);
-    expect(onChange).toHaveBeenCalledTimes(3);
+    await userEvent.click(orButton);
+    expect(onChange).toHaveBeenCalledTimes(21);
     expect(onChange).lastCalledWith({
       children: [
         {
@@ -314,8 +310,8 @@ describe("FilterBuilder component", () => {
 
     // Click the "-" button
     const firstDeleteButton = wrapper.getAllByRole("button", { name: /-/i })[0];
-    fireEvent.click(firstDeleteButton);
-    expect(onChange).toHaveBeenCalledTimes(4);
+    await userEvent.click(firstDeleteButton);
+    expect(onChange).toHaveBeenCalledTimes(22);
     expect(onChange).lastCalledWith({
       children: [
         {
@@ -384,7 +380,9 @@ describe("FilterBuilder component", () => {
     });
 
     // Set the model to null.
-    fireEvent.click(wrapper.getByRole("button", { name: /reset to null/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /reset to null/i })
+    );
 
     // Resets itself with the inital filter model.
     await waitFor(() => {

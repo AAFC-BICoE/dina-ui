@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { mountWithAppContext } from "common-ui";
 import { LanguageSelector } from "../LanguageSelector";
 
@@ -48,7 +49,7 @@ describe("LanguageSelector component", () => {
       apiContext
     });
 
-    expect(await component.queryByText("English")).not.toBeInTheDocument();
+    expect(component.queryByText("English")).not.toBeInTheDocument();
     expect(await component.findByText("Français")).toBeInTheDocument();
   });
 
@@ -61,12 +62,12 @@ describe("LanguageSelector component", () => {
     const langButton = await component.findByText("Français");
     expect(langButton).toBeInTheDocument();
 
-    fireEvent.click(langButton);
+    await userEvent.click(langButton);
 
-    waitFor(async () => {
-      // The locale should have been changed to "fr":
-      expect(await component.findByText("English")).toBeInTheDocument();
-      expect(await component.findByText("Français")).not.toBeInTheDocument();
+    // The locale should have been changed to "fr":
+    expect(await component.findByText("English")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(component.queryByText("Français")).not.toBeInTheDocument();
     });
   });
 });

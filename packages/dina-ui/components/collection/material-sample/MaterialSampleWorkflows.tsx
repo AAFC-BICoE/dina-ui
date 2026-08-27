@@ -1,19 +1,20 @@
 import React from "react";
 import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
   dateCell,
   LoadingSpinner,
   ReactTable,
   ReadOnlyValue,
-  FieldSet
+  FieldSet,
+  ExternalLink
 } from "common-ui";
 import { groupCell } from "../../../components";
 import useVocabularyOptions from "../useVocabularyOptions";
 import { WORKFLOWS_COMPONENT_NAME } from "../../../types/collection-api";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import _ from "lodash";
 
 export function MaterialSampleWorkflows({
   workflows
@@ -24,54 +25,94 @@ export function MaterialSampleWorkflows({
     path: "seqdb-api/vocabulary/molecularAnalysisType"
   });
 
-  const WORKFLOW_TABLE_COLUMNS: ColumnDef<GenericMolecularAnalysis>[] = [
+  const WORKFLOW_TABLE_COLUMNS: ColumnDef<any>[] = [
     {
-      cell: ({
-        row: {
-          original: { id, name }
-        }
-      }) => (
-        <Link
-          href={`/seqdb/molecular-analysis-workflow/run?genericMolecularAnalysisId=${id}`}
-          legacyBehavior
-        >
-          {name || id}
-        </Link>
-      ),
+      cell: ({ row }) => {
+        const id = _.get(row.original, "genericMolecularAnalysis.id");
+        const name = _.get(row.original, "genericMolecularAnalysis.name");
+        return (
+          <Link
+            href={`/seqdb/molecular-analysis-workflow/run?genericMolecularAnalysisId=${id}`}
+          >
+            {name || id}
+          </Link>
+        );
+      },
       accessorKey: "name",
-      header: () => <SeqdbMessage id="molecularAnalysisName" />
+      header: () => <DinaMessage id="molecularAnalysisName" />
     },
     {
-      cell: ({
-        row: {
-          original: { analysisType }
-        }
-      }) => (
-        <>
-          {loading ? (
-            <LoadingSpinner loading={true} />
-          ) : (
-            <>
-              {vocabOptions.find((option) => option.value === analysisType)
-                ?.label ?? analysisType}
-            </>
-          )}
-        </>
-      ),
+      cell: ({ row }) => {
+        const analysisType = _.get(
+          row.original,
+          "genericMolecularAnalysis.analysisType"
+        );
+        return (
+          <>
+            {loading ? (
+              <LoadingSpinner loading={true} />
+            ) : (
+              <>
+                {vocabOptions.find((option) => option.value === analysisType)
+                  ?.label ?? analysisType}
+              </>
+            )}
+          </>
+        );
+      },
       accessorKey: "analysisType",
       header: () => <DinaMessage id="field_analysisType" />
     },
-    groupCell("group"),
     {
-      cell: ({
-        row: {
-          original: { createdBy }
+      cell: ({ row }) => {
+        const name = _.get(row.original, "molecularAnalysisRunItem.name");
+        return <>{name}</>;
+      },
+      accessorKey: "runItemName",
+      header: () => (
+        <DinaMessage id="field_run-summary_items.genericMolecularAnalysisItemSummary.name" />
+      )
+    },
+    {
+      cell: ({ row }) => {
+        const attachments = _.get(
+          row.original,
+          "molecularAnalysisRunItem.result.attachments"
+        );
+
+        if (!attachments || attachments.length === 0) {
+          return <></>;
         }
-      }) => <ReadOnlyValue value={createdBy} />,
+
+        return (
+          <>
+            {attachments.map((metadata: any, index: number) => (
+              <span key={metadata?.id ?? index}>
+                <ExternalLink href={`#`}>
+                  {metadata?.filename ?? metadata?.id}
+                </ExternalLink>
+                {index < attachments.length - 1 && ", "}
+              </span>
+            ))}
+          </>
+        );
+      },
+      accessorKey: "attachments",
+      header: () => <DinaMessage id="molecularAnalysisRunItemAttachments" />
+    },
+    groupCell("genericMolecularAnalysis.group"),
+    {
+      cell: ({ row }) => {
+        const createdBy = _.get(
+          row.original,
+          "genericMolecularAnalysis.createdBy"
+        );
+        return <ReadOnlyValue value={createdBy} />;
+      },
       accessorKey: "createdBy",
       header: () => <DinaMessage id="field_createdBy" />
     },
-    dateCell("createdOn")
+    dateCell("createdOn", "genericMolecularAnalysis.createdOn")
   ];
 
   return (
@@ -81,7 +122,7 @@ export function MaterialSampleWorkflows({
       componentName={WORKFLOWS_COMPONENT_NAME}
     >
       <ReactTable<GenericMolecularAnalysis>
-        columns={WORKFLOW_TABLE_COLUMNS}
+        columns={WORKFLOW_TABLE_COLUMNS as any}
         data={workflows || []}
       />
     </FieldSet>

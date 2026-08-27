@@ -1,5 +1,5 @@
 import PcrPrimerListPage from "../../../../pages/seqdb/pcr-primer/list";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -50,11 +50,10 @@ describe("PcrPrimer list page", () => {
     const wrapper = mountWithAppContext(<PcrPrimerListPage />, { apiContext });
 
     // Enter a search value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
-      target: {
-        value: "101F"
-      }
-    });
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /filter value/i }),
+      "101F"
+    );
 
     // Submit the search form.
     fireEvent.submit(wrapper.container.querySelector("form")!);

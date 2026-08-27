@@ -144,9 +144,10 @@ describe("PcrBatch edit page", () => {
     );
 
     // Change textbox value to "test new batch"
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: { value: "test new batch" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "test new batch"
+    );
 
     // Select person 1 from Experimenters Combo Box
     await userEvent.click(
@@ -280,9 +281,10 @@ describe("PcrBatch edit page", () => {
     );
 
     // Change textbox value to "test new batch"
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: { value: "test new batch" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "test new batch"
+    );
 
     // Select a storage unit type.
     await userEvent.click(
@@ -340,9 +342,10 @@ describe("PcrBatch edit page", () => {
     );
 
     // Change textbox value to "test new batch"
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: { value: "test new batch" }
-    });
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "test new batch"
+    );
 
     // Select a storage unit type.
     await userEvent.click(

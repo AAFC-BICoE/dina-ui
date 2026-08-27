@@ -1,4 +1,8 @@
-import { useAccount, useApiClient } from "common-ui/lib";
+import {
+  FiqlSearchFilterBuilder,
+  useAccount,
+  useApiClient
+} from "common-ui/lib";
 import { KitsuResource } from "kitsu";
 import { useEffect, useState, useMemo } from "react";
 import Modal from "react-bootstrap/Modal";
@@ -349,11 +353,18 @@ export default function useSavedExports<TData extends KitsuResource>({
    */
   async function retrieveSavedExports() {
     setLoadingSavedExports(true);
+
+    // Fetch public items, plus items for the user's groups.
+    // Restricting by group reduces API permission checks, while user-level permissions are still enforced by the API.
     await apiClient
       .get<DataExportTemplate[]>("dina-export-api/data-export-template", {
-        filter: {
-          group: groupNames?.[0] ?? ""
-        }
+        fiql: FiqlSearchFilterBuilder.create()
+          .or((b) =>
+            b
+              .where("publiclyReleasable", "EQ", true)
+              .whereIn("group", groupNames)
+          )
+          .build()
       })
       .then((response) => {
         setLoadingSavedExports(false);

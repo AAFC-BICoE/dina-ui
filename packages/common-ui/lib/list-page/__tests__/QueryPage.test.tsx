@@ -5,7 +5,7 @@ import {
   waitForLoadingToDisappear
 } from "common-ui";
 import { mockResponses, mockResponsesTabs } from "../__mocks__/QueryPageMocks";
-import { waitFor } from "@testing-library/dom";
+import { waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MaterialSampleListPage from "@dina-ui/pages/collection/material-sample/list";
 import "@testing-library/jest-dom";

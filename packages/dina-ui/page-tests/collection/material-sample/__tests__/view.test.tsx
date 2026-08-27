@@ -7,6 +7,7 @@ import {
 } from "../../../../types/collection-api";
 import "@testing-library/jest-dom";
 import { waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { GenericMolecularAnalysis } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { TEST_QUALITY_CONTROL_TYPES } from "../../../seqdb/molecular-analysis-run/__mocks__/MolecularAnalysisRunViewMocks";
@@ -200,9 +201,8 @@ describe("Material Sample View Page", () => {
     // Test Material Sample Name and Collecting Date Start Event Date Time to be rendered
     await waitFor(() => {
       expect(wrapper.getAllByText("my-sample-name")[0]).toBeInTheDocument();
+      expect(wrapper.getByText("2019_01_01_10_10_10")).toBeInTheDocument();
     });
-
-    expect(wrapper.getByText("2019_01_01_10_10_10")).toBeInTheDocument();
   });
 
   it("Renders the organisms expanded by default.", async () => {
@@ -296,7 +296,7 @@ describe("Material Sample View Page", () => {
       button.className.includes("accordion-button")
     );
     expect(transactionsSection).toBeDefined();
-    transactionsSection!.click();
+    await userEvent.click(transactionsSection!);
 
     // Wait for the transaction list to be populated
     await waitFor(

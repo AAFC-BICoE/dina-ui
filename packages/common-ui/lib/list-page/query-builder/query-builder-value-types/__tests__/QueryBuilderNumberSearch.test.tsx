@@ -604,7 +604,7 @@ describe("QueryBuilderNumberSearch", () => {
         expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
       });
 
-      it('should return validation error for "in" operator with non-numbers', () => {
+      it('should return validation error for "notIn" operator with non-numbers', () => {
         const result = validateNumber(
           "myNumber",
           "10, apple, -3",
@@ -620,7 +620,7 @@ describe("QueryBuilderNumberSearch", () => {
         }); // Specific error message called
       });
 
-      it('should return validation error for "in" operator with single non-number', () => {
+      it('should return validation error for "notIn" operator with single non-number', () => {
         const result = validateNumber(
           "myNumber",
           "apple",
@@ -636,7 +636,7 @@ describe("QueryBuilderNumberSearch", () => {
         }); // Specific error message called
       });
 
-      it('should return true for valid "in" operator values', () => {
+      it('should return true for valid "notIn" operator values', () => {
         const result = validateNumber(
           "myNumber",
           "1, -5, 3.5, ",
