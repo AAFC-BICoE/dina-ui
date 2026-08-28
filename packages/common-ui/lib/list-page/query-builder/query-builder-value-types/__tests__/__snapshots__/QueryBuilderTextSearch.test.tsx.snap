@@ -23,12 +23,16 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
       <div
         class="error-viewer"
       />
-      <input
-        class="form-control"
-        placeholder="Enter text search value..."
-        type="text"
-        value="test"
-      />
+      <div
+        class="d-flex flex-column gap-1"
+      >
+        <input
+          class="form-control"
+          placeholder="Enter text search value..."
+          type="text"
+          value="test"
+        />
+      </div>
     </form>
   </div>
 </DocumentFragment>
@@ -43,12 +47,16 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
       <div
         class="error-viewer"
       />
-      <input
-        class="form-control"
-        placeholder="Enter comma-separated values..."
-        type="text"
-        value="test1, test2, test3"
-      />
+      <div
+        class="d-flex flex-column gap-1"
+      >
+        <input
+          class="form-control"
+          placeholder="Enter comma-separated values..."
+          type="text"
+          value="test1, test2, test3"
+        />
+      </div>
     </form>
   </div>
 </DocumentFragment>
@@ -63,12 +71,16 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
       <div
         class="error-viewer"
       />
-      <input
-        class="form-control"
-        placeholder="Enter comma-separated values..."
-        type="text"
-        value="test1, test2, test3"
-      />
+      <div
+        class="d-flex flex-column gap-1"
+      >
+        <input
+          class="form-control"
+          placeholder="Enter comma-separated values..."
+          type="text"
+          value="test1, test2, test3"
+        />
+      </div>
     </form>
   </div>
 </DocumentFragment>
@@ -287,14 +299,6 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation with boolean-like values Normal field 1`] = `
-{
-  "term": {
-    "data.attributes.textField": "true",
-  },
-}
-`;
-
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation With relationship as field 1`] = `
 {
   "nested": {
@@ -305,30 +309,6 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
           {
             "term": {
               "included.attributes.name.keyword": "text search",
-            },
-          },
-          {
-            "term": {
-              "included.type": "collection",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation with boolean-like values With relationship as field 1`] = `
-{
-  "nested": {
-    "path": "included",
-    "query": {
-      "bool": {
-        "must": [
-          {
-            "term": {
-              "includes.name.keyword": "false",
             },
           },
           {
@@ -358,6 +338,38 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
           {
             "term": {
               "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation with boolean-like values Normal field 1`] = `
+{
+  "term": {
+    "data.attributes.textField": "true",
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation with boolean-like values With relationship as field 1`] = `
+{
+  "nested": {
+    "path": "included",
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "term": {
+              "includes.name.keyword": "false",
+            },
+          },
+          {
+            "term": {
+              "included.type": "collection",
             },
           },
         ],

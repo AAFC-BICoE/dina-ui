@@ -6,6 +6,8 @@ import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import _ from "lodash";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
 import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
+import React from "react";
 
 describe("QueryBuilderTextSearch", () => {
   describe("QueryBuilderTextSearch Component", () => {
@@ -91,6 +93,102 @@ describe("QueryBuilderTextSearch", () => {
       expect(textSearchNotIn.asFragment()).toMatchSnapshot(
         "Expect text field to be displayed with a different placeholder."
       );
+    });
+
+    it("Display info message when using IN operator and you have more than 100 items", async () => {
+      const INFO_MESSAGE_REGEX = /case-sensitive/i;
+
+      function TestWrapper() {
+        const [val, setVal] = React.useState("");
+        return (
+          <DinaForm initialValues={{}}>
+            <QueryBuilderContextProvider
+              value={{ performSubmit: _.noop, groups: [] }}
+            >
+              <QueryBuilderTextSearch
+                matchType="in"
+                value={val}
+                setValue={(newValue) => setVal(newValue)}
+              />
+            </QueryBuilderContextProvider>
+          </DinaForm>
+        );
+      }
+
+      const wrapper = mountWithAppContext(<TestWrapper />);
+
+      const input = wrapper.getByRole("textbox");
+
+      // Initial state: No info message should be displayed
+      expect(wrapper.queryByText(INFO_MESSAGE_REGEX)).not.toBeInTheDocument();
+
+      // Type 50 items: Info message should STILL NOT be displayed
+      const fiftyItems = Array.from({ length: 50 }, (_, i) => `item${i}`).join(
+        ","
+      );
+      await userEvent.type(input, fiftyItems);
+
+      expect(wrapper.queryByText(INFO_MESSAGE_REGEX)).not.toBeInTheDocument();
+
+      // Clear and enter 101 items: Info message SHOULD appear
+      await userEvent.clear(input);
+      const hundredAndOneItems = Array.from(
+        { length: 101 },
+        (_, i) => `item${i}`
+      ).join(",");
+
+      // It's likely users will be pasting this amount and not be typing it by hand.
+      await userEvent.paste(hundredAndOneItems);
+
+      expect(wrapper.getByText(INFO_MESSAGE_REGEX)).toBeInTheDocument();
+    });
+
+    it("Display info message when using NOT IN operator and you have more than 100 items", async () => {
+      const INFO_MESSAGE_REGEX = /case-sensitive/i;
+
+      function TestWrapper() {
+        const [val, setVal] = React.useState("");
+        return (
+          <DinaForm initialValues={{}}>
+            <QueryBuilderContextProvider
+              value={{ performSubmit: _.noop, groups: [] }}
+            >
+              <QueryBuilderTextSearch
+                matchType="notIn"
+                value={val}
+                setValue={(newValue) => setVal(newValue)}
+              />
+            </QueryBuilderContextProvider>
+          </DinaForm>
+        );
+      }
+
+      const wrapper = mountWithAppContext(<TestWrapper />);
+
+      const input = wrapper.getByRole("textbox");
+
+      // Initial state: No info message should be displayed
+      expect(wrapper.queryByText(INFO_MESSAGE_REGEX)).not.toBeInTheDocument();
+
+      // Type 50 items: Info message should STILL NOT be displayed
+      const fiftyItems = Array.from({ length: 50 }, (_, i) => `item${i}`).join(
+        ","
+      );
+      await userEvent.type(input, fiftyItems);
+
+      expect(wrapper.queryByText(INFO_MESSAGE_REGEX)).not.toBeInTheDocument();
+
+      // Clear and enter 101 items: Info message SHOULD appear
+      await userEvent.clear(input);
+      const hundredAndOneItems = Array.from(
+        { length: 101 },
+        (_, i) => `item${i}`
+      ).join(",");
+
+      // It's likely users will be pasting this amount and not be typing it by hand.
+      await userEvent.paste(hundredAndOneItems);
+
+      expect(wrapper.getByText(INFO_MESSAGE_REGEX)).toBeInTheDocument();
     });
 
     it("Should call performSubmit on enter key press in textfield", async () => {
