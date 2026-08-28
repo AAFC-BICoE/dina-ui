@@ -172,20 +172,47 @@ function ControlledVocabularyItemEditPageContent({
           delete submittedValues.unit;
         }
 
-        // Convert the editable format to the stored format:
+        // Convert the editable format to the stored format. Only include the
+        // non-empty descriptions, and set to null if all of them are empty.
         if (submittedValues.multilingualDescription) {
-          submittedValues.multilingualDescription = {
-            descriptions: _.toPairs(
+          try {
+            const descriptions = _.toPairs(
               submittedValues.multilingualDescription
-            ).map(([lang, desc]) => ({ lang, desc }))
-          };
-        }
-        if (submittedValues.multilingualTitle) {
-          submittedValues.multilingualTitle = {
-            titles: _.toPairs(submittedValues.multilingualTitle).map(
-              ([lang, title]) => ({ lang, title })
             )
-          };
+              .map(([lang, desc]) => ({ lang, desc }))
+              .filter(
+                ({ desc }) =>
+                  desc !== null &&
+                  desc !== undefined &&
+                  String(desc).trim() !== ""
+              );
+
+            submittedValues.multilingualDescription =
+              descriptions.length > 0 ? { descriptions } : (null as any);
+          } catch (_) {
+            // If the value is in an unexpected format, don't save anything.
+            submittedValues.multilingualDescription = null as any;
+          }
+        }
+        // Convert the editable format to the stored format. Only include the
+        // non-empty titles, and set to null if all of them are empty.
+        if (submittedValues.multilingualTitle) {
+          try {
+            const titles = _.toPairs(submittedValues.multilingualTitle)
+              .map(([lang, title]) => ({ lang, title }))
+              .filter(
+                ({ title }) =>
+                  title !== null &&
+                  title !== undefined &&
+                  String(title).trim() !== ""
+              );
+
+            submittedValues.multilingualTitle =
+              titles.length > 0 ? { titles } : (null as any);
+          } catch (_) {
+            // If the value is in an unexpected format, don't save anything.
+            submittedValues.multilingualTitle = null as any;
+          }
         }
 
         // Uri template should be null if empty string, and should include $1 if not empty.
