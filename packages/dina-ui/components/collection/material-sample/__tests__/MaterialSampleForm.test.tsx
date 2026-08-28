@@ -1,6 +1,10 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
-import { mountWithAppContext, waitForLoadingToDisappear, clearAndType } from "common-ui";
+import {
+  mountWithAppContext,
+  waitForLoadingToDisappear,
+  clearAndType
+} from "common-ui";
 import {
   blankMaterialSample,
   CollectingEvent,
@@ -4870,7 +4874,9 @@ describe("Material Sample Edit Page", () => {
 
       // Type into the Primary ID field and press Enter, simulating a user
       // hitting Enter instead of clicking a button.
-      const primaryIdInput = wrapper.getByRole("textbox", { name: /primary id/i });
+      const primaryIdInput = wrapper.getByRole("textbox", {
+        name: /primary id/i
+      });
       await clearAndType(primaryIdInput, "Sample1");
       await userEvent.type(primaryIdInput, "{enter}");
 
@@ -4904,4 +4910,3 @@ describe("Material Sample Edit Page", () => {
     });
   });
 });
-

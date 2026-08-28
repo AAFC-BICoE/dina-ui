@@ -2350,7 +2350,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "containsSupport": false,
           "distinctTerm": false,
           "dynamicField": {
-            "apiEndpoint": "objectstore-api/managed-attribute",
+            "apiEndpoint": "objectstore-api/controlled-vocabulary-item",
             "component": "ENTITY",
             "label": "managedAttributes",
             "path": "included.attributes.managedAttributes",

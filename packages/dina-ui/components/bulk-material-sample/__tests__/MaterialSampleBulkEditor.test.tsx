@@ -881,7 +881,7 @@ describe("MaterialSampleBulkEditor", () => {
       throw new Error("Collecting event toggle needs to exist at this point.");
     }
     await userEvent.click(collectingEventToggle[1]);
-    await waitFor(() => { }); // Wait for UI to update after toggle, if necessary for next action
+    await waitFor(() => {}); // Wait for UI to update after toggle, if necessary for next action
 
     // Click the "Save All" button
     await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
@@ -1147,7 +1147,7 @@ describe("MaterialSampleBulkEditor", () => {
 
       // Click "Yes" on the popup dialog.
       await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-      await waitFor(() => { }); // Wait for dialog to close and UI to update
+      await waitFor(() => {}); // Wait for dialog to close and UI to update
     }
 
     // Organisms section opens with an initial value, so it has the green indicator on the fieldset
@@ -1205,7 +1205,7 @@ describe("MaterialSampleBulkEditor", () => {
       }),
       "new-scientific-name"
     );
-    await waitFor(() => { }); // Allow for any state updates
+    await waitFor(() => {}); // Allow for any state updates
 
     // Override the scheduled acitons
     await clearAndType(
@@ -2488,16 +2488,16 @@ describe("MaterialSampleBulkEditor", () => {
       expect(
         wrapper.container.querySelector(
           ".sample-tabpanel-0 #" +
-          COLLECTING_EVENT_COMPONENT_NAME +
-          " .dwcVerbatimLocality-field input"
+            COLLECTING_EVENT_COMPONENT_NAME +
+            " .dwcVerbatimLocality-field input"
         )
       ).toBeInTheDocument()
     );
 
     const verbatimLocality = wrapper.container.querySelector(
       ".sample-tabpanel-0 #" +
-      COLLECTING_EVENT_COMPONENT_NAME +
-      " .dwcVerbatimLocality-field input"
+        COLLECTING_EVENT_COMPONENT_NAME +
+        " .dwcVerbatimLocality-field input"
     );
     if (!verbatimLocality) {
       throw new Error("Verbatim locality textbox cannot be found.");

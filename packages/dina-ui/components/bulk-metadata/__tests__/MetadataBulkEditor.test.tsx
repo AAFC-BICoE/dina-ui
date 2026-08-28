@@ -1,4 +1,8 @@
-import { mountWithAppContext, waitForLoadingToDisappear, clearAndType } from "common-ui";
+import {
+  mountWithAppContext,
+  waitForLoadingToDisappear,
+  clearAndType
+} from "common-ui";
 import { MetadataBulkEditor } from "../MetadataBulkEditor";
 import { waitFor, within } from "@testing-library/react";
 import {
@@ -24,7 +28,7 @@ const mockGet = jest.fn<any, any>(async (path, _params) => {
       return { data: [TEST_OBJECT_SUBTYPE_DATA] };
     case "objectstore-api/license":
       return { data: [] };
-    case "objectstore-api/managed-attribute":
+    case "objectstore-api/controlled-vocabulary-item":
       return { data: [] };
     case "agent-api/person":
       return { data: [] };

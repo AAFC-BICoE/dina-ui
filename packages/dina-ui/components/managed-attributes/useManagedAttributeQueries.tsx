@@ -13,6 +13,8 @@ export interface UseBulkGetParams {
   keys: string[];
   disabled?: boolean;
   isControlledVocabulary?: boolean;
+  /** Controlled Vocabulary UUID used to scope managed attributes. Defaults to the collection managed attribute vocabulary. */
+  controlledVocabularyId?: string;
 }
 
 /**
@@ -37,7 +39,8 @@ export function useManagedAttributeQueries({
   managedAttributeComponent = "",
   keys,
   disabled = false,
-  isControlledVocabulary = false
+  isControlledVocabulary = false,
+  controlledVocabularyId = COLLECTION_MANAGED_ATTRIBUTE_ID
 }: UseBulkGetParams) {
   const { apiClient } = useApiClient();
 
@@ -68,7 +71,7 @@ export function useManagedAttributeQueries({
               builder.where(
                 "controlledVocabulary.uuid",
                 "EQ",
-                COLLECTION_MANAGED_ATTRIBUTE_ID
+                controlledVocabularyId
               )
             )
             .build()

@@ -1,6 +1,5 @@
 import {
   ColumnDefinition,
-  CreateButton,
   dateCell,
   descriptionCell,
   ListLayoutFilterType,
@@ -10,7 +9,9 @@ import {
   SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useMemo, useCallback, useState, useEffect } from "react";
+import { FaPlus } from "react-icons/fa";
 
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
@@ -28,68 +29,84 @@ import {
 import styles from "./controlled-vocabulary.module.css";
 
 import { useControlledVocabularySidebarData } from "packages/dina-ui/components/controlled-vocabulary/useControlledVocabularySidebarData";
+import {
+  CONTROLLED_VOCABULARY_APIS,
+  ControlledVocabularyApiConfig
+} from "packages/dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
-
-const COLLECTION_API = "/collection-api";
-const OBJECT_STORE_API = "/objectstore-api";
 
 const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy"];
 
-const COLUMNS: ColumnDefinition<ControlledVocabularyItem>[] = [
-  {
-    accessorKey: "multilingualTitle",
-    header: "Multilingual Title",
-    cell: ({ row: { original } }) =>
-      original.multilingualTitle?.titles?.[0]?.title ?? ""
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row: { original } }) => (
-      <Link href={`/controlled-vocabulary-item/view?id=${original.id}`}>
-        {original.name ?? original.id}
-      </Link>
-    )
-  },
-  {
-    accessorKey: "dinaComponent",
-    header: "Data Component",
-    cell: ({ row: { original } }) => {
-      const comp = original.dinaComponent as any;
-      return comp ?? "";
-    }
-  },
-  {
-    accessorKey: "vocabularyElementType",
-    header: "Vocabulary Element Type",
-    cell: ({ row: { original } }) => original.vocabularyElementType ?? ""
-  },
-  {
-    accessorKey: "unit",
-    header: "Unit",
-    cell: ({ row: { original } }) => original.unit ?? ""
-  },
-  {
-    accessorKey: "acceptedValues",
-    header: "Accepted Values",
-    cell: ({ row: { original } }) =>
-      Array.isArray(original.acceptedValues)
-        ? original.acceptedValues.map((v) => `"${v}"`).join(", ")
-        : ""
-  },
-  descriptionCell(false, false, "multilingualDescription"),
-  groupCell("group"),
-  {
-    accessorKey: "createdBy",
-    header: () => <DinaMessage id="field_createdBy" />
-  },
-  dateCell("createdOn")
-];
+function getColumns(
+  viewRoute: string
+): ColumnDefinition<ControlledVocabularyItem>[] {
+  return [
+    {
+      accessorKey: "multilingualTitle",
+      header: "Multilingual Title",
+      cell: ({ row: { original } }) =>
+        original.multilingualTitle?.titles?.[0]?.title ?? ""
+    },
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row: { original } }) => (
+        <Link href={`${viewRoute}?id=${original.id}`}>
+          {original.name ?? original.id}
+        </Link>
+      )
+    },
+    {
+      accessorKey: "dinaComponent",
+      header: "Data Component",
+      cell: ({ row: { original } }) => {
+        const comp = original.dinaComponent as any;
+        return comp ?? "";
+      }
+    },
+    {
+      accessorKey: "vocabularyElementType",
+      header: "Vocabulary Element Type",
+      cell: ({ row: { original } }) => original.vocabularyElementType ?? ""
+    },
+    {
+      accessorKey: "unit",
+      header: "Unit",
+      cell: ({ row: { original } }) => original.unit ?? ""
+    },
+    {
+      accessorKey: "acceptedValues",
+      header: "Accepted Values",
+      cell: ({ row: { original } }) =>
+        Array.isArray(original.acceptedValues)
+          ? original.acceptedValues.map((v) => `"${v}"`).join(", ")
+          : ""
+    },
+    descriptionCell(false, false, "multilingualDescription"),
+    groupCell("group"),
+    {
+      accessorKey: "createdBy",
+      header: () => <DinaMessage id="field_createdBy" />
+    },
+    dateCell("createdOn")
+  ];
+}
 
-const MODULE_TABS: ModuleTabConfig[] = [
-  { titleKey: "collectionListTitle" },
-  { titleKey: "objectStoreTitle" }
-];
+const CV_MODULES: Array<ControlledVocabularyApiConfig & { titleKey: string }> =
+  [
+    {
+      titleKey: "collectionListTitle",
+      ...CONTROLLED_VOCABULARY_APIS.collection
+    },
+    {
+      titleKey: "objectStoreTitle",
+      ...CONTROLLED_VOCABULARY_APIS.objectstore
+    }
+  ];
+
+const MODULE_TABS: ModuleTabConfig[] = CV_MODULES.map(({ titleKey }) => ({
+  titleKey
+}));
 
 const SHARED_CV_PARAMS = {
   fiql: "type==MANAGED_ATTRIBUTE,type==SYSTEM",
@@ -100,37 +117,35 @@ const SHARED_CV_PARAMS = {
 export default function ControlledVocabularyListPage() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
+  const router = useRouter();
 
   // Tab state
-  const [currentTab, setCurrentTab] = useState<number>(0);
+  const [currentTab, setCurrentTab] = useState<number>(() =>
+    router.query.tab === "1" ? 1 : 0
+  );
 
-  // Collection API data
-  const {
-    items: collectionCVItems,
-    loading: collectionCVLoading,
-    error: collectionCVError
-  } = useControlledVocabularySidebarData({
-    apiBaseUrl: COLLECTION_API,
+  // Sidebar data for each configured module. Hooks are called unconditionally
+  // and in a fixed order; add a new entry when a new module is introduced.
+  const collectionSidebarData = useControlledVocabularySidebarData({
+    apiBaseUrl: CV_MODULES[0].apiBaseUrl,
     limit: 1000,
     params: SHARED_CV_PARAMS
   });
-
-  // Object Store API data
-  const {
-    items: objectStoreCVItems,
-    loading: objectStoreCVLoading,
-    error: objectStoreCVError
-  } = useControlledVocabularySidebarData({
-    apiBaseUrl: OBJECT_STORE_API,
+  const objectStoreSidebarData = useControlledVocabularySidebarData({
+    apiBaseUrl: CV_MODULES[1].apiBaseUrl,
     limit: 1000,
     params: SHARED_CV_PARAMS
   });
+  const moduleSidebarData = [collectionSidebarData, objectStoreSidebarData];
+
+  const activeModule = CV_MODULES[currentTab];
 
   // Active tab's data
-  const cvItems = currentTab === 0 ? collectionCVItems : objectStoreCVItems;
-  const cvLoading =
-    currentTab === 0 ? collectionCVLoading : objectStoreCVLoading;
-  const cvError = currentTab === 0 ? collectionCVError : objectStoreCVError;
+  const {
+    items: cvItems,
+    loading: cvLoading,
+    error: cvError
+  } = moduleSidebarData[currentTab];
 
   // 2. Filter State
   const [typeFilter, setTypeFilter] = useState<TypeFilterState>({
@@ -141,9 +156,8 @@ export default function ControlledVocabularyListPage() {
   // 3. Load Children Helper — uses the active tab's API.
   const loadChildren = useCallback(
     async (parentUuid: string): Promise<SidebarOption[]> => {
-      const apiBase = currentTab === 0 ? COLLECTION_API : OBJECT_STORE_API;
       const resp: any = await apiClient.get(
-        `${apiBase}/controlled-vocabulary-item`,
+        `${activeModule.apiBaseUrl}/controlled-vocabulary-item`,
         {
           page: { limit: 1000 },
           filter: { "controlledVocabulary.uuid": { EQ: parentUuid } },
@@ -163,7 +177,7 @@ export default function ControlledVocabularyListPage() {
 
       return Array.from(counts, ([id, count]) => ({ id, label: id, count }));
     },
-    [apiClient, currentTab]
+    [apiClient, activeModule]
   );
 
   const [parentCounts, setParentCounts] = useState<Record<string, number>>({});
@@ -187,10 +201,8 @@ export default function ControlledVocabularyListPage() {
               withChildren.add(cv.id);
             }
 
-            const apiBase =
-              currentTab === 0 ? COLLECTION_API : OBJECT_STORE_API;
             const resp: any = await apiClient.get(
-              `${apiBase}/controlled-vocabulary-item`,
+              `${activeModule.apiBaseUrl}/controlled-vocabulary-item`,
               {
                 page: { limit: 999 },
                 filter: { "controlledVocabulary.uuid": { EQ: cv.id } },
@@ -210,7 +222,7 @@ export default function ControlledVocabularyListPage() {
     };
 
     fetchAllCounts();
-  }, [cvItems, loadChildren, apiClient, currentTab]);
+  }, [cvItems, loadChildren, apiClient, activeModule]);
 
   // 4. Build Sidebar Options (merged with Counts)
   const parentOptions = useMemo(() => {
@@ -284,9 +296,7 @@ export default function ControlledVocabularyListPage() {
   // 9. Query table props — API path depends on the active tab.
   const buildQueryTableProps = useCallback(() => {
     const filter: Record<string, any> = {};
-    const itemsPath = `${
-      currentTab === 0 ? COLLECTION_API : OBJECT_STORE_API
-    }/controlled-vocabulary-item`;
+    const itemsPath = `${activeModule.apiBaseUrl}/controlled-vocabulary-item`;
 
     if (effectiveParents.length > 0) {
       filter["controlledVocabulary.uuid"] = {
@@ -296,7 +306,7 @@ export default function ControlledVocabularyListPage() {
 
     if (isMixedCase) {
       return {
-        columns: COLUMNS,
+        columns: getColumns(activeModule.viewRoute),
         path: itemsPath,
         filter,
         include: "controlledVocabulary",
@@ -317,7 +327,7 @@ export default function ControlledVocabularyListPage() {
     }
 
     return {
-      columns: COLUMNS,
+      columns: getColumns(activeModule.viewRoute),
       path: itemsPath,
       filter
     };
@@ -326,7 +336,7 @@ export default function ControlledVocabularyListPage() {
     selectedChildren,
     isMixedCase,
     getParentFilterGroups,
-    currentTab
+    activeModule
   ]);
 
   return (
@@ -334,7 +344,13 @@ export default function ControlledVocabularyListPage() {
       titleId="controlledVocabularyTitle"
       buttonBarContent={
         <div className="flex d-flex ms-auto">
-          <CreateButton entityLink="/controlled-vocabulary-item" />
+          <Link
+            href={activeModule.editRoute}
+            className="btn btn-primary ms-auto"
+          >
+            <FaPlus className="me-2" />
+            <DinaMessage id="createNew" />
+          </Link>
         </div>
       }
     >
