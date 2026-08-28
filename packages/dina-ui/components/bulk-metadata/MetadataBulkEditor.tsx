@@ -5,7 +5,6 @@ import {
   bulkEditAllManagedAttributes,
   BulkEditTabContextI,
   ButtonBar,
-  ClearType,
   DinaForm,
   DoOperationsError,
   FormikButton,
@@ -29,6 +28,10 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import _ from "lodash";
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { FaArrowLeft } from "react-icons/fa6";
+import {
+  applyAppendedFields,
+  applyClearedFields
+} from "../bulk-edit/BulkEditUtils";
 
 export interface MetadataBulkEditorProps {
   metadatas: InputResource<Metadata>[];
@@ -97,12 +100,13 @@ export const MetadataBulkEditor = forwardRef<
 
     const [initialized, setInitialized] = useState(false);
 
-    const { bulkEditTab, clearedFields, deletedFields } = useBulkEditTab({
-      resourceHooks: metadataHooks,
-      hideBulkEditTab: !initialized,
-      resourceForm: metadataForm,
-      bulkEditFormRef
-    });
+    const { bulkEditTab, clearedFields, deletedFields, appendFields } =
+      useBulkEditTab({
+        resourceHooks: metadataHooks,
+        hideBulkEditTab: !initialized,
+        resourceForm: metadataForm,
+        bulkEditFormRef
+      });
 
     const metadataBulkOverrider = useCallback(
       () => getMetadataBulkOverrider(bulkEditFormRef, deletedFields),
@@ -120,7 +124,8 @@ export const MetadataBulkEditor = forwardRef<
       bulkEditCtx: {
         resourceHooks: metadataHooks,
         bulkEditFormRef,
-        clearedFields
+        clearedFields,
+        appendFields
       }
     });
 
@@ -287,7 +292,8 @@ function useBulkMetadataSave({
   const {
     bulkEditFormRef,
     resourceHooks: metadataHooks,
-    clearedFields
+    clearedFields,
+    appendFields
   } = bulkEditCtx;
 
   async function saveAll() {
@@ -345,16 +351,9 @@ function useBulkMetadataSave({
             }
           });
 
-          // Check if cleared fields have been requested, make the changes for each operation.
-          if (clearedFields?.size) {
-            for (const [fieldName, clearType] of clearedFields) {
-              _.set(
-                saveOp.resource as any,
-                fieldName,
-                clearType === ClearType.EmptyString ? "" : null
-              );
-            }
-          }
+          // Handle Bulk Editor special functionality
+          applyClearedFields(saveOp.resource, clearedFields);
+          applyAppendedFields(saveOp.resource, resource, appendFields);
 
           saveOperations.push(saveOp);
         } catch (error: unknown) {

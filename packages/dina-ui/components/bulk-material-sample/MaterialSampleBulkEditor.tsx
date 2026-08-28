@@ -2,7 +2,6 @@ import {
   bulkEditAllManagedAttributes,
   BulkEditTabContextI,
   ButtonBar,
-  ClearType,
   DinaForm,
   DoOperationsError,
   FormikButton,
@@ -39,6 +38,10 @@ import {
   CollectingEvent,
   FormTemplate
 } from "packages/dina-ui/types/collection-api";
+import {
+  applyAppendedFields,
+  applyClearedFields
+} from "../bulk-edit/BulkEditUtils";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -552,43 +555,9 @@ function useBulkSampleSave({
             overrideCollectingEventUUID: getOverrideCollectingEventUUID()
           });
 
-          // Handle cleared fields
-          if (clearedFields?.size) {
-            for (const [fieldName, clearType] of clearedFields) {
-              _.set(
-                saveOp.resource as any,
-                fieldName,
-                clearType === ClearType.EmptyString ? "" : null
-              );
-            }
-          }
-
-          // Handle appended fields
-          if (appendFields?.size) {
-            for (const fieldName of appendFields) {
-              // Fetch original initial values from original unedited resource
-              const originalValue = _.get(resource, fieldName);
-              const existingArray: string[] = Array.isArray(originalValue)
-                ? originalValue
-                : [];
-
-              // Fetch new values added in the bulk edit form / save operation
-              const formValue = _.get(saveOp.resource, fieldName);
-              const bulkInputArray: string[] = Array.isArray(formValue)
-                ? formValue
-                : [];
-
-              // Check if there is anything to append, if not then skip this.
-              if (bulkInputArray.length > 0) {
-                // Combine original + new values and remove duplicates
-                const mergedValue = _.uniq([
-                  ...existingArray,
-                  ...bulkInputArray
-                ]);
-                _.set(saveOp.resource as any, fieldName, mergedValue);
-              }
-            }
-          }
+          // Handle Bulk Editor special functionality
+          applyClearedFields(saveOp.resource, clearedFields);
+          applyAppendedFields(saveOp.resource, resource, appendFields);
 
           saveOperations.push(saveOp);
         } catch (error: unknown) {
