@@ -97,12 +97,13 @@ export function MaterialSampleBulkEditor({
   );
 
   const [initialized, setInitialized] = useState(false);
-  const { bulkEditTab, clearedFields, deletedFields } = useBulkEditTab({
-    resourceHooks: sampleHooks,
-    hideBulkEditTab: !initialized,
-    resourceForm: materialSampleForm,
-    bulkEditFormRef
-  });
+  const { bulkEditTab, clearedFields, deletedFields, appendFields } =
+    useBulkEditTab({
+      resourceHooks: sampleHooks,
+      hideBulkEditTab: !initialized,
+      resourceForm: materialSampleForm,
+      bulkEditFormRef
+    });
 
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
@@ -121,7 +122,12 @@ export function MaterialSampleBulkEditor({
   const { saveAll, submissionError } = useBulkSampleSave({
     onSaved,
     samplePreProcessor: sampleBulkOverrider,
-    bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef, clearedFields },
+    bulkEditCtx: {
+      resourceHooks: sampleHooks,
+      bulkEditFormRef,
+      clearedFields,
+      appendFields
+    },
     bulkEditCollectingEvtFormRef,
     bulkEditSampleHook
   });
@@ -560,17 +566,20 @@ function useBulkSampleSave({
           // Handle appended fields
           if (appendFields?.size) {
             for (const fieldName of appendFields) {
-              // Get the existing array from the original resource before bulk editing
-              const existingValue: string[] = _.get(resource, fieldName) ?? [];
-              // Get the new array generated from the bulk edit input
-              const bulkInputValue: string[] =
-                _.get(saveOp.resource, fieldName) ?? [];
+              // Fetch original initial values from original unedited resource
+              const originalValue = _.get(resource, fieldName);
+              const existingArray: string[] = Array.isArray(originalValue)
+                ? originalValue
+                : [];
 
-              // Combine existing values with new values and remove duplicates
-              const mergedValue = _.uniq([
-                ...(Array.isArray(existingValue) ? existingValue : []),
-                ...(Array.isArray(bulkInputValue) ? bulkInputValue : [])
-              ]);
+              // Fetch new values added in the bulk edit form / save operation
+              const formValue = _.get(saveOp.resource, fieldName);
+              const bulkInputArray: string[] = Array.isArray(formValue)
+                ? formValue
+                : [];
+
+              // Combine original + new values and remove duplicates
+              const mergedValue = _.uniq([...existingArray, ...bulkInputArray]);
 
               _.set(saveOp.resource as any, fieldName, mergedValue);
             }
