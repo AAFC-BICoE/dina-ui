@@ -458,7 +458,8 @@ function useBulkSampleSave({
   const {
     bulkEditFormRef,
     resourceHooks: sampleHooks,
-    clearedFields
+    clearedFields,
+    appendFields
   } = bulkEditCtx;
 
   async function saveAll() {
@@ -545,6 +546,7 @@ function useBulkSampleSave({
             overrideCollectingEventUUID: getOverrideCollectingEventUUID()
           });
 
+          // Handle cleared fields
           if (clearedFields?.size) {
             for (const [fieldName, clearType] of clearedFields) {
               _.set(
@@ -552,6 +554,25 @@ function useBulkSampleSave({
                 fieldName,
                 clearType === ClearType.EmptyString ? "" : null
               );
+            }
+          }
+
+          // Handle appended fields
+          if (appendFields?.size) {
+            for (const fieldName of appendFields) {
+              // Get the existing array from the original resource before bulk editing
+              const existingValue: string[] = _.get(resource, fieldName) ?? [];
+              // Get the new array generated from the bulk edit input
+              const bulkInputValue: string[] =
+                _.get(saveOp.resource, fieldName) ?? [];
+
+              // Combine existing values with new values and remove duplicates
+              const mergedValue = _.uniq([
+                ...(Array.isArray(existingValue) ? existingValue : []),
+                ...(Array.isArray(bulkInputValue) ? bulkInputValue : [])
+              ]);
+
+              _.set(saveOp.resource as any, fieldName, mergedValue);
             }
           }
 
