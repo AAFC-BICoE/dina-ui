@@ -4,17 +4,20 @@ import {
   SimpleSearchFilterBuilder,
   Tooltip,
   useAccount,
-  useQuery
+  useBulkEditTabContext,
+  useQuery,
+  SortableSelect
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
+import { FaPlus, FaRightLeft } from "react-icons/fa6";
+import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import { useDebounce } from "use-debounce";
 import { useElasticSearchDistinctTerm } from "../../../common-ui/lib/list-page/useElasticSearchDistinctTerm";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
-import { SortableSelect } from "common-ui";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
@@ -41,6 +44,9 @@ export function TagSelectField({
   indexName,
   ...props
 }: TagSelectFieldProps) {
+  const bulkCtx = useBulkEditTabContext();
+  const [editMode, setEditMode] = useState<"append" | "replace">("append");
+
   return (
     <FieldWrapper
       {...props}
@@ -67,32 +73,85 @@ export function TagSelectField({
         )
       }
     >
-      {({ value, setValue, invalid, placeholder }) =>
-        indexName ? (
-          <TagSelectElasticSearch
-            value={value}
-            onChange={setValue}
-            invalid={invalid}
-            resourcePath={resourcePath}
-            groupSelectorName={props.groupSelectorName}
-            placeholder={placeholder}
-            tagsFieldName={tagsFieldName}
-            tagIncludedType={props.tagIncludedType}
-            indexName={indexName}
-          />
-        ) : (
-          <TagSelect
-            value={value}
-            onChange={setValue}
-            invalid={invalid}
-            resourcePath={resourcePath}
-            groupSelectorName={props.groupSelectorName}
-            placeholder={placeholder}
-            tagsFieldName={tagsFieldName}
-            tagIncludedType={props.tagIncludedType}
-          />
-        )
-      }
+      {({ value, setValue, invalid, placeholder }) => (
+        <>
+          {/* Append / Replace Toggle for Bulk Edit Context */}
+          {bulkCtx && (
+            <div className="d-flex justify-content-end mb-2">
+              <ToggleButtonGroup
+                type="radio"
+                name={`${tagsFieldName}-edit-mode`}
+                value={editMode}
+                onChange={(val) => setEditMode(val)}
+              >
+                <ToggleButton
+                  id={`${tagsFieldName}-mode-append`}
+                  value="append"
+                  variant={
+                    editMode === "append" ? "primary" : "outline-primary"
+                  }
+                  size="sm"
+                >
+                  <Tooltip
+                    directText="In append mode, tags entered here will be added to each record's existing tags rather than replacing them."
+                    placement="top"
+                    disableSpanMargin={true}
+                    visibleElement={
+                      <span className="d-flex align-items-center gap-2">
+                        <FaPlus /> Append
+                      </span>
+                    }
+                  />
+                </ToggleButton>
+                <ToggleButton
+                  id={`${tagsFieldName}-mode-replace`}
+                  value="replace"
+                  variant={
+                    editMode === "replace" ? "primary" : "outline-primary"
+                  }
+                  size="sm"
+                >
+                  <Tooltip
+                    directText="In replace mode, tags entered here will overwrite all existing tags for each record."
+                    placement="top"
+                    disableSpanMargin={true}
+                    visibleElement={
+                      <span className="d-flex align-items-center gap-2">
+                        <FaRightLeft /> Replace
+                      </span>
+                    }
+                  />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </div>
+          )}
+
+          {indexName ? (
+            <TagSelectElasticSearch
+              value={value}
+              onChange={setValue}
+              invalid={invalid}
+              resourcePath={resourcePath}
+              groupSelectorName={props.groupSelectorName}
+              placeholder={placeholder}
+              tagsFieldName={tagsFieldName}
+              tagIncludedType={props.tagIncludedType}
+              indexName={indexName}
+            />
+          ) : (
+            <TagSelect
+              value={value}
+              onChange={setValue}
+              invalid={invalid}
+              resourcePath={resourcePath}
+              groupSelectorName={props.groupSelectorName}
+              placeholder={placeholder}
+              tagsFieldName={tagsFieldName}
+              tagIncludedType={props.tagIncludedType}
+            />
+          )}
+        </>
+      )}
     </FieldWrapper>
   );
 }
