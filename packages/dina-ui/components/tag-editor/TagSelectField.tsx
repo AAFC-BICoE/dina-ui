@@ -11,7 +11,7 @@ import {
 import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
 import _ from "lodash";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
 import { FaPlus, FaRightLeft } from "react-icons/fa6";
 import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
@@ -47,86 +47,97 @@ export function TagSelectField({
   const bulkCtx = useBulkEditTabContext();
   const [editMode, setEditMode] = useState<"append" | "replace">("append");
 
-  return (
-    <FieldWrapper
-      {...props}
-      readOnlyRender={(tagsVal) =>
-        !!tagsVal?.length && (
-          <div className="d-flex flex-wrap gap-2 float-end">
-            {(tagsVal ?? []).map((tag, index) => (
-              <Tooltip
-                key={index}
-                visibleElement={
-                  <div
-                    className="card pill py-1 px-2 flex-row align-items-center gap-1"
-                    style={{ background: "rgb(24, 102, 109)" }}
-                  >
-                    <AiFillTag className="text-white" />
-                    <span className="text-white">{tag}</span>
-                  </div>
-                }
-                id="tag"
-                disableSpanMargin={true}
-              />
-            ))}
-          </div>
-        )
-      }
-    >
-      {({ value, setValue, invalid, placeholder }) => (
-        <>
-          {/* Append / Replace Toggle for Bulk Edit Context */}
-          {bulkCtx && (
-            <div className="d-flex justify-content-end mb-2">
-              <ToggleButtonGroup
-                type="radio"
-                name={`${tagsFieldName}-edit-mode`}
-                value={editMode}
-                onChange={(val) => setEditMode(val)}
-              >
-                <ToggleButton
-                  id={`${tagsFieldName}-mode-append`}
-                  value="append"
-                  variant={
-                    editMode === "append" ? "primary" : "outline-primary"
-                  }
-                  size="sm"
-                >
-                  <Tooltip
-                    directText="In append mode, tags entered here will be added to each record's existing tags rather than replacing them."
-                    placement="top"
-                    disableSpanMargin={true}
-                    visibleElement={
-                      <span className="d-flex align-items-center gap-2">
-                        <FaPlus /> Append
-                      </span>
-                    }
-                  />
-                </ToggleButton>
-                <ToggleButton
-                  id={`${tagsFieldName}-mode-replace`}
-                  value="replace"
-                  variant={
-                    editMode === "replace" ? "primary" : "outline-primary"
-                  }
-                  size="sm"
-                >
-                  <Tooltip
-                    directText="In replace mode, tags entered here will overwrite all existing tags for each record."
-                    placement="top"
-                    disableSpanMargin={true}
-                    visibleElement={
-                      <span className="d-flex align-items-center gap-2">
-                        <FaRightLeft /> Replace
-                      </span>
-                    }
-                  />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </div>
-          )}
+  useEffect(() => {
+    if (!bulkCtx?.setAppendFields) return;
 
-          {indexName ? (
+    if (editMode === "append") {
+      bulkCtx.setAppendFields((prev) => new Set(prev).add(props.name));
+    } else {
+      bulkCtx.setAppendFields((prev) => {
+        const next = new Set(prev);
+        next.delete(props.name);
+        return next;
+      });
+    }
+  }, [editMode]);
+
+  return (
+    <>
+      {/* Append / Replace Toggle */}
+      {bulkCtx && (
+        <div className="d-flex align-items-center justify-content-end mb-2">
+          <ToggleButtonGroup
+            type="radio"
+            name={`${tagsFieldName}-edit-mode`}
+            value={editMode}
+            onChange={(val) => setEditMode(val)}
+            size="sm"
+          >
+            <ToggleButton
+              id={`${tagsFieldName}-mode-append`}
+              value="append"
+              variant={editMode === "append" ? "primary" : "outline-primary"}
+              className="px-2 py-0 fs-7"
+            >
+              <Tooltip
+                directText="In append mode, tags entered here will be added to each record's existing tags rather than replacing them."
+                placement="top"
+                disableSpanMargin={true}
+                visibleElement={
+                  <span className="d-flex align-items-center gap-1">
+                    <FaPlus /> Append
+                  </span>
+                }
+              />
+            </ToggleButton>
+            <ToggleButton
+              id={`${tagsFieldName}-mode-replace`}
+              value="replace"
+              variant={editMode === "replace" ? "primary" : "outline-primary"}
+              className="px-2 py-0 fs-7"
+            >
+              <Tooltip
+                directText="In replace mode, tags entered here will overwrite all existing tags for each record."
+                placement="top"
+                disableSpanMargin={true}
+                visibleElement={
+                  <span className="d-flex align-items-center gap-1">
+                    <FaRightLeft /> Replace
+                  </span>
+                }
+              />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </div>
+      )}
+
+      <FieldWrapper
+        {...props}
+        readOnlyRender={(tagsVal) =>
+          !!tagsVal?.length && (
+            <div className="d-flex flex-wrap gap-2 float-end">
+              {(tagsVal ?? []).map((tag, index) => (
+                <Tooltip
+                  key={index}
+                  visibleElement={
+                    <div
+                      className="card pill py-1 px-2 flex-row align-items-center gap-1"
+                      style={{ background: "rgb(24, 102, 109)" }}
+                    >
+                      <AiFillTag className="text-white" />
+                      <span className="text-white">{tag}</span>
+                    </div>
+                  }
+                  id="tag"
+                  disableSpanMargin={true}
+                />
+              ))}
+            </div>
+          )
+        }
+      >
+        {({ value, setValue, invalid, placeholder }) =>
+          indexName ? (
             <TagSelectElasticSearch
               value={value}
               onChange={setValue}
@@ -149,10 +160,10 @@ export function TagSelectField({
               tagsFieldName={tagsFieldName}
               tagIncludedType={props.tagIncludedType}
             />
-          )}
-        </>
-      )}
-    </FieldWrapper>
+          )
+        }
+      </FieldWrapper>
+    </>
   );
 }
 
@@ -221,7 +232,7 @@ function TagSelect(props: TagSelectProps) {
   const { isAdmin, groupNames } = useAccount();
 
   const [inputValue, setInputValue] = useState("");
-  const [tagOptions, setTagOptions] = useState<TagSelectOption[]>([]); // ✅ destructure tuple properly
+  const [tagOptions, setTagOptions] = useState<TagSelectOption[]>([]);
 
   const typeName = _.last(resourcePath?.split("/"));
 
