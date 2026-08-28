@@ -578,10 +578,15 @@ function useBulkSampleSave({
                 ? formValue
                 : [];
 
-              // Combine original + new values and remove duplicates
-              const mergedValue = _.uniq([...existingArray, ...bulkInputArray]);
-
-              _.set(saveOp.resource as any, fieldName, mergedValue);
+              // Check if there is anything to append, if not then skip this.
+              if (bulkInputArray.length > 0) {
+                // Combine original + new values and remove duplicates
+                const mergedValue = _.uniq([
+                  ...existingArray,
+                  ...bulkInputArray
+                ]);
+                _.set(saveOp.resource as any, fieldName, mergedValue);
+              }
             }
           }
 
