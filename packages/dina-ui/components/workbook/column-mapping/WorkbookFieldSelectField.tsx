@@ -144,7 +144,11 @@ export function WorkbookFieldSelectField({
               }}
               filter={(input: string) =>
                 SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
-                  .where("id", "EQ", OBJECT_STORE_MANAGED_ATTRIBUTE_ID)
+                  .where(
+                    "controlledVocabulary.uuid" as any,
+                    "EQ",
+                    OBJECT_STORE_MANAGED_ATTRIBUTE_ID
+                  )
                   .searchFilter("name", input)
                   .build()
               }
