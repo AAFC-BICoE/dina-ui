@@ -132,10 +132,10 @@ export function Tooltip({
             </span>
           ) : (
             <FaInfoCircle
+              className="tooltip-info-icon"
               aria-describedby={id}
               aria-description={id ? formatMessage({ id }) : directText}
               tabIndex={0}
-              style={{ color: "#1c578a", marginBottom: "3px" }}
             />
           )}
         </span>
