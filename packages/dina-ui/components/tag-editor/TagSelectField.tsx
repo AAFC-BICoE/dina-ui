@@ -17,7 +17,7 @@ import { FaPlus, FaRightLeft } from "react-icons/fa6";
 import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import { useDebounce } from "use-debounce";
 import { useElasticSearchDistinctTerm } from "../../../common-ui/lib/list-page/useElasticSearchDistinctTerm";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
@@ -44,6 +44,7 @@ export function TagSelectField({
   indexName,
   ...props
 }: TagSelectFieldProps) {
+  const { formatMessage } = useDinaIntl();
   const bulkCtx = useBulkEditTabContext();
   const [editMode, setEditMode] = useState<"append" | "replace">("append");
 
@@ -80,12 +81,12 @@ export function TagSelectField({
               className="px-2 py-0 fs-7"
             >
               <Tooltip
-                directText="In append mode, tags entered here will be added to each record's existing tags rather than replacing them."
+                directText={formatMessage("append_tooltip")}
                 placement="top"
                 disableSpanMargin={true}
                 visibleElement={
                   <span className="d-flex align-items-center gap-1">
-                    <FaPlus /> Append
+                    <FaPlus /> <DinaMessage id="append" />
                   </span>
                 }
               />
@@ -97,12 +98,12 @@ export function TagSelectField({
               className="px-2 py-0 fs-7"
             >
               <Tooltip
-                directText="In replace mode, tags entered here will overwrite all existing tags for each record."
+                directText={formatMessage("replace_tooltip")}
                 placement="top"
                 disableSpanMargin={true}
                 visibleElement={
                   <span className="d-flex align-items-center gap-1">
-                    <FaRightLeft /> Replace
+                    <FaRightLeft /> <DinaMessage id="replace" />
                   </span>
                 }
               />
