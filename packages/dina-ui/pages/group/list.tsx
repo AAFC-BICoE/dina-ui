@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { CSSProperties, useMemo } from "react";
 import {
   ColumnDefinition,
   CreateButton,
@@ -341,7 +341,14 @@ export default function GroupListPage() {
           </div>
         )}
         queryTableProps={queryTableProps}
-        wrapTable={(table) => <div className="dina-list-table">{table}</div>}
+        wrapTable={(table) => (
+          <div
+            className="dina-list-table"
+            style={{ "--cell-block-min-width": "4ch" } as CSSProperties}
+          >
+            {table}
+          </div>
+        )}
       />
     </PageLayout>
   );
