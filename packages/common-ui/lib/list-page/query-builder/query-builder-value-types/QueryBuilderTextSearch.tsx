@@ -12,7 +12,8 @@ import {
   inTextQuery,
   betweenQuery,
   emptyFieldQuery,
-  notEmptyFieldQuery
+  notEmptyFieldQuery,
+  getInQueryStats
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
@@ -56,15 +57,10 @@ export default function QueryRowTextSearch({
   const isInMatchType = matchType === "in" || matchType === "notIn";
 
   // Count comma-separated items when 'in' or 'notIn' is active
-  const itemCounts = React.useMemo(() => {
-    if (!isInMatchType || !value?.trim()) return 0;
-    return value
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean).length;
+  const { count: itemCounts, exceedsThreshold } = React.useMemo(() => {
+    if (!isInMatchType) return { count: 0, exceedsThreshold: false };
+    return getInQueryStats(value);
   }, [isInMatchType, value]);
-
-  const exceedsItemThreshold = isInMatchType && itemCounts > 100;
 
   return (
     <>
@@ -90,7 +86,7 @@ export default function QueryRowTextSearch({
             />
           )}
 
-          {exceedsItemThreshold && (
+          {exceedsThreshold && (
             <small className="form-text text-muted">
               <FaCircleInfo className="me-2" />
               {formatMessage(

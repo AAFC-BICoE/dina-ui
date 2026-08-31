@@ -279,8 +279,23 @@ describe("QueryBuilderTextSearch", () => {
       });
     });
 
+    // Helper to generate a comma-separated string with a given number of items
+    const generateItems = (count: number) =>
+      Array.from({ length: count }, (_, i) => `test${i + 1}`).join(", ");
+
+    const relationshipFieldInfo = {
+      label: "determination.scientificName",
+      parentName: "organism",
+      parentPath: "included",
+      parentType: "organism",
+      path: "attributes.determination",
+      type: "text",
+      value: "organism.determination.scientificName",
+      keywordMultiFieldSupport: true
+    };
+
     describe("in operator", () => {
-      test("Normal field", async () => {
+      test("Normal field - under threshold (case-insensitive term query)", async () => {
         expect(
           transformTextSearchToDSL({
             operation: "in",
@@ -291,10 +306,64 @@ describe("QueryBuilderTextSearch", () => {
           })
         ).toMatchSnapshot();
       });
+
+      test("Normal field - over 100 items (case-sensitive terms query)", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "in",
+          value: generateItems(101),
+          fieldInfo: {} as any,
+          fieldPath: "data.attributes.textField",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
+
+        // Explicit structural check for terms query
+        expect(dsl).toEqual({
+          bool: {
+            must: {
+              terms: {
+                "data.attributes.textField": expect.arrayContaining([
+                  "test1",
+                  "test101"
+                ])
+              }
+            }
+          }
+        });
+
+        expect(dsl.bool.must.terms["data.attributes.textField"]).toHaveLength(
+          101
+        );
+      });
+
+      test("Relationship field - under threshold", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "in",
+          value: "Homo sapiens, Canis lupus",
+          fieldInfo: relationshipFieldInfo as any,
+          fieldPath: "included.attributes.determination.scientificName",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
+      });
+
+      test("Relationship field - over 100 items", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "in",
+          value: generateItems(101),
+          fieldInfo: relationshipFieldInfo as any,
+          fieldPath: "included.attributes.determination.scientificName",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
+      });
     });
 
     describe("not in operator", () => {
-      test("Normal field", async () => {
+      test("Normal field - under threshold (case-insensitive term query)", async () => {
         expect(
           transformTextSearchToDSL({
             operation: "notIn",
@@ -304,6 +373,60 @@ describe("QueryBuilderTextSearch", () => {
             queryType: "in"
           })
         ).toMatchSnapshot();
+      });
+
+      test("Normal field - over 100 items (case-sensitive terms query)", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "notIn",
+          value: generateItems(101),
+          fieldInfo: {} as any,
+          fieldPath: "data.attributes.textField",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
+
+        // Explicit structural check for terms query under must_not
+        expect(dsl).toEqual({
+          bool: {
+            must_not: {
+              terms: {
+                "data.attributes.textField": expect.arrayContaining([
+                  "test1",
+                  "test101"
+                ])
+              }
+            }
+          }
+        });
+
+        expect(
+          dsl.bool.must_not.terms["data.attributes.textField"]
+        ).toHaveLength(101);
+      });
+
+      test("Relationship field - under threshold", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "notIn",
+          value: "Homo sapiens, Canis lupus",
+          fieldInfo: relationshipFieldInfo as any,
+          fieldPath: "included.attributes.determination.scientificName",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
+      });
+
+      test("Relationship field - over 100 items", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "notIn",
+          value: generateItems(101),
+          fieldInfo: relationshipFieldInfo as any,
+          fieldPath: "included.attributes.determination.scientificName",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
       });
     });
 
