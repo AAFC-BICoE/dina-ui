@@ -1,5 +1,5 @@
 import React from "react";
-import { screen, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { mountWithAppContext } from "common-ui";
 import * as WorkbookProvider from "../WorkbookProvider";
@@ -81,6 +81,72 @@ describe("SaveWorkbookProgress", () => {
     });
   });
 
+  it("Saves all workbook resources successfully without triggering deletion", async () => {
+    const mockFinishSavingWorkbook = jest.fn();
+    const mockSaveProgress = jest.fn();
+
+    (WorkbookProvider.useWorkbookContext as jest.Mock).mockImplementation(
+      () => {
+        const [status, setStatus] = React.useState<string>("SAVING");
+        const [progress, setProgress] = React.useState<number>(0);
+
+        return {
+          workbookResources: baseWorkbookResources,
+          progress,
+          group: "test-group",
+          type: "material-sample",
+          apiBaseUrl: "/collection-api",
+          status,
+          saveProgress: jest.fn((p) => {
+            setProgress(p);
+            mockSaveProgress(p);
+          }),
+          pauseSavingWorkbook: jest.fn(),
+          resumeSavingWorkbook: jest.fn(),
+          finishSavingWorkbook: jest.fn((sourceSet, count) => {
+            setStatus("FINISHED");
+            mockFinishSavingWorkbook(sourceSet, count);
+          }),
+          cancelSavingWorkbook: jest.fn(),
+          failSavingWorkbook: jest.fn(),
+          workbookColumnMap: {},
+          appendData: false
+        };
+      }
+    );
+
+    mockSave.mockImplementation(async (ops) => {
+      return (Array.isArray(ops) ? ops : [ops]).map((op, idx) => ({
+        id: `mat-sample-10${idx + 1}`,
+        type: "material-sample",
+        ...op
+      }));
+    });
+
+    mountWithAppContext(
+      <SaveWorkbookProgress
+        onWorkbookCanceled={mockOnWorkbookCanceled}
+        onWorkbookFailed={mockOnWorkbookFailed}
+      />,
+      { apiContext }
+    );
+
+    await waitFor(() => {
+      expect(mockSave).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(mockFinishSavingWorkbook).toHaveBeenCalledWith(
+        expect.stringMatching(/^wb_upload_/),
+        0
+      );
+    });
+
+    expect(mockSaveProgress).toHaveBeenCalledWith(baseWorkbookResources.length);
+    expect(mockBulkDeleteResources).not.toHaveBeenCalled();
+    expect(mockOnWorkbookFailed).not.toHaveBeenCalled();
+  });
+
   it("Deletes created material-sample, collecting-event, organism, and storage-unit-usage records when cleaning up failed import", async () => {
     (WorkbookProvider.useWorkbookContext as jest.Mock).mockImplementation(
       () => {
@@ -137,7 +203,7 @@ describe("SaveWorkbookProgress", () => {
       ).toBeInTheDocument();
     });
 
-    const deleteButton = await screen.findByRole("button", {
+    const deleteButton = await wrapper.findByRole("button", {
       name: /Delete Failed Import/i
     });
 
