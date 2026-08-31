@@ -735,5 +735,12 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
 
 .dina-list-table .ReactTable tbody td {
   padding: 0.6rem 0.75rem;
-  vertical-align: top;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.dina-list-table .ReactTable tbody td > * {
+  display: inline-block;
+  min-width: 50%;
+  text-align: left;
 }

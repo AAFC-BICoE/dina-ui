@@ -223,7 +223,7 @@ function GroupRolesList({
   }
 
   return (
-    <ul className="list-unstyled mb-0 d-flex flex-column gap-1">
+    <ul className="list-unstyled mb-0 d-flex flex-column gap-1 align-items-center">
       {groupNames.map((groupName) => {
         const group = groupsByName[groupName];
         const label = group?.labels?.[locale] ?? groupName;
@@ -288,7 +288,10 @@ export default function DinaUserListPage() {
         id: "name",
         header: () => <FieldHeader name="name" />,
         // Derived from firstName + lastName, which the User API can't sort by as one field.
-        cell: ({ row: { original } }) => fullName(original) || EMPTY_CELL,
+        cell: ({ row: { original } }) => {
+          const name = fullName(original);
+          return name ? <span>{name}</span> : EMPTY_CELL;
+        },
         enableSorting: false
       },
       {

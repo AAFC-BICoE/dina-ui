@@ -215,7 +215,8 @@ export default function GroupListPage() {
         id: `labels.${locale}`,
         header: () => <DinaMessage id="groupLabel" />,
         accessorFn: (group) => group.labels?.[locale] ?? "",
-        cell: ({ getValue }) => getValue<string>() || EMPTY_CELL
+        cell: ({ getValue }) =>
+          getValue<string>() ? <span>{getValue<string>()}</span> : EMPTY_CELL
       },
       {
         cell: ({
