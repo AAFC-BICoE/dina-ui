@@ -50,7 +50,7 @@ export const HAS_LABEL = "hasLabel";
 export const MISSING_LABEL = "missingLabel";
 
 /** Placeholder shown in empty table cells. */
-const EMPTY_CELL = <span className="text-muted">—</span>;
+const EMPTY_CELL = <span className="text-muted d-block text-center">—</span>;
 
 /** The current user's account details the filters depend on. */
 export interface GroupFilterContext {

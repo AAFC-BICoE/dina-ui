@@ -20,7 +20,11 @@ import { PersistedResource } from "kitsu";
 import _ from "lodash";
 import Link from "next/link";
 import { useMemo } from "react";
-import { GroupSelectField, RoleBadges, useUserApiFilteringSupport } from "../../components";
+import {
+  GroupSelectField,
+  RoleBadges,
+  useUserApiFilteringSupport
+} from "../../components";
 import PageLayout from "../../components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
@@ -39,7 +43,7 @@ const USER_FILTER_ATTRIBUTES = [
 ];
 
 /*
- * Attributes searched by the free-text search when filtering in-memory. 
+ * Attributes searched by the free-text search when filtering in-memory.
  * The agent's display name is joined client-side from the Agent API, so the User API can't search it.
  */
 const IN_MEMORY_USER_FILTER_ATTRIBUTES = [
@@ -81,7 +85,7 @@ const USER_JOIN_SPECS: ClientSideJoinSpec[] = [
 ];
 
 /* Placeholder shown in empty table cells. */
-const EMPTY_CELL = <span className="text-muted">—</span>;
+const EMPTY_CELL = <span className="text-muted d-block text-center">—</span>;
 
 /* The user's full name, as shown in the Name column. */
 export function fullName({
@@ -184,8 +188,8 @@ export function userFiqlFilter(filterForm: any, groupNames: string[]): string {
     clauses.push(
       groupNames.length
         ? `(${groupNames
-          .map((groupName) => `rolesPerGroup.${groupName}==${role}`)
-          .join(",")})`
+            .map((groupName) => `rolesPerGroup.${groupName}==${role}`)
+            .join(",")})`
         : NO_USER_FIQL
     );
   } else if (group) {
@@ -251,7 +255,7 @@ export default function DinaUserListPage() {
     useUserApiFilteringSupport();
 
   // Load the groups once for the whole table
-  // (labels, links and the server-side role filter) 
+  // (labels, links and the server-side role filter)
   // instead of one request per cell
   const { response: groupsResponse, loading: groupsLoading } = useQuery<
     Group[]
@@ -351,7 +355,7 @@ export default function DinaUserListPage() {
     [groupsByName, locale]
   );
 
-  // Keyed on the locale rather than on formatMessage, 
+  // Keyed on the locale rather than on formatMessage,
   // which is a new function on every render (and would defeat the memoization)
   const agentLinkOptions = useMemo(
     () => [
@@ -371,8 +375,8 @@ export default function DinaUserListPage() {
     [columns]
   );
 
-  // Mount the list once the filtering mode is known 
-  // (and the groups the server-side role filter depends on are loaded), 
+  // Mount the list once the filtering mode is known
+  // (and the groups the server-side role filter depends on are loaded),
   // so the list isn't requested twice.
   if (filteringSupportLoading || groupsLoading) {
     return (
@@ -398,7 +402,7 @@ export default function DinaUserListPage() {
             ? "userSearchPlaceholderWithoutAgent"
             : "userSearchPlaceholder"
         )}
-        // Re-filtering as the user types is only cheap in-memory. 
+        // Re-filtering as the user types is only cheap in-memory.
         // Server-side, each search is a request that has the User API re-read the users from Keycloak.
         liveSearch={!serverSideFiltering}
         enableInMemoryFilter={!serverSideFiltering}
