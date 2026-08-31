@@ -252,6 +252,12 @@ export function SaveWorkbookProgress({
   }
 
   async function deleteFailedImport() {
+    // Appending data should not delete the failed import records, only on create.
+    if (!sourceSet.current || appendData) {
+      onWorkbookFailed?.();
+      return;
+    }
+
     const fetchedMaterialSamples = await apiClient.get<MaterialSample[]>(
       "/collection-api/material-sample",
       {
