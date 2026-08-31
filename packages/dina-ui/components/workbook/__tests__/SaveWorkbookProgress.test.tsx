@@ -37,12 +37,12 @@ describe("SaveWorkbookProgress", () => {
   };
 
   const baseWorkbookResources = [
-    { type: "material-sample", materialSampleName: "sample-1" },
-    { type: "material-sample", materialSampleName: "sample-2" },
-    { type: "material-sample", materialSampleName: "sample-3" },
-    { type: "material-sample", materialSampleName: "sample-4" },
-    { type: "material-sample", materialSampleName: "sample-5" },
-    { type: "material-sample", materialSampleName: "sample-6" }
+    { type: "material-sample", materialSampleName: "mat-sample-101" },
+    { type: "material-sample", materialSampleName: "mat-sample-102" },
+    { type: "material-sample", materialSampleName: "mat-sample-103" },
+    { type: "material-sample", materialSampleName: "mat-sample-104" },
+    { type: "material-sample", materialSampleName: "mat-sample-105" },
+    { type: "material-sample", materialSampleName: "mat-sample-106" }
   ];
 
   beforeEach(() => {
@@ -51,20 +51,28 @@ describe("SaveWorkbookProgress", () => {
     mockGet.mockImplementation(async (path: string, options?: any) => {
       if (
         path === "/collection-api/material-sample" &&
-        (options?.include === "collectingEvent" ||
-          options?.fiql?.includes("sourceSet"))
+        (options?.include?.includes("collectingEvent") ||
+          options?.filter?.includes("sourceSet"))
       ) {
         return {
           data: [
             {
               id: "mat-sample-101",
               type: "material-sample",
-              collectingEvent: { id: "col-event-201", type: "collecting-event" }
+              collectingEvent: {
+                id: "col-event-201",
+                type: "collecting-event"
+              },
+              organism: [{ id: "organism-301", type: "organism" }],
+              storageUnitUsage: {
+                id: "storage-unit-usage-401",
+                type: "storage-unit-usage"
+              }
             },
-            {
-              id: "mat-sample-102",
-              type: "material-sample"
-            }
+            { id: "mat-sample-102", type: "material-sample" },
+            { id: "mat-sample-103", type: "material-sample" },
+            { id: "mat-sample-104", type: "material-sample" },
+            { id: "mat-sample-105", type: "material-sample" }
           ]
         };
       }
@@ -73,8 +81,7 @@ describe("SaveWorkbookProgress", () => {
     });
   });
 
-  it("Deletes created material-sample and collecting-event records when cleaning up failed import", async () => {
-    // Stateful mock hook so failSavingWorkbook triggers a re-render with status = "FAILED"
+  it("Deletes created material-sample, collecting-event, organism, and storage-unit-usage records when cleaning up failed import", async () => {
     (WorkbookProvider.useWorkbookContext as jest.Mock).mockImplementation(
       () => {
         const [status, setStatus] = React.useState<string>("SAVING");
@@ -116,13 +123,19 @@ describe("SaveWorkbookProgress", () => {
       throw new Error("Import save failed");
     });
 
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <SaveWorkbookProgress
         onWorkbookCanceled={mockOnWorkbookCanceled}
         onWorkbookFailed={mockOnWorkbookFailed}
       />,
       { apiContext }
     );
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: "Delete Failed Import" })
+      ).toBeInTheDocument();
+    });
 
     const deleteButton = await screen.findByRole("button", {
       name: /Delete Failed Import/i
@@ -134,13 +147,19 @@ describe("SaveWorkbookProgress", () => {
       expect(mockGet).toHaveBeenCalledWith(
         "/collection-api/material-sample",
         expect.objectContaining({
-          include: "collectingEvent"
+          include: "collectingEvent,organism,storageUnitUsage"
         })
       );
     });
 
     expect(mockBulkDeleteResources).toHaveBeenCalledWith(
-      ["mat-sample-101", "mat-sample-102"],
+      [
+        "mat-sample-101",
+        "mat-sample-102",
+        "mat-sample-103",
+        "mat-sample-104",
+        "mat-sample-105"
+      ],
       {
         apiBaseUrl: "/collection-api",
         resourceType: "material-sample"
@@ -151,5 +170,18 @@ describe("SaveWorkbookProgress", () => {
       apiBaseUrl: "/collection-api",
       resourceType: "collecting-event"
     });
+
+    expect(mockBulkDeleteResources).toHaveBeenCalledWith(["organism-301"], {
+      apiBaseUrl: "/collection-api",
+      resourceType: "organism"
+    });
+
+    expect(mockBulkDeleteResources).toHaveBeenCalledWith(
+      ["storage-unit-usage-401"],
+      {
+        apiBaseUrl: "/collection-api",
+        resourceType: "storage-unit-usage"
+      }
+    );
   });
 });
