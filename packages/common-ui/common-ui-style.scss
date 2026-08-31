@@ -727,14 +727,10 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
  * (e.g. through ListPageLayout's wrapTable prop).
  */
 .dina-list-table .ReactTable thead th {
-  text-align: left;
+  text-align: center;
   font-weight: normal;
   padding: 0.6rem 0.75rem;
   background-color: #f8f9fa;
-}
-
-.dina-list-table .ReactTable thead th .column-header > span {
-  justify-content: flex-start !important;
 }
 
 .dina-list-table .ReactTable tbody td {
