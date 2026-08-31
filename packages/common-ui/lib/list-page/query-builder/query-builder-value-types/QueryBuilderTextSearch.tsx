@@ -91,9 +91,7 @@ export default function QueryRowTextSearch({
               <FaCircleInfo className="me-2" />
               {formatMessage(
                 {
-                  id: "queryBuilder_value_in_case_sensitivity_notice",
-                  defaultMessage:
-                    "Searches with over 100 items will automatically run as case-sensitive to maintain performance."
+                  id: "queryBuilder_value_in_case_sensitivity_notice"
                 },
                 { count: itemCounts }
               )}
