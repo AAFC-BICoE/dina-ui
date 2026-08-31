@@ -286,7 +286,7 @@ export default function QueryRowFieldExtensionSearch({
             }
             menuPortalTarget={document.body}
             styles={{
-              menuPortal: (base) => ({
+              menu: (base) => ({
                 ...base,
                 zIndex: 9999
               })
@@ -310,6 +310,12 @@ export default function QueryRowFieldExtensionSearch({
               })
             }
             onKeyDown={onKeyDown}
+            styles={{
+              menu: (base) => ({
+                ...base,
+                zIndex: 9999
+              })
+            }}
           />
         );
       case "BOOL":
@@ -356,7 +362,7 @@ export default function QueryRowFieldExtensionSearch({
         minMenuHeight={600}
         menuPortalTarget={document.body}
         styles={{
-          menuPortal: (base) => ({
+          menu: (base) => ({
             ...base,
             zIndex: 9999
           })
@@ -381,7 +387,7 @@ export default function QueryRowFieldExtensionSearch({
             }
             menuPortalTarget={document.body}
             styles={{
-              menuPortal: (base) => ({
+              menu: (base) => ({
                 ...base,
                 zIndex: 9999
               })
@@ -417,7 +423,7 @@ export default function QueryRowFieldExtensionSearch({
             minMenuHeight={600}
             menuPortalTarget={document.body}
             styles={{
-              menuPortal: (base) => ({
+              menu: (base) => ({
                 ...base,
                 zIndex: 9999
               })

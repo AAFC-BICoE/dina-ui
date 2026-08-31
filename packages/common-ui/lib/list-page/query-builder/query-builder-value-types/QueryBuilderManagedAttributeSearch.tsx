@@ -178,7 +178,15 @@ export default function QueryRowManagedAttributeSearch({
           "notEmpty"
         ];
       case "PICK_LIST":
-        return ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"];
+        return [
+          "equals",
+          "notEquals",
+          "wildcard",
+          "in",
+          "notIn",
+          "empty",
+          "notEmpty"
+        ];
       case "BOOL":
         return ["equals", "empty", "notEmpty"];
       case "STRING":
@@ -246,51 +254,75 @@ export default function QueryRowManagedAttributeSearch({
             value: pickOption,
             label: pickOption
           })) ?? [];
-        return operator === "in" || operator === "notIn" ? (
-          <Select
-            options={pickListOptions}
-            className={`col ps-0`}
-            value={(managedAttributeState.searchValue?.split(",") ?? []).map(
-              (val) => {
-                return pickListOptions.find(
-                  (pickOption) => pickOption.value === val
-                );
-              }
-            )}
-            placeholder={formatMessage({
-              id: "queryBuilder_pickList_multiple_placeholder"
-            })}
-            isMulti={true}
-            onChange={(pickListOption) =>
-              setManagedAttributeState({
-                ...managedAttributeState,
-                searchValue: (pickListOption.flat() ?? [])
-                  .map((item) => item?.value ?? "")
-                  .join(",")
-              })
-            }
-            onKeyDown={onKeyDown}
-          />
-        ) : (
-          <Select
-            options={pickListOptions}
-            className={`col ps-0`}
-            value={pickListOptions?.find(
-              (pickOption) =>
-                pickOption.value === managedAttributeState.searchValue
-            )}
-            placeholder={formatMessage({
-              id: "queryBuilder_pickList_placeholder"
-            })}
-            onChange={(pickListOption) =>
-              setManagedAttributeState({
-                ...managedAttributeState,
-                searchValue: pickListOption?.value ?? ""
-              })
-            }
-            onKeyDown={onKeyDown}
-          />
-        );
+
+        switch (operator) {
+          case "in":
+          case "notIn":
+            return (
+              <Select
+                options={pickListOptions}
+                className={`col ps-0`}
+                value={(
+                  managedAttributeState.searchValue?.split(",") ?? []
+                ).map((val) => {
+                  return pickListOptions.find(
+                    (pickOption) => pickOption.value === val
+                  );
+                })}
+                placeholder={formatMessage({
+                  id: "queryBuilder_pickList_multiple_placeholder"
+                })}
+                isMulti={true}
+                onChange={(pickListOption) =>
+                  setManagedAttributeState({
+                    ...managedAttributeState,
+                    searchValue: (pickListOption.flat() ?? [])
+                      .map((item) => item?.value ?? "")
+                      .join(",")
+                  })
+                }
+                onKeyDown={onKeyDown}
+                styles={{
+                  menu: (base) => ({
+                    ...base,
+                    zIndex: 9999
+                  })
+                }}
+              />
+            );
+
+          case "wildcard":
+            return <QueryBuilderTextSearch {...commonProps} />;
+
+          // All other operators
+          default:
+            return (
+              <Select
+                options={pickListOptions}
+                className={`col ps-0`}
+                value={pickListOptions?.find(
+                  (pickOption) =>
+                    pickOption.value === managedAttributeState.searchValue
+                )}
+                placeholder={formatMessage({
+                  id: "queryBuilder_pickList_placeholder"
+                })}
+                onChange={(pickListOption) =>
+                  setManagedAttributeState({
+                    ...managedAttributeState,
+                    searchValue: pickListOption?.value ?? ""
+                  })
+                }
+                onKeyDown={onKeyDown}
+                styles={{
+                  menu: (base) => ({
+                    ...base,
+                    zIndex: 9999
+                  })
+                }}
+              />
+            );
+        }
       case "BOOL":
         // Automatically set the boolean value to true if it's not preset.
         if (
@@ -464,7 +496,7 @@ export default function QueryRowManagedAttributeSearch({
           minMenuHeight={600}
           menuPortalTarget={document.body}
           styles={{
-            menuPortal: (base) => ({
+            menu: (base) => ({
               ...base,
               zIndex: 9999
             })
@@ -592,9 +624,6 @@ export function validateManagedAttribute(
           managedAttributeSearchValue.selectedOperator,
           formatMessage
         );
-      // case "PICK_LIST":
-      // case "STRING":
-      // case "BOOL":
     }
 
     return true;
