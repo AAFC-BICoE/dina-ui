@@ -194,7 +194,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   backToParentFile: "Back to parent file: {parentFilename}",
   attachSelected: "Attach Selected",
   notifications: "Notifications",
-  noNotifications: "No notifications",
+  noNotifications: "All caught up!",
+  noNotificationsMessage: "No new notifications right now.",
   markAllAsRead: "Mark all as read",
   notificationErrorTitle: "Failed to load notifications",
   notificationErrorMessage:

@@ -54,10 +54,12 @@ const MOCK_EMPTY_RESPONSE = {
 describe("useNotification", () => {
   let mockGet;
   let mockDoOperations;
+  let mockSave;
 
   beforeEach(() => {
     mockGet = jest.fn();
     mockDoOperations = jest.fn();
+    mockSave = jest.fn();
     jest.clearAllMocks();
   });
 
@@ -442,6 +444,116 @@ describe("useNotification", () => {
 
       // Should not call doOperations since there are no unread notifications
       expect(mockDoOperations).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Delete notification", () => {
+    it("Delete an individual notification", async () => {
+      mockGet.mockResolvedValue(MOCK_NOTIFICATIONS_RESPONSE);
+      mockDoOperations.mockResolvedValue(undefined);
+
+      const TestComponent = () => {
+        const { deleteNotification, unreadCount } = useNotification();
+        return (
+          <div>
+            <div data-testid="unread-count">{unreadCount}</div>
+            <button onClick={() => deleteNotification("test-id")}>
+              Delete notification
+            </button>
+          </div>
+        );
+      };
+
+      const wrapper = mountWithAppContext(<TestComponent />, {
+        apiContext: {
+          apiClient: { get: mockGet },
+          save: mockSave
+        },
+        accountContext: {
+          subject: "test-user-id"
+        }
+      });
+
+      // Wait for initial load and verify unread count
+      await waitFor(() => {
+        expect(wrapper.getByTestId("unread-count").textContent).toBe("2");
+      });
+
+      // Click the delete notification button.
+      const button = wrapper.getByText("Delete notification");
+      button.click();
+
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledWith(
+          [
+            {
+              delete: {
+                id: "test-id",
+                type: "notification"
+              }
+            }
+          ],
+          { apiBaseUrl: "/user-api" }
+        );
+      });
+    });
+  });
+
+  describe("Delete all notifications", () => {
+    it("Delete all notifications sends correct network requests", async () => {
+      mockGet.mockResolvedValue(MOCK_NOTIFICATIONS_RESPONSE);
+      mockDoOperations.mockResolvedValue(undefined);
+
+      const TestComponent = () => {
+        const { deleteAllNotifications, unreadCount } = useNotification();
+        return (
+          <div>
+            <div data-testid="unread-count">{unreadCount}</div>
+            <button onClick={() => deleteAllNotifications()}>
+              Delete all notification
+            </button>
+          </div>
+        );
+      };
+
+      const wrapper = mountWithAppContext(<TestComponent />, {
+        apiContext: {
+          apiClient: { get: mockGet },
+          doOperations: mockDoOperations
+        },
+        accountContext: {
+          subject: "test-user-id"
+        }
+      });
+
+      // Wait for initial load and verify unread count
+      await waitFor(() => {
+        expect(wrapper.getByTestId("unread-count").textContent).toBe("2");
+      });
+
+      // Click the delete all notification button.
+      const button = wrapper.getByText("Delete all notification");
+      button.click();
+
+      await waitFor(() => {
+        expect(mockDoOperations).toHaveBeenCalledWith(
+          [
+            {
+              op: "DELETE",
+              path: "notification/1"
+            },
+            {
+              op: "DELETE",
+              path: "notification/2"
+            },
+            {
+              op: "DELETE",
+              path: "notification/3"
+            }
+          ],
+          { apiBaseUrl: "/user-api" }
+        );
+      });
     });
   });
 
