@@ -741,6 +741,6 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
 
 .dina-list-table .ReactTable tbody td > * {
   display: inline-block;
-  min-width: 50%;
+  min-width: var(--cell-block-min-width, 50%);
   text-align: left;
 }
