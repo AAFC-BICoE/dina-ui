@@ -2249,16 +2249,12 @@ mockSave.mockRejectedValueOnce({
     expect(wrapper.getByRole("textbox", { name: /name/i })).toBeInTheDocument();
   });
 
-  // Fill form using fireEvent
-  fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-    target: { value: "John" }
-  });
+  // Fill the form with userEvent (always awaited). Use clearAndType() when the
+  // field may already have a value, it clears the input before typing.
+  await clearAndType(wrapper.getByRole("textbox", { name: /name/i }), "John");
 
-  // Or use userEvent for more realistic interactions
-  userEvent.click(wrapper.getByRole("button", { name: /submit/i }));
-
-  // Submit form
-  fireEvent.submit(wrapper.container.querySelector("form")!);
+  // Submit the form by clicking the Save button, like a user would.
+  await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
   // Wait for save to complete
   await waitFor(() =&gt; {
@@ -2286,21 +2282,19 @@ mockSave.mockRejectedValueOnce({
   });
 
   // Click button
-  userEvent.click(wrapper.getByRole("button", { name: /add tag/i }));
+  await userEvent.click(wrapper.getByRole("button", { name: /add tag/i }));
 
-  // Change input
-  fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
-    target: { value: "new tag" }
-  });
+  // Type into an input (creatable select shown here)
+  await userEvent.type(wrapper.getByRole("combobox", { name: /tags/i }), "new tag");
 
   // Select option
-  userEvent.click(wrapper.getByRole("option", { name: /add "new tag"/i }));
+  await userEvent.click(wrapper.getByRole("option", { name: /add "new tag"/i }));
 
   // Toggle switch
-  userEvent.click(wrapper.getByRole("switch"));
+  await userEvent.click(wrapper.getByRole("switch"));
 
   // Remove item
-  userEvent.click(wrapper.getByRole("button", { name: /remove tag1/i }));
+  await userEvent.click(wrapper.getByRole("button", { name: /remove tag1/i }));
 
   // Wait for new element to appear
   await waitFor(() =&gt; {
@@ -2322,10 +2316,10 @@ mockSave.mockRejectedValueOnce({
   });
 
   // Open dropdown
-  userEvent.click(wrapper.getByRole("combobox", { name: /license/i }));
+  await userEvent.click(wrapper.getByRole("combobox", { name: /license/i }));
 
   // Select option
-  userEvent.click(wrapper.getByRole("option", { name: /&lt;none&gt;/i }));
+  await userEvent.click(wrapper.getByRole("option", { name: /&lt;none&gt;/i }));
 
   // Verify selection
   expect(wrapper.getByRole("combobox", { name: /license/i })).toHaveDisplayValue("");
@@ -2400,17 +2394,64 @@ describe("My Component", () =&gt; {
 <div class="sect2">
 <h3 id="_best_practices">10.8. Best Practices</h3>
 <div class="sect3">
-<h4 id="_always_use_waitfor_for_async_operations">10.8.1. Always use waitFor for async operations</h4>
+<h4 id="_simulate_the_user_with_userevent_not_fireevent">10.8.1. Simulate the user with <code>userEvent</code>, not <code>fireEvent</code></h4>
+<div class="paragraph">
+<p>Use <code>@testing-library/user-event</code> for interactions and always <code>await</code> it. It
+dispatches the full sequence of events a real user produces (pointer, focus,
+keyboard, input, change) and waits for React to settle, which avoids the
+"works locally, flaky in CI" class of failures.</p>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-typescript" data-lang="typescript">await waitFor(() =&gt; {
-  expect(wrapper.getByText("Loaded")).toBeInTheDocument();
-});</code></pre>
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">import userEvent from "@testing-library/user-event";
+import { clearAndType, mountWithAppContext } from "common-ui";
+
+await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+await userEvent.type(wrapper.getByRole("textbox", { name: /name/i }), "John");
+
+// Replace an existing value (userEvent.clear + userEvent.type):
+await clearAndType(wrapper.getByRole("textbox", { name: /name/i }), "New name");</code></pre>
 </div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>fireEvent.change()</code> &#8594; <code>await userEvent.type()</code> / <code>await clearAndType()</code></p>
+</li>
+<li>
+<p><code>fireEvent.click()</code> &#8594; <code>await userEvent.click()</code></p>
+</li>
+<li>
+<p><code>fireEvent.submit(form)</code> &#8594; <code>await userEvent.click(saveButton)</code></p>
+</li>
+<li>
+<p><code>fail("&#8230;&#8203;")</code> (deprecated jasmine global) &#8594; <code>throw new Error("&#8230;&#8203;")</code></p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_use_appropriate_queries">10.8.2. Use appropriate queries</h4>
+<h4 id="_always_use_waitfor_or_findby_for_async_operations">10.8.2. Always use waitFor (or findBy*) for async operations</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">// Wait for an element to appear:
+expect(await wrapper.findByText("Loaded")).toBeInTheDocument();
+
+// Wait for a non-DOM condition, e.g. an API mock being called:
+await waitFor(() =&gt; {
+  expect(mockSave).toHaveBeenCalledTimes(1);
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Keep user actions (<code>userEvent.<strong></code>) and other side effects *outside</strong> of <code>waitFor</code>
+callbacks: the callback is retried until it passes, so an action inside it can
+run more than once. Never use <code>await new Promiser) &#8658; setTimeout(r, N</code> to
+"wait a bit" - wait for the actual condition instead.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_use_appropriate_queries">10.8.3. Use appropriate queries</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -2429,7 +2470,7 @@ describe("My Component", () =&gt; {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_check_only_changed_values_in_saves">10.8.3. Check only changed values in saves</h4>
+<h4 id="_check_only_changed_values_in_saves">10.8.4. Check only changed values in saves</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-typescript" data-lang="typescript">expect(mockSave).lastCalledWith(
@@ -2737,7 +2778,7 @@ CSVFILE=messages.csv yarn import-intl-csv</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-08-24 20:03:45 UTC
+Last updated 2026-09-01 18:29:36 UTC
 </div>
 </div>
 </body>
