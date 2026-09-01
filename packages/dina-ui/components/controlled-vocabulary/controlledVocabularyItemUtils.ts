@@ -1,6 +1,14 @@
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs } from "lodash";
-import { VocabularyElementType } from "../../types/collection-api";
+import {
+  COLLECTION_MODULE_TYPE_LABELS,
+  COLLECTION_MODULE_TYPES
+} from "../../types/collection-api/resources/CollectionModuleType";
+import { VocabularyElementType } from "../../types/collection-api/resources/VocabularyElementType";
+import {
+  OBJECT_STORE_MODULE_TYPE_LABELS,
+  OBJECT_STORE_MODULE_TYPES
+} from "../../types/objectstore-api/resources/ObjectStoreModuleTypes";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 
 export const COLLECTION_OTHER_IDENTIFIERS_ID =
@@ -11,6 +19,55 @@ export const COLLECTION_MANAGED_ATTRIBUTE_ID =
 
 export const OBJECT_STORE_MANAGED_ATTRIBUTE_ID =
   "b8527bdf-a1d2-465d-a8bb-2a66d552de23";
+
+export type ControlledVocabularyApi = "collection" | "objectstore";
+
+export interface ControlledVocabularyApiConfig {
+  apiPath: string;
+  apiBaseUrl: string;
+  entityLink: string;
+  editRoute: string;
+  viewRoute: string;
+  listRoute: string;
+  /** Data component types available when creating/editing an item in this API. */
+  componentTypes: readonly string[];
+  /** i18n key for each component type, used as the option label. */
+  componentTypeLabels: Record<string, string>;
+}
+
+/**
+ * API, route and form configuration for the controlled-vocabulary-item pages.
+ * A controlled vocabulary item may reside in any of the configured APIs, and
+ * each API has its own page routes and data component types.
+ */
+export const CONTROLLED_VOCABULARY_APIS: Record<
+  ControlledVocabularyApi,
+  ControlledVocabularyApiConfig
+> = {
+  collection: {
+    apiPath: "collection-api",
+    apiBaseUrl: "/collection-api",
+    entityLink: "/controlled-vocabulary-item",
+    editRoute: "/controlled-vocabulary-item/edit",
+    viewRoute: "/controlled-vocabulary-item/view",
+    listRoute: "/controlled-vocabulary/list",
+    componentTypes: COLLECTION_MODULE_TYPES,
+    componentTypeLabels: COLLECTION_MODULE_TYPE_LABELS as Record<string, string>
+  },
+  objectstore: {
+    apiPath: "objectstore-api",
+    apiBaseUrl: "/objectstore-api",
+    entityLink: "/object-store/controlled-vocabulary-item",
+    editRoute: "/object-store/controlled-vocabulary-item/edit",
+    viewRoute: "/object-store/controlled-vocabulary-item/view",
+    listRoute: "/controlled-vocabulary/list?tab=1",
+    componentTypes: OBJECT_STORE_MODULE_TYPES,
+    componentTypeLabels: OBJECT_STORE_MODULE_TYPE_LABELS as Record<
+      string,
+      string
+    >
+  }
+};
 
 /**
  * Transforms a ControlledVocabularyItem from the API format to a format suitable for form editing.

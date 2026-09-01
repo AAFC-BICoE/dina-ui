@@ -713,6 +713,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   groupListTitle: "Groups",
   editGroupTitle: "Edit Group",
   group: "Group",
+  myGroups: "My Groups",
+  allGroups: "All Groups",
   groupMustBeSelected: "Group must be selected",
   hostOrganismLegend: "Host Organism",
   http403ForbiddenError: "Access is denied",

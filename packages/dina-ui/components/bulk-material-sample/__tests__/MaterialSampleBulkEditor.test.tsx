@@ -1194,14 +1194,14 @@ describe("MaterialSampleBulkEditor", () => {
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", {
-          name: /verbatim scientific name no changes × insert hybrid symbol/i
+          name: /verbatim scientific name no changes/i
         })
       ).toBeInTheDocument()
     );
     // Override the verbatim scientific name.
     await clearAndType(
       wrapper.getByRole("textbox", {
-        name: /verbatim scientific name no changes × insert hybrid symbol/i
+        name: /verbatim scientific name no changes/i
       }),
       "new-scientific-name"
     );
@@ -2987,6 +2987,138 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               barcode: "",
               id: "3",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Ability to append fields in the edit all tab.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES}
+      />,
+      testCtx as any
+    );
+
+    await waitForLoadingToDisappear();
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("combobox", {
+          name: /tags no changes multiple values/i
+        })
+      ).toBeInTheDocument()
+    );
+
+    // By default, append mode is selected, add a tag and save to ensure it's appended not replacing.
+    const tagDropdown = wrapper.getByRole("combobox", {
+      name: /tags no changes multiple values/i
+    });
+    await userEvent.click(tagDropdown);
+    await userEvent.type(tagDropdown, "New Tag{enter}"); // Hit the enter key after typing to add the new tag.
+
+    await waitFor(() => {
+      expect(wrapper.getByText(/changes made/i)).toBeInTheDocument();
+    });
+
+    // Click the "Save All" button
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Expect the tag to be appended, not replacing existing tags.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              tags: [
+                ...(TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES.at(0)?.tags ??
+                  []),
+                "New Tag"
+              ],
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              id: "2",
+              tags: [
+                ...(TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES.at(1)?.tags ??
+                  []),
+                "New Tag"
+              ],
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Ability to replace (not append) fields in the edit all tab.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES}
+      />,
+      testCtx as any
+    );
+
+    await waitForLoadingToDisappear();
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("combobox", {
+          name: /tags no changes multiple values/i
+        })
+      ).toBeInTheDocument()
+    );
+
+    // By default, append mode is selected, switch to replace mode:
+    await userEvent.click(wrapper.getByText(/replace/i));
+
+    const tagDropdown = wrapper.getByRole("combobox", {
+      name: /tags no changes multiple values/i
+    });
+    await userEvent.click(tagDropdown);
+    await userEvent.type(tagDropdown, "Replace Tag{enter}"); // Hit the enter key after typing to add the new tag.
+
+    await waitFor(() => {
+      expect(wrapper.getByText(/changes made/i)).toBeInTheDocument();
+    });
+
+    // Click the "Save All" button
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Expect the tag to be replaced, not appended.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              tags: ["Replace Tag"],
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              id: "2",
+              tags: ["Replace Tag"],
               type: "material-sample"
             },
             type: "material-sample"

@@ -1,12 +1,24 @@
 import { DinaForm } from "common-ui";
 import Link from "next/link";
+import { MdEdit } from "react-icons/md";
 import { ViewPageLayout } from "../../components";
-import { transformControlledVocabularyItemForForm } from "../../components/controlled-vocabulary/controlledVocabularyItemUtils";
+import {
+  CONTROLLED_VOCABULARY_APIS,
+  ControlledVocabularyApi,
+  transformControlledVocabularyItemForForm
+} from "../../components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 import { ControlledVocabularyItemFormLayout } from "./edit";
 
-export default function ControlledVocabularyItemViewPage() {
+export function ControlledVocabularyItemViewPage({
+  api = "collection"
+}: {
+  api?: ControlledVocabularyApi;
+}) {
+  const { apiPath, apiBaseUrl, entityLink, editRoute, listRoute } =
+    CONTROLLED_VOCABULARY_APIS[api];
+
   return (
     <ViewPageLayout<ControlledVocabularyItem>
       form={(props) => (
@@ -18,28 +30,37 @@ export default function ControlledVocabularyItemViewPage() {
             ) as ControlledVocabularyItem
           }
         >
-          <ControlledVocabularyItemFormLayout />
+          <ControlledVocabularyItemFormLayout api={api} />
         </DinaForm>
       )}
       query={(id) => ({
-        path: `collection-api/controlled-vocabulary-item/${id}`,
+        path: `${apiPath}/controlled-vocabulary-item/${id}`,
         include: "controlledVocabulary"
       })}
-      entityLink="/controlled-vocabulary-item"
-      specialListUrl="/controlled-vocabulary/list"
+      entityLink={entityLink}
+      specialListUrl={listRoute}
       type="controlled-vocabulary-item"
-      apiBaseUrl="/collection-api"
+      apiBaseUrl={apiBaseUrl}
       nameField="name"
       mainClass="container-fluid"
       showEditButton={true}
-      backButton={
+      editButton={({ initialValues }) => (
         <Link
-          href="/controlled-vocabulary/list"
-          className="back-button my-auto me-auto"
+          href={`${editRoute}?id=${initialValues.id}`}
+          className="btn btn-primary"
+          style={{ paddingLeft: "15px", paddingRight: "15px" }}
         >
+          <MdEdit className="me-2" />
+          <DinaMessage id="operation_edit" />
+        </Link>
+      )}
+      backButton={
+        <Link href={listRoute} className="back-button my-auto me-auto">
           <DinaMessage id="backToList" />
         </Link>
       }
     />
   );
 }
+
+export default ControlledVocabularyItemViewPage;

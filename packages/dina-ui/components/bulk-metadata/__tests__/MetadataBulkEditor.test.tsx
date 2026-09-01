@@ -28,7 +28,7 @@ const mockGet = jest.fn<any, any>(async (path, _params) => {
       return { data: [TEST_OBJECT_SUBTYPE_DATA] };
     case "objectstore-api/license":
       return { data: [] };
-    case "objectstore-api/managed-attribute":
+    case "objectstore-api/controlled-vocabulary-item":
       return { data: [] };
     case "agent-api/person":
       return { data: [] };
@@ -686,6 +686,155 @@ describe("MetadataBulkEditor", () => {
             {
               resource: {
                 acCaption: "",
+                id: "bulk-edit-3",
+                type: "metadata"
+              },
+              type: "metadata"
+            }
+          ],
+          {
+            apiBaseUrl: "/objectstore-api"
+          }
+        ]
+      ]);
+    });
+
+    it("Ability to append fields in the edit all tab.", async () => {
+      const wrapper = mountWithAppContext(
+        <MetadataBulkEditor
+          onSaved={mockOnSaved}
+          metadatas={TEST_BULK_EDIT_METADATA}
+        />,
+        testCtx as any
+      );
+
+      await waitForLoadingToDisappear();
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("combobox", {
+            name: /tags no changes multiple values/i
+          })
+        ).toBeInTheDocument()
+      );
+
+      // By default, append mode is selected, add a tag and save to ensure it's appended not replacing.
+      const tagDropdown = wrapper.getByRole("combobox", {
+        name: /tags no changes multiple values/i
+      });
+      await userEvent.click(tagDropdown);
+      await userEvent.type(tagDropdown, "New Tag{enter}"); // Hit the enter key after typing to add the new tag.
+
+      await waitFor(() => {
+        expect(wrapper.getByText(/changes made/i)).toBeInTheDocument();
+      });
+
+      // Click the "Save All" button
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Expect the tag to be appended, not replacing existing tags.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                acTags: [
+                  ...(TEST_BULK_EDIT_METADATA.at(0)?.acTags ?? []),
+                  "New Tag"
+                ],
+                id: "bulk-edit-1",
+                type: "metadata"
+              },
+              type: "metadata"
+            },
+            {
+              resource: {
+                acTags: [
+                  ...(TEST_BULK_EDIT_METADATA.at(1)?.acTags ?? []),
+                  "New Tag"
+                ],
+                id: "bulk-edit-2",
+                type: "metadata"
+              },
+              type: "metadata"
+            },
+            {
+              resource: {
+                acTags: [
+                  ...(TEST_BULK_EDIT_METADATA.at(2)?.acTags ?? []),
+                  "New Tag"
+                ],
+                id: "bulk-edit-3",
+                type: "metadata"
+              },
+              type: "metadata"
+            }
+          ],
+          {
+            apiBaseUrl: "/objectstore-api"
+          }
+        ]
+      ]);
+    });
+
+    it("Ability to replace (not append) fields in the edit all tab.", async () => {
+      const wrapper = mountWithAppContext(
+        <MetadataBulkEditor
+          onSaved={mockOnSaved}
+          metadatas={TEST_BULK_EDIT_METADATA}
+        />,
+        testCtx as any
+      );
+
+      await waitForLoadingToDisappear();
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("combobox", {
+            name: /tags no changes multiple values/i
+          })
+        ).toBeInTheDocument()
+      );
+
+      // By default, append mode is selected, switch to replace mode:
+      await userEvent.click(wrapper.getByText(/replace/i));
+
+      const tagDropdown = wrapper.getByRole("combobox", {
+        name: /tags no changes multiple values/i
+      });
+      await userEvent.click(tagDropdown);
+      await userEvent.type(tagDropdown, "Replace Tag{enter}"); // Hit the enter key after typing to add the new tag.
+
+      await waitFor(() => {
+        expect(wrapper.getByText(/changes made/i)).toBeInTheDocument();
+      });
+
+      // Click the "Save All" button
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Expect the tag to be replaced, not appended.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                acTags: ["Replace Tag"],
+                id: "bulk-edit-1",
+                type: "metadata"
+              },
+              type: "metadata"
+            },
+            {
+              resource: {
+                acTags: ["Replace Tag"],
+                id: "bulk-edit-2",
+                type: "metadata"
+              },
+              type: "metadata"
+            },
+            {
+              resource: {
+                acTags: ["Replace Tag"],
                 id: "bulk-edit-3",
                 type: "metadata"
               },

@@ -10,7 +10,6 @@ import {
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ControlledVocabularyItem,
-  ManagedAttribute,
   VocabularyElement
 } from "../../../types/collection-api";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
@@ -18,7 +17,8 @@ import { WorkbookColumnMappingFields } from "./WorkbookColumnMapping";
 import { useColumnMapping } from "./useColumnMapping";
 import {
   COLLECTION_MANAGED_ATTRIBUTE_ID,
-  COLLECTION_OTHER_IDENTIFIERS_ID
+  COLLECTION_OTHER_IDENTIFIERS_ID,
+  OBJECT_STORE_MANAGED_ATTRIBUTE_ID
 } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface WorkbookFieldSelectFieldProps {
@@ -134,7 +134,7 @@ export function WorkbookFieldSelectField({
       {fieldMap[columnIndex]?.targetField === "managedAttributes" &&
         type == "metadata" && (
           <div className="flex-fill">
-            <ResourceSelectField<ManagedAttribute>
+            <ResourceSelectField<ControlledVocabularyItem>
               name={`fieldMap[${columnIndex}].targetKey`}
               hideLabel={true}
               selectProps={{
@@ -143,14 +143,19 @@ export function WorkbookFieldSelectField({
                 styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
               }}
               filter={(input: string) =>
-                SimpleSearchFilterBuilder.create<ManagedAttribute>()
+                SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+                  .where(
+                    "controlledVocabulary.uuid" as any,
+                    "EQ",
+                    OBJECT_STORE_MANAGED_ATTRIBUTE_ID
+                  )
                   .searchFilter("name", input)
                   .build()
               }
               isDisabled={disabled}
               additionalSort={"name"}
-              showGroupCategary={true}
-              model={"objectstore-api/managed-attribute"}
+              groupBy="group"
+              model={"objectstore-api/controlled-vocabulary-item"}
               optionLabel={(ma) => {
                 const multiDescription =
                   ma?.multilingualDescription?.descriptions?.find(
@@ -200,7 +205,7 @@ export function WorkbookFieldSelectField({
               }
               isDisabled={disabled}
               additionalSort={"name"}
-              showGroupCategary={true}
+              groupBy="group"
               model={"collection-api/controlled-vocabulary-item"}
               optionLabel={(ma) => {
                 const multiDescription =
