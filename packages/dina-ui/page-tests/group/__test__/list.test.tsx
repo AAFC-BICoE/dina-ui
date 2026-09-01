@@ -111,7 +111,10 @@ describe("Group list page", () => {
       expect(wrapper.getByText("cnc")).toBeInTheDocument();
     });
 
-    // The group name links to the group view page
+    // The group's short identifier is labelled "Group Code"
+    expect(wrapper.getByText("Group Code")).toBeInTheDocument();
+
+    // The group code links to the group view page
     expect(wrapper.getByRole("link", { name: "aafc" })).toHaveAttribute(
       "href",
       "/group/view?id=1"
@@ -346,7 +349,7 @@ describe("Group list page", () => {
 
     // The search input explains what can be searched
     expect(
-      wrapper.getByPlaceholderText("Search by name, path or label")
+      wrapper.getByPlaceholderText("Search by code, path or label")
     ).toBeInTheDocument();
 
     // Search by the French label without clicking the filter button;

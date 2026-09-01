@@ -198,6 +198,7 @@ export default function GroupListPage() {
   const groupTableColumns: ColumnDefinition<Group>[] = useMemo(
     () => [
       {
+        header: () => <DinaMessage id="groupCode" />,
         cell: ({
           row: {
             original: { id, name }
