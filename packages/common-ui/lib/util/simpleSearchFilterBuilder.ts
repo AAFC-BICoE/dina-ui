@@ -1,4 +1,5 @@
 import { FilterParam } from "kitsu";
+import { ScopeOption } from "../resource-select/ResourceScopes";
 
 // Define the supported filter operations
 export type FilterOperation =
@@ -156,6 +157,39 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
     } else if (falseCallback) {
       falseCallback(this);
     }
+    return this;
+  }
+
+  /**
+   * Applies the `applyFilter` of whichever option is currently active for each
+   * given scope. Scopes with no active option (or none defined) are skipped.
+   *
+   * e.g. .applyScopes(scopes, activeScopes)
+   *
+   * This is mainly used by the ResourceSelect as you can add additional filters inside of the
+   * dropdown menu, based on the choices, it will automatically apply those filters.
+   *
+   * @param scopes The full list of scope definitions (as passed to ResourceSelect).
+   * @param activeScopes A map of scopeId -> the currently selected optionId.
+   */
+  public applyScopes(
+    scopes: ScopeOption[] | undefined,
+    activeScopes: Record<string, string> | undefined
+  ): this {
+    if (!scopes?.length || !activeScopes) {
+      return this;
+    }
+
+    scopes.forEach((scope) => {
+      if (scope.type === "toggle") {
+        const activeOptionId = activeScopes[scope.id];
+        const activeOption = scope.options.find(
+          (opt) => opt.id === activeOptionId
+        );
+        activeOption?.applyFilter(this);
+      }
+    });
+
     return this;
   }
 

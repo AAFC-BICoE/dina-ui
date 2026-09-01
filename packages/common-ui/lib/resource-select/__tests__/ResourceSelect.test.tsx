@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { ResourceSelect, ResourceSelectProps } from "../..";
+import { ResourceSelect, ResourceSelectProps, ScopeOption } from "../..";
 import { mountWithAppContext } from "common-ui";
 import { AsyncOption } from "../ResourceSelect";
 import "@testing-library/jest-dom";
@@ -610,6 +610,123 @@ describe("ResourceSelect component", () => {
     await waitFor(() => {
       expect(mockBulkGet).toHaveBeenCalledTimes(0);
       expect(wrapper.getByText(/example\-custom\-name/i)).toBeInTheDocument();
+    });
+  });
+
+  describe("Scope functionality in ResourceSelect", () => {
+    const MOCK_SCOPES: ScopeOption[] = [
+      {
+        id: "statusFilter",
+        type: "toggle",
+        label: "Status",
+        options: [
+          { id: "all", label: "All Todos", applyFilter: () => {} },
+          {
+            id: "active",
+            label: "Active Only",
+            applyFilter: (builder) => builder.where("status", "EQ", "active")
+          }
+        ]
+      }
+    ];
+
+    const DEFAULT_SCOPED_SELECT_PROPS: ResourceSelectProps<Todo> = {
+      model: "todo-api/todo",
+      filter: (input) => ({ name: input }),
+      scopes: MOCK_SCOPES,
+      optionLabel: (todo) => todo.name,
+      omitNullOption: true
+    };
+
+    it("Fetches and displays initial resource options", async () => {
+      const wrapper = mountWithContext(
+        <ResourceSelect {...DEFAULT_SCOPED_SELECT_PROPS} />
+      );
+
+      await waitFor(() => {
+        expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      });
+
+      await userEvent.click(wrapper.getByRole("combobox"));
+
+      await waitFor(() => {
+        const options = wrapper.getAllByRole("option");
+        expect(options).toHaveLength(3);
+        expect(options.map((o) => o.textContent)).toEqual([
+          "todo 1",
+          "todo 2",
+          "todo 3"
+        ]);
+      });
+
+      // Ensure scope is rendered:
+      expect(wrapper.getByText(/status/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/all todos/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/active only/i)).toBeInTheDocument();
+    });
+
+    it("Applies selected scope filter and triggers a new API request", async () => {
+      const wrapper = mountWithContext(
+        <ResourceSelect {...DEFAULT_SCOPED_SELECT_PROPS} />
+      );
+
+      // Initial fetch using default scope ("all" because it's index 0 of the toggle)
+      await waitFor(() => {
+        expect(mockGet).toHaveBeenCalledWith("todo-api/todo", {
+          page: { limit: 6 },
+          sort: "-createdOn"
+        });
+      });
+
+      await userEvent.click(wrapper.getByRole("combobox"));
+
+      // Select the "Active Only" for status scope.
+      await userEvent.click(wrapper.getByText(/active only/i));
+
+      // Verifies new fetch with active scope filter applied
+      await waitFor(() => {
+        expect(mockGet).lastCalledWith("todo-api/todo", {
+          filter: { status: { EQ: "active" } },
+          page: { limit: 6 },
+          sort: "-createdOn"
+        });
+      });
+    });
+
+    it("Applies search input filtering via filter prop", async () => {
+      const wrapper = mountWithContext(
+        <ResourceSelect {...DEFAULT_SCOPED_SELECT_PROPS} />
+      );
+      await userEvent.click(wrapper.getByRole("combobox"));
+      await userEvent.type(wrapper.getByRole("combobox"), "todo 2");
+
+      await waitFor(() => {
+        expect(mockGet).lastCalledWith("todo-api/todo", {
+          filter: { name: "todo 2" },
+          page: { limit: 6 },
+          sort: "-createdOn"
+        });
+      });
+    });
+
+    it("Combines active scope filters and search filters together", async () => {
+      const wrapper = mountWithContext(
+        <ResourceSelect
+          {...DEFAULT_SCOPED_SELECT_PROPS}
+          defaultScopes={{ statusFilter: "active" }}
+        />
+      );
+      await userEvent.click(wrapper.getByRole("combobox"));
+      await userEvent.type(wrapper.getByRole("combobox"), "todo 2");
+
+      // Verifies new fetch with active scope filter applied
+      await waitFor(() => {
+        expect(mockGet).lastCalledWith("todo-api/todo", {
+          filter: { name: "todo 2", status: { EQ: "active" } },
+          page: { limit: 6 },
+          sort: "-createdOn"
+        });
+      });
     });
   });
 });

@@ -406,7 +406,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
 
     managedAttributes: {
       dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
-      endpoint: "objectstore-api/managed-attribute",
+      endpoint: "objectstore-api/controlled-vocabulary-item",
       managedAttributeComponent: "ENTITY"
     }
   }

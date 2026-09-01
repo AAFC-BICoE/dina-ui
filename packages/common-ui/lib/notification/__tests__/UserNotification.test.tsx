@@ -328,7 +328,7 @@ describe("UserNotification", () => {
       await userEvent.click(button);
 
       await waitFor(() => {
-        expect(wrapper.getByText(/No notifications/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/All caught up!/i)).toBeInTheDocument();
       });
     });
 
@@ -379,6 +379,28 @@ describe("UserNotification", () => {
         const cards = wrapper.container.querySelectorAll(".notification-card");
         expect(cards.length).toBe(3);
       });
+    });
+  });
+
+  describe("Notification Toasts", () => {
+    it("Does not display toasts on initial load for existing notifications", async () => {
+      mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
+
+      const wrapper = mountWithAppContext(<UserNotification />, {
+        apiContext: {
+          apiClient: { get: mockGet },
+          doOperations: mockDoOperations
+        }
+      });
+
+      await waitFor(() => {
+        expect(mockGet).toHaveBeenCalled();
+      });
+
+      // Toast stack items should not be present on initial render
+      const toastItems =
+        wrapper.container.querySelectorAll(".toast-stack-item");
+      expect(toastItems.length).toBe(0);
     });
   });
 

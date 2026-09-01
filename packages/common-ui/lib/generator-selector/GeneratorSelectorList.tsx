@@ -322,7 +322,7 @@ export function GeneratorSelectorList({
                 isDisabled={disabled}
                 omitNullOption={true}
                 additionalSort={"name"}
-                showGroupCategary={true}
+                groupBy="group"
                 onChange={(newValue) => {
                   if (newValue) {
                     setDynamicFieldValue((newValue as any)?.key);

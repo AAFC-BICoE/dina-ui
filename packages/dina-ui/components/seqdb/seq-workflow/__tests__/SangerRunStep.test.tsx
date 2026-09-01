@@ -1,4 +1,8 @@
-import { mountWithAppContext, waitForLoadingToDisappear, clearAndType } from "common-ui";
+import {
+  mountWithAppContext,
+  waitForLoadingToDisappear,
+  clearAndType
+} from "common-ui";
 import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
 import _ from "lodash";
 import { waitFor } from "@testing-library/react";
