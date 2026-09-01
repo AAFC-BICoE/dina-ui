@@ -967,7 +967,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   userMissingAgent: "Non lié",
   userMustBelongToGroup: "L’utilisateur doit appartenir à un groupe",
   userSearchPlaceholder: "Rechercher par nom d’utilisateur, nom, courriel ou agent",
-  userSearchPlaceholderWithoutAgent: "Rechercher par nom d’utilisateur, nom ou courriel",
   userViewTitle: "Utilisateur",
   valueCad: "Valeur ($ CA)",
   verbatimDeterminationLegend: "Détermination verbatim",

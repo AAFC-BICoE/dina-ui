@@ -47,22 +47,12 @@ const TEST_GROUPS: Group[] = [
   }
 ];
 
-/**
- * Whether the mocked User API advertises server-side filtering (meta.serverSideFiltering).
- * The mock never applies the fiql it receives, so in server-side mode the rows displayed are
- * exactly what the "server" returned, which shows that nothing is filtered client-side.
- */
-let serverSideFiltering = false;
-
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async (path: string) => {
   if (path === "user-api/group") {
     return {
       data: TEST_GROUPS,
-      meta: {
-        totalResourceCount: TEST_GROUPS.length,
-        ...(serverSideFiltering && { serverSideFiltering: true })
-      }
+      meta: { totalResourceCount: TEST_GROUPS.length }
     };
   }
   return { data: [] };
@@ -129,8 +119,7 @@ describe("Group list page", () => {
     expect(wrapper.getByText("super-user")).toBeInTheDocument();
     expect(wrapper.getByText("guest")).toBeInTheDocument();
 
-    // The full list is loaded once for in-memory filtering,
-    // without a fiql param (which the User API ignores)
+    // The full list is loaded once for in-memory filtering, without a fiql param
     expect(mockGet).toHaveBeenCalledWith(
       "user-api/group",
       expect.objectContaining({ page: { limit: 1000, offset: 0 } })
@@ -139,8 +128,7 @@ describe("Group list page", () => {
       "user-api/group",
       expect.not.objectContaining({ fiql: expect.anything() })
     );
-    // Sorting is in-memory too, so no sort param is sent (the Label column's id is a
-    // localized label path the table sorts by client-side)
+    // Sorting is in-memory too, so no sort param is sent
     expect(mockGet).not.toHaveBeenCalledWith(
       "user-api/group",
       expect.objectContaining({ sort: expect.anything() })
@@ -372,143 +360,5 @@ describe("Group list page", () => {
     expect(
       wrapper.getAllByText(/filtered from 3 total/i)[0]
     ).toBeInTheDocument();
-  });
-});
-
-describe("Group list page with a User API that filters server-side", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    window.localStorage.clear();
-    serverSideFiltering = true;
-  });
-
-  afterEach(() => {
-    serverSideFiltering = false;
-  });
-
-  it("Requests one page sorted by the server and searches the labels of each supported language.", async () => {
-    const wrapper = mountWithAppContext(<GroupListPage />, {
-      apiContext,
-      accountContext
-    });
-
-    await waitFor(() => {
-      expect(wrapper.getByText("cnc")).toBeInTheDocument();
-    });
-
-    // A single table page is requested, sorted by the server, instead of the whole list
-    expect(mockGet).toHaveBeenCalledWith(
-      "user-api/group",
-      expect.objectContaining({
-        page: { limit: 25, offset: 0 },
-        sort: "name"
-      })
-    );
-    expect(mockGet).not.toHaveBeenCalledWith(
-      "user-api/group",
-      expect.objectContaining({ page: { limit: 1000, offset: 0 } })
-    );
-
-    // The labels are searched per supported language (en,fr in the test context)
-    await clearAndType(
-      wrapper.getByRole("textbox", { name: /filter value/i }),
-      "asc"
-    );
-    await userEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
-
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        "user-api/group",
-        expect.objectContaining({
-          fiql: "name==*asc*,path==*asc*,labels.en==*asc*,labels.fr==*asc*"
-        })
-      );
-    });
-
-    // The rows are what the server returned (the mock ignores the fiql)
-    // nothing is filtered out client-side, and there is no "filtered from" count.
-    expect(wrapper.getByText("aafc")).toBeInTheDocument();
-    expect(wrapper.getByText("cnc")).toBeInTheDocument();
-    expect(wrapper.getByText("unlabelled")).toBeInTheDocument();
-    expect(wrapper.queryByText(/filtered from/i)).not.toBeInTheDocument();
-
-    // The Label column is sorted by the server on the current language's label
-    await userEvent.click(wrapper.getByText("Label"));
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        "user-api/group",
-        expect.objectContaining({ sort: "labels.en" })
-      );
-    });
-  });
-
-  it("Sends the membership, role and label-status filters as fiql.", async () => {
-    const wrapper = mountWithAppContext(<GroupListPage />, {
-      apiContext,
-      accountContext
-    });
-
-    await waitFor(() => {
-      expect(wrapper.getByText("cnc")).toBeInTheDocument();
-    });
-
-    // The current user's roles come from the account context, so the role filter is
-    // sent as the names of the groups where the user has that role
-    await selectOption(wrapper, ".role-field", "super-user");
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        "user-api/group",
-        expect.objectContaining({ fiql: "name=in=(aafc)" })
-      );
-    });
-
-    // A missing label is either absent or blank
-    await selectOption(wrapper, ".labelStatus-field", /unlabeled/i);
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        "user-api/group",
-        expect.objectContaining({
-          fiql: 'name=in=(aafc);(labels.en==null,labels.en=="")'
-        })
-      );
-    });
-
-    // Groups the user doesn't belong to
-    await selectOption(wrapper, ".membership-field", /other groups/i);
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        "user-api/group",
-        expect.objectContaining({
-          fiql: 'name!=aafc;name!=cnc;name=in=(aafc);(labels.en==null,labels.en=="")'
-        })
-      );
-    });
-  });
-
-  it("Combines the free-text search with the dropdown filters.", async () => {
-    const wrapper = mountWithAppContext(<GroupListPage />, {
-      apiContext,
-      accountContext
-    });
-
-    await waitFor(() => {
-      expect(wrapper.getByText("cnc")).toBeInTheDocument();
-    });
-
-    await clearAndType(
-      wrapper.getByRole("textbox", { name: /filter value/i }),
-      "cnc"
-    );
-    await userEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
-    await selectOption(wrapper, ".membership-field", /my groups/i);
-
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        "user-api/group",
-        expect.objectContaining({
-          fiql: "(name==*cnc*,path==*cnc*,labels.en==*cnc*,labels.fr==*cnc*);(name=in=(aafc,cnc))"
-        })
-      );
-    });
   });
 });

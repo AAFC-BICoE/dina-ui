@@ -75,13 +75,6 @@ const TEST_GROUPS = [
   }
 ];
 
-/**
- * Whether the mocked User API advertises server-side filtering (meta.serverSideFiltering).
- * The mock never applies the fiql it receives, so in server-side mode the rows displayed are
- * exactly what the "server" returned, which shows that nothing is filtered client-side.
- */
-let serverSideFiltering = false;
-
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async (path: string, params?: any) => {
   if (path === "user-api/user") {
@@ -97,10 +90,7 @@ const mockGet = jest.fn(async (path: string, params?: any) => {
       : TEST_GROUPS;
     return {
       data: groups,
-      meta: {
-        totalResourceCount: groups.length,
-        ...(serverSideFiltering && { serverSideFiltering: true })
-      }
+      meta: { totalResourceCount: groups.length }
     };
   }
   return { data: [] };
@@ -196,8 +186,7 @@ describe("Dina user list page", () => {
     // Realm-level admin roles are displayed as badges
     expect(wrapper.getByText("dina-admin")).toBeInTheDocument();
 
-    // The full list is loaded once for in-memory filtering,
-    // without a fiql param (which the User API ignores)
+    // The full list is loaded once for in-memory filtering, without a fiql param
     expect(mockGet).toHaveBeenCalledWith(
       "user-api/user",
       expect.objectContaining({ page: { limit: 1000, offset: 0 } })
@@ -367,108 +356,5 @@ describe("Dina user list page", () => {
     expect(
       wrapper.getAllByText(/filtered from 3 total/i)[0]
     ).toBeInTheDocument();
-  });
-});
-
-describe("Dina user list page with a User API that filters server-side", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    window.localStorage.clear();
-    serverSideFiltering = true;
-  });
-
-  afterEach(() => {
-    serverSideFiltering = false;
-  });
-
-  it("Requests one sorted page and sends the free-text search as fiql instead of filtering in-memory.", async () => {
-    const wrapper = mountWithAppContext(<DinaUserListPage />, { apiContext });
-
-    await waitFor(() => {
-      expect(wrapper.getByText("bob")).toBeInTheDocument();
-    });
-
-    // A single table page is requested, sorted by the server, instead of the whole list
-    expect(mockGet).toHaveBeenCalledWith(
-      "user-api/user",
-      expect.objectContaining({
-        page: { limit: 25, offset: 0 },
-        sort: "username"
-      })
-    );
-    expect(mockGet).not.toHaveBeenCalledWith(
-      "user-api/user",
-      expect.objectContaining({ page: { limit: 1000, offset: 0 } })
-    );
-
-    // The agent is joined client-side, so it can't be searched server-side
-    expect(
-      wrapper.getByPlaceholderText("Search by username, name or email")
-    ).toBeInTheDocument();
-
-    await clearAndType(
-      wrapper.getByRole("textbox", { name: /filter value/i }),
-      "arnold"
-    );
-    await userEvent.click(
-      wrapper.getByRole("button", { name: /filter list/i })
-    );
-
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        "user-api/user",
-        expect.objectContaining({
-          fiql: "username==*arnold*,firstName==*arnold*,lastName==*arnold*,emailAddress==*arnold*"
-        })
-      );
-    });
-
-    // The rows are what the server returned (the mock ignores the fiql)
-    // nothing is filtered out client-side, and there is no "filtered from" count.
-    expect(wrapper.getByText("alice")).toBeInTheDocument();
-    expect(wrapper.getByText("bob")).toBeInTheDocument();
-    expect(wrapper.getByText("legacy-user")).toBeInTheDocument();
-    expect(wrapper.queryByText(/filtered from/i)).not.toBeInTheDocument();
-  });
-
-  it("Sends the group, role and agent-link filters as fiql.", async () => {
-    const wrapper = mountWithAppContext(<DinaUserListPage />, { apiContext });
-
-    await waitFor(() => {
-      expect(wrapper.getByText("bob")).toBeInTheDocument();
-    });
-
-    // A group-based role with no group selected is searched across all the known groups
-    await selectOption(wrapper, ".role-field", "super-user");
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        "user-api/user",
-        expect.objectContaining({
-          fiql: "(rolesPerGroup.aafc==super-user,rolesPerGroup.cnc==super-user)"
-        })
-      );
-    });
-
-    // Within the selected group
-    await selectOption(wrapper, ".group-field", "CNC");
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        "user-api/user",
-        expect.objectContaining({ fiql: "rolesPerGroup.cnc==super-user" })
-      );
-    });
-
-    // Admin-based roles are stored in adminRoles; the group is then a membership check.
-    // The agent link is based on the agentId
-    await selectOption(wrapper, ".role-field", "dina-admin");
-    await selectOption(wrapper, ".agentLink-field", /^unlinked$/i);
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        "user-api/user",
-        expect.objectContaining({
-          fiql: "adminRoles==dina-admin;rolesPerGroup.cnc!=null;agentId==null"
-        })
-      );
-    });
   });
 });

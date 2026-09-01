@@ -136,16 +136,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   } else {
     let filterBuilderFiql = "";
     try {
-      // The free-text search is applied to the attributes currently passed by the page, 
-      // not to the ones saved with the filter form in localStorage, which may be stale 
-      // (e.g. the page's searchable attributes changed since the form was last submitted).
-      const filterBuilderModel =
-        filterType === ListLayoutFilterType.FREE_TEXT &&
-          filterForm.filterBuilderModel?.type === "FREE_TEXT_SEARCH_FILTER" &&
-          filterAttributes
-          ? { ...filterForm.filterBuilderModel, filterAttributes }
-          : filterForm.filterBuilderModel;
-      filterBuilderFiql = fiql(filterBuilderModel);
+      filterBuilderFiql = fiql(filterForm.filterBuilderModel);
     } catch (error) {
       // If there is an error, ignore the filter form instead of crashing the page.
       console.error(error);

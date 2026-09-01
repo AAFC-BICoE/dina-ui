@@ -4,7 +4,6 @@ import {
   FieldHeader,
   ListLayoutFilterType,
   ListPageLayout,
-  LoadingSpinner,
   SelectField,
   useQuery
 } from "common-ui";
@@ -20,11 +19,7 @@ import { PersistedResource } from "kitsu";
 import _ from "lodash";
 import Link from "next/link";
 import { useMemo } from "react";
-import {
-  GroupSelectField,
-  RoleBadges,
-  useUserApiFilteringSupport
-} from "../../components";
+import { GroupSelectField, RoleBadges } from "../../components";
 import PageLayout from "../../components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
@@ -34,25 +29,14 @@ import { DinaUser } from "../../types/user-api/resources/DinaUser";
 /* DinaUser with the Person record joined in client-side. */
 type DinaUserWithAgent = DinaUser & { agent?: Person };
 
-/* User API attributes searched by the free-text search. */
+/* Attributes searched by the free-text search. */
 const USER_FILTER_ATTRIBUTES = [
   "username",
   "firstName",
   "lastName",
-  "emailAddress"
-];
-
-/*
- * Attributes searched by the free-text search when filtering in-memory.
- * The agent's display name is joined client-side from the Agent API, so the User API can't search it.
- */
-const IN_MEMORY_USER_FILTER_ATTRIBUTES = [
-  ...USER_FILTER_ATTRIBUTES,
+  "emailAddress",
   "agent.displayName"
 ];
-
-/* fiql that matches no user (usernames are never blank), for filters that can't match anything. */
-const NO_USER_FIQL = 'username==""';
 
 const DEFAULT_SORT = [{ id: "username", desc: false }];
 
@@ -96,12 +80,10 @@ export function fullName({
 }
 
 /**
- * Applies the free-text search and the group / role / agent-link dropdown filters to a user,
- * when filtering in-memory (see useUserApiFilteringSupport), the visible user list is loaded
- * once and filtered client-side. The back-end already restricts which users are returned
- * based on the caller's roles.
+ * Applies the free-text search and the group / role / agent-link dropdown filters to a user.
  *
- * Must stay equivalent to userFiqlFilter, which is used when the User API filters server-side.
+ * Filtering is done in-memory: the visible user list is loaded once and filtered client-side.
+ * The back-end already restricts which users are returned based on the caller's roles.
  */
 export function userFilterFn(
   filterForm: any,
@@ -161,48 +143,6 @@ export function userFilterFn(
   return true;
 }
 
-/**
- * Converts the group / role / agent-link dropdown filters to fiql, for when the User API
- * filters server-side. (The free-text search is converted to fiql by the ListPageLayout.)
- *
- * rolesPerGroup is a map keyed by group name, which the User API can only filter by path
- * ("rolesPerGroup.<group>"), so a role in any group is an OR over all the known groups.
- *
- * Must stay equivalent to userFilterFn, which is used when filtering in-memory.
- */
-export function userFiqlFilter(filterForm: any, groupNames: string[]): string {
-  const group: string | undefined = filterForm?.group || undefined;
-  const role: string | undefined = filterForm?.role || undefined;
-  const agentLink: string | undefined = filterForm?.agentLink || undefined;
-
-  const clauses: string[] = [];
-
-  if (role && ADMIN_BASED_ROLES.includes(role)) {
-    clauses.push(`adminRoles==${role}`);
-    if (group) {
-      clauses.push(`rolesPerGroup.${group}!=null`);
-    }
-  } else if (role && group) {
-    clauses.push(`rolesPerGroup.${group}==${role}`);
-  } else if (role) {
-    clauses.push(
-      groupNames.length
-        ? `(${groupNames
-            .map((groupName) => `rolesPerGroup.${groupName}==${role}`)
-            .join(",")})`
-        : NO_USER_FIQL
-    );
-  } else if (group) {
-    clauses.push(`rolesPerGroup.${group}!=null`);
-  }
-
-  if (agentLink) {
-    clauses.push(agentLink === HAS_AGENT ? "agentId!=null" : "agentId==null");
-  }
-
-  return clauses.join(";");
-}
-
 interface GroupRolesListProps {
   rolesPerGroup?: Record<string, string[] | undefined>;
   /* All groups keyed by name, to link each group and show its localized label. */
@@ -250,16 +190,9 @@ function GroupRolesList({
 export default function DinaUserListPage() {
   const { formatMessage, locale } = useDinaIntl();
 
-  // Filter server-side when the User API supports it, in-memory otherwise.
-  const { loading: filteringSupportLoading, serverSideFiltering } =
-    useUserApiFilteringSupport();
-
   // Load the groups once for the whole table
-  // (labels, links and the server-side role filter)
-  // instead of one request per cell
-  const { response: groupsResponse, loading: groupsLoading } = useQuery<
-    Group[]
-  >({
+  // (labels and links) instead of one request per cell.
+  const { response: groupsResponse } = useQuery<Group[]>({
     path: "user-api/group",
     page: { limit: 1000 }
   });
@@ -268,7 +201,6 @@ export default function DinaUserListPage() {
     () => _.keyBy(groupsResponse?.data ?? [], "name"),
     [groupsResponse]
   );
-  const groupNames = useMemo(() => Object.keys(groupsByName), [groupsByName]);
 
   const columns: ColumnDefinition<DinaUserWithAgent>[] = useMemo(
     () => [
@@ -378,42 +310,17 @@ export default function DinaUserListPage() {
     [columns]
   );
 
-  // Mount the list once the filtering mode is known
-  // (and the groups the server-side role filter depends on are loaded),
-  // so the list isn't requested twice.
-  if (filteringSupportLoading || groupsLoading) {
-    return (
-      <PageLayout titleId="userListTitle">
-        <LoadingSpinner loading={true} />
-      </PageLayout>
-    );
-  }
-
   return (
     <PageLayout titleId="userListTitle">
       <ListPageLayout<DinaUserWithAgent>
         id="user-list"
         filterType={ListLayoutFilterType.FREE_TEXT}
-        filterAttributes={
-          serverSideFiltering
-            ? USER_FILTER_ATTRIBUTES
-            : IN_MEMORY_USER_FILTER_ATTRIBUTES
-        }
+        filterAttributes={USER_FILTER_ATTRIBUTES}
         filterFormClassName="list-filter-panel"
-        filterPlaceholder={formatMessage(
-          serverSideFiltering
-            ? "userSearchPlaceholderWithoutAgent"
-            : "userSearchPlaceholder"
-        )}
-        // Re-filtering as the user types is only cheap in-memory.
-        // Server-side, each search is a request that has the User API re-read the users from Keycloak.
-        liveSearch={!serverSideFiltering}
-        enableInMemoryFilter={!serverSideFiltering}
+        filterPlaceholder={formatMessage("userSearchPlaceholder")}
+        liveSearch={true}
+        enableInMemoryFilter={true}
         filterFn={userFilterFn}
-        // Ignored in in-memory mode.
-        additionalFiqlFilters={(filterForm) =>
-          userFiqlFilter(filterForm, groupNames)
-        }
         filterFormchildren={({ submitForm }) => (
           <div className="d-flex gap-3 flex-wrap">
             <div style={{ width: "230px" }}>
