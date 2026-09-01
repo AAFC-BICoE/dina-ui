@@ -173,12 +173,47 @@ const mockSave = jest.fn((ops) =>
   }))
 );
 
+const mockPost = jest.fn((path) => {
+  if (path === "search-api/search-ws/search") {
+    return {
+      data: {
+        hits: {
+          total: {
+            value: 2
+          },
+          hits: [
+            {
+              _source: {
+                data: {
+                  id: TEST_METADATA_1.id,
+                  type: "metadata",
+                  attributes: TEST_METADATA_1
+                }
+              }
+            },
+            {
+              _source: {
+                data: {
+                  id: TEST_METADATA_2.id,
+                  type: "metadata",
+                  attributes: TEST_METADATA_2
+                }
+              }
+            }
+          ]
+        }
+      }
+    };
+  }
+});
+
 const testCtx = {
   apiContext: {
     apiClient: {
       get: mockGet,
       axios: {
-        get: mockGet
+        get: mockGet,
+        post: mockPost
       }
     },
     bulkGet: mockBulkGet,
@@ -309,6 +344,106 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
           wrapper.getByText(/1 attachment was found./i)
         ).toBeInTheDocument();
       });
+    });
+
+    it("Can individually add an attachment to a run item", async () => {
+      const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Click the first "Add" button on the page.
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[0]
+      );
+      await waitForLoadingToDisappear();
+
+      // Click the "Attach Existing Objects" tab.
+      await userEvent.click(
+        wrapper.getByRole("tab", { name: /attach existing objects/i })
+      );
+      await waitForLoadingToDisappear();
+
+      // Select everything, only 2 records returned by elasticsearch mock.
+      await userEvent.click(
+        wrapper.getByRole("checkbox", { name: /check all/i })
+      );
+
+      // Click the "Attach Selected".
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /attach selected/i })
+      );
+      await waitForLoadingToDisappear();
+
+      // Expect the result with the two material samples.
+      expect(mockSave).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            resource: {
+              createdBy: "test-user",
+              group: "aafc",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      type: "metadata"
+                    },
+                    {
+                      id: "d15ddb56-180c-4a70-a10e-d9b7845adbf5",
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+
+      // Now update the run item to have the result added in.
+      expect(mockSave).toHaveBeenNthCalledWith(
+        2,
+        [
+          {
+            resource: {
+              id: "f65ed036-eb92-40d9-af03-d027646e8948",
+              name: "Provided run item name",
+              relationships: {
+                result: {
+                  data: {
+                    id: "saved-id-123",
+                    type: "molecular-analysis-result"
+                  }
+                },
+                run: {
+                  attachments: [
+                    {
+                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      type: "metadata"
+                    }
+                  ],
+                  group: "aafc",
+                  id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
+                  name: "run-name-1",
+                  type: "molecular-analysis-run"
+                }
+              },
+              type: "molecular-analysis-run-item",
+              usageType: "hrms"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+
+      // Should appear for the quality controls and now for the run items.
+      expect(
+        (await wrapper.findAllByRole("link", { name: "canada.jpg" })).length
+      ).toBe(2);
     });
 
     it("Sequencing Run Content displays error messages for deleted or missing attachments", async () => {
