@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataDetails } from "../MetadataDetails";
-import { screen, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
@@ -51,23 +51,18 @@ const apiContext: any = {
 
 describe("MetadataDetails component", () => {
   it("Renders the metadata details.", async () => {
-    mountWithAppContext(<MetadataDetails metadata={TEST_METADATA} />, {
-      apiContext
-    });
+    const wrapper = mountWithAppContext(
+      <MetadataDetails metadata={TEST_METADATA} />,
+      {
+        apiContext
+      }
+    );
 
     await waitFor(() => {
+      expect(wrapper.getByText(/attr1 value/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/attr2 value/i)).toBeInTheDocument();
       expect(
-        screen.getByRole("img", {
-          name: /attr1 value/i
-        })
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole("img", {
-          name: /attr2 value/i
-        })
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole("cell", {
+        wrapper.getByRole("cell", {
           name: /cf99c285\-0353\-4fed\-a15d\-ac963e0514f3/i
         })
       ).toBeInTheDocument();

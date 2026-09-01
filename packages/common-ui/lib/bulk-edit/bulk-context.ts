@@ -29,10 +29,18 @@ export enum ClearType {
 export interface BulkEditTabContextI<T extends KitsuResource = KitsuResource> {
   bulkEditFormRef: RefObject<FormikProps<InputResource<T>> | null>;
   resourceHooks: ResourceWithHooks<T>[];
+
+  // Indicate which fields are in "append" mode, otherwise it's considered a replace.
+  appendFields?: Set<string>;
+  setAppendFields?: React.Dispatch<React.SetStateAction<Set<string>>>;
+
+  // Indicate which fields the user wishes to empty the value.
   clearedFields?: Map<string, ClearType>;
   setClearedFields?: React.Dispatch<
     React.SetStateAction<Map<string, ClearType>>
   >;
+
+  // Indiciate which fields should be deleted/removed.
   deletedFields?: Set<string>;
   setDeletedFields?: React.Dispatch<React.SetStateAction<Set<string>>>;
 }

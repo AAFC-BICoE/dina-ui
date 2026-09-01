@@ -674,6 +674,30 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   padding: 0.75rem;
 }
 
+/* Tooltip */
+.tooltip-info-icon {
+  color: #1c578a;
+  margin-bottom: 3px;
+  cursor: pointer;
+  border-radius: 50%;
+  outline: none;
+  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.info-icon-hover:focus {
+  outline: none;
+}
+
+.tooltip-info-icon:hover {
+  color: #12395b;
+  transform: scale(1.15);
+}
+
+.tooltip-info-icon:focus-visible {
+  outline: 2px solid #12395b !important;
+  outline-offset: 2px; 
+  color: #12395b;
+  transform: scale(1.15);
 .notification-card {
   position: relative;
   transition: 
@@ -720,4 +744,5 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   5%   { transform: rotate(3deg); }
   6%   { transform: rotate(0deg); }
   100% { transform: rotate(0deg); }
+}
 }

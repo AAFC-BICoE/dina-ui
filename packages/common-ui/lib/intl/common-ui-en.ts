@@ -11,6 +11,12 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   addNew: "Add New",
   agricultureCanada: "Agriculture and Agri-Food Canada",
   areYouSure: "Are you sure?",
+  append: "Append",
+  append_tooltip:
+    "In append mode, tags entered here will be added to each record's existing tags rather than replacing them.",
+  replace: "Replace",
+  replace_tooltip:
+    "In replace mode, tags entered here will overwrite all existing tags for each record.",
   linked: "Linked Collecting Event",
   attributeLabel: "Attribute",
   autoFillGeoSuggestLabel:
