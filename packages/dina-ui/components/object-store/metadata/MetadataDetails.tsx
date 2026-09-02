@@ -97,6 +97,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         <ManagedAttributesViewer
           values={metadata.managedAttributes}
           managedAttributeApiPath="objectstore-api/controlled-vocabulary-item"
+          managedAttributeComponent="METADATA"
         />
       </CollapsableSection>
 

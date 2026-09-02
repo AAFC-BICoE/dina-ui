@@ -67,5 +67,19 @@ describe("MetadataDetails component", () => {
         })
       ).toBeInTheDocument();
     });
+    expect(mockGet).toHaveBeenCalledWith(
+      "objectstore-api/controlled-vocabulary-item",
+      {
+        filter: {
+          dinaComponent: {
+            EQ: "METADATA"
+          },
+          key: {
+            IN: "0763db31-a0c9-43f8-b7fc-705a783c35df,e5b9765e-1246-4119-b4e4-8d2267175662"
+          }
+        },
+        page: { limit: 2 }
+      }
+    );
   });
 });
