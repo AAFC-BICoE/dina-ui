@@ -22,6 +22,7 @@ import { useManagedAttributeQueries } from "./useManagedAttributeQueries";
 import _ from "lodash";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "../controlled-vocabulary/controlledVocabularyItemUtils";
 import { useIntl } from "react-intl";
+import { ManagedAttributesViewer } from "./ManagedAttributesViewer";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -123,7 +124,7 @@ function ManagedAttributesEditorInner({
     keys: visibleAttributeKeys,
     managedAttributeApiPath,
     managedAttributeComponent,
-    disabled: !visibleAttributeKeys.length,
+    disabled: readOnly || !visibleAttributeKeys.length,
     isControlledVocabulary,
     controlledVocabularyId
   });
@@ -196,17 +197,14 @@ function ManagedAttributesEditorInner({
         </FieldSet>
       )}
       {readOnly && (
-        <div className="row">
-          {visibleAttributes.map((attribute) => (
-            <ManagedAttributeFieldWithLabel
-              key={attribute.key}
-              attribute={attribute}
-              values={values}
-              valuesPath={valuesPath}
-              disableClearButton={disableClearButton}
-            />
-          ))}
-        </div>
+        <ManagedAttributesViewer
+          values={currentValue}
+          managedAttributeApiPath={managedAttributeApiPath}
+          managedAttributeComponent={managedAttributeComponent}
+          controlledVocabularyId={
+            isControlledVocabulary ? controlledVocabularyId : undefined
+          }
+        />
       )}
     </>
   );

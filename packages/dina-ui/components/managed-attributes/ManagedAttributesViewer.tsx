@@ -9,7 +9,10 @@ import _ from "lodash";
 import { ManagedAttribute } from "../../types/collection-api";
 import { useEffect, useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { getManagedAttributeTooltipText } from "./ManagedAttributeField";
+import {
+  getManagedAttributeTitle,
+  getManagedAttributeTooltipText
+} from "./ManagedAttributeField";
 
 export interface ManagedAttributesViewerProps {
   /**
@@ -19,12 +22,14 @@ export interface ManagedAttributesViewerProps {
   values?: Record<string, string | null | undefined> | null;
   managedAttributeApiPath: string;
   managedAttributeComponent?: string;
+  controlledVocabularyId?: string;
 }
 
 export function ManagedAttributesViewer({
   values,
   managedAttributeApiPath,
-  managedAttributeComponent
+  managedAttributeComponent,
+  controlledVocabularyId
 }: ManagedAttributesViewerProps) {
   const { locale, formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
@@ -49,6 +54,13 @@ export function ManagedAttributesViewer({
               .when(!!managedAttributeComponent, (builder) =>
                 builder.where("dinaComponent", "EQ", managedAttributeComponent)
               )
+              .when(!!controlledVocabularyId, (builder) =>
+                builder.where(
+                  "controlledVocabulary.uuid" as any,
+                  "EQ",
+                  controlledVocabularyId
+                )
+              )
               .build(),
             page: { limit: managedAttributeKeys.length }
           }
@@ -57,7 +69,7 @@ export function ManagedAttributesViewer({
           (accu, obj) => ({
             ...accu,
             [obj.key]: {
-              name: obj.name,
+              name: getManagedAttributeTitle(obj as any, locale),
               multilingualDescription: obj.multilingualDescription
             }
           }),

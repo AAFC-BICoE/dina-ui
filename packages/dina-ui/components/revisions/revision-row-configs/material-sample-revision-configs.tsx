@@ -14,7 +14,7 @@ import { Metadata, Person } from "../../../types/objectstore-api";
 import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
-import { ControlledVocabularyViewer } from "@dina-ui/components/controlled-vocabulary/ControlledVocabularyViewer";
+import { ManagedAttributesViewer } from "@dina-ui/components/managed-attributes/ManagedAttributesViewer";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSample> =
@@ -31,11 +31,11 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           original: { value }
         }
       }) => (
-        <ControlledVocabularyViewer
+        <ManagedAttributesViewer
           values={value}
-          baseApi="collection-api"
-          dinaComponent="MATERIAL_SAMPLE"
-          controlledVocabularyUUID={COLLECTION_MANAGED_ATTRIBUTE_ID}
+          managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+          managedAttributeComponent="MATERIAL_SAMPLE"
+          controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
         />
       ),
 
