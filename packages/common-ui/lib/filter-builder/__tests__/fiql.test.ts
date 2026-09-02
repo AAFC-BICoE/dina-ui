@@ -1,6 +1,6 @@
 import { FilterParam } from "kitsu";
 import { FilterGroupModel } from "../FilterGroup";
-import { fiql, simpleSearchFilterToFiql } from "../fiql";
+import { fiql, fiqlArgument, simpleSearchFilterToFiql } from "../fiql";
 
 describe("fiql conversion", () => {
   it("Converts from a filter model to fiql.", () => {
@@ -656,6 +656,66 @@ describe("fiql conversion", () => {
     it("Returns an empty string when an empty FilterParam is provided.", () => {
       const fiqlFilter = simpleSearchFilterToFiql({});
       expect(fiqlFilter).toEqual("");
+    });
+  });
+
+  describe("free-text search", () => {
+    it("Converts a free-text search to an OR of partial matches on each attribute.", () => {
+      const fiqlFilter = fiql({
+        type: "FREE_TEXT_SEARCH_FILTER",
+        value: "john",
+        filterAttributes: ["username", "labels.en"]
+      });
+      expect(fiqlFilter).toEqual("username==*john*,labels.en==*john*");
+    });
+
+    it("Quotes values with spaces or characters that can't appear unquoted in fiql.", () => {
+      expect(
+        fiql({
+          type: "FREE_TEXT_SEARCH_FILTER",
+          value: "John Smith",
+          filterAttributes: ["name"]
+        })
+      ).toEqual('name=="*John Smith*"');
+
+      expect(
+        fiql({
+          type: "FREE_TEXT_SEARCH_FILTER",
+          value: "john@example.com",
+          filterAttributes: ["emailAddress"]
+        })
+      ).toEqual('emailAddress=="*john@example.com*"');
+    });
+
+    it("Quotes partial and exact match filter row values when needed.", () => {
+      const model: FilterGroupModel = {
+        children: [
+          {
+            attribute: "name",
+            id: 1,
+            predicate: "IS",
+            searchType: "PARTIAL_MATCH",
+            type: "FILTER_ROW",
+            value: "John Smith"
+          }
+        ],
+        id: 2,
+        operator: "AND",
+        type: "FILTER_GROUP"
+      };
+      expect(fiql(model)).toEqual('name=="*John Smith*"');
+    });
+  });
+
+  describe("fiqlArgument", () => {
+    it("Leaves simple values unquoted.", () => {
+      expect(fiqlArgument("abc-123.4/x:y*")).toEqual("abc-123.4/x:y*");
+    });
+
+    it("Quotes values with reserved characters and drops double quotes, which can't be escaped.", () => {
+      expect(fiqlArgument("a b")).toEqual('"a b"');
+      expect(fiqlArgument("a;b,c(d)")).toEqual('"a;b,c(d)"');
+      expect(fiqlArgument('say "hi"')).toEqual('"say hi"');
     });
   });
 });
