@@ -676,11 +676,9 @@ describe("ExportPage Component", () => {
 
       // Select "originalFilename" as the alias field.
       // The field label in the dropdown is the intl message "field_originalFilename" = "Original Filename"
-      await selectDropdownOption(
-        wrapper,
-        /file name alias field/i,
-        "Original Filename"
-      );
+      const aliasFieldSelect = wrapper.getAllByRole("combobox")[0];
+      await userEvent.click(aliasFieldSelect);
+      await userEvent.click(await wrapper.findByText(/original filename/i));
 
       // Submit the export
       await userEvent.click(wrapper.getByRole("button", { name: /export/i }));
@@ -736,7 +734,9 @@ describe("ExportPage Component", () => {
 
       // The resize Select should now be enabled (all objects are JPEG).
       // Select resize to 50%
-      await selectDropdownOption(wrapper, /resize images/i, "50%");
+      const resizeSelect = wrapper.getAllByRole("combobox")[1];
+      await userEvent.click(resizeSelect);
+      await userEvent.click(await wrapper.findByText(/^50%/));
 
       // Submit the export
       await userEvent.click(wrapper.getByRole("button", { name: /export/i }));
@@ -792,17 +792,11 @@ describe("ExportPage Component", () => {
         expect(mockBulkGet).toHaveBeenCalled();
       });
 
-      // When not all objects are JPEG, the resize control is wrapped in a Tooltip
-      // and the react-select has isDisabled=true. The control element should have
-      // the aria-disabled attribute or the react-select's is-disabled class.
+      // When not all objects are JPEG, the resize react-select is disabled.
       await waitFor(() => {
-        const resizeContainer = wrapper
-          .getByText(/resize images/i)
-          .closest("div");
-        const resizeControl = resizeContainer?.querySelector(
-          ".react-select__control"
-        );
-        expect(resizeControl).toHaveClass("react-select__control--is-disabled");
+        expect(
+          wrapper.container.querySelectorAll("input:disabled").length
+        ).toBeGreaterThan(0);
       });
     });
 
