@@ -216,8 +216,7 @@ describe("ExportPage Component", () => {
         expect(wrapper.getByText(/visible to group/i)).toBeInTheDocument();
 
         // Tabbed separator should be selected.
-        // Todo: this seems to be broken.
-        // expect(wrapper.getByText("Tab")).toBeInTheDocument();
+        expect(wrapper.getByText("Tab")).toBeInTheDocument();
 
         // Submit the export to ensure the network request is setup properly.
         await userEvent.click(wrapper.getByRole("button", { name: "Export" }));
@@ -227,7 +226,7 @@ describe("ExportPage Component", () => {
               {
                 resource: {
                   exportOptions: {
-                    columnSeparator: "COMMA"
+                    columnSeparator: "TAB"
                   },
                   functions: undefined,
                   name: undefined,
@@ -412,7 +411,7 @@ describe("ExportPage Component", () => {
               data: {
                 attributes: {
                   exportOptions: {
-                    columnSeparator: "COMMA"
+                    columnSeparator: "TAB"
                   },
                   exportType: "TABULAR_DATA",
                   functions: undefined,
@@ -437,6 +436,26 @@ describe("ExportPage Component", () => {
             expect.any(Object)
           );
         });
+      });
+
+      it("Shows Save Changes after changing the separator", async () => {
+        const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+        await waitForLoadingToDisappear();
+
+        await selectDropdownOption(
+          wrapper,
+          /select export template/i,
+          "Material Sample Demo"
+        );
+        await waitForLoadingToDisappear();
+
+        expect(wrapper.queryByText(/save changes/i)).not.toBeInTheDocument();
+
+        const separatorSelect = wrapper.getAllByRole("combobox")[0];
+        await userEvent.click(separatorSelect);
+        await userEvent.click(await wrapper.findByText(/^Comma$/));
+
+        expect(wrapper.getByText(/save changes/i)).toBeInTheDocument();
       });
     });
 

@@ -605,11 +605,14 @@ export default function ExportPage<TData extends KitsuResource>() {
                           onChange={(selection) => {
                             if (selection) {
                               setSelectedSeparator(selection);
+                              if (selectedSavedExport) {
+                                setChangesMade(true);
+                              }
                             }
                           }}
                           isLoading={loadingSavedExports}
                           isDisabled={loading}
-                          defaultValue={selectedSeparator}
+                          value={selectedSeparator}
                         />
                       </div>
                       <div className="col-md-4">
@@ -627,6 +630,15 @@ export default function ExportPage<TData extends KitsuResource>() {
                           onChange={(selection) => {
                             if (selection && selection.resource) {
                               setSelectedSavedExport(selection.resource);
+                              const separator = SEPARATOR_OPTIONS.find(
+                                (option) =>
+                                  option.value ===
+                                  selection.resource?.exportOptions
+                                    ?.columnSeparator
+                              );
+                              if (separator) {
+                                setSelectedSeparator(separator);
+                              }
                             }
                           }}
                           isLoading={loadingSavedExports}
