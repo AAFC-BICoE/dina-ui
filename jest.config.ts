@@ -1,6 +1,13 @@
 import type { Config } from "@jest/types";
 
+// Always show the "Summary of all failing tests" block whenever more than one
+// test suite runs. Jest's default threshold of 20 hid it in CI chunks of ~20 files.
+const reporters: NonNullable<Config.InitialOptions["reporters"]> = [
+  ["default", { summaryThreshold: 1 }]
+];
+
 const config: Config.InitialOptions = {
+  reporters,
   collectCoverageFrom: ["**/*.{ts,tsx,js,jsx}"],
   coveragePathIgnorePatterns: [
     "/node_modules/",
