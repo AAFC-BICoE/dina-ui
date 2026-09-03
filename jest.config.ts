@@ -11,6 +11,8 @@ const reporters: NonNullable<Config.InitialOptions["reporters"]> = [
 // prints these codes unconditionally, so only enable it on GitHub Actions runners.
 if (process.env.GITHUB_ACTIONS === "true") {
   reporters.push("github-actions");
+  // appends markdown failure digest (failing tests, messages, and a local rerun command) to the job's Summary page
+  reporters.push("<rootDir>/jest-ci-summary-reporter.js");
 }
 
 const config: Config.InitialOptions = {
@@ -26,6 +28,8 @@ const config: Config.InitialOptions = {
     "/dina-ui/intl",
     "/jest.config.ts",
     "/jest.setup.js",
+    "/jest-ci-summary-reporter.js",
+    "/jest-ci-compose-report.js",
     "/next.config.js",
     "index.ts",
     "types.ts",
