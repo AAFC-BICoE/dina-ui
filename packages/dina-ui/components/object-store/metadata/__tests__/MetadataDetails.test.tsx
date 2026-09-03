@@ -4,6 +4,7 @@ import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataDetails } from "../MetadataDetails";
 import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { OBJECT_STORE_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2"],
@@ -59,18 +60,22 @@ describe("MetadataDetails component", () => {
     );
 
     await waitFor(() => {
-      expect(wrapper.getByText(/attr1 value/i)).toBeInTheDocument();
-      expect(wrapper.getByText(/attr2 value/i)).toBeInTheDocument();
+      expect(wrapper.getAllByText(/attr1 value/i)[0]).toBeInTheDocument();
+      expect(wrapper.getAllByText(/attr2 value/i)[0]).toBeInTheDocument();
       expect(
         wrapper.getByRole("cell", {
           name: /cf99c285\-0353\-4fed\-a15d\-ac963e0514f3/i
         })
       ).toBeInTheDocument();
     });
+
     expect(mockGet).toHaveBeenCalledWith(
       "objectstore-api/controlled-vocabulary-item",
       {
         filter: {
+          "controlledVocabulary.uuid": {
+            EQ: OBJECT_STORE_MANAGED_ATTRIBUTE_ID
+          },
           dinaComponent: {
             EQ: "METADATA"
           },
