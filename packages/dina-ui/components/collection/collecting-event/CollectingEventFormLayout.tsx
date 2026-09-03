@@ -54,6 +54,7 @@ import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
 import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 import { GeographyFormLayout } from "./GeographyFormLayout";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -181,6 +182,7 @@ export function CollectingEventFormLayout({
       valuesPath="managedAttributes"
       managedAttributeApiPath="collection-api/controlled-vocabulary-item"
       managedAttributeComponent="COLLECTING_EVENT"
+      controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
       fieldSetProps={{
         legend: <DinaMessage id="collectingEventManagedAttributes" />,
         componentName: COLLECTING_EVENT_COMPONENT_NAME,

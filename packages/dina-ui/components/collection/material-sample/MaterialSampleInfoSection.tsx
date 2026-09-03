@@ -18,6 +18,7 @@ import { MaterialSampleStateReadOnlyRender } from "../MaterialSampleStateWarning
 import _ from "lodash";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
   "materialSampleRemarks",
@@ -123,6 +124,7 @@ export function MaterialSampleInfoSection({
               valuesPath="managedAttributes"
               managedAttributeApiPath="collection-api/controlled-vocabulary-item"
               managedAttributeComponent="MATERIAL_SAMPLE"
+              controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
               fieldSetProps={{
                 id,
                 legend: <DinaMessage id="materialSampleManagedAttributes" />

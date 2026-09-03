@@ -12,8 +12,7 @@ export interface UseBulkGetParams {
   /**
    * The base API path for the managed attributes or controlled vocabulary items.
    *
-   * If fetching managed attributes, this would be the path to the managed attribute API (e.g., "collection-api/managed-attribute").
-   * If fetching controlled vocabulary items, this would be the path to the controlled vocabulary item API (e.g., "collection-api").
+   * e.g., "collection-api/managed-attribute" or "collection-api/controlled-vocabulary-item"
    */
   baseApiPath: string;
 
@@ -82,34 +81,29 @@ export function useBulkManagedAttributes({
 
     const { data } = await apiClient.get<
       (ManagedAttribute | ControlledVocabularyItem)[]
-    >(
-      isControlledVocabulary
-        ? baseApiPath + "/controlled-vocabulary-item"
-        : baseApiPath,
-      {
-        header: headers,
-        filter: SimpleSearchFilterBuilder.create()
-          .whereIn("key", keysToFetch)
-          .when(!!dinaComponent, (builder) =>
-            builder.where(
-              isControlledVocabulary
-                ? "dinaComponent"
-                : "managedAttributeComponent",
-              "EQ",
-              dinaComponent
-            )
+    >(baseApiPath, {
+      header: headers,
+      filter: SimpleSearchFilterBuilder.create()
+        .whereIn("key", keysToFetch)
+        .when(!!dinaComponent, (builder) =>
+          builder.where(
+            isControlledVocabulary
+              ? "dinaComponent"
+              : "managedAttributeComponent",
+            "EQ",
+            dinaComponent
           )
-          .when(isControlledVocabulary, (builder) =>
-            builder.where(
-              "controlledVocabulary.uuid",
-              "EQ",
-              controlledVocabularyId
-            )
+        )
+        .when(isControlledVocabulary, (builder) =>
+          builder.where(
+            "controlledVocabulary.uuid",
+            "EQ",
+            controlledVocabularyId
           )
-          .build(),
-        page: { limit: keysToFetch.length }
-      }
-    );
+        )
+        .build(),
+      page: { limit: keysToFetch.length }
+    });
 
     return data ?? [];
   };

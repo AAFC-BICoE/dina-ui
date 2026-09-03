@@ -234,15 +234,9 @@ describe("ManagedAttributesEditor component", () => {
       dinaComponent: "SITE"
     };
 
-    const mockGetCV = jest.fn<any, any>(async (path, params) => {
+    const mockGetCV = jest.fn<any, any>(async (path) => {
       switch (path) {
         case "collection-api/controlled-vocabulary-item":
-          if (params?.filter?.key?.EQ === "example_attribute_1") {
-            return { data: [EXAMPLE_CV_1] };
-          }
-          if (params?.filter?.key?.EQ === "example_attribute_2") {
-            return { data: [EXAMPLE_CV_2] };
-          }
           return { data: [EXAMPLE_CV_1, EXAMPLE_CV_2] };
         case "user-api/group":
           return { data: [] };
@@ -263,6 +257,7 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/controlled-vocabulary-item"
           managedAttributeComponent="SITE"
+          controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
           disableClearButton={true}
           isControlledVocabulary={true}
         />
@@ -272,58 +267,22 @@ describe("ManagedAttributesEditor component", () => {
 
     // Wait for the data to load and ensure the filter uses dinaComponent instead of managedAttributeComponent.
     await waitFor(() => {
-      expect(mockGetCV.mock.calls).toEqual(
-        expect.arrayContaining([
-          // Fetch for example_attribute_1 using dinaComponent filter
-          [
-            "collection-api/controlled-vocabulary-item",
-            {
-              header: {
-                Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json"
-              },
-              filter: {
-                dinaComponent: {
-                  EQ: "SITE"
-                },
-                "controlledVocabulary.uuid": {
-                  EQ: COLLECTION_MANAGED_ATTRIBUTE_ID
-                },
-                key: {
-                  EQ: "example_attribute_1"
-                }
-              }
+      expect(mockGetCV.mock.calls[0]).toEqual([
+        "collection-api/controlled-vocabulary-item",
+        {
+          filter: {
+            "controlledVocabulary.uuid": {
+              EQ: COLLECTION_MANAGED_ATTRIBUTE_ID
+            },
+            dinaComponent: {
+              EQ: "SITE"
+            },
+            key: {
+              IN: "example_attribute_1,example_attribute_2"
             }
-          ],
-          // Fetch for example_attribute_2 using dinaComponent filter
-          [
-            "collection-api/controlled-vocabulary-item",
-            {
-              header: {
-                Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json"
-              },
-              filter: {
-                dinaComponent: {
-                  EQ: "SITE"
-                },
-                "controlledVocabulary.uuid": {
-                  EQ: COLLECTION_MANAGED_ATTRIBUTE_ID
-                },
-                key: {
-                  EQ: "example_attribute_2"
-                }
-              }
-            }
-          ]
-        ])
-      );
-
-      // Also verify managedAttributeComponent filter was never used
-      const calls = mockGetCV.mock.calls;
-      calls.forEach(([_, params]) => {
-        expect(params?.filter).not.toHaveProperty("managedAttributeComponent");
-      });
+          }
+        }
+      ]);
     });
 
     // Verify that the correct input values are still rendered correctly.

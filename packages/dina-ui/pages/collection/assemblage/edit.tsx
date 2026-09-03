@@ -30,6 +30,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttributesEditor } from "../../../components/managed-attributes/ManagedAttributesEditor";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 interface AssemblageFormProps {
   fetchedAssemblage?: Assemblage;
@@ -212,6 +213,7 @@ export function AssemblageFormLayout() {
         valuesPath="managedAttributes"
         managedAttributeApiPath="collection-api/controlled-vocabulary-item"
         managedAttributeComponent="ASSEMBLAGE"
+        controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
         fieldSetProps={{
           legend: <DinaMessage id="assemblageManagedAttributes" />
         }}

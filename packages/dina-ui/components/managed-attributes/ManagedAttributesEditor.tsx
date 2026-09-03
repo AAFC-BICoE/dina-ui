@@ -70,16 +70,6 @@ export interface ManagedAttributesEditorProps {
    * Defaults to the collection managed attribute vocabulary.
    */
   controlledVocabularyId?: string;
-
-  /**
-   * In read only mode, what type of viewer to display. If not specified, no viewer is displayed.
-   * Options:
-   * - "controlledVocabularyViewer": Displays a ControlledVocabularyViewer.
-   * - "managedAttributesViewer": [DEPRECATED] Displays a ManagedAttributesViewer. (Default for backward compatibility.)
-   *
-   * If not specified, no viewer is displayed in read only mode.
-   */
-  readOnlyViewMode?: "controlledVocabularyViewer" | "managedAttributesViewer";
 }
 
 interface ManagedAttributesEditorInnerProps
@@ -100,8 +90,7 @@ function ManagedAttributesEditorInner({
   disableClearButton = false,
   values,
   isControlledVocabulary = false,
-  controlledVocabularyId = COLLECTION_MANAGED_ATTRIBUTE_ID,
-  readOnlyViewMode = "managedAttributesViewer"
+  controlledVocabularyId = COLLECTION_MANAGED_ATTRIBUTE_ID
 }: ManagedAttributesEditorInnerProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
@@ -207,7 +196,7 @@ function ManagedAttributesEditorInner({
           </div>
         </FieldSet>
       )}
-      {readOnly && readOnlyViewMode === "managedAttributesViewer" && (
+      {readOnly && !isControlledVocabulary && (
         <ManagedAttributesViewer
           values={currentValue}
           managedAttributeApiPath={managedAttributeApiPath}
@@ -217,7 +206,7 @@ function ManagedAttributesEditorInner({
           }
         />
       )}
-      {readOnly && readOnlyViewMode === "controlledVocabularyViewer" && (
+      {readOnly && isControlledVocabulary && (
         <ControlledVocabularyViewer
           values={currentValue}
           baseApi={managedAttributeApiPath}
