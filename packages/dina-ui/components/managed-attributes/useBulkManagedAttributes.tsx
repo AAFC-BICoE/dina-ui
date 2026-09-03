@@ -84,7 +84,7 @@ export function useBulkManagedAttributes({
       (ManagedAttribute | ControlledVocabularyItem)[]
     >(
       isControlledVocabulary
-        ? baseApiPath + "/controlled-vocabulary-items"
+        ? baseApiPath + "/controlled-vocabulary-item"
         : baseApiPath,
       {
         header: headers,

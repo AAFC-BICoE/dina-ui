@@ -1,18 +1,11 @@
 import { ControlledVocabularyItem } from "@dina-ui/types/collection-api";
-import {
-  DinaForm,
-  FieldView,
-  LoadingSpinner,
-  SimpleSearchFilterBuilder,
-  useApiClient,
-  useIsMounted
-} from "common-ui";
-import { useEffect, useState } from "react";
+import { DinaForm, FieldView, LoadingSpinner } from "common-ui";
 import {
   getManagedAttributeTitle,
   getManagedAttributeTooltipText
 } from "../managed-attributes/ManagedAttributeField";
 import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
+import { useBulkManagedAttributes } from "../managed-attributes/useBulkManagedAttributes";
 
 export interface ControlledVocabularyViewerProps {
   /**
@@ -44,13 +37,6 @@ export interface ControlledVocabularyViewerProps {
   controlledVocabularyUUID: string;
 }
 
-interface ControlledVocabularyItemView extends ControlledVocabularyItem {
-  // The value to be displayed to the user for the controlled vocabulary.
-  value: string | null | undefined;
-  label: string;
-  tooltipText?: string;
-}
-
 export function ControlledVocabularyViewer({
   values,
   baseApi,
@@ -58,101 +44,51 @@ export function ControlledVocabularyViewer({
   controlledVocabularyUUID
 }: ControlledVocabularyViewerProps) {
   const { locale, formatMessage } = useDinaIntl();
-  const { apiClient } = useApiClient();
-  const isMounted = useIsMounted();
 
-  /**
-   * If awaiting for network requests.
-   */
-  const [loading, setLoading] = useState<boolean>(true);
+  const keys = values ? Object.keys(values) : [];
 
-  /**
-   * Final loaded in structure, this will be used to display the controlled vocabulary to the user.
-   */
-  const [loadedControlledVocabulary, setLoadedControlledVocabulary] = useState<
-    Record<string, ControlledVocabularyItemView>
-  >({});
-
-  /**
-   * Load each controlled vocabulary item required based on the values given.
-   */
-  useEffect(() => {
-    async function fetchAllControlledVocabularyItems() {
-      const keys = values ? Object.keys(values) : [];
-      if (!keys.length) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const { data } = await apiClient.get<ControlledVocabularyItem[]>(
-          `${baseApi}/controlled-vocabulary-item`,
-          {
-            filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
-              .whereIn("key", keys)
-              .when(!!dinaComponent, (builder) =>
-                builder.where("dinaComponent", "EQ", dinaComponent)
-              )
-              .where(
-                "controlledVocabulary.uuid" as any,
-                "EQ",
-                controlledVocabularyUUID
-              )
-              .build(),
-            page: { limit: keys.length }
-          }
-        );
-
-        const controlledVocabularyMap: Record<
-          string,
-          ControlledVocabularyItemView
-        > = {};
-
-        data?.forEach((item) => {
-          const label = getManagedAttributeTitle(item as any, locale);
-          const rawTooltipText = getManagedAttributeTooltipText(
-            item as any,
-            locale,
-            formatMessage
-          );
-
-          const val = values?.[item.key];
-          const isUseful =
-            Boolean(rawTooltipText?.trim()) &&
-            rawTooltipText?.trim().toLowerCase() !==
-              label?.trim().toLowerCase() &&
-            rawTooltipText?.trim().toLowerCase() !== val?.trim().toLowerCase();
-
-          controlledVocabularyMap[item.key] = {
-            ...item,
-            label,
-            value: val,
-            tooltipText: isUseful ? rawTooltipText : undefined
-          };
-        });
-
-        if (isMounted.current) {
-          setLoadedControlledVocabulary(controlledVocabularyMap);
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        if (isMounted.current) {
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchAllControlledVocabularyItems();
-  }, [values, baseApi, dinaComponent, controlledVocabularyUUID]);
+  // Use the custom hook to perform the bulk query and fetch controlled vocabulary items
+  const { data, loading } = useBulkManagedAttributes({
+    baseApiPath: baseApi,
+    dinaComponent,
+    keys,
+    isControlledVocabulary: true,
+    controlledVocabularyId: controlledVocabularyUUID,
+    disabled: !keys.length
+  });
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
   }
 
-  const sortedEntries = Object.values(loadedControlledVocabulary ?? {}).sort(
-    (a, b) => a.label.localeCompare(b.label, locale, { sensitivity: "base" })
+  // Process and enrich fetched items with labels, values, and useful tooltips
+  const processedItems = (data as ControlledVocabularyItem[] | undefined)?.map(
+    (item) => {
+      const label = getManagedAttributeTitle(item as any, locale);
+      const rawTooltipText = getManagedAttributeTooltipText(
+        item as any,
+        locale,
+        formatMessage
+      );
+
+      const val = values?.[item.key];
+      const isUseful =
+        Boolean(rawTooltipText?.trim()) &&
+        rawTooltipText?.trim().toLowerCase() !== label?.trim().toLowerCase() &&
+        rawTooltipText?.trim().toLowerCase() !== val?.trim().toLowerCase();
+
+      return {
+        ...item,
+        label,
+        value: val,
+        tooltipText: isUseful ? rawTooltipText : undefined
+      };
+    }
+  );
+
+  // Sort items alphabetically by their resolved label
+  const sortedEntries = (processedItems ?? []).sort((a, b) =>
+    a.label.localeCompare(b.label, locale, { sensitivity: "base" })
   );
 
   // Map values for Formik / DinaForm binding
