@@ -67,68 +67,72 @@ export function ControlledVocabularyViewer({
   /**
    * Final loaded in structure, this will be used to display the controlled vocabulary to the user.
    */
-  const [loadedControlledVocabulary, setLoadedControlledVocabulary] =
-    useState<Record<string, ControlledVocabularyItemView>>();
+  const [loadedControlledVocabulary, setLoadedControlledVocabulary] = useState<
+    Record<string, ControlledVocabularyItemView>
+  >({});
 
   /**
    * Load each controlled vocabulary item required based on the values given.
    */
   useEffect(() => {
     async function fetchAllControlledVocabularyItems() {
-      if (values && isMounted) {
+      const keys = values ? Object.keys(values) : [];
+      if (!keys.length) {
+        setLoading(false);
+        return;
+      }
+
+      try {
         setLoading(true);
+        const { data } = await apiClient.get<ControlledVocabularyItem[]>(
+          `${baseApi}/controlled-vocabulary-item`,
+          {
+            filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+              .whereIn("key", keys)
+              .when(!!dinaComponent, (builder) =>
+                builder.where("dinaComponent", "EQ", dinaComponent)
+              )
+              .where(
+                "controlledVocabulary.uuid" as any,
+                "EQ",
+                controlledVocabularyUUID
+              )
+              .build(),
+            page: { limit: keys.length }
+          }
+        );
+
         const controlledVocabularyMap: Record<
           string,
           ControlledVocabularyItemView
         > = {};
 
-        for (const [key, value] of Object.entries(values)) {
-          try {
-            const { data } = await apiClient.get<ControlledVocabularyItem[]>(
-              `${baseApi}/controlled-vocabulary-item`,
-              {
-                filter:
-                  SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
-                    .whereProvided("dinaComponent", "EQ", dinaComponent)
-                    .where(
-                      "controlledVocabulary.uuid" as any,
-                      "EQ",
-                      controlledVocabularyUUID
-                    )
-                    .where("key", "EQ", key)
-                    .build(),
-                page: {
-                  limit: 1
-                }
-              }
-            );
+        data?.forEach((item) => {
+          controlledVocabularyMap[item.key] = {
+            ...item,
+            value: values?.[item.key]
+          };
+        });
 
-            // Add it to our temporary map.
-            if (data?.[0]) {
-              controlledVocabularyMap[key] = {
-                ...data[0],
-                value: value
-              };
-            }
-          } catch (error) {
-            console.error(error);
-          }
+        if (isMounted.current) {
+          setLoadedControlledVocabulary(controlledVocabularyMap);
         }
-
-        // Once the full map has been created, set it.
-        setLoadedControlledVocabulary(controlledVocabularyMap);
-        setLoading(false);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (isMounted.current) {
+          setLoading(false);
+        }
       }
     }
 
     fetchAllControlledVocabularyItems();
-  }, [values, isMounted]);
+  }, [values, baseApi, dinaComponent, controlledVocabularyUUID]);
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
   }
 
-  // Sort the controlled vocabulary by title if possible.
   const sortedEntries = Object.values(loadedControlledVocabulary ?? {}).sort(
     (a, b) => {
       const titleA = getManagedAttributeTitle(a as any, locale);
@@ -167,6 +171,13 @@ function ControlledVocabularyField({
   value: string | null | undefined;
   tooltipText?: string;
 }) {
+  // Determine if the tooltip text provides meaningful extra information
+  // that isn't identical to the label or value being displayed.
+  const isTooltipUseful =
+    Boolean(tooltipText?.trim()) &&
+    tooltipText?.trim().toLowerCase() !== label?.trim().toLowerCase() &&
+    tooltipText?.trim().toLowerCase() !== value?.trim().toLowerCase();
+
   return (
     <div className="col-6">
       <label className="mb-3 w-100">
@@ -175,7 +186,7 @@ function ControlledVocabularyField({
             <strong className="me-2">
               <FieldHeader
                 name={label}
-                tooltipOverride={tooltipText}
+                tooltipOverride={isTooltipUseful ? tooltipText : undefined}
                 startCaseLabel={false}
                 combineFieldHeaderWithTooltip={false}
               />

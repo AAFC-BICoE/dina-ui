@@ -1,9 +1,10 @@
 import { DateView } from "common-ui";
 import Link from "next/link";
 import { Metadata, Person } from "../../../types/objectstore-api";
-import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
+import { ControlledVocabularyViewer } from "@dina-ui/components/controlled-vocabulary/ControlledVocabularyViewer";
+import { OBJECT_STORE_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
   name: ({ id, originalFilename }) => (
@@ -68,10 +69,11 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
         original: { value }
       }
     }) => (
-      <ManagedAttributesViewer
+      <ControlledVocabularyViewer
+        baseApi="objectstore-api"
+        dinaComponent="METADATA"
         values={value}
-        managedAttributeApiPath="objectstore-api/controlled-vocabulary-item"
-        managedAttributeComponent="METADATA"
+        controlledVocabularyUUID={OBJECT_STORE_MANAGED_ATTRIBUTE_ID}
       />
     )
   }

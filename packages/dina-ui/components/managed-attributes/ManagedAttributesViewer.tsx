@@ -25,6 +25,9 @@ export interface ManagedAttributesViewerProps {
   controlledVocabularyId?: string;
 }
 
+/**
+ * @deprecated Use ControlledVocabularyViewer instead. This component is being kept for backward compatibility.
+ */
 export function ManagedAttributesViewer({
   values,
   managedAttributeApiPath,

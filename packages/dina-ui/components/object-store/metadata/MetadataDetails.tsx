@@ -13,9 +13,10 @@ import { ORIENTATION_OPTIONS } from "../../../pages/object-store/metadata/edit";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { License, Metadata } from "../../../types/objectstore-api";
 import { GroupLabel } from "../../group-select/GroupFieldView";
-import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { DerivativeList } from "../derivative-list/DerivativeList";
 import { formatBytes } from "../object-store-utils";
+import { OBJECT_STORE_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import { ControlledVocabularyViewer } from "@dina-ui/components/controlled-vocabulary/ControlledVocabularyViewer";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -94,10 +95,11 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         collapserId="managed-attributes"
         title={formatMessage("metadataManagedAttributesLabel")}
       >
-        <ManagedAttributesViewer
+        <ControlledVocabularyViewer
+          baseApi="objectstore-api"
+          dinaComponent="METADATA"
           values={metadata.managedAttributes}
-          managedAttributeApiPath="objectstore-api/controlled-vocabulary-item"
-          managedAttributeComponent="METADATA"
+          controlledVocabularyUUID={OBJECT_STORE_MANAGED_ATTRIBUTE_ID}
         />
       </CollapsableSection>
 
