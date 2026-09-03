@@ -65,12 +65,12 @@ const EXAMPLE_CV_ITEM_REDUNDANT = {
   }
 };
 
-const TEST_BASE_API = "collection-api";
+const TEST_BASE_API = "collection-api/controlled-vocabulary-item";
 const TEST_DINA_COMPONENT = "MATERIAL_SAMPLE";
 const TEST_CV_UUID = "test-controlled-vocabulary-uuid";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
-  if (path === `${TEST_BASE_API}/controlled-vocabulary-item`) {
+  if (path === `${TEST_BASE_API}`) {
     const keyFilter = params?.filter?.key?.IN;
     if (keyFilter) {
       const requestedKeys =
@@ -114,7 +114,7 @@ describe("ControlledVocabularyViewer", () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(
-        `${TEST_BASE_API}/controlled-vocabulary-item`,
+        `${TEST_BASE_API}`,
         expect.objectContaining({
           filter: expect.objectContaining({
             key: { IN: "attribute_1,attribute_2" },

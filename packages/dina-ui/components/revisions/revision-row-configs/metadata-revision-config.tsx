@@ -70,7 +70,7 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
       }
     }) => (
       <ControlledVocabularyViewer
-        baseApi="objectstore-api"
+        baseApi="objectstore-api/controlled-vocabulary-item"
         dinaComponent="METADATA"
         values={value}
         controlledVocabularyUUID={OBJECT_STORE_MANAGED_ATTRIBUTE_ID}

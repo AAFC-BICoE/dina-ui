@@ -54,9 +54,7 @@ describe("MetadataDetails component", () => {
   it("Renders the metadata details.", async () => {
     const wrapper = mountWithAppContext(
       <MetadataDetails metadata={TEST_METADATA} />,
-      {
-        apiContext
-      }
+      { apiContext }
     );
 
     await waitFor(() => {
@@ -82,6 +80,10 @@ describe("MetadataDetails component", () => {
           key: {
             IN: "0763db31-a0c9-43f8-b7fc-705a783c35df,e5b9765e-1246-4119-b4e4-8d2267175662"
           }
+        },
+        header: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json"
         },
         page: { limit: 2 } // Dynamically changes based on the total number of managed attribute keys.
       }

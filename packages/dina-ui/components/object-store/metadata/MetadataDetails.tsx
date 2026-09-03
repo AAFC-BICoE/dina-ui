@@ -96,7 +96,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         title={formatMessage("metadataManagedAttributesLabel")}
       >
         <ControlledVocabularyViewer
-          baseApi="objectstore-api"
+          baseApi="objectstore-api/controlled-vocabulary-item"
           dinaComponent="METADATA"
           values={metadata.managedAttributes}
           controlledVocabularyUUID={OBJECT_STORE_MANAGED_ATTRIBUTE_ID}
