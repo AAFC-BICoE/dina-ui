@@ -37,15 +37,13 @@ describe("composeReport", () => {
         { id: "1", stats: chunkStats({ endTime: 30000 }) }
       ],
       expectedChunkIds: [0, 1],
-      testResult: "success",
-      canaryResult: "success"
+      testResult: "success"
     });
 
     expect(markdown).toContain("## 🧪 Test report");
     expect(markdown).toContain("✅ **40 tests passed**");
     expect(markdown).toContain("8 suites over 2 chunks");
     expect(markdown).toContain("slowest chunk 1m 5s");
-    expect(markdown).toContain("reporting canary ✅");
     expect(markdown).toContain("<details><summary>Per-chunk breakdown</summary>");
     expect(markdown).toContain("<details><summary>⏱️ Slowest suites across the run</summary>");
     expect(markdown).not.toContain("❌");
@@ -79,8 +77,7 @@ describe("composeReport", () => {
         }
       ],
       expectedChunkIds: [0, 1],
-      testResult: "failure",
-      canaryResult: "success"
+      testResult: "failure"
     });
 
     expect(markdown).toContain("❌ **2 of 40 tests failed**");
@@ -100,31 +97,17 @@ describe("composeReport", () => {
     const markdown = composeReport({
       chunks: [{ id: "0", stats: chunkStats() }],
       expectedChunkIds: [0, 1, 2],
-      testResult: "failure",
-      canaryResult: "success"
+      testResult: "failure"
     });
 
     expect(markdown).toContain("No stats received from chunk(s) 1, 2");
-  });
-
-  it("warns when the reporting canary did not pass", () => {
-    const markdown = composeReport({
-      chunks: [{ id: "0", stats: chunkStats() }],
-      expectedChunkIds: [0],
-      testResult: "success",
-      canaryResult: "failure"
-    });
-
-    expect(markdown).toContain("reporting canary ❌");
-    expect(markdown).toContain("failure reporting may be broken");
   });
 
   it("still produces a report when no stats exist at all", () => {
     const markdown = composeReport({
       chunks: [],
       expectedChunkIds: [],
-      testResult: "skipped",
-      canaryResult: "skipped"
+      testResult: "skipped"
     });
     expect(markdown).toContain("## 🧪 Test report");
   });

@@ -7,7 +7,7 @@
  *
  * CLI: node jest-ci-compose-report.js <stats-dir>
  * Env: EXPECTED_CHUNKS (JSON array of chunk ids, from the setup job),
- *      TEST_RESULT and CANARY_RESULT (GitHub job results, e.g. "success").
+ *      TEST_RESULT (the test-chunk GitHub job result, e.g. "success").
  * Prints markdown to stdout (appended to $GITHUB_STEP_SUMMARY by the caller).
  */
 
@@ -24,16 +24,6 @@ function formatDuration(ms) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
-}
-
-function resultIcon(result) {
-  if (result === "success") {
-    return "✅";
-  }
-  if (result === "skipped" || result === "cancelled" || result === undefined) {
-    return "⚠️";
-  }
-  return "❌";
 }
 
 function readStatsDir(statsDir) {
@@ -58,7 +48,7 @@ function readStatsDir(statsDir) {
   return chunks;
 }
 
-function composeReport({ chunks, expectedChunkIds, testResult, canaryResult }) {
+function composeReport({ chunks, expectedChunkIds, testResult }) {
   const valid = chunks.filter(chunk => chunk.stats);
   const broken = chunks.filter(chunk => !chunk.stats);
 
@@ -95,8 +85,7 @@ function composeReport({ chunks, expectedChunkIds, testResult, canaryResult }) {
         : `✅ **${totals.passed} tests passed**`,
       totals.pending > 0 ? `${totals.pending} skipped` : null,
       `${totals.suites} suites over ${valid.length} chunks`,
-      `slowest chunk ${formatDuration(slowestChunkMs)}`,
-      `reporting canary ${resultIcon(canaryResult)}`
+      `slowest chunk ${formatDuration(slowestChunkMs)}`
     ]
       .filter(Boolean)
       .join(" · "),
@@ -116,14 +105,6 @@ function composeReport({ chunks, expectedChunkIds, testResult, canaryResult }) {
       ""
     );
   }
-  if (canaryResult !== "success") {
-    lines.push(
-      `⚠️ The "verify CI failure reporting" canary did not pass ` +
-        `(result: ${canaryResult}) — failure reporting may be broken.`,
-      ""
-    );
-  }
-
   if (failingSuites.length > 0) {
     lines.push(`### ❌ Failing suites`, "");
     for (const suite of failingSuites) {
@@ -197,8 +178,7 @@ if (require.main === module) {
     composeReport({
       chunks: statsDir ? readStatsDir(statsDir) : [],
       expectedChunkIds: parseExpectedChunkIds(process.env.EXPECTED_CHUNKS),
-      testResult: process.env.TEST_RESULT,
-      canaryResult: process.env.CANARY_RESULT
+      testResult: process.env.TEST_RESULT
     })
   );
 }
