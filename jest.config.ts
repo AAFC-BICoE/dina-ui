@@ -6,6 +6,13 @@ const reporters: NonNullable<Config.InitialOptions["reporters"]> = [
   ["default", { summaryThreshold: 1 }]
 ];
 
+// Jest's built-in github-actions reporter emits ::error:: annotations (shown on the
+// PR checks tab and run Summary page) plus collapsible per-file failure logs, but it
+// prints these codes unconditionally, so only enable it on GitHub Actions runners.
+if (process.env.GITHUB_ACTIONS === "true") {
+  reporters.push("github-actions");
+}
+
 const config: Config.InitialOptions = {
   reporters,
   collectCoverageFrom: ["**/*.{ts,tsx,js,jsx}"],
