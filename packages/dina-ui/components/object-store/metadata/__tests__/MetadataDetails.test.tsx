@@ -83,7 +83,7 @@ describe("MetadataDetails component", () => {
             IN: "0763db31-a0c9-43f8-b7fc-705a783c35df,e5b9765e-1246-4119-b4e4-8d2267175662"
           }
         },
-        page: { limit: 2 }
+        page: { limit: 2 } // Dynamically changes based on the total number of managed attribute keys.
       }
     );
   });

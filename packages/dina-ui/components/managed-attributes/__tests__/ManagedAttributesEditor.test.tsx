@@ -59,18 +59,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/managed-attribute":
-      // Handle filter-based lookups used by useManagedAttributeQueries
-      if (params?.filter?.key?.EQ === "example_attribute_1") {
-        return { data: [EXAMPLE_MA_1] };
-      }
-      if (params?.filter?.key?.EQ === "example_attribute_2") {
-        return { data: [EXAMPLE_MA_2] };
-      }
-      if (params?.filter?.key?.EQ === "example_attribute_3") {
-        return { data: [EXAMPLE_MA_3] };
-      }
-      // Default: return all for the multiselect dropdown
-      return { data: [EXAMPLE_MA_1, EXAMPLE_MA_2] };
+      return { data: [EXAMPLE_MA_1, EXAMPLE_MA_2, EXAMPLE_MA_3] };
     case "collection-api/form-template/existing-view-id":
       return {
         data: TEST_COLLECTING_EVENT_CUSTOM_VIEW
@@ -137,8 +126,7 @@ describe("ManagedAttributesEditor component", () => {
             {
               header: {
                 Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json",
-                "Crnk-Compact": "true"
+                "Content-Type": "application/vnd.api+json"
               },
               filter: {
                 managedAttributeComponent: {
@@ -156,8 +144,7 @@ describe("ManagedAttributesEditor component", () => {
             {
               header: {
                 Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json",
-                "Crnk-Compact": "true"
+                "Content-Type": "application/vnd.api+json"
               },
               filter: {
                 managedAttributeComponent: {
@@ -293,8 +280,7 @@ describe("ManagedAttributesEditor component", () => {
             {
               header: {
                 Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json",
-                "Crnk-Compact": "true"
+                "Content-Type": "application/vnd.api+json"
               },
               filter: {
                 dinaComponent: {
@@ -315,8 +301,7 @@ describe("ManagedAttributesEditor component", () => {
             {
               header: {
                 Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json",
-                "Crnk-Compact": "true"
+                "Content-Type": "application/vnd.api+json"
               },
               filter: {
                 dinaComponent: {

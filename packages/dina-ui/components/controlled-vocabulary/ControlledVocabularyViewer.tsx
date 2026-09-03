@@ -1,8 +1,8 @@
 import { ControlledVocabularyItem } from "@dina-ui/types/collection-api";
 import {
-  FieldHeader,
+  DinaForm,
+  FieldView,
   LoadingSpinner,
-  ReadOnlyValue,
   SimpleSearchFilterBuilder,
   useApiClient,
   useIsMounted
@@ -47,6 +47,8 @@ export interface ControlledVocabularyViewerProps {
 interface ControlledVocabularyItemView extends ControlledVocabularyItem {
   // The value to be displayed to the user for the controlled vocabulary.
   value: string | null | undefined;
+  label: string;
+  tooltipText?: string;
 }
 
 export function ControlledVocabularyViewer({
@@ -108,9 +110,25 @@ export function ControlledVocabularyViewer({
         > = {};
 
         data?.forEach((item) => {
+          const label = getManagedAttributeTitle(item as any, locale);
+          const rawTooltipText = getManagedAttributeTooltipText(
+            item as any,
+            locale,
+            formatMessage
+          );
+
+          const val = values?.[item.key];
+          const isUseful =
+            Boolean(rawTooltipText?.trim()) &&
+            rawTooltipText?.trim().toLowerCase() !==
+              label?.trim().toLowerCase() &&
+            rawTooltipText?.trim().toLowerCase() !== val?.trim().toLowerCase();
+
           controlledVocabularyMap[item.key] = {
             ...item,
-            value: values?.[item.key]
+            label,
+            value: val,
+            tooltipText: isUseful ? rawTooltipText : undefined
           };
         });
 
@@ -134,69 +152,29 @@ export function ControlledVocabularyViewer({
   }
 
   const sortedEntries = Object.values(loadedControlledVocabulary ?? {}).sort(
-    (a, b) => {
-      const titleA = getManagedAttributeTitle(a as any, locale);
-      const titleB = getManagedAttributeTitle(b as any, locale);
-      return titleA.localeCompare(titleB, locale, { sensitivity: "base" });
-    }
+    (a, b) => a.label.localeCompare(b.label, locale, { sensitivity: "base" })
+  );
+
+  // Map values for Formik / DinaForm binding
+  const initialValues = sortedEntries.reduce(
+    (acc, item) => ({ ...acc, [item.key]: item.value }),
+    {}
   );
 
   return (
-    <div className="row">
-      {sortedEntries.map((item) => (
-        <ControlledVocabularyField
-          key={item.key}
-          label={getManagedAttributeTitle(item as any, locale)}
-          value={item.value}
-          tooltipText={getManagedAttributeTooltipText(
-            item as any,
-            locale,
-            formatMessage
-          )}
-        />
-      ))}
-    </div>
-  );
-}
-
-/**
- * Renders a single controlled vocabulary pair.
- */
-function ControlledVocabularyField({
-  label,
-  value,
-  tooltipText
-}: {
-  label: string;
-  value: string | null | undefined;
-  tooltipText?: string;
-}) {
-  // Determine if the tooltip text provides meaningful extra information
-  // that isn't identical to the label or value being displayed.
-  const isTooltipUseful =
-    Boolean(tooltipText?.trim()) &&
-    tooltipText?.trim().toLowerCase() !== label?.trim().toLowerCase() &&
-    tooltipText?.trim().toLowerCase() !== value?.trim().toLowerCase();
-
-  return (
-    <div className="col-6">
-      <label className="mb-3 w-100">
-        <div className="field-label mb-2">
-          <div className="d-flex align-items-center w-100">
-            <strong className="me-2">
-              <FieldHeader
-                name={label}
-                tooltipOverride={isTooltipUseful ? tooltipText : undefined}
-                startCaseLabel={false}
-                combineFieldHeaderWithTooltip={false}
-              />
-            </strong>
-          </div>
-        </div>
-        <div className="field-col" style={{ cursor: "auto" }}>
-          <ReadOnlyValue value={value} />
-        </div>
-      </label>
-    </div>
+    <DinaForm initialValues={initialValues}>
+      <div className="row g-3">
+        {sortedEntries.map((item) => (
+          <FieldView
+            key={item.key}
+            className="col-12 col-md-6"
+            name={item.key}
+            customName={item.label}
+            tooltipOverride={item.tooltipText}
+            startCaseLabel={false}
+          />
+        ))}
+      </div>
+    </DinaForm>
   );
 }

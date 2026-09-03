@@ -18,11 +18,12 @@ import {
 } from "../../types/collection-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
 import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
-import { useManagedAttributeQueries } from "./useManagedAttributeQueries";
 import _ from "lodash";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "../controlled-vocabulary/controlledVocabularyItemUtils";
 import { useIntl } from "react-intl";
 import { ManagedAttributesViewer } from "./ManagedAttributesViewer";
+import { ControlledVocabularyViewer } from "../controlled-vocabulary/ControlledVocabularyViewer";
+import { useBulkManagedAttributes } from "./useBulkManagedAttributes";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -69,6 +70,16 @@ export interface ManagedAttributesEditorProps {
    * Defaults to the collection managed attribute vocabulary.
    */
   controlledVocabularyId?: string;
+
+  /**
+   * In read only mode, what type of viewer to display. If not specified, no viewer is displayed.
+   * Options:
+   * - "controlledVocabularyViewer": Displays a ControlledVocabularyViewer.
+   * - "managedAttributesViewer": [DEPRECATED] Displays a ManagedAttributesViewer. (Default for backward compatibility.)
+   *
+   * If not specified, no viewer is displayed in read only mode.
+   */
+  readOnlyViewMode?: "controlledVocabularyViewer" | "managedAttributesViewer";
 }
 
 interface ManagedAttributesEditorInnerProps
@@ -89,7 +100,8 @@ function ManagedAttributesEditorInner({
   disableClearButton = false,
   values,
   isControlledVocabulary = false,
-  controlledVocabularyId = COLLECTION_MANAGED_ATTRIBUTE_ID
+  controlledVocabularyId = COLLECTION_MANAGED_ATTRIBUTE_ID,
+  readOnlyViewMode = "managedAttributesViewer"
 }: ManagedAttributesEditorInnerProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
@@ -119,11 +131,10 @@ function ManagedAttributesEditorInner({
   }, [visibleAttributeKeysProp]);
 
   // Fetch the attributes (to display on the form, not the multiselect list), but omit any that are missing e.g. were deleted.
-
-  const { data: fetchedAttributes, loading } = useManagedAttributeQueries({
+  const { data: fetchedAttributes, loading } = useBulkManagedAttributes({
     keys: visibleAttributeKeys,
-    managedAttributeApiPath,
-    managedAttributeComponent,
+    baseApiPath: managedAttributeApiPath,
+    dinaComponent: managedAttributeComponent,
     disabled: readOnly || !visibleAttributeKeys.length,
     isControlledVocabulary,
     controlledVocabularyId
@@ -196,7 +207,7 @@ function ManagedAttributesEditorInner({
           </div>
         </FieldSet>
       )}
-      {readOnly && (
+      {readOnly && readOnlyViewMode === "managedAttributesViewer" && (
         <ManagedAttributesViewer
           values={currentValue}
           managedAttributeApiPath={managedAttributeApiPath}
@@ -204,6 +215,14 @@ function ManagedAttributesEditorInner({
           controlledVocabularyId={
             isControlledVocabulary ? controlledVocabularyId : undefined
           }
+        />
+      )}
+      {readOnly && readOnlyViewMode === "controlledVocabularyViewer" && (
+        <ControlledVocabularyViewer
+          values={currentValue}
+          baseApi={managedAttributeApiPath}
+          dinaComponent={managedAttributeComponent}
+          controlledVocabularyUUID={controlledVocabularyId}
         />
       )}
     </>
