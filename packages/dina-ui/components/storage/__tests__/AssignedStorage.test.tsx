@@ -89,9 +89,13 @@ describe("AssignedStorage component", () => {
     );
 
     await waitFor(() => {
-      expect(wrapper.getByRole("img")).toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".tooltip-info-icon")
+      ).toBeInTheDocument();
     });
-    await userEvent.hover(wrapper.getByRole("img"));
+
+    const infoIcon = wrapper.container.querySelector(".tooltip-info-icon");
+    await userEvent.hover(infoIcon!);
 
     expect(
       wrapper.getByRole("tooltip", {

@@ -30,6 +30,7 @@ export function useBulkEditTab({
     new Map()
   );
   const [deletedFields, setDeletedFields] = useState<Set<string>>(new Set());
+  const [appendFields, setAppendFields] = useState<Set<string>>(new Set());
 
   const ctx: BulkEditTabContextI = {
     resourceHooks,
@@ -37,7 +38,9 @@ export function useBulkEditTab({
     clearedFields,
     deletedFields,
     setClearedFields,
-    setDeletedFields
+    setDeletedFields,
+    appendFields,
+    setAppendFields
   };
 
   const bulkEditTab: BulkNavigatorTab = {
@@ -56,6 +59,7 @@ export function useBulkEditTab({
     bulkEditTab,
     bulkEditFormRef,
     clearedFields,
-    deletedFields
+    deletedFields,
+    appendFields
   };
 }

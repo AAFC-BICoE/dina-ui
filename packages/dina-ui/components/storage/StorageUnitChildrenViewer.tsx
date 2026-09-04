@@ -14,6 +14,7 @@ import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
 import { TableColumn } from "../../../common-ui/lib/list-page/types";
+import { getScientificNames } from "../collection/material-sample/organismUtils";
 
 export interface StorageTreeFieldProps {
   storageUnit: StorageUnit;
@@ -207,6 +208,11 @@ export function StorageUnitContents({
       header: () => <FieldHeader name="materialSampleName" />,
       id: "materialSampleName",
       accessorKey: "materialSampleName"
+    },
+    {
+      id: "scientificName",
+      cell: ({ row: { original } }) => <>{getScientificNames(original)}</>,
+      header: () => <FieldHeader name="determination.scientificName" />
     },
     // Material Sample Type
     {

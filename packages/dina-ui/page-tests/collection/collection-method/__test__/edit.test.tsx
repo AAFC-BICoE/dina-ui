@@ -1,4 +1,8 @@
-import { OperationsResponse, clearAndType, makeAxiosErrorMoreReadable } from "common-ui";
+import {
+  OperationsResponse,
+  clearAndType,
+  makeAxiosErrorMoreReadable
+} from "common-ui";
 import CollectionMethodEditPage, {
   CollectionMethodForm
 } from "../../../../pages/collection/collection-method/edit";

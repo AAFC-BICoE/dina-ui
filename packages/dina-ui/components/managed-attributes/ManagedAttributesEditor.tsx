@@ -62,6 +62,12 @@ export interface ManagedAttributesEditorProps {
    * Eventually, all managed attributes will be from controlled vocabulary endpoints and this prop can be removed, but for now it is needed to support both the existing managed attributes and the new controlled vocabulary items.
    */
   isControlledVocabulary?: boolean;
+
+  /**
+   * Controlled Vocabulary UUID used to scope managed attributes when isControlledVocabulary is true.
+   * Defaults to the collection managed attribute vocabulary.
+   */
+  controlledVocabularyId?: string;
 }
 
 interface ManagedAttributesEditorInnerProps
@@ -81,7 +87,8 @@ function ManagedAttributesEditorInner({
   managedAttributeOrderFieldName,
   disableClearButton = false,
   values,
-  isControlledVocabulary = false
+  isControlledVocabulary = false,
+  controlledVocabularyId = COLLECTION_MANAGED_ATTRIBUTE_ID
 }: ManagedAttributesEditorInnerProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
@@ -117,7 +124,8 @@ function ManagedAttributesEditorInner({
     managedAttributeApiPath,
     managedAttributeComponent,
     disabled: !visibleAttributeKeys.length,
-    isControlledVocabulary
+    isControlledVocabulary,
+    controlledVocabularyId
   });
 
   // Store the last fetched Attributes in a ref instead of showing a
@@ -178,6 +186,7 @@ function ManagedAttributesEditorInner({
                       visibleAttributes={visibleAttributes}
                       loading={loading}
                       isControlledVocabulary={isControlledVocabulary}
+                      controlledVocabularyId={controlledVocabularyId}
                     />
                   </label>
                 </div>
@@ -356,7 +365,8 @@ export function ManagedAttributeMultiSelect({
   onChange,
   visibleAttributes,
   loading,
-  isControlledVocabulary = false
+  isControlledVocabulary = false,
+  controlledVocabularyId = COLLECTION_MANAGED_ATTRIBUTE_ID
 }: {
   managedAttributeComponent?: string;
   managedAttributeApiPath: string;
@@ -366,6 +376,7 @@ export function ManagedAttributeMultiSelect({
   >[];
   loading?: boolean;
   isControlledVocabulary: boolean;
+  controlledVocabularyId?: string;
 }) {
   const { locale } = useDinaIntl();
 
@@ -387,11 +398,11 @@ export function ManagedAttributeMultiSelect({
           builder.where(
             "controlledVocabulary.uuid",
             "EQ",
-            COLLECTION_MANAGED_ATTRIBUTE_ID
+            controlledVocabularyId
           )
         )
         .build(),
-    [managedAttributeComponent]
+    [managedAttributeComponent, controlledVocabularyId]
   );
 
   // Memoize the label function

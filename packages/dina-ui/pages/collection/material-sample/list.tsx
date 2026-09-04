@@ -330,7 +330,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         type: "managedAttribute",
         label: "managedAttributes",
         path: "included.attributes.managedAttributes",
-        apiEndpoint: "objectstore-api/managed-attribute",
+        apiEndpoint: "objectstore-api/controlled-vocabulary-item",
         component: "ENTITY",
         referencedBy: "attachment",
         referencedType: "metadata"
