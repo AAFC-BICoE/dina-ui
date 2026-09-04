@@ -59,7 +59,11 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/managed-attribute":
-      return { data: [EXAMPLE_MA_1, EXAMPLE_MA_2, EXAMPLE_MA_3] };
+      return {
+        data: [EXAMPLE_MA_1, EXAMPLE_MA_2, EXAMPLE_MA_3].filter((attribute) =>
+          params?.filter?.key?.IN?.split(",").includes(attribute.key)
+        )
+      };
     case "collection-api/form-template/existing-view-id":
       return {
         data: TEST_COLLECTING_EVENT_CUSTOM_VIEW
@@ -120,7 +124,7 @@ describe("ManagedAttributesEditor component", () => {
     await waitFor(() => {
       expect(mockGet.mock.calls).toEqual(
         expect.arrayContaining([
-          // Fetch for example_attribute_1 using filter query
+          // Fetch both visible attributes in one request.
           [
             "collection-api/managed-attribute",
             {
@@ -133,27 +137,10 @@ describe("ManagedAttributesEditor component", () => {
                   EQ: "COLLECTING_EVENT"
                 },
                 key: {
-                  EQ: "example_attribute_1"
+                  IN: "example_attribute_1,example_attribute_2"
                 }
-              }
-            }
-          ],
-          // Fetch for example_attribute_2 using filter query
-          [
-            "collection-api/managed-attribute",
-            {
-              header: {
-                Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json"
               },
-              filter: {
-                managedAttributeComponent: {
-                  EQ: "COLLECTING_EVENT"
-                },
-                key: {
-                  EQ: "example_attribute_2"
-                }
-              }
+              page: { limit: 2 }
             }
           ]
         ])
@@ -267,22 +254,31 @@ describe("ManagedAttributesEditor component", () => {
 
     // Wait for the data to load and ensure the filter uses dinaComponent instead of managedAttributeComponent.
     await waitFor(() => {
-      expect(mockGetCV.mock.calls[0]).toEqual([
-        "collection-api/controlled-vocabulary-item",
-        {
-          filter: {
-            "controlledVocabulary.uuid": {
-              EQ: COLLECTION_MANAGED_ATTRIBUTE_ID
-            },
-            dinaComponent: {
-              EQ: "SITE"
-            },
-            key: {
-              IN: "example_attribute_1,example_attribute_2"
+      expect(mockGetCV.mock.calls).toEqual(
+        expect.arrayContaining([
+          [
+            "collection-api/controlled-vocabulary-item",
+            {
+              header: {
+                Accept: "application/vnd.api+json",
+                "Content-Type": "application/vnd.api+json"
+              },
+              filter: {
+                "controlledVocabulary.uuid": {
+                  EQ: COLLECTION_MANAGED_ATTRIBUTE_ID
+                },
+                dinaComponent: {
+                  EQ: "SITE"
+                },
+                key: {
+                  IN: "example_attribute_1,example_attribute_2"
+                }
+              },
+              page: { limit: 2 }
             }
-          }
-        }
-      ]);
+          ]
+        ])
+      );
     });
 
     // Verify that the correct input values are still rendered correctly.

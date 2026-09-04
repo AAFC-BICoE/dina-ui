@@ -135,7 +135,7 @@ describe("useBulkManagedAttributes hook", () => {
 
     mountWithAppContext(
       <TestComponent
-        baseApiPath="collection-api"
+        baseApiPath="collection-api/controlled-vocabulary-item"
         dinaComponent="MATERIAL_SAMPLE"
         keys={["attr_1"]}
         isControlledVocabulary={true}
