@@ -19,6 +19,7 @@ import { PartialDeep } from "type-fest";
 import { screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { QueryBuilderContext } from "../list-page/query-builder/QueryBuilder";
+import userEvent from "@testing-library/user-event";
 
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
@@ -177,6 +178,28 @@ export async function waitForLoadingToDisappear(
     const currentLoadingElements = screen.queryAllByText(loadingTextRegex);
     expect(currentLoadingElements).toHaveLength(0);
   }, options);
+}
+
+/**
+ * Opens a react-select style dropdown by locating the container div nearest
+ * a given label/text, then selects the given option from the list.
+ *
+ * @param wrapper - the render result from mountWithAppContext
+ * @param labelText - text (or regex) used to locate the dropdown's container
+ * @param optionText - the visible text of the option to select
+ */
+export async function selectDropdownOption(
+  wrapper: ReturnType<typeof mountWithAppContext>,
+  labelText: string | RegExp,
+  optionText: string
+) {
+  const container = wrapper.getByText(labelText).closest("div")!;
+  const input = container.querySelector("input") as HTMLElement;
+
+  await userEvent.click(input);
+
+  const option = await wrapper.findByText(optionText);
+  await userEvent.click(option);
 }
 
 /**
