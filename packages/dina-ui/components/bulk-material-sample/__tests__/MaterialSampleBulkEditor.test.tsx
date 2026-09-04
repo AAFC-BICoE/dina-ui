@@ -78,6 +78,19 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         }
       };
     case "collection-api/controlled-vocabulary-item":
+      if (params?.filter?.key?.IN) {
+        const keys = params.filter.key.IN.split(",");
+        return Promise.resolve({
+          data: keys.map((key) => ({
+            type: "controlled-vocabulary-item",
+            id: key,
+            key,
+            vocabularyElementType: "STRING",
+            dinaComponent: "MATERIAL_SAMPLE",
+            name: `Managed Attribute ${key.slice(1)}`
+          }))
+        });
+      }
       if (params?.filter?.key?.EQ === "m1") {
         return Promise.resolve({
           data: [

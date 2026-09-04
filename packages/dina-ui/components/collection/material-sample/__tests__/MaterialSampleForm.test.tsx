@@ -223,19 +223,16 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/controlled-vocabulary-item":
       // Handle filter-based lookups used by useBulkManagedAttributes
-      if (params?.filter?.key?.EQ === "attribute_1") {
+      if (params?.filter?.key?.EQ || params?.filter?.key?.IN) {
+        const keys = params.filter.key.EQ
+          ? [params.filter.key.EQ]
+          : params.filter.key.IN.split(",");
         return Promise.resolve({
-          data: [{ id: "1", key: "attribute_1", name: "Attribute 1" }]
-        });
-      }
-      if (params?.filter?.key?.EQ === "attribute_2") {
-        return Promise.resolve({
-          data: [{ id: "2", key: "attribute_2", name: "Attribute 2" }]
-        });
-      }
-      if (params?.filter?.key?.EQ === "attribute_3") {
-        return Promise.resolve({
-          data: [{ id: "3", key: "attribute_3", name: "Attribute 3" }]
+          data: keys.map((key) => ({
+            id: key.replace("attribute_", ""),
+            key,
+            name: `Attribute ${key.replace("attribute_", "")}`
+          }))
         });
       }
       // return all for the multiselect dropdown
