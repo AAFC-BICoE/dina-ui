@@ -88,3 +88,4 @@ export * from "./home2/UIPreferenceHook";
 export * from "./home2/LayoutToggle";
 export * from "./page-layouts/TypeFilterSideBarDynamic";
 export * from "./permissions/PermissionsTable";
+export * from "./permissions/RoleBadges";
