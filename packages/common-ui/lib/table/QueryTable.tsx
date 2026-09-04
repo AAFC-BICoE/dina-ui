@@ -134,6 +134,15 @@ export interface QueryTableProps<TData extends KitsuResource> {
 }
 
 const DEFAULT_PAGE_SIZE = 25;
+
+/**
+ * Number of records fetched when in-memory filtering is enabled.
+ * Matches the back-end's maximum page limit (requesting more falls back to the
+ * back-end's small default limit). Filtering, sorting and pagination all happen
+ * client-side on this single fetched dataset.
+ */
+const IN_MEMORY_FETCH_LIMIT = 1000;
+
 /**
  * Table component that fetches data from the backend API.
  */
@@ -252,14 +261,17 @@ export function QueryTable<TData extends KitsuResource>({
 
   let query: JsonApiQuerySpec;
   if (enableInMemoryFilter) {
+    // Load the whole dataset once as using the table's page size here
+    // would cap the filterable records to a single table page.
+    // Sorting is done in-memory too (manualSorting is off), so no sort param is sent.
+    // The sortable columns don't have to be attributes the back-end can sort by.
     query = {
       path,
       fields,
       fiql,
       filter,
       include,
-      page: { limit: page.limit, offset: 0 },
-      sort
+      page: { limit: IN_MEMORY_FETCH_LIMIT, offset: 0 }
     };
   } else {
     query = {
@@ -302,8 +314,9 @@ export function QueryTable<TData extends KitsuResource>({
 
   const { error, loading: queryIsLoading, response } = queryState;
 
-  const lastSuccessfulResponse =
-    useRef<KitsuResponse<TData[], MetaWithTotal> | undefined>(undefined);
+  const lastSuccessfulResponse = useRef<
+    KitsuResponse<TData[], MetaWithTotal> | undefined
+  >(undefined);
 
   if (response) {
     if (enableInMemoryFilter) {
@@ -319,6 +332,23 @@ export function QueryTable<TData extends KitsuResource>({
 
   const totalCount =
     lastSuccessfulResponse.current?.meta?.totalResourceCount ?? 0;
+
+  // In-memory mode, how many records were loaded before the client-side filter
+  // narrowed them down, so the user can tell a filtered list from a short one.
+  const unfilteredCount = enableInMemoryFilter
+    ? response?.data?.length
+    : undefined;
+  const filteredFromCountElement =
+    unfilteredCount !== undefined && unfilteredCount > totalCount ? (
+      <span className="text-muted ms-2 filtered-from-count">
+        (
+        <CommonMessage
+          id="tableFilteredFromCount"
+          values={{ totalCount: formatNumber(unfilteredCount) }}
+        />
+        )
+      </span>
+    ) : null;
 
   const numberOfPages = totalCount
     ? Math.ceil(totalCount / page.limit)
@@ -365,12 +395,15 @@ export function QueryTable<TData extends KitsuResource>({
     >
       <div className="d-flex align-items-end mb-1">
         {!omitPaging && (
-          <span>
-            <CommonMessage
-              id="tableTotalCount"
-              values={{ totalCount: formatNumber(totalCount) }}
-            />
-          </span>
+          <>
+            <span>
+              <CommonMessage
+                id="tableTotalCount"
+                values={{ totalCount: formatNumber(totalCount) }}
+              />
+            </span>
+            {filteredFromCountElement}
+          </>
         )}
         <div className="ms-auto">
           <div>{topRightCorner}</div>
@@ -436,6 +469,7 @@ export function QueryTable<TData extends KitsuResource>({
               values={{ totalCount: formatNumber(totalCount) }}
             />
           </span>
+          {filteredFromCountElement}
         </div>
       )}
     </div>

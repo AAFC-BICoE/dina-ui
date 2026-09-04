@@ -116,20 +116,17 @@ describe("useAutocompleteSearchButFallbackToApiSearch hook", () => {
 
     await waitFor(() => {
       expect(mockSearchApiGet).toHaveBeenCalledTimes(1);
-      expect(mockSearchApiGet).lastCalledWith(
-        "search-api/search-ws/auto-complete",
-        {
-          params: {
-            additionalField: undefined,
-            group: undefined,
-            autoCompleteField: "data.attributes.displayName",
-            indexName: "dina_agent_index",
-            prefix: "test-query",
-            restrictedField: "testRestrictedField",
-            restrictedFieldValue: "testRestrictedValue"
-          }
-        }
-      );
+      const [url, config] =
+        mockSearchApiGet.mock.calls[mockSearchApiGet.mock.calls.length - 1];
+
+      expect(url).toBe("search-api/search-ws/auto-complete");
+      expect(config.params).toStrictEqual({
+        autoCompleteField: "data.attributes.displayName",
+        indexName: "dina_agent_index",
+        prefix: "test-query",
+        restrictedField: "testRestrictedField",
+        restrictedFieldValue: "testRestrictedValue"
+      });
       expect(wrapper2.getAllByRole("listitem").length).toEqual(1);
       expect(wrapper2.getByRole("listitem").textContent).toEqual(
         "Person from Search API"
