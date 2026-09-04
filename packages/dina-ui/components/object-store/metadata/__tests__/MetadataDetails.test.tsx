@@ -59,7 +59,7 @@ describe("MetadataDetails component", () => {
     );
 
     await waitFor(() => {
-      expect(wrapper.getByText(/attr1 value/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/attr5 value/i)).toBeInTheDocument();
       expect(wrapper.getByText(/attr2 value/i)).toBeInTheDocument();
       expect(
         wrapper.getByRole("cell", {
