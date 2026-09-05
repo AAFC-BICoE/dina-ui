@@ -19,6 +19,7 @@ import {
   Vocabulary
 } from "../../../types/collection-api";
 import _ from "lodash";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface PreparationFieldProps {
   className?: string;
@@ -201,6 +202,7 @@ export function PreparationField({
             valuesPath="preparationManagedAttributes"
             managedAttributeApiPath="collection-api/controlled-vocabulary-item"
             managedAttributeComponent="PREPARATION"
+            controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
             fieldSetProps={{
               id,
               legend: <DinaMessage id="preparationManagedAttributes" />,

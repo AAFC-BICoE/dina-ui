@@ -1,9 +1,18 @@
-import { DinaForm, FieldView, useApiClient, useIsMounted } from "common-ui";
+import {
+  DinaForm,
+  FieldView,
+  SimpleSearchFilterBuilder,
+  useApiClient,
+  useIsMounted
+} from "common-ui";
 import _ from "lodash";
 import { ManagedAttribute } from "../../types/collection-api";
 import { useEffect, useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { getManagedAttributeTooltipText } from "./ManagedAttributeField";
+import {
+  getManagedAttributeTitle,
+  getManagedAttributeTooltipText
+} from "./ManagedAttributeField";
 
 export interface ManagedAttributesViewerProps {
   /**
@@ -12,11 +21,18 @@ export interface ManagedAttributesViewerProps {
    */
   values?: Record<string, string | null | undefined> | null;
   managedAttributeApiPath: string;
+  managedAttributeComponent?: string;
+  controlledVocabularyId?: string;
 }
 
+/**
+ * @deprecated Use ControlledVocabularyViewer instead. This component is being kept for backward compatibility.
+ */
 export function ManagedAttributesViewer({
   values,
-  managedAttributeApiPath
+  managedAttributeApiPath,
+  managedAttributeComponent,
+  controlledVocabularyId
 }: ManagedAttributesViewerProps) {
   const { locale, formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
@@ -28,15 +44,35 @@ export function ManagedAttributesViewer({
   useEffect(() => {
     async function fetchAllManagedAttributes() {
       try {
+        const managedAttributeKeys = values ? Object.keys(values) : [];
+        if (!managedAttributeKeys.length) {
+          return;
+        }
+
         const { data } = await apiClient.get<ManagedAttribute[]>(
           `${managedAttributeApiPath}`,
-          {}
+          {
+            filter: SimpleSearchFilterBuilder.create()
+              .whereIn("key", managedAttributeKeys)
+              .when(!!managedAttributeComponent, (builder) =>
+                builder.where("dinaComponent", "EQ", managedAttributeComponent)
+              )
+              .when(!!controlledVocabularyId, (builder) =>
+                builder.where(
+                  "controlledVocabulary.uuid" as any,
+                  "EQ",
+                  controlledVocabularyId
+                )
+              )
+              .build(),
+            page: { limit: managedAttributeKeys.length }
+          }
         );
         const attrKeyNameMap = data.reduce(
           (accu, obj) => ({
             ...accu,
             [obj.key]: {
-              name: obj.name,
+              name: getManagedAttributeTitle(obj as any, locale),
               multilingualDescription: obj.multilingualDescription
             }
           }),

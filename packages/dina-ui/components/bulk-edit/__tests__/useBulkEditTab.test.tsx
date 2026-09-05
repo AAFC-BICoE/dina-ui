@@ -129,6 +129,19 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/controlled-vocabulary-item":
+      if (params?.filter?.key?.IN) {
+        const keys = params.filter.key.IN.split(",");
+        return {
+          data: keys.map((key) => ({
+            id: key,
+            type: "controlled-vocabulary-item",
+            vocabularyElementType: "STRING",
+            dinaComponent: "MATERIAL_SAMPLE",
+            key,
+            name: `Managed Attribute ${key}`
+          }))
+        };
+      }
       if (params?.filter?.key?.EQ === "a") {
         return {
           data: [
@@ -136,7 +149,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
               id: "1",
               type: "controlled-vocabulary-item",
               vocabularyElementType: "STRING",
-              managedAttributeComponent: "MATERIAL_SAMPLE",
+              dinaComponent: "MATERIAL_SAMPLE",
               key: "a",
               name: "Managed Attribute 1"
             }
@@ -150,7 +163,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
               id: "2",
               type: "controlled-vocabulary-item",
               vocabularyElementType: "STRING",
-              managedAttributeComponent: "MATERIAL_SAMPLE",
+              dinaComponent: "MATERIAL_SAMPLE",
               key: "b",
               name: "Managed Attribute 2"
             }
@@ -164,7 +177,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
               id: "3",
               type: "controlled-vocabulary-item",
               vocabularyElementType: "STRING",
-              managedAttributeComponent: "MATERIAL_SAMPLE",
+              dinaComponent: "MATERIAL_SAMPLE",
               key: "c",
               name: "Managed Attribute 3"
             }
@@ -178,7 +191,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
             id: "1",
             type: "controlled-vocabulary-item",
             vocabularyElementType: "STRING",
-            managedAttributeComponent: "MATERIAL_SAMPLE",
+            dinaComponent: "MATERIAL_SAMPLE",
             key: "a",
             name: "Managed Attribute 1"
           },
@@ -186,7 +199,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
             id: "2",
             type: "controlled-vocabulary-item",
             vocabularyElementType: "STRING",
-            managedAttributeComponent: "MATERIAL_SAMPLE",
+            dinaComponent: "MATERIAL_SAMPLE",
             key: "b",
             name: "Managed Attribute 2"
           },
@@ -194,7 +207,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
             id: "3",
             type: "controlled-vocabulary-item",
             vocabularyElementType: "STRING",
-            managedAttributeComponent: "MATERIAL_SAMPLE",
+            dinaComponent: "MATERIAL_SAMPLE",
             key: "c",
             name: "Managed Attribute 3"
           }

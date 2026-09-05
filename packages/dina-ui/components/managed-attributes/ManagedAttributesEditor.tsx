@@ -18,10 +18,12 @@ import {
 } from "../../types/collection-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
 import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
-import { useManagedAttributeQueries } from "./useManagedAttributeQueries";
 import _ from "lodash";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "../controlled-vocabulary/controlledVocabularyItemUtils";
 import { useIntl } from "react-intl";
+import { ManagedAttributesViewer } from "./ManagedAttributesViewer";
+import { ControlledVocabularyViewer } from "../controlled-vocabulary/ControlledVocabularyViewer";
+import { useBulkManagedAttributes } from "./useBulkManagedAttributes";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -118,12 +120,11 @@ function ManagedAttributesEditorInner({
   }, [visibleAttributeKeysProp]);
 
   // Fetch the attributes (to display on the form, not the multiselect list), but omit any that are missing e.g. were deleted.
-
-  const { data: fetchedAttributes, loading } = useManagedAttributeQueries({
+  const { data: fetchedAttributes, loading } = useBulkManagedAttributes({
     keys: visibleAttributeKeys,
-    managedAttributeApiPath,
-    managedAttributeComponent,
-    disabled: !visibleAttributeKeys.length,
+    baseApiPath: managedAttributeApiPath,
+    dinaComponent: managedAttributeComponent,
+    disabled: readOnly || !visibleAttributeKeys.length,
     isControlledVocabulary,
     controlledVocabularyId
   });
@@ -195,18 +196,23 @@ function ManagedAttributesEditorInner({
           </div>
         </FieldSet>
       )}
-      {readOnly && (
-        <div className="row">
-          {visibleAttributes.map((attribute) => (
-            <ManagedAttributeFieldWithLabel
-              key={attribute.key}
-              attribute={attribute}
-              values={values}
-              valuesPath={valuesPath}
-              disableClearButton={disableClearButton}
-            />
-          ))}
-        </div>
+      {readOnly && !isControlledVocabulary && (
+        <ManagedAttributesViewer
+          values={currentValue}
+          managedAttributeApiPath={managedAttributeApiPath}
+          managedAttributeComponent={managedAttributeComponent}
+          controlledVocabularyId={
+            isControlledVocabulary ? controlledVocabularyId : undefined
+          }
+        />
+      )}
+      {readOnly && isControlledVocabulary && (
+        <ControlledVocabularyViewer
+          values={currentValue}
+          baseApi={managedAttributeApiPath}
+          dinaComponent={managedAttributeComponent}
+          controlledVocabularyUUID={controlledVocabularyId}
+        />
       )}
     </>
   );

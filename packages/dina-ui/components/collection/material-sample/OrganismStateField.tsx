@@ -11,6 +11,7 @@ import { DeterminationField, ManagedAttributesEditor } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api";
 import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 /**
  * List of field names in the OrganismStateField component.
@@ -127,6 +128,7 @@ export function OrganismStateField({
             valuesPath={fieldProps("managedAttributes").name}
             managedAttributeApiPath="collection-api/controlled-vocabulary-item"
             managedAttributeComponent="ORGANISM"
+            controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
             attributeSelectorWidth={12}
             fieldSetProps={{
               legend: <DinaMessage id="organismManagedAttributes" />,

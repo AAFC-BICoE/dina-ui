@@ -51,22 +51,37 @@ const EXAMPLE_CV_ITEM_3 = {
   }
 };
 
-const TEST_BASE_API = "collection-api";
+// Item where description is redundant (matches the title)
+const EXAMPLE_CV_ITEM_REDUNDANT = {
+  id: "4",
+  type: "controlled-vocabulary-item",
+  key: "attribute_redundant",
+  name: "Redundant Title",
+  multilingualTitle: {
+    titles: [{ lang: "en", title: "Redundant Title" }]
+  },
+  multilingualDescription: {
+    descriptions: [{ lang: "en", desc: "Redundant Title" }]
+  }
+};
+
+const TEST_BASE_API = "collection-api/controlled-vocabulary-item";
 const TEST_DINA_COMPONENT = "MATERIAL_SAMPLE";
 const TEST_CV_UUID = "test-controlled-vocabulary-uuid";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
-  if (path === `${TEST_BASE_API}/controlled-vocabulary-item`) {
-    const keyFilter = params?.filter?.key?.EQ;
-    switch (keyFilter) {
-      case "attribute_1":
-        return { data: [EXAMPLE_CV_ITEM_1] };
-      case "attribute_2":
-        return { data: [EXAMPLE_CV_ITEM_2] };
-      case "attribute_3":
-        return { data: [EXAMPLE_CV_ITEM_3] };
-      default:
-        return { data: [] };
+  if (path === `${TEST_BASE_API}`) {
+    const keyFilter = params?.filter?.key?.IN;
+    if (keyFilter) {
+      const requestedKeys =
+        typeof keyFilter === "string" ? keyFilter.split(",") : keyFilter;
+      const items = [
+        EXAMPLE_CV_ITEM_1,
+        EXAMPLE_CV_ITEM_2,
+        EXAMPLE_CV_ITEM_3,
+        EXAMPLE_CV_ITEM_REDUNDANT
+      ].filter((item) => requestedKeys.includes(item.key));
+      return { data: items };
     }
   }
   return { data: [] };
@@ -81,7 +96,7 @@ const apiContext = {
 describe("ControlledVocabularyViewer", () => {
   beforeEach(jest.clearAllMocks);
 
-  it("Makes one API request per value key with the correct filters", async () => {
+  it("Makes a single batched API request with whereIn for all requested value keys", async () => {
     const values = {
       attribute_1: "value-one",
       attribute_2: "value-two"
@@ -99,31 +114,19 @@ describe("ControlledVocabularyViewer", () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(
-        `${TEST_BASE_API}/controlled-vocabulary-item`,
+        `${TEST_BASE_API}`,
         expect.objectContaining({
           filter: expect.objectContaining({
-            key: { EQ: "attribute_1" },
+            key: { IN: "attribute_1,attribute_2" },
             dinaComponent: { EQ: TEST_DINA_COMPONENT },
             "controlledVocabulary.uuid": { EQ: TEST_CV_UUID }
           }),
-          page: { limit: 1 }
+          page: { limit: 2 }
         })
       );
 
-      expect(mockGet).toHaveBeenCalledWith(
-        `${TEST_BASE_API}/controlled-vocabulary-item`,
-        expect.objectContaining({
-          filter: expect.objectContaining({
-            key: { EQ: "attribute_2" },
-            dinaComponent: { EQ: TEST_DINA_COMPONENT },
-            "controlledVocabulary.uuid": { EQ: TEST_CV_UUID }
-          }),
-          page: { limit: 1 }
-        })
-      );
-
-      // One call per key, no more.
-      expect(mockGet).toHaveBeenCalledTimes(2);
+      // One API call for everything!
+      expect(mockGet).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -203,6 +206,37 @@ describe("ControlledVocabularyViewer", () => {
     await waitFor(() => {
       const [, params] = mockGet.mock.calls[0];
       expect(params.filter).not.toHaveProperty("dinaComponent");
+    });
+  });
+
+  it("Only displays tooltips when they provide useful, non-redundant information", async () => {
+    const values = {
+      attribute_1: "value-one",
+      attribute_redundant: "value-redundant"
+    };
+
+    const { container } = mountWithAppContext(
+      <ControlledVocabularyViewer
+        values={values}
+        baseApi={TEST_BASE_API}
+        dinaComponent={TEST_DINA_COMPONENT}
+        controlledVocabularyUUID={TEST_CV_UUID}
+      />,
+      { apiContext }
+    );
+
+    await waitFor(() => {
+      // Select the field container columns rendered by FieldHeader
+      const fields = container.querySelectorAll(".col-md-6, .col-6");
+      expect(fields).toHaveLength(2);
+
+      // First field (attribute_1) should render the tooltip icon SVG
+      const tooltip1 = fields[0].querySelector(".tooltip-info-icon");
+      expect(tooltip1).toBeInTheDocument();
+
+      // Second field (attribute_redundant) should omit the tooltip because title === description
+      const tooltipRedundant = fields[1].querySelector(".tooltip-info-icon");
+      expect(tooltipRedundant).not.toBeInTheDocument();
     });
   });
 });
