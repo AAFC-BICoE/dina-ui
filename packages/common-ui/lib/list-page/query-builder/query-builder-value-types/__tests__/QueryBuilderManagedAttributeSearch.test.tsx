@@ -151,11 +151,21 @@ describe("QueryBuilderManagedAttributeSearch", () => {
             case "in":
             case "notIn":
               return "option1, option2,option3";
+            case "wildcard":
+              return "option";
             default:
               return "option1";
           }
         },
-        operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"],
+        operators: [
+          "equals",
+          "notEquals",
+          "wildcard",
+          "in",
+          "notIn",
+          "empty",
+          "notEmpty"
+        ],
         subTypes: [undefined],
         useKeywordMultiField: true,
         useKeywordNumericField: false

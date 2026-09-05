@@ -117,7 +117,7 @@ export default function QueryRowImageLink({
         }
         menuPortalTarget={document.body}
         styles={{
-          menuPortal: (base) => ({
+          menu: (base) => ({
             ...base,
             zIndex: 9999
           })
