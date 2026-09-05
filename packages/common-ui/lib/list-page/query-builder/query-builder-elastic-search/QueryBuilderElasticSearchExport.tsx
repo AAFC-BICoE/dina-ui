@@ -593,7 +593,31 @@ export function inQuery(
       };
 }
 
-// Multi-search exact matches (case-insensitive) (in/not in)
+export const IN_ITEM_THRESHOLD = 100;
+
+/**
+ * Splits a comma-separated string into a clean array of non-empty items.
+ */
+export function parseCommaSeparatedValues(value?: string): string[] {
+  if (!value?.trim()) return [];
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Returns parsing details including items, total count, and threshold status.
+ */
+export function getInQueryStats(value?: string, threshold = IN_ITEM_THRESHOLD) {
+  const items = parseCommaSeparatedValues(value);
+  const count = items.length;
+  const exceedsThreshold = count > threshold;
+
+  return { items, count, exceedsThreshold };
+}
+
+// Multi-search exact matches (case-insensitive up to 100 items, case-sensitive terms query > 100) (in/not in)
 export function inTextQuery(
   fieldName: string,
   matchValues: string,
@@ -602,12 +626,42 @@ export function inTextQuery(
   not: boolean
 ): any {
   const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
-    .map((value) => value.trim())
-    .filter((value) => value !== "");
+    .map((value) => value?.trim())
+    .filter((value) => Boolean(value));
 
   if (matchValuesArray.length === 0) {
     return {};
   }
+
+  const targetField = fieldName + (keywordMultiFieldSupport ? ".keyword" : "");
+  const isOverThreshold = matchValuesArray.length > 100;
+
+  // Build the matching strategy based on item count threshold
+  const valueMatchQuery = isOverThreshold
+    ? {
+        terms: {
+          [targetField]: matchValuesArray
+        }
+      }
+    : {
+        bool: {
+          should: matchValuesArray.map((value) => ({
+            term: {
+              [targetField]: {
+                value,
+                case_insensitive: true
+              }
+            }
+          })),
+          minimum_should_match: 1
+        }
+      };
+
+  const matchClause = {
+    bool: {
+      [not ? "must_not" : "must"]: valueMatchQuery
+    }
+  };
 
   return parentType
     ? {
@@ -615,48 +669,12 @@ export function inTextQuery(
           path: "included",
           query: {
             bool: {
-              must: [
-                {
-                  bool: {
-                    [not ? "must_not" : "must"]: {
-                      bool: {
-                        should: matchValuesArray.map((value) => ({
-                          term: {
-                            [fieldName +
-                            (keywordMultiFieldSupport ? ".keyword" : "")]: {
-                              value,
-                              case_insensitive: true
-                            }
-                          }
-                        })),
-                        minimum_should_match: 1
-                      }
-                    }
-                  }
-                },
-                includedTypeQuery(parentType)
-              ]
+              must: [matchClause, includedTypeQuery(parentType)]
             }
           }
         }
       }
-    : {
-        bool: {
-          [not ? "must_not" : "must"]: {
-            bool: {
-              should: matchValuesArray.map((value) => ({
-                term: {
-                  [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
-                    value,
-                    case_insensitive: true
-                  }
-                }
-              })),
-              minimum_should_match: 1
-            }
-          }
-        }
-      };
+    : matchClause;
 }
 
 // Multi-search exact date matches (case-insensitive) (in/not in)

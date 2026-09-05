@@ -12,10 +12,12 @@ import {
   inTextQuery,
   betweenQuery,
   emptyFieldQuery,
-  notEmptyFieldQuery
+  notEmptyFieldQuery,
+  getInQueryStats
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
+import { FaCircleInfo } from "react-icons/fa6";
 
 interface QueryRowTextSearchProps {
   /**
@@ -51,11 +53,20 @@ export default function QueryRowTextSearch({
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
   const onKeyDown = useQueryBuilderEnterToSearch();
 
+  // Check if current selection is 'in' or 'notIn'
+  const isInMatchType = matchType === "in" || matchType === "notIn";
+
+  // Count comma-separated items when 'in' or 'notIn' is active
+  const { count: itemCounts, exceedsThreshold } = React.useMemo(() => {
+    if (!isInMatchType) return { count: 0, exceedsThreshold: false };
+    return getInQueryStats(value);
+  }, [isInMatchType, value]);
+
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {matchType !== "empty" && matchType !== "notEmpty" && (
-        <>
+        <div className="d-flex flex-column gap-1">
           {matchType === "between" ? (
             BetweenElement
           ) : (
@@ -65,7 +76,7 @@ export default function QueryRowTextSearch({
               onChange={(newValue) => setValue?.(newValue?.target?.value)}
               className="form-control"
               placeholder={
-                matchType !== "in" && matchType !== "notIn"
+                !isInMatchType
                   ? formatMessage({
                       id: "queryBuilder_value_text_placeholder"
                     })
@@ -74,7 +85,19 @@ export default function QueryRowTextSearch({
               onKeyDown={onKeyDown}
             />
           )}
-        </>
+
+          {exceedsThreshold && (
+            <small className="form-text text-muted">
+              <FaCircleInfo className="me-2" />
+              {formatMessage(
+                {
+                  id: "queryBuilder_value_in_case_sensitivity_notice"
+                },
+                { count: itemCounts }
+              )}
+            </small>
+          )}
+        </div>
       )}
     </>
   );

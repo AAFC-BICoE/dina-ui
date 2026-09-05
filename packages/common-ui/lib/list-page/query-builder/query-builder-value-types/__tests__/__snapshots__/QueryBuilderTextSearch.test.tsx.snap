@@ -23,12 +23,16 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
       <div
         class="error-viewer"
       />
-      <input
-        class="form-control"
-        placeholder="Enter text search value..."
-        type="text"
-        value="test"
-      />
+      <div
+        class="d-flex flex-column gap-1"
+      >
+        <input
+          class="form-control"
+          placeholder="Enter text search value..."
+          type="text"
+          value="test"
+        />
+      </div>
     </form>
   </div>
 </DocumentFragment>
@@ -43,12 +47,16 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
       <div
         class="error-viewer"
       />
-      <input
-        class="form-control"
-        placeholder="Enter comma-separated values..."
-        type="text"
-        value="test1, test2, test3"
-      />
+      <div
+        class="d-flex flex-column gap-1"
+      >
+        <input
+          class="form-control"
+          placeholder="Enter comma-separated values..."
+          type="text"
+          value="test1, test2, test3"
+        />
+      </div>
     </form>
   </div>
 </DocumentFragment>
@@ -63,12 +71,16 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
       <div
         class="error-viewer"
       />
-      <input
-        class="form-control"
-        placeholder="Enter comma-separated values..."
-        type="text"
-        value="test1, test2, test3"
-      />
+      <div
+        class="d-flex flex-column gap-1"
+      >
+        <input
+          class="form-control"
+          placeholder="Enter comma-separated values..."
+          type="text"
+          value="test1, test2, test3"
+        />
+      </div>
     </form>
   </div>
 </DocumentFragment>
@@ -287,14 +299,6 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation with boolean-like values Normal field 1`] = `
-{
-  "term": {
-    "data.attributes.textField": "true",
-  },
-}
-`;
-
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation With relationship as field 1`] = `
 {
   "nested": {
@@ -305,30 +309,6 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
           {
             "term": {
               "included.attributes.name.keyword": "text search",
-            },
-          },
-          {
-            "term": {
-              "included.type": "collection",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation with boolean-like values With relationship as field 1`] = `
-{
-  "nested": {
-    "path": "included",
-    "query": {
-      "bool": {
-        "must": [
-          {
-            "term": {
-              "includes.name.keyword": "false",
             },
           },
           {
@@ -358,6 +338,38 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
           {
             "term": {
               "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation with boolean-like values Normal field 1`] = `
+{
+  "term": {
+    "data.attributes.textField": "true",
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation with boolean-like values With relationship as field 1`] = `
+{
+  "nested": {
+    "path": "included",
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "term": {
+              "includes.name.keyword": "false",
+            },
+          },
+          {
+            "term": {
+              "included.type": "collection",
             },
           },
         ],
@@ -569,7 +581,121 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function contains (wild
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function in operator Normal field 1`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function in operator Normal field - over 100 items (case-sensitive terms query) 1`] = `
+{
+  "bool": {
+    "must": {
+      "terms": {
+        "data.attributes.textField": [
+          "test1",
+          "test2",
+          "test3",
+          "test4",
+          "test5",
+          "test6",
+          "test7",
+          "test8",
+          "test9",
+          "test10",
+          "test11",
+          "test12",
+          "test13",
+          "test14",
+          "test15",
+          "test16",
+          "test17",
+          "test18",
+          "test19",
+          "test20",
+          "test21",
+          "test22",
+          "test23",
+          "test24",
+          "test25",
+          "test26",
+          "test27",
+          "test28",
+          "test29",
+          "test30",
+          "test31",
+          "test32",
+          "test33",
+          "test34",
+          "test35",
+          "test36",
+          "test37",
+          "test38",
+          "test39",
+          "test40",
+          "test41",
+          "test42",
+          "test43",
+          "test44",
+          "test45",
+          "test46",
+          "test47",
+          "test48",
+          "test49",
+          "test50",
+          "test51",
+          "test52",
+          "test53",
+          "test54",
+          "test55",
+          "test56",
+          "test57",
+          "test58",
+          "test59",
+          "test60",
+          "test61",
+          "test62",
+          "test63",
+          "test64",
+          "test65",
+          "test66",
+          "test67",
+          "test68",
+          "test69",
+          "test70",
+          "test71",
+          "test72",
+          "test73",
+          "test74",
+          "test75",
+          "test76",
+          "test77",
+          "test78",
+          "test79",
+          "test80",
+          "test81",
+          "test82",
+          "test83",
+          "test84",
+          "test85",
+          "test86",
+          "test87",
+          "test88",
+          "test89",
+          "test90",
+          "test91",
+          "test92",
+          "test93",
+          "test94",
+          "test95",
+          "test96",
+          "test97",
+          "test98",
+          "test99",
+          "test100",
+          "test101",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function in operator Normal field - under threshold (case-insensitive term query) 1`] = `
 {
   "bool": {
     "must": {
@@ -607,7 +733,297 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function in operator No
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function not in operator Normal field 1`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function in operator Relationship field - over 100 items 1`] = `
+{
+  "nested": {
+    "path": "included",
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "bool": {
+              "must": {
+                "terms": {
+                  "included.attributes.determination.scientificName.keyword": [
+                    "test1",
+                    "test2",
+                    "test3",
+                    "test4",
+                    "test5",
+                    "test6",
+                    "test7",
+                    "test8",
+                    "test9",
+                    "test10",
+                    "test11",
+                    "test12",
+                    "test13",
+                    "test14",
+                    "test15",
+                    "test16",
+                    "test17",
+                    "test18",
+                    "test19",
+                    "test20",
+                    "test21",
+                    "test22",
+                    "test23",
+                    "test24",
+                    "test25",
+                    "test26",
+                    "test27",
+                    "test28",
+                    "test29",
+                    "test30",
+                    "test31",
+                    "test32",
+                    "test33",
+                    "test34",
+                    "test35",
+                    "test36",
+                    "test37",
+                    "test38",
+                    "test39",
+                    "test40",
+                    "test41",
+                    "test42",
+                    "test43",
+                    "test44",
+                    "test45",
+                    "test46",
+                    "test47",
+                    "test48",
+                    "test49",
+                    "test50",
+                    "test51",
+                    "test52",
+                    "test53",
+                    "test54",
+                    "test55",
+                    "test56",
+                    "test57",
+                    "test58",
+                    "test59",
+                    "test60",
+                    "test61",
+                    "test62",
+                    "test63",
+                    "test64",
+                    "test65",
+                    "test66",
+                    "test67",
+                    "test68",
+                    "test69",
+                    "test70",
+                    "test71",
+                    "test72",
+                    "test73",
+                    "test74",
+                    "test75",
+                    "test76",
+                    "test77",
+                    "test78",
+                    "test79",
+                    "test80",
+                    "test81",
+                    "test82",
+                    "test83",
+                    "test84",
+                    "test85",
+                    "test86",
+                    "test87",
+                    "test88",
+                    "test89",
+                    "test90",
+                    "test91",
+                    "test92",
+                    "test93",
+                    "test94",
+                    "test95",
+                    "test96",
+                    "test97",
+                    "test98",
+                    "test99",
+                    "test100",
+                    "test101",
+                  ],
+                },
+              },
+            },
+          },
+          {
+            "term": {
+              "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function in operator Relationship field - under threshold 1`] = `
+{
+  "nested": {
+    "path": "included",
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "bool": {
+              "must": {
+                "bool": {
+                  "minimum_should_match": 1,
+                  "should": [
+                    {
+                      "term": {
+                        "included.attributes.determination.scientificName.keyword": {
+                          "case_insensitive": true,
+                          "value": "Homo sapiens",
+                        },
+                      },
+                    },
+                    {
+                      "term": {
+                        "included.attributes.determination.scientificName.keyword": {
+                          "case_insensitive": true,
+                          "value": "Canis lupus",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          {
+            "term": {
+              "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function not in operator Normal field - over 100 items (case-sensitive terms query) 1`] = `
+{
+  "bool": {
+    "must_not": {
+      "terms": {
+        "data.attributes.textField": [
+          "test1",
+          "test2",
+          "test3",
+          "test4",
+          "test5",
+          "test6",
+          "test7",
+          "test8",
+          "test9",
+          "test10",
+          "test11",
+          "test12",
+          "test13",
+          "test14",
+          "test15",
+          "test16",
+          "test17",
+          "test18",
+          "test19",
+          "test20",
+          "test21",
+          "test22",
+          "test23",
+          "test24",
+          "test25",
+          "test26",
+          "test27",
+          "test28",
+          "test29",
+          "test30",
+          "test31",
+          "test32",
+          "test33",
+          "test34",
+          "test35",
+          "test36",
+          "test37",
+          "test38",
+          "test39",
+          "test40",
+          "test41",
+          "test42",
+          "test43",
+          "test44",
+          "test45",
+          "test46",
+          "test47",
+          "test48",
+          "test49",
+          "test50",
+          "test51",
+          "test52",
+          "test53",
+          "test54",
+          "test55",
+          "test56",
+          "test57",
+          "test58",
+          "test59",
+          "test60",
+          "test61",
+          "test62",
+          "test63",
+          "test64",
+          "test65",
+          "test66",
+          "test67",
+          "test68",
+          "test69",
+          "test70",
+          "test71",
+          "test72",
+          "test73",
+          "test74",
+          "test75",
+          "test76",
+          "test77",
+          "test78",
+          "test79",
+          "test80",
+          "test81",
+          "test82",
+          "test83",
+          "test84",
+          "test85",
+          "test86",
+          "test87",
+          "test88",
+          "test89",
+          "test90",
+          "test91",
+          "test92",
+          "test93",
+          "test94",
+          "test95",
+          "test96",
+          "test97",
+          "test98",
+          "test99",
+          "test100",
+          "test101",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function not in operator Normal field - under threshold (case-insensitive term query) 1`] = `
 {
   "bool": {
     "must_not": {
@@ -636,6 +1052,182 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function not in operato
                 "case_insensitive": true,
                 "value": "test3",
               },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function not in operator Relationship field - over 100 items 1`] = `
+{
+  "nested": {
+    "path": "included",
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "bool": {
+              "must_not": {
+                "terms": {
+                  "included.attributes.determination.scientificName.keyword": [
+                    "test1",
+                    "test2",
+                    "test3",
+                    "test4",
+                    "test5",
+                    "test6",
+                    "test7",
+                    "test8",
+                    "test9",
+                    "test10",
+                    "test11",
+                    "test12",
+                    "test13",
+                    "test14",
+                    "test15",
+                    "test16",
+                    "test17",
+                    "test18",
+                    "test19",
+                    "test20",
+                    "test21",
+                    "test22",
+                    "test23",
+                    "test24",
+                    "test25",
+                    "test26",
+                    "test27",
+                    "test28",
+                    "test29",
+                    "test30",
+                    "test31",
+                    "test32",
+                    "test33",
+                    "test34",
+                    "test35",
+                    "test36",
+                    "test37",
+                    "test38",
+                    "test39",
+                    "test40",
+                    "test41",
+                    "test42",
+                    "test43",
+                    "test44",
+                    "test45",
+                    "test46",
+                    "test47",
+                    "test48",
+                    "test49",
+                    "test50",
+                    "test51",
+                    "test52",
+                    "test53",
+                    "test54",
+                    "test55",
+                    "test56",
+                    "test57",
+                    "test58",
+                    "test59",
+                    "test60",
+                    "test61",
+                    "test62",
+                    "test63",
+                    "test64",
+                    "test65",
+                    "test66",
+                    "test67",
+                    "test68",
+                    "test69",
+                    "test70",
+                    "test71",
+                    "test72",
+                    "test73",
+                    "test74",
+                    "test75",
+                    "test76",
+                    "test77",
+                    "test78",
+                    "test79",
+                    "test80",
+                    "test81",
+                    "test82",
+                    "test83",
+                    "test84",
+                    "test85",
+                    "test86",
+                    "test87",
+                    "test88",
+                    "test89",
+                    "test90",
+                    "test91",
+                    "test92",
+                    "test93",
+                    "test94",
+                    "test95",
+                    "test96",
+                    "test97",
+                    "test98",
+                    "test99",
+                    "test100",
+                    "test101",
+                  ],
+                },
+              },
+            },
+          },
+          {
+            "term": {
+              "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function not in operator Relationship field - under threshold 1`] = `
+{
+  "nested": {
+    "path": "included",
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "bool": {
+              "must_not": {
+                "bool": {
+                  "minimum_should_match": 1,
+                  "should": [
+                    {
+                      "term": {
+                        "included.attributes.determination.scientificName.keyword": {
+                          "case_insensitive": true,
+                          "value": "Homo sapiens",
+                        },
+                      },
+                    },
+                    {
+                      "term": {
+                        "included.attributes.determination.scientificName.keyword": {
+                          "case_insensitive": true,
+                          "value": "Canis lupus",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          {
+            "term": {
+              "included.type": "organism",
             },
           },
         ],
