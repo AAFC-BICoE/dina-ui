@@ -4,7 +4,6 @@ import {
   FormikButton,
   ResourceSelect,
   SimpleSearchFilterBuilder,
-  useBulkGet,
   useDinaFormContext
 } from "common-ui";
 import { FieldArray } from "formik";
@@ -14,8 +13,13 @@ import { useRef } from "react";
 import { GiMove } from "react-icons/gi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../types/collection-api";
+import {
+  ControlledVocabularyItem,
+  ManagedAttribute
+} from "../../../types/collection-api";
 import { ManagedAttributeField } from "../ManagedAttributeField";
+import { useManagedAttributeQueries } from "../useManagedAttributeQueries";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "../../controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   DndContext,
   closestCenter,
@@ -39,16 +43,30 @@ export interface ManagedAttributeSorterProps {
   /** If inputa are editable, this is the path to the managedAttributes field in the form. */
   valuesPath?: string;
   managedAttributeApiPath: string;
+
+  /**
+   * Whether the managed attributes are from a controlled vocabulary endpoint (e.g. collection-api/controlled-vocabulary-item) or from a regular managed attribute endpoint (e.g. collection-api/managed-attribute).
+   * This changes how the "Add Managed Attribute" selector filters and fetches attributes.
+   */
+  isControlledVocabulary?: boolean;
+
+  /**
+   * Controlled Vocabulary UUID used to scope managed attributes when isControlledVocabulary is true.
+   * Defaults to the collection managed attribute vocabulary.
+   */
+  controlledVocabularyId?: string;
 }
 
 export function ManagedAttributesSorter({
   managedAttributeComponent,
   name,
   managedAttributeApiPath,
-  valuesPath
+  valuesPath,
+  isControlledVocabulary = false,
+  controlledVocabularyId = COLLECTION_MANAGED_ATTRIBUTE_ID
 }: ManagedAttributeSorterProps) {
   const { readOnly, isTemplate } = useDinaFormContext();
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -92,15 +110,24 @@ export function ManagedAttributesSorter({
                 className="managed-attributes-select mb-4"
                 style={{ maxWidth: "30rem" }}
               >
-                <ResourceSelect<ManagedAttribute>
+                <ResourceSelect<ManagedAttribute | ControlledVocabularyItem>
                   filter={(input: string) =>
-                    SimpleSearchFilterBuilder.create<ManagedAttribute>()
+                    SimpleSearchFilterBuilder.create<any>()
                       .searchFilter("name", input)
                       .when(!!managedAttributeComponent, (builder) =>
                         builder.where(
-                          "managedAttributeComponent",
+                          isControlledVocabulary
+                            ? "dinaComponent"
+                            : "managedAttributeComponent",
                           "EQ",
                           managedAttributeComponent
+                        )
+                      )
+                      .when(isControlledVocabulary, (builder) =>
+                        builder.where(
+                          "controlledVocabulary.uuid",
+                          "EQ",
+                          controlledVocabularyId
                         )
                       )
                       .build()
@@ -115,7 +142,21 @@ export function ManagedAttributesSorter({
                       push(ma.key);
                     }
                   }}
-                  optionLabel={(ma) => ma.name}
+                  optionLabel={(attribute) => {
+                    const localizedTitle = (
+                      attribute as ControlledVocabularyItem
+                    )?.multilingualTitle?.titles?.find(
+                      (t) => t.lang === locale
+                    )?.title;
+                    const fallbackTitle = (
+                      attribute as ControlledVocabularyItem
+                    )?.multilingualTitle?.titles?.find(
+                      (t) => t.lang !== locale
+                    )?.title;
+                    return (
+                      localizedTitle || fallbackTitle || attribute.name || ""
+                    );
+                  }}
                   placeholder={formatMessage("addManagedAttribute")}
                   omitNullOption={true}
                 />
@@ -164,6 +205,8 @@ export function ManagedAttributesSorter({
                       managedAttributeComponent={managedAttributeComponent}
                       onRemoveClick={(index) => remove(index)}
                       valuesPath={valuesPath}
+                      isControlledVocabulary={isControlledVocabulary}
+                      controlledVocabularyId={controlledVocabularyId}
                     />
                   </DndContext>
                 )}
@@ -182,6 +225,8 @@ interface AttributesViewListProps {
   managedAttributeComponent?: string;
   onRemoveClick: (index: number) => void;
   valuesPath?: string;
+  isControlledVocabulary?: boolean;
+  controlledVocabularyId?: string;
 }
 
 /** Sortable Managed Attribute list. */
@@ -190,23 +235,25 @@ function AttributesViewList({
   managedAttributeApiPath,
   managedAttributeComponent,
   onRemoveClick,
-  valuesPath
+  valuesPath,
+  isControlledVocabulary = false,
+  controlledVocabularyId = COLLECTION_MANAGED_ATTRIBUTE_ID
 }: AttributesViewListProps) {
   // Fetch the attributes, but omit any that are missing e.g. were deleted.
-  const { dataWithNullForMissing: fetchedAttributes } =
-    useBulkGet<ManagedAttribute>({
-      ids: keys.map((key) =>
-        // Use the component prefix if needed by the back-end:
-        _.compact([managedAttributeComponent, key]).join(".")
-      ),
-      listPath: managedAttributeApiPath
-    });
+  const { data: fetchedAttributes } = useManagedAttributeQueries({
+    keys,
+    managedAttributeApiPath,
+    managedAttributeComponent,
+    disabled: !keys.length,
+    isControlledVocabulary,
+    controlledVocabularyId
+  });
 
   // Store the last fetched Attributes in a ref instead of showing a
   // loading state when the visible attributes change.
-  const lastFetchedAttributes = useRef<PersistedResource<ManagedAttribute>[]>(
-    []
-  );
+  const lastFetchedAttributes = useRef<
+    PersistedResource<ManagedAttribute | ControlledVocabularyItem>[]
+  >([]);
   if (fetchedAttributes) {
     lastFetchedAttributes.current = _.compact(fetchedAttributes);
   }
@@ -247,7 +294,7 @@ function AttributesViewList({
 
 interface AttributesViewItemProps {
   onRemoveClick: () => void;
-  attribute: PersistedResource<ManagedAttribute>;
+  attribute: PersistedResource<ManagedAttribute | ControlledVocabularyItem>;
   valuesPath?: string;
 }
 

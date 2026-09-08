@@ -228,6 +228,12 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
+            id: "expedition"
+          },
+          {
+            id: "site"
+          },
+          {
             id: "habitat"
           },
           {
@@ -334,10 +340,10 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "managedAttributes.attachmentsConfig.allowNew"
+            id: "attachmentsConfig.allowNew"
           },
           {
-            id: "managedAttributes.attachmentsConfig.allowExisting"
+            id: "attachmentsConfig.allowExisting"
           }
         ]
       }
@@ -520,13 +526,13 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "associations.associationType"
+            id: "associations[0].associationType"
           },
           {
-            id: "associations.associatedSample"
+            id: "associations[0].associatedSample"
           },
           {
-            id: "associations.remarks"
+            id: "associations[0].remarks"
           }
         ]
       }
@@ -622,12 +628,30 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
     switchClassName: "enable-citations",
     sections: [
       {
-        id: "citations-general-section",
+        id: "citations-add-section",
         labelKey: "citations",
         maxGridSizeX: 2,
         items: [
           {
-            id: "citations[0].title"
+            id: "citation.doi"
+          },
+          {
+            id: "citation.title"
+          },
+          {
+            id: "citation.year"
+          },
+          {
+            id: "citation.journal"
+          },
+          {
+            id: "citation.volume"
+          },
+          {
+            id: "citation.pages"
+          },
+          {
+            id: "citation.citationRemarks"
           }
         ]
       }

@@ -352,4 +352,66 @@ describe("ManagedAttributesEditor component", () => {
     expect(exampleAttribute1Input.value).toEqual("example-value-1");
     expect(exampleAttribute2Input.value).toEqual("example-value-2");
   });
+
+  it("Shows Controlled Vocabulary options in the 'Add Managed Attribute' selector in a Form Template (isTemplate + managedAttributeOrderFieldName), instead of always being empty.", async () => {
+    const EXAMPLE_CV_1 = {
+      id: "1",
+      key: "example_attribute_1",
+      name: "Example Attribute 1",
+      vocabularyElementType: "STRING",
+      dinaComponent: "COLLECTING_EVENT"
+    };
+
+    const mockGetSorter = jest.fn<any, any>(async (path, params) => {
+      switch (path) {
+        case "collection-api/controlled-vocabulary-item":
+          if (
+            params?.filter?.dinaComponent?.EQ === "COLLECTING_EVENT" &&
+            params?.filter?.["controlledVocabulary.uuid"]?.EQ ===
+              COLLECTION_MANAGED_ATTRIBUTE_ID &&
+            !params?.filter?.managedAttributeComponent
+          ) {
+            return { data: [EXAMPLE_CV_1] };
+          }
+          return { data: [] };
+      }
+    });
+
+    const sorterApiContext = {
+      apiClient: { get: mockGetSorter },
+      bulkGet: mockBulkGet,
+      save: mockSave
+    };
+
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ collectingEventManagedAttributesOrder: [] }}
+        isTemplate={true}
+      >
+        <ManagedAttributesEditor
+          valuesPath="managedAttributes"
+          managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+          managedAttributeComponent="COLLECTING_EVENT"
+          managedAttributeOrderFieldName="collectingEventManagedAttributesOrder"
+          isControlledVocabulary={true}
+        />
+      </DinaForm>,
+      { apiContext: sorterApiContext }
+    );
+
+    // Open the "Add Managed Attribute" selector:
+    await waitFor(() => {
+      expect(wrapper.getByText("Add Managed Attribute")).toBeInTheDocument();
+    });
+    await userEvent.click(wrapper.getByText("Add Managed Attribute"));
+    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
+
+    // The controlled vocabulary item should be an available option, not "no options":
+    await waitFor(() => {
+      const options = wrapper.getAllByRole("option");
+      expect(options.map((option) => option.textContent)).toEqual([
+        "Example Attribute 1"
+      ]);
+    });
+  });
 });

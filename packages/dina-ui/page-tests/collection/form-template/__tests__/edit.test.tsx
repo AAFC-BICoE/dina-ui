@@ -477,6 +477,8 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "collecting-event-details",
           visible: true,
           items: [
+            { defaultValue: undefined, name: "expedition", visible: false },
+            { defaultValue: undefined, name: "site", visible: false },
             { defaultValue: undefined, name: "habitat", visible: false },
             { defaultValue: undefined, name: "host", visible: false },
             {
@@ -602,12 +604,12 @@ const formTemplate: PersistedResource<FormTemplate> = {
           items: [
             {
               defaultValue: undefined,
-              name: "managedAttributes.attachmentsConfig.allowNew",
+              name: "attachmentsConfig.allowNew",
               visible: false
             },
             {
               defaultValue: undefined,
-              name: "managedAttributes.attachmentsConfig.allowExisting",
+              name: "attachmentsConfig.allowExisting",
               visible: false
             }
           ]
@@ -817,17 +819,17 @@ const formTemplate: PersistedResource<FormTemplate> = {
           items: [
             {
               defaultValue: undefined,
-              name: "associations.associationType",
+              name: "associations[0].associationType",
               visible: false
             },
             {
               defaultValue: undefined,
-              name: "associations.associatedSample",
+              name: "associations[0].associatedSample",
               visible: false
             },
             {
               defaultValue: undefined,
-              name: "associations.remarks",
+              name: "associations[0].remarks",
               visible: false
             }
           ]
@@ -917,7 +919,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
         {
           items: [
             {
-              name: "citations[0].title"
+              name: "citation.title"
             }
           ]
         }
@@ -1236,6 +1238,8 @@ const expected = {
           name: "collecting-event-details",
           visible: true,
           items: [
+            { defaultValue: undefined, name: "expedition", visible: false },
+            { defaultValue: undefined, name: "site", visible: false },
             { defaultValue: undefined, name: "habitat", visible: false },
             { defaultValue: undefined, name: "host", visible: false },
             {
@@ -1392,12 +1396,12 @@ const expected = {
           items: [
             {
               defaultValue: undefined,
-              name: "managedAttributes.attachmentsConfig.allowNew",
+              name: "attachmentsConfig.allowNew",
               visible: false
             },
             {
               defaultValue: undefined,
-              name: "managedAttributes.attachmentsConfig.allowExisting",
+              name: "attachmentsConfig.allowExisting",
               visible: false
             }
           ]
@@ -1632,17 +1636,17 @@ const expected = {
           items: [
             {
               defaultValue: undefined,
-              name: "associations.associationType",
+              name: "associations[0].associationType",
               visible: false
             },
             {
               defaultValue: undefined,
-              name: "associations.associatedSample",
+              name: "associations[0].associatedSample",
               visible: false
             },
             {
               defaultValue: undefined,
-              name: "associations.remarks",
+              name: "associations[0].remarks",
               visible: false
             }
           ]
@@ -1756,12 +1760,42 @@ const expected = {
       order: 10,
       sections: [
         {
-          name: "citations-general-section",
+          name: "citations-add-section",
           visible: true,
           items: [
             {
               defaultValue: undefined,
-              name: "citations[0].title",
+              name: "citation.doi",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "citation.title",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "citation.year",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "citation.journal",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "citation.volume",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "citation.pages",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "citation.citationRemarks",
               visible: false
             }
           ]

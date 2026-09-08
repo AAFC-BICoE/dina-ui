@@ -139,7 +139,7 @@ export function getComponentValues(
                 (item.name && item.visible) ||
                 item.name === "geoReferenceAssertions"
               ) {
-                componentValues[item.name] = item.defaultValue;
+                _.set(componentValues, item.name!, item.defaultValue);
                 templateCheckboxes[
                   component.name + "." + section.name + "." + item.name
                 ] = true;
@@ -180,7 +180,7 @@ export function getMaterialSampleComponentValues(
           component.sections?.forEach((section) => {
             section.items?.forEach((item) => {
               if (item.name && item.visible) {
-                componentValues[item.name] = item.defaultValue;
+                _.set(componentValues, item.name, item.defaultValue);
                 templateCheckboxes[
                   component.name + "." + section.name + "." + item.name
                 ] = true;

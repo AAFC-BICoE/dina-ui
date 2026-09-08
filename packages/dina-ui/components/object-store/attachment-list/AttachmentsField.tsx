@@ -107,7 +107,8 @@ export function AttachmentsEditor({
   wrapContent = (content) => content,
   name
 }: AttachmentsEditorProps) {
-  const { isTemplate, readOnly } = useDinaFormContext();
+  const { isTemplate, readOnly, componentName, sectionName } =
+    useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const { closeModal } = useModal();
 
@@ -129,6 +130,19 @@ export function AttachmentsEditor({
   // Whether to disable the "Add Attachments" button:
   const addingAttachmentsDisabled =
     !allowAttachmentsConfig?.allowExisting && !allowAttachmentsConfig?.allowNew;
+
+  function setTemplateCheckboxValue(
+    fieldName: string | undefined,
+    form,
+    checked: boolean
+  ) {
+    if (fieldName && componentName && sectionName) {
+      form.setFieldValue(
+        `templateCheckboxes['${componentName}.${sectionName}.${fieldName}']`,
+        checked
+      );
+    }
+  }
 
   const COLUMNS: ColumnDef<PersistedResource<KitsuResource | Metadata>>[] = [
     ThumbnailCell({
@@ -267,6 +281,13 @@ export function AttachmentsEditor({
               className="allow-new-checkbox"
               name={allowNewFieldName}
               includeAllLabel={formatMessage("allowNew")}
+              onClickIncludeAll={(e, form) =>
+                setTemplateCheckboxValue(
+                  allowNewFieldName,
+                  form,
+                  e.target.checked
+                )
+              }
             />
           )}
           {allowExistingFieldName && (
@@ -274,6 +295,13 @@ export function AttachmentsEditor({
               className="allow-existing-checkbox"
               name={allowExistingFieldName}
               includeAllLabel={formatMessage("allowExisting")}
+              onClickIncludeAll={(e, form) =>
+                setTemplateCheckboxValue(
+                  allowExistingFieldName,
+                  form,
+                  e.target.checked
+                )
+              }
             />
           )}
         </>
