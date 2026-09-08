@@ -1,18 +1,11 @@
-import {
-  DinaForm,
-  FieldView,
-  SimpleSearchFilterBuilder,
-  useApiClient,
-  useIsMounted
-} from "common-ui";
+import { DinaForm, FieldView } from "common-ui";
 import _ from "lodash";
-import { ManagedAttribute } from "../../types/collection-api";
-import { useEffect, useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   getManagedAttributeTitle,
   getManagedAttributeTooltipText
 } from "./ManagedAttributeField";
+import { useBulkManagedAttributes } from "./useBulkManagedAttributes";
 
 export interface ManagedAttributesViewerProps {
   /**
@@ -35,60 +28,29 @@ export function ManagedAttributesViewer({
   controlledVocabularyId
 }: ManagedAttributesViewerProps) {
   const { locale, formatMessage } = useDinaIntl();
-  const { apiClient } = useApiClient();
-  const [allAttrKeyNameMap, setAllAttrKeyNameMap] = useState<{
-    [key: string]: Record<string, string>;
-  }>({});
-  const isMounted = useIsMounted();
-  // Call API to fetch all ManagedAttributes
-  useEffect(() => {
-    async function fetchAllManagedAttributes() {
-      try {
-        const managedAttributeKeys = values ? Object.keys(values) : [];
-        if (!managedAttributeKeys.length) {
-          return;
-        }
 
-        const { data } = await apiClient.get<ManagedAttribute[]>(
-          `${managedAttributeApiPath}`,
-          {
-            filter: SimpleSearchFilterBuilder.create()
-              .whereIn("key", managedAttributeKeys)
-              .when(!!managedAttributeComponent, (builder) =>
-                builder.where("dinaComponent", "EQ", managedAttributeComponent)
-              )
-              .when(!!controlledVocabularyId, (builder) =>
-                builder.where(
-                  "controlledVocabulary.uuid" as any,
-                  "EQ",
-                  controlledVocabularyId
-                )
-              )
-              .build(),
-            page: { limit: managedAttributeKeys.length }
-          }
-        );
-        const attrKeyNameMap = data.reduce(
-          (accu, obj) => ({
-            ...accu,
-            [obj.key]: {
-              name: getManagedAttributeTitle(obj as any, locale),
-              multilingualDescription: obj.multilingualDescription
-            }
-          }),
-          {} as { [key: string]: {} }
-        );
+  const managedAttributeKeys = values ? Object.keys(values) : [];
 
-        if (isMounted.current) {
-          setAllAttrKeyNameMap(attrKeyNameMap);
-        }
-      } catch (error) {
-        // Handle the error here, e.g., log it or display an error message.
-        console.error(error);
+  const { data: fetchedAttributes } = useBulkManagedAttributes({
+    baseApiPath: managedAttributeApiPath,
+    dinaComponent: managedAttributeComponent,
+    keys: managedAttributeKeys,
+    isControlledVocabulary: !!controlledVocabularyId,
+    controlledVocabularyId,
+    disabled: !managedAttributeKeys.length
+  });
+
+  const allAttrKeyNameMap = (fetchedAttributes ?? []).reduce(
+    (accu, obj) => ({
+      ...accu,
+      [obj.key]: {
+        name: getManagedAttributeTitle(obj as any, locale),
+        multilingualDescription: obj.multilingualDescription
       }
-    }
-    fetchAllManagedAttributes();
-  }, []);
+    }),
+    {} as { [key: string]: Record<string, string> }
+  );
+
   const managedAttributeValues = (
     values
       ? _.toPairs(values).map(([key, mav]) => ({
