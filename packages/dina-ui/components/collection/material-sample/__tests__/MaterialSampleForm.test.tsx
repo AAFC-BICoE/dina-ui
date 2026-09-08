@@ -1,4 +1,4 @@
-import { InputResource, KitsuResourceLink } from "kitsu";
+import { InputResource, KitsuResourceLink, PersistedResource } from "kitsu";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
 import {
   mountWithAppContext,
@@ -6,8 +6,13 @@ import {
   clearAndType
 } from "common-ui";
 import {
+  ASSOCIATIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
+  COLLECTING_EVENT_COMPONENT_NAME,
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
   blankMaterialSample,
   CollectingEvent,
+  FormTemplate,
   MaterialSample
 } from "../../../../types/collection-api";
 import { waitFor, screen, within } from "@testing-library/react";
@@ -219,6 +224,113 @@ const mockGeographicSearchResults = [
   }
 ];
 
+/**
+ * A Form Template used to test "applying" a saved Form Template when creating a new Material
+ * Sample: both the default value population (useMaterialSampleFormTemplateSelectState /
+ * useMaterialSampleFormTemplateProps) and the field-visibility hiding (FieldWrapper's
+ * disabledByFormTemplate) driven by the same FormTemplate resource.
+ *
+ * Deliberately mixes visible:true/visible:false on sibling fields within the same section
+ * (e.g. expedition shown but site hidden) to prove per-field granularity works.
+ */
+const TEST_APPLY_FORM_TEMPLATE_ID = "test-apply-form-template-uuid";
+const TEST_APPLY_FORM_TEMPLATE: PersistedResource<FormTemplate> = {
+  id: TEST_APPLY_FORM_TEMPLATE_ID,
+  type: "form-template",
+  name: "Test Apply Form Template",
+  group: "aafc",
+  viewConfiguration: { type: "material-sample-form-template" } as any,
+  components: [
+    {
+      name: MANAGED_ATTRIBUTES_COMPONENT_NAME,
+      visible: true,
+      order: 0,
+      sections: [
+        {
+          name: "managed-attributes-section",
+          visible: true,
+          items: [
+            {
+              name: "managedAttributes",
+              visible: true,
+              defaultValue: { attribute_1: "default attribute 1 value" }
+            },
+            {
+              name: "managedAttributesOrder",
+              visible: true,
+              defaultValue: ["attribute_1", "attribute_2"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: COLLECTING_EVENT_COMPONENT_NAME,
+      visible: true,
+      order: 1,
+      sections: [
+        {
+          name: "collecting-event-details",
+          visible: true,
+          items: [
+            {
+              name: "expedition",
+              visible: true,
+              defaultValue: {
+                id: "expedition-1",
+                type: "expedition",
+                name: "Test Expedition"
+              }
+            },
+            // Site is intentionally left hidden, to prove per-field granularity
+            // within the same section as the (visible) expedition field above:
+            { name: "site", visible: false }
+          ]
+        }
+      ]
+    },
+    {
+      name: ASSOCIATIONS_COMPONENT_NAME,
+      visible: true,
+      order: 2,
+      sections: [
+        {
+          name: "associations-material-sample-section",
+          visible: true,
+          items: [
+            {
+              name: "associations[0].associationType",
+              visible: true,
+              defaultValue: "host"
+            },
+            { name: "associations[0].associatedSample", visible: false },
+            { name: "associations[0].remarks", visible: false }
+          ]
+        }
+      ]
+    },
+    {
+      name: CITATIONS_COMPONENT_NAME,
+      visible: true,
+      order: 3,
+      sections: [
+        {
+          name: "citations-add-section",
+          visible: true,
+          items: [
+            {
+              name: "citation.title",
+              visible: true,
+              defaultValue: "Default Paper Title"
+            },
+            { name: "citation.doi", visible: false }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/controlled-vocabulary-item":
@@ -305,6 +417,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           }
         ]
       };
+    case `collection-api/form-template/${TEST_APPLY_FORM_TEMPLATE_ID}`:
+      return { data: TEST_APPLY_FORM_TEMPLATE };
     default:
       return { data: [], meta: { totalResourceCount: 0 } };
   }
@@ -4539,6 +4653,55 @@ describe("Material Sample Edit Page", () => {
         ])
       );
     });
+
+    it("Hides fields based on the active Form Template (regression test).", async () => {
+      // ScheduledActionSubForm (like CitationSubForm) uses a plain nested <DinaForm>
+      // rather than a <DinaFormSection> whenever it's NOT inside the Form Template
+      // editor itself. A plain <DinaForm> starts a brand new DinaFormContext from only
+      // the props explicitly given to it, so without forwarding the ambient
+      // formTemplate into it, the per-field visibility hiding (FieldWrapper's
+      // disabledByFormTemplate) never activated - every scheduled action field always
+      // showed, regardless of what the Form Template said.
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms"
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "scheduled-actions-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "scheduled-actions-add-section",
+                    visible: true,
+                    items: [
+                      { name: "scheduledAction.actionType", visible: true },
+                      { name: "scheduledAction.assignedTo", visible: false }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("textbox", { name: /action type/i })
+        ).toBeInTheDocument()
+      );
+      expect(
+        wrapper.queryByRole("combobox", { name: /assigned to/i })
+      ).not.toBeInTheDocument();
+    });
   });
 
   describe("save and copy to next functionality", () => {
@@ -4907,6 +5070,154 @@ describe("Material Sample Edit Page", () => {
       expect(routerPushMock).not.toHaveBeenCalledWith(
         expect.stringContaining("copyFromId")
       );
+    });
+  });
+
+  describe("Applying a Form Template", () => {
+    beforeEach(() => {
+      // The selected Form Template's UUID is persisted in localStorage
+      // (keyed by username), independently of the router query param:
+      window.localStorage.clear();
+    });
+
+    afterEach(() => {
+      window.localStorage.clear();
+    });
+
+    it("Populates default values and hides fields based on a Form Template selected via the ?formTemplateId= query param.", async () => {
+      (useRouter as jest.Mock).mockReturnValue({
+        query: { formTemplateId: TEST_APPLY_FORM_TEMPLATE_ID },
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // --- Managed Attributes: default value populated, order/visibility applied ---
+      // Attribute 1 has a default value from the template:
+      await waitFor(() =>
+        expect(
+          wrapper.getByDisplayValue(/default attribute 1 value/i)
+        ).toBeInTheDocument()
+      );
+      // Attribute 2 is visible (in the template's managedAttributesOrder) but has no default:
+      expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
+
+      // --- Collecting Event: enabled automatically by the template (no manual toggle needed) ---
+      // Expedition is visible and pre-filled with the template's default value:
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelector(".expedition-field")
+        ).toBeInTheDocument()
+      );
+      expect(wrapper.getByText(/test expedition/i)).toBeInTheDocument();
+      // Site is hidden by the template, even though it's in the same section as Expedition:
+      expect(
+        wrapper.container.querySelector(".site-field")
+      ).not.toBeInTheDocument();
+
+      // --- Associations: default value creates the entry, mixed field visibility applies ---
+      // The association tab/panel exists because the template gave it a default value
+      // (associations[0].associationType), even though nothing was added manually:
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelector(
+            ".associations_0__associationType-field"
+          )
+        ).toBeInTheDocument()
+      );
+      // Associated Sample and Remarks are hidden by the template on that same entry:
+      expect(
+        wrapper.container.querySelector(
+          ".associations_0__associatedSample-field"
+        )
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".associations_0__remarks-field")
+      ).not.toBeInTheDocument();
+
+      // --- Citations: default value populated, doi field hidden ---
+      await waitFor(() =>
+        expect(
+          wrapper.getByDisplayValue(/default paper title/i)
+        ).toBeInTheDocument()
+      );
+      expect(
+        wrapper.container.querySelector(".doi-field")
+      ).not.toBeInTheDocument();
+    });
+
+    it("Hides fields on an EXISTING Citation being edited on an existing Material Sample, based on the active Form Template (regression test).", async () => {
+      // CitationSubForm (used both for adding a new Citation and for editing an existing
+      // one) uses a plain nested <DinaForm> rather than a <DinaFormSection> whenever it's
+      // NOT inside the Form Template editor itself. A plain <DinaForm> starts a brand new
+      // DinaFormContext from only the props explicitly given to it, so without forwarding
+      // the ambient formTemplate into it, the per-field visibility hiding (FieldWrapper's
+      // disabledByFormTemplate) never activated - every citation field always showed,
+      // regardless of what the Form Template said, for both new AND existing citations.
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            id: "333",
+            group: "test-group",
+            materialSampleName: "test-ms",
+            citations: [
+              {
+                title: "Existing Title",
+                doi: "https://doi.org/10.1234/existing"
+              }
+            ]
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "citations-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "citations-add-section",
+                    visible: true,
+                    items: [
+                      { name: "citation.title", visible: true },
+                      { name: "citation.doi", visible: false }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      // Switch to the detail table view to reveal the per-row Edit button:
+      await waitFor(() =>
+        expect(wrapper.getByLabelText(/view detail/i)).toBeInTheDocument()
+      );
+      await userEvent.click(wrapper.getByLabelText(/view detail/i));
+
+      // Open the existing citation for editing:
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /^edit$/i })
+        ).toBeInTheDocument()
+      );
+      await userEvent.click(wrapper.getByRole("button", { name: /^edit$/i }));
+
+      // The visible "title" field shows the existing value:
+      await waitFor(() =>
+        expect(wrapper.getByDisplayValue(/existing title/i)).toBeInTheDocument()
+      );
+      // The hidden "doi" field does not show, even though it has an existing value:
+      expect(
+        wrapper.container.querySelector(".doi-field")
+      ).not.toBeInTheDocument();
     });
   });
 });

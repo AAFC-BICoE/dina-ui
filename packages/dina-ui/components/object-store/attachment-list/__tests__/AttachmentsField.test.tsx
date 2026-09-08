@@ -1,4 +1,4 @@
-import { DinaForm, OBJECT_STORE_MAPPING } from "common-ui";
+import { DinaForm, DinaFormSection, OBJECT_STORE_MAPPING } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
@@ -343,6 +343,108 @@ describe("AttachmentsField component", () => {
       expect(mockOnSubmit).lastCalledWith({
         attachment: [{ id: "example-2", type: "metadata" }]
       });
+    });
+  });
+
+  describe("Form Template mode", () => {
+    it("Sets the matching templateCheckboxes entry when 'Allow Existing' is checked (regression test).", async () => {
+      const mockSubmit = jest.fn();
+
+      const wrapper = mountWithAppContext(
+        <DinaForm
+          initialValues={{ attachmentsConfig: {}, templateCheckboxes: {} }}
+          isTemplate={true}
+          onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+        >
+          <DinaFormSection
+            componentName="material-sample-attachments-component"
+            sectionName="material-sample-attachments-sections"
+          >
+            <AttachmentsField
+              name="attachment"
+              allowNewFieldName="attachmentsConfig.allowNew"
+              allowExistingFieldName="attachmentsConfig.allowExisting"
+            />
+          </DinaFormSection>
+        </DinaForm>,
+        testCtx as any
+      );
+
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelector("input.allow-existing-checkbox")
+        ).toBeInTheDocument()
+      );
+
+      await userEvent.click(
+        wrapper.container.querySelector("input.allow-existing-checkbox")!
+      );
+
+      const form = wrapper.container.querySelector("form");
+      fireEvent.submit(form!);
+
+      await waitFor(() => expect(mockSubmit).toHaveBeenCalled());
+
+      const submitted = mockSubmit.mock.calls[0][0];
+      expect(submitted.attachmentsConfig.allowExisting).toEqual(true);
+      expect(
+        submitted.templateCheckboxes[
+          "material-sample-attachments-component.material-sample-attachments-sections.attachmentsConfig.allowExisting"
+        ]
+      ).toEqual(true);
+      // The untouched sibling checkbox's templateCheckboxes entry should not be set:
+      expect(
+        submitted.templateCheckboxes[
+          "material-sample-attachments-component.material-sample-attachments-sections.attachmentsConfig.allowNew"
+        ]
+      ).toBeUndefined();
+    });
+
+    it("Sets the matching templateCheckboxes entry when 'Allow New' is checked (regression test).", async () => {
+      const mockSubmit = jest.fn();
+
+      const wrapper = mountWithAppContext(
+        <DinaForm
+          initialValues={{ attachmentsConfig: {}, templateCheckboxes: {} }}
+          isTemplate={true}
+          onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+        >
+          <DinaFormSection
+            componentName="collecting-event-component"
+            sectionName="collecting-event-attachments-section"
+          >
+            <AttachmentsField
+              name="attachment"
+              allowNewFieldName="attachmentsConfig.allowNew"
+              allowExistingFieldName="attachmentsConfig.allowExisting"
+            />
+          </DinaFormSection>
+        </DinaForm>,
+        testCtx as any
+      );
+
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelector("input.allow-new-checkbox")
+        ).toBeInTheDocument()
+      );
+
+      await userEvent.click(
+        wrapper.container.querySelector("input.allow-new-checkbox")!
+      );
+
+      const form = wrapper.container.querySelector("form");
+      fireEvent.submit(form!);
+
+      await waitFor(() => expect(mockSubmit).toHaveBeenCalled());
+
+      const submitted = mockSubmit.mock.calls[0][0];
+      expect(submitted.attachmentsConfig.allowNew).toEqual(true);
+      expect(
+        submitted.templateCheckboxes[
+          "collecting-event-component.collecting-event-attachments-section.attachmentsConfig.allowNew"
+        ]
+      ).toEqual(true);
     });
   });
 });

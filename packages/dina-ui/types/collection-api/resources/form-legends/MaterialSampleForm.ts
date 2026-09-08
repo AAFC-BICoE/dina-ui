@@ -652,6 +652,9 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "citation.citationRemarks"
+          },
+          {
+            id: "authors"
           }
         ]
       }

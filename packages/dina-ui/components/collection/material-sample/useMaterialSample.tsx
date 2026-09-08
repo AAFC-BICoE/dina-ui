@@ -1711,7 +1711,7 @@ export function useMaterialSampleSave({
       (isTemplate
         ? colEventTemplateInitialValues
         : isCreatingNewColEvent
-        ? emptyCollectingEventInitialValues
+        ? collectingEventInitialValuesProp ?? emptyCollectingEventInitialValues
         : collectingEventInitialValues);
     const hasMultipleUsages = Boolean(
       materialSampleUsageCount && materialSampleUsageCount > 1

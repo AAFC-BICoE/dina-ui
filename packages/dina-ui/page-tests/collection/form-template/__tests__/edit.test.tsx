@@ -176,6 +176,9 @@ async function mountForm(
   const associationsSwitch = within(
     wrapper.container.querySelector(".enable-associations")! as HTMLElement
   ).getByRole("switch") as HTMLInputElement;
+  const citationsSwitch = within(
+    wrapper.container.querySelector(".enable-citations")! as HTMLElement
+  ).getByRole("switch") as HTMLInputElement;
 
   async function toggleDataComponent(switchElement: HTMLElement, val: boolean) {
     // Simulate click event on the checkbox
@@ -213,6 +216,10 @@ async function mountForm(
     await toggleDataComponent(associationsSwitch, val);
   }
 
+  async function toggleCitations(val: boolean) {
+    await toggleDataComponent(citationsSwitch, val);
+  }
+
   async function fillOutRequiredFields() {
     const nameInput = wrapper.container.querySelector(
       ".workflow-main-details .name-field input"
@@ -237,12 +244,14 @@ async function mountForm(
     toggleOrganisms,
     toggleScheduledActions,
     toggleAssociations,
+    toggleCitations,
     colEventSwitch,
     catalogSwitch,
     storageSwitch,
     scheduledActionsSwitch,
     organismsSwitch,
     associationsSwitch,
+    citationsSwitch,
     fillOutRequiredFields,
     submitForm
   };
@@ -1797,6 +1806,11 @@ const expected = {
               defaultValue: undefined,
               name: "citation.citationRemarks",
               visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "authors",
+              visible: false
             }
           ]
         }
@@ -1972,5 +1986,38 @@ describe("Form template edit page", () => {
     expect(colEventSwitch).not.toBeChecked();
     expect(catalogSwitch).not.toBeChecked();
     expect(scheduledActionsSwitch).not.toBeChecked();
+  });
+
+  it("Persists the Citation 'Authors' visibility checkbox correctly.", async () => {
+    const { toggleCitations, fillOutRequiredFields, submitForm, wrapper } =
+      await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the Citations component, showing the "Add Citation" sub-form directly:
+    await toggleCitations(true);
+
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelector(".citation_title-field")
+      ).toBeInTheDocument()
+    );
+
+    const authorsCheckbox = wrapper.container.querySelector(
+      ".authors-section input[type='checkbox']"
+    )!;
+    await userEvent.click(authorsCheckbox);
+
+    await submitForm();
+
+    const savedCitationsComponent =
+      mockOnSaved.mock.calls[0][0].components.find(
+        (comp) => comp.name === "citations-component"
+      );
+    const savedAuthorsItem = savedCitationsComponent?.sections
+      ?.find((section) => section.name === "citations-add-section")
+      ?.items?.find((item) => item.name === "authors");
+
+    expect(savedAuthorsItem?.visible).toEqual(true);
   });
 });
