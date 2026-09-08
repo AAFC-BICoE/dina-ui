@@ -5219,5 +5219,202 @@ describe("Material Sample Edit Page", () => {
         wrapper.container.querySelector(".doi-field")
       ).not.toBeInTheDocument();
     });
+
+    it("Still shows Preparation Managed Attributes when every other Preparation field is hidden by the Form Template", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms"
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "preparations-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "general-section",
+                    visible: true,
+                    items: [
+                      { name: "preparationType", visible: false },
+                      { name: "preparationMethod", visible: false },
+                      { name: "preservationType", visible: false },
+                      { name: "preparationFixative", visible: false },
+                      { name: "preparationMaterials", visible: false },
+                      { name: "preparationSubstrate", visible: false },
+                      { name: "preparationRemarks", visible: false },
+                      { name: "dwcDegreeOfEstablishment", visible: false },
+                      { name: "preparedBy", visible: false },
+                      { name: "preparationDate", visible: false },
+                      { name: "preparationProtocol", visible: false }
+                    ]
+                  },
+                  {
+                    name: "preparations-managed-attributes-section",
+                    visible: true,
+                    items: [
+                      { name: "preparationManagedAttributes", visible: true },
+                      {
+                        name: "preparationManagedAttributesOrder",
+                        visible: true
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      // Every individual Preparation field is correctly hidden:
+      expect(
+        wrapper.container.querySelector(".preparation-type")
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".preservationType-field")
+      ).not.toBeInTheDocument();
+
+      // But the Preparation Managed Attributes section still shows, including its
+      // "add an attribute" selector:
+      expect(
+        wrapper.getByText(/preparation managed attributes/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".visible-attribute-menu")
+      ).toBeInTheDocument();
+    });
+
+    it("Still shows Organism Managed Attributes when every other Organism field is hidden by the Form Template.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms",
+            organismsQuantity: 1,
+            organism: [{ type: "organism" }]
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "organisms-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "organisms-general-section",
+                    visible: true,
+                    items: [
+                      { name: "organism[0].lifeStage", visible: false },
+                      { name: "organism[0].sex", visible: false },
+                      { name: "organism[0].remarks", visible: false },
+                      {
+                        name: "organism[0].dwcVernacularName",
+                        visible: false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      expect(
+        wrapper.container.querySelector(".lifeStage-field")
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.getByText(/organism managed attributes/i)
+      ).toBeInTheDocument();
+    });
+
+    it("Still shows Determination Managed Attributes when every other Determination field is hidden by the Form Template.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms",
+            organism: [
+              {
+                type: "organism",
+                determination: [{ isPrimary: true }]
+              }
+            ]
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "organisms-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "organism-verbatim-determination-section",
+                    visible: true,
+                    items: [
+                      {
+                        name: "organism[0].determination[0].verbatimScientificName",
+                        visible: false
+                      }
+                    ]
+                  },
+                  {
+                    name: "organism-determination-section",
+                    visible: true,
+                    items: [
+                      {
+                        name: "organism[0].determination[0].scientificName",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].scientificNameInput",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determiner",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determinedOn",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determinationRemarks",
+                        visible: false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      expect(
+        wrapper.container.querySelector(".verbatimScientificName-field")
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.getByText(/determination managed attributes/i)
+      ).toBeInTheDocument();
+    });
   });
 });
