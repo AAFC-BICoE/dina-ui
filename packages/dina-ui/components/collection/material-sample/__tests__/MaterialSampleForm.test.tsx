@@ -5629,5 +5629,78 @@ describe("Material Sample Edit Page", () => {
         wrapper.getByText(/determination managed attributes/i)
       ).toBeInTheDocument();
     });
+
+    it("Hides the whole 'Collecting Event Details' section when every field within it is hidden by the Form Template, while a sibling section sharing the same component stays visible", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms"
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "collecting-event-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "collecting-event-details",
+                    visible: true,
+                    items: [
+                      {
+                        name: "expedition",
+                        visible: true,
+                        defaultValue: {
+                          id: "expedition-1",
+                          type: "expedition",
+                          name: "Test Expedition"
+                        }
+                      },
+                      { name: "site", visible: false }
+                    ]
+                  },
+                  {
+                    name: "collecting-event-additional-details-section",
+                    visible: true,
+                    items: [
+                      { name: "habitat", visible: false },
+                      { name: "host", visible: false },
+                      { name: "collectionMethod", visible: false },
+                      { name: "substrate", visible: false },
+                      { name: "dwcMinimumElevationInMeters", visible: false },
+                      { name: "dwcMaximumElevationInMeters", visible: false },
+                      { name: "dwcMinimumDepthInMeters", visible: false },
+                      { name: "dwcMaximumDepthInMeters", visible: false },
+                      { name: "remarks", visible: false }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      // Nothing is checked in the "additional details" section (habitat, host, etc.),
+      // so its box should not render at all - not even its empty legend/fieldset:
+      expect(
+        wrapper.queryByText("Collecting Event Details")
+      ).not.toBeInTheDocument();
+
+      // Expedition is visible (a sibling box sharing the "collecting-event-details"
+      // section id) and must not be affected by the above:
+      expect(
+        wrapper.getByText(/collecting event expedition/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".expedition-field")
+      ).toBeInTheDocument();
+    });
   });
 });

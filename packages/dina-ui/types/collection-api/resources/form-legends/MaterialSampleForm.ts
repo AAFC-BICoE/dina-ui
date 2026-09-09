@@ -232,7 +232,13 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "site"
-          },
+          }
+        ]
+      },
+      {
+        id: "collecting-event-additional-details-section",
+        maxGridSizeX: 1,
+        items: [
           {
             id: "habitat"
           },

@@ -520,7 +520,7 @@ export function CollectingEventFormLayout({
             legend={<DinaMessage id="collectingEventDetails" />}
             className="non-strip h-100"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
-            sectionName="collecting-event-details"
+            sectionName="collecting-event-additional-details-section"
           >
             <TextField name="habitat" />
             <TextField

@@ -1259,7 +1259,13 @@ const expected = {
           visible: true,
           items: [
             { defaultValue: undefined, name: "expedition", visible: false },
-            { defaultValue: undefined, name: "site", visible: false },
+            { defaultValue: undefined, name: "site", visible: false }
+          ]
+        },
+        {
+          name: "collecting-event-additional-details-section",
+          visible: true,
+          items: [
             { defaultValue: undefined, name: "habitat", visible: false },
             { defaultValue: undefined, name: "host", visible: false },
             {
