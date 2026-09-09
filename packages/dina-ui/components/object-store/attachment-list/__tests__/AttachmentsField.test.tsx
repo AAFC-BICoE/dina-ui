@@ -347,7 +347,7 @@ describe("AttachmentsField component", () => {
   });
 
   describe("Form Template mode", () => {
-    it("Sets the matching templateCheckboxes entry when 'Allow Existing' is checked (regression test).", async () => {
+    it("Sets the matching templateCheckboxes entry when 'Allow Existing' is checked.", async () => {
       const mockSubmit = jest.fn();
 
       const wrapper = mountWithAppContext(
@@ -400,7 +400,7 @@ describe("AttachmentsField component", () => {
       ).toBeUndefined();
     });
 
-    it("Sets the matching templateCheckboxes entry when 'Allow New' is checked (regression test).", async () => {
+    it("Sets the matching templateCheckboxes entry when 'Allow New' is checked.", async () => {
       const mockSubmit = jest.fn();
 
       const wrapper = mountWithAppContext(
@@ -503,7 +503,7 @@ describe("AttachmentsField component", () => {
   });
 
   describe("Applying a Form Template's Allow New/Allow Existing config", () => {
-    it("Hides the 'Attach Existing Objects' tab when the applied Form Template set allowExisting to false (regression test).", async () => {
+    it("Hides the 'Attach Existing Objects' tab when the applied Form Template set allowExisting to false.", async () => {
       const wrapper = mountWithAppContext(
         <DinaForm
           initialValues={{

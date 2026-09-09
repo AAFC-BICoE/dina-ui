@@ -4704,14 +4704,7 @@ describe("Material Sample Edit Page", () => {
       );
     });
 
-    it("Hides fields based on the active Form Template (regression test).", async () => {
-      // ScheduledActionSubForm (like CitationSubForm) uses a plain nested <DinaForm>
-      // rather than a <DinaFormSection> whenever it's NOT inside the Form Template
-      // editor itself. A plain <DinaForm> starts a brand new DinaFormContext from only
-      // the props explicitly given to it, so without forwarding the ambient
-      // formTemplate into it, the per-field visibility hiding (FieldWrapper's
-      // disabledByFormTemplate) never activated - every scheduled action field always
-      // showed, regardless of what the Form Template said.
+    it("Hides fields based on the active Form Template.", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleForm
           materialSample={{
@@ -5214,14 +5207,7 @@ describe("Material Sample Edit Page", () => {
       ).not.toBeInTheDocument();
     });
 
-    it("Strips the UI-only attachmentsConfig field from the submitted payload (regression test).", async () => {
-      // attachmentsConfig.allowNew/allowExisting is populated into the real form's
-      // initialValues from a Form Template's defaults (getMaterialSampleComponentValues),
-      // but it isn't a real Material Sample API field - it must never reach the backend.
-      // Use a NEW (no id) sample so the full submitted values are sent as-is, rather
-      // than an unchanged-field diff against an existing sample - which would hide this
-      // bug even without the fix, since attachmentsConfig wouldn't have changed from
-      // its initial value.
+    it("Strips the UI-only attachmentsConfig field from the submitted payload.", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleForm
           materialSample={
@@ -5249,14 +5235,7 @@ describe("Material Sample Edit Page", () => {
       expect(savedResource.attachmentsConfig).toBeUndefined();
     });
 
-    it("Hides fields on an EXISTING Citation being edited on an existing Material Sample, based on the active Form Template (regression test).", async () => {
-      // CitationSubForm (used both for adding a new Citation and for editing an existing
-      // one) uses a plain nested <DinaForm> rather than a <DinaFormSection> whenever it's
-      // NOT inside the Form Template editor itself. A plain <DinaForm> starts a brand new
-      // DinaFormContext from only the props explicitly given to it, so without forwarding
-      // the ambient formTemplate into it, the per-field visibility hiding (FieldWrapper's
-      // disabledByFormTemplate) never activated - every citation field always showed,
-      // regardless of what the Form Template said, for both new AND existing citations.
+    it("Hides fields on an EXISTING Citation being edited on an existing Material Sample, based on the active Form Template.", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleForm
           materialSample={{
