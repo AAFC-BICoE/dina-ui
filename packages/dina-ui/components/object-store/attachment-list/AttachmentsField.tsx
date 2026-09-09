@@ -72,9 +72,25 @@ export function AttachmentsField(props: AttachmentsFieldProps) {
       {(value, { form }) => {
         const metadatas =
           _.uniqBy(value as ResourceIdentifierObject[] | undefined, "id") ?? [];
+
+        const allowNew = props.allowNewFieldName
+          ? _.get(form.values, props.allowNewFieldName)
+          : undefined;
+        const allowExisting = props.allowExistingFieldName
+          ? _.get(form.values, props.allowExistingFieldName)
+          : undefined;
+        const allowAttachmentsConfig =
+          allowNew !== undefined || allowExisting !== undefined
+            ? {
+                allowNew: allowNew ?? true,
+                allowExisting: allowExisting ?? true
+              }
+            : props.allowAttachmentsConfig;
+
         return (
           <AttachmentsEditor
             {...props}
+            allowAttachmentsConfig={allowAttachmentsConfig}
             value={metadatas}
             onChange={(newMetadatas) =>
               form.setFieldValue(props.name, newMetadatas)
@@ -107,7 +123,8 @@ export function AttachmentsEditor({
   wrapContent = (content) => content,
   name
 }: AttachmentsEditorProps) {
-  const { isTemplate, readOnly } = useDinaFormContext();
+  const { isTemplate, readOnly, componentName, sectionName } =
+    useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const { closeModal } = useModal();
 
@@ -129,6 +146,15 @@ export function AttachmentsEditor({
   // Whether to disable the "Add Attachments" button:
   const addingAttachmentsDisabled =
     !allowAttachmentsConfig?.allowExisting && !allowAttachmentsConfig?.allowNew;
+
+  function setTemplateCheckboxValue(fieldName: string | undefined, form) {
+    if (fieldName && componentName && sectionName) {
+      form.setFieldValue(
+        `templateCheckboxes['${componentName}.${sectionName}.${fieldName}']`,
+        true
+      );
+    }
+  }
 
   const COLUMNS: ColumnDef<PersistedResource<KitsuResource | Metadata>>[] = [
     ThumbnailCell({
@@ -267,6 +293,9 @@ export function AttachmentsEditor({
               className="allow-new-checkbox"
               name={allowNewFieldName}
               includeAllLabel={formatMessage("allowNew")}
+              onClickIncludeAll={(_e, form) =>
+                setTemplateCheckboxValue(allowNewFieldName, form)
+              }
             />
           )}
           {allowExistingFieldName && (
@@ -274,6 +303,9 @@ export function AttachmentsEditor({
               className="allow-existing-checkbox"
               name={allowExistingFieldName}
               includeAllLabel={formatMessage("allowExisting")}
+              onClickIncludeAll={(_e, form) =>
+                setTemplateCheckboxValue(allowExistingFieldName, form)
+              }
             />
           )}
         </>

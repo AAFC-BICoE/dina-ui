@@ -205,6 +205,10 @@ export function useCollectingEventSave({
       delete collectingEventDiff.attachment;
     }
 
+    // This is a UI-only field used to store the Form Template's Allow New/Allow
+    // Existing attachment toggles - it is not a real API field:
+    delete (collectingEventDiff as any).attachmentsConfig;
+
     // Convert georeferenceByAgents to relationship
     if (
       collectingEventDiff.geoReferenceAssertions &&

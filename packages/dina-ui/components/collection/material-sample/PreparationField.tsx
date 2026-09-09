@@ -1,6 +1,7 @@
 import {
   AutoSuggestTextField,
   DateField,
+  DinaFormSection,
   FieldSet,
   FieldSpy,
   ResourceSelectField,
@@ -87,114 +88,118 @@ export function PreparationField({
       id={id}
       legend={<DinaMessage id="preparations" />}
       componentName={PREPARATIONS_COMPONENT_NAME}
-      sectionName="general-section"
     >
-      <div className="row">
-        <div className="col-md-6">
-          <FieldSpy<string> fieldName="group">
-            {(group) => (
-              <div>
-                <ResourceSelectField<PreparationType>
-                  {...fieldProps("preparationType")}
-                  model="collection-api/preparation-type"
+      <DinaFormSection sectionName="general-section">
+        <div className="row">
+          <div className="col-md-6">
+            <FieldSpy<string> fieldName="group">
+              {(group) => (
+                <div>
+                  <ResourceSelectField<PreparationType>
+                    {...fieldProps("preparationType")}
+                    model="collection-api/preparation-type"
+                    optionLabel={(it) => it.name}
+                    readOnlyLink="/collection/preparation-type/view?id="
+                    className="preparation-type"
+                    filter={(searchValue: string) =>
+                      SimpleSearchFilterBuilder.create<PreparationType>()
+                        .searchFilter("name", searchValue)
+                        .whereProvided("group", "EQ", group)
+                        .build()
+                    }
+                    tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-type"
+                    tooltipLinkText="fromDinaUserGuide"
+                  />
+                  <ResourceSelectField<PreparationMethod>
+                    {...fieldProps("preparationMethod")}
+                    model="collection-api/preparation-method"
+                    optionLabel={(it) => it.name}
+                    readOnlyLink="/collection/preparation-method/view?id="
+                    className="preparation-method"
+                    filter={(searchValue: string) =>
+                      SimpleSearchFilterBuilder.create<PreparationMethod>()
+                        .searchFilter("name", searchValue)
+                        .whereProvided("group", "EQ", group)
+                        .build()
+                    }
+                    key={group}
+                    tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-method"
+                    tooltipLinkText="fromDinaUserGuide"
+                  />
+                </div>
+              )}
+            </FieldSpy>
+            <TextField
+              {...fieldProps("preservationType")}
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preservation-type"
+              tooltipLinkText="fromDinaUserGuide"
+            />
+            <TextField
+              {...fieldProps("preparationFixative")}
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-fixative"
+              tooltipLinkText="fromDinaUserGuide"
+            />
+            <TextField
+              {...fieldProps("preparationMaterials")}
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-materials"
+              tooltipLinkText="fromDinaUserGuide"
+            />
+            <TextField
+              {...fieldProps("preparationSubstrate")}
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-substrate"
+              tooltipLinkText="fromDinaUserGuide"
+            />
+          </div>
+          <div className="col-md-6">
+            <TextField
+              {...fieldProps("preparationRemarks")}
+              multiLines={true}
+            />
+            <AutoSuggestTextField<Vocabulary>
+              {...fieldProps("dwcDegreeOfEstablishment")}
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/vocabulary2/degreeOfEstablishment"
+                }),
+                option: (vocabElement) =>
+                  _.compact(
+                    vocabElement?.vocabularyElements?.map(
+                      (it) =>
+                        _.find(
+                          it?.multilingualTitle?.titles || [],
+                          (item) => item.lang === locale
+                        )?.title ||
+                        it.name ||
+                        ""
+                    ) ?? []
+                  )
+              }}
+              blankSearchBackend={"json-api"}
+              tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
+            />
+            <PersonSelectField {...fieldProps("preparedBy")} isMulti={true} />
+            <DateField {...fieldProps("preparationDate")} />
+            <FieldSpy<string> fieldName="group">
+              {(group) => (
+                <ResourceSelectField<Protocol>
+                  {...fieldProps("preparationProtocol")}
+                  model="collection-api/protocol"
                   optionLabel={(it) => it.name}
-                  readOnlyLink="/collection/preparation-type/view?id="
-                  className="preparation-type"
+                  readOnlyLink="/collection/protocol/view?id="
+                  className="protocol"
                   filter={(searchValue: string) =>
-                    SimpleSearchFilterBuilder.create<PreparationType>()
-                      .searchFilter("name", searchValue)
-                      .whereProvided("group", "EQ", group)
-                      .build()
-                  }
-                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-type"
-                  tooltipLinkText="fromDinaUserGuide"
-                />
-                <ResourceSelectField<PreparationMethod>
-                  {...fieldProps("preparationMethod")}
-                  model="collection-api/preparation-method"
-                  optionLabel={(it) => it.name}
-                  readOnlyLink="/collection/preparation-method/view?id="
-                  className="preparation-method"
-                  filter={(searchValue: string) =>
-                    SimpleSearchFilterBuilder.create<PreparationMethod>()
+                    SimpleSearchFilterBuilder.create<Protocol>()
                       .searchFilter("name", searchValue)
                       .whereProvided("group", "EQ", group)
                       .build()
                   }
                   key={group}
-                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-method"
-                  tooltipLinkText="fromDinaUserGuide"
                 />
-              </div>
-            )}
-          </FieldSpy>
-          <TextField
-            {...fieldProps("preservationType")}
-            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preservation-type"
-            tooltipLinkText="fromDinaUserGuide"
-          />
-          <TextField
-            {...fieldProps("preparationFixative")}
-            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-fixative"
-            tooltipLinkText="fromDinaUserGuide"
-          />
-          <TextField
-            {...fieldProps("preparationMaterials")}
-            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-materials"
-            tooltipLinkText="fromDinaUserGuide"
-          />
-          <TextField
-            {...fieldProps("preparationSubstrate")}
-            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-substrate"
-            tooltipLinkText="fromDinaUserGuide"
-          />
+              )}
+            </FieldSpy>
+          </div>
         </div>
-        <div className="col-md-6">
-          <TextField {...fieldProps("preparationRemarks")} multiLines={true} />
-          <AutoSuggestTextField<Vocabulary>
-            {...fieldProps("dwcDegreeOfEstablishment")}
-            jsonApiBackend={{
-              query: () => ({
-                path: "collection-api/vocabulary2/degreeOfEstablishment"
-              }),
-              option: (vocabElement) =>
-                _.compact(
-                  vocabElement?.vocabularyElements?.map(
-                    (it) =>
-                      _.find(
-                        it?.multilingualTitle?.titles || [],
-                        (item) => item.lang === locale
-                      )?.title ||
-                      it.name ||
-                      ""
-                  ) ?? []
-                )
-            }}
-            blankSearchBackend={"json-api"}
-            tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
-          />
-          <PersonSelectField {...fieldProps("preparedBy")} isMulti={true} />
-          <DateField {...fieldProps("preparationDate")} />
-          <FieldSpy<string> fieldName="group">
-            {(group) => (
-              <ResourceSelectField<Protocol>
-                {...fieldProps("preparationProtocol")}
-                model="collection-api/protocol"
-                optionLabel={(it) => it.name}
-                readOnlyLink="/collection/protocol/view?id="
-                className="protocol"
-                filter={(searchValue: string) =>
-                  SimpleSearchFilterBuilder.create<Protocol>()
-                    .searchFilter("name", searchValue)
-                    .whereProvided("group", "EQ", group)
-                    .build()
-                }
-                key={group}
-              />
-            )}
-          </FieldSpy>
-        </div>
-      </div>
+      </DinaFormSection>
       <div className="row">
         <div className="col-md-12">
           <ManagedAttributesEditor

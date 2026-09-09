@@ -228,6 +228,18 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
+            id: "expedition"
+          },
+          {
+            id: "site"
+          }
+        ]
+      },
+      {
+        id: "collecting-event-additional-details-section",
+        maxGridSizeX: 1,
+        items: [
+          {
             id: "habitat"
           },
           {
@@ -292,9 +304,6 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "geoReferenceAssertions[0].dwcGeoreferenceRemarks"
-          },
-          {
-            id: "geoReferenceAssertions"
           }
         ]
       },
@@ -334,10 +343,12 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "managedAttributes.attachmentsConfig.allowNew"
+            id: "attachmentsConfig.allowNew",
+            visible: true
           },
           {
-            id: "managedAttributes.attachmentsConfig.allowExisting"
+            id: "attachmentsConfig.allowExisting",
+            visible: true
           }
         ]
       }
@@ -424,9 +435,6 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "organism[0].dwcVernacularName"
-          },
-          {
-            id: "organism[0].managedAttributes"
           }
         ]
       },
@@ -491,7 +499,18 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         id: "organism-managed-attributes-section",
         labelKey: "typeSpecimen",
         maxGridSizeX: 2,
-        items: []
+        items: [
+          {
+            id: "organism[0].managedAttributes",
+            visible: true
+          },
+          { id: "organismManagedAttributesOrder", visible: true },
+          {
+            id: "organism[0].determination[0].managedAttributes",
+            visible: true
+          },
+          { id: "determinationManagedAttributesOrder", visible: true }
+        ]
       }
     ]
   },
@@ -520,13 +539,13 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "associations.associationType"
+            id: "associations[0].associationType"
           },
           {
-            id: "associations.associatedSample"
+            id: "associations[0].associatedSample"
           },
           {
-            id: "associations.remarks"
+            id: "associations[0].remarks"
           }
         ]
       }
@@ -622,12 +641,33 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
     switchClassName: "enable-citations",
     sections: [
       {
-        id: "citations-general-section",
+        id: "citations-add-section",
         labelKey: "citations",
         maxGridSizeX: 2,
         items: [
           {
-            id: "citations[0].title"
+            id: "citation.doi"
+          },
+          {
+            id: "citation.title"
+          },
+          {
+            id: "citation.year"
+          },
+          {
+            id: "citation.journal"
+          },
+          {
+            id: "citation.volume"
+          },
+          {
+            id: "citation.pages"
+          },
+          {
+            id: "citation.citationRemarks"
+          },
+          {
+            id: "authors"
           }
         ]
       }
@@ -675,10 +715,12 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "attachmentsConfig.allowNew"
+            id: "attachmentsConfig.allowNew",
+            visible: true
           },
           {
-            id: "attachmentsConfig.allowExisting"
+            id: "attachmentsConfig.allowExisting",
+            visible: true
           }
         ]
       }

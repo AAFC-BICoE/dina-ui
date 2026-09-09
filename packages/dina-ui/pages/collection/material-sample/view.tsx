@@ -27,6 +27,7 @@ import {
   MaterialSampleBreadCrumb,
   MaterialSampleFormTemplateSelect,
   MaterialSampleIdentifiersSection,
+  MaterialSampleInfoManagedAttributes,
   MaterialSampleInfoSection,
   Nav,
   OrganismsField,
@@ -346,6 +347,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
 
                 <MaterialSampleInfoSection />
+                <MaterialSampleInfoManagedAttributes
+                  visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+                />
                 {withResponse(colEventQuery, ({ data: colEvent }) => {
                   function legendWrapper():
                     | ((legendElement: React.JSX.Element) => React.JSX.Element)

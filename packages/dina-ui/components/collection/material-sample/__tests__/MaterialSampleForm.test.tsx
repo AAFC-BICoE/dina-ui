@@ -1,4 +1,4 @@
-import { InputResource, KitsuResourceLink } from "kitsu";
+import { InputResource, KitsuResourceLink, PersistedResource } from "kitsu";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
 import {
   mountWithAppContext,
@@ -6,8 +6,13 @@ import {
   clearAndType
 } from "common-ui";
 import {
+  ASSOCIATIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
+  COLLECTING_EVENT_COMPONENT_NAME,
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
   blankMaterialSample,
   CollectingEvent,
+  FormTemplate,
   MaterialSample
 } from "../../../../types/collection-api";
 import { waitFor, screen, within } from "@testing-library/react";
@@ -219,6 +224,152 @@ const mockGeographicSearchResults = [
   }
 ];
 
+/**
+ * A Form Template used to test "applying" a saved Form Template when creating a new Material
+ * Sample: both the default value population (useMaterialSampleFormTemplateSelectState /
+ * useMaterialSampleFormTemplateProps) and the field-visibility hiding (FieldWrapper's
+ * disabledByFormTemplate) driven by the same FormTemplate resource.
+ *
+ * Deliberately mixes visible:true/visible:false on sibling fields within the same section
+ * (e.g. expedition shown but site hidden) to prove per-field granularity works.
+ */
+const TEST_APPLY_FORM_TEMPLATE_ID = "test-apply-form-template-uuid";
+const TEST_APPLY_FORM_TEMPLATE: PersistedResource<FormTemplate> = {
+  id: TEST_APPLY_FORM_TEMPLATE_ID,
+  type: "form-template",
+  name: "Test Apply Form Template",
+  group: "aafc",
+  viewConfiguration: { type: "material-sample-form-template" } as any,
+  components: [
+    {
+      name: MANAGED_ATTRIBUTES_COMPONENT_NAME,
+      visible: true,
+      order: 0,
+      sections: [
+        {
+          name: "managed-attributes-section",
+          visible: true,
+          items: [
+            {
+              name: "managedAttributes",
+              visible: true,
+              defaultValue: { attribute_1: "default attribute 1 value" }
+            },
+            {
+              name: "managedAttributesOrder",
+              visible: true,
+              defaultValue: ["attribute_1", "attribute_2"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: COLLECTING_EVENT_COMPONENT_NAME,
+      visible: true,
+      order: 1,
+      sections: [
+        {
+          name: "collecting-event-details",
+          visible: true,
+          items: [
+            {
+              name: "expedition",
+              visible: true,
+              defaultValue: {
+                id: "expedition-1",
+                type: "expedition",
+                name: "Test Expedition"
+              }
+            },
+            // Site is intentionally left hidden, to prove per-field granularity
+            // within the same section as the (visible) expedition field above:
+            { name: "site", visible: false }
+          ]
+        },
+        {
+          // Nothing in Georeferencing is checked: every field is hidden
+          name: "georeferencing-section",
+          visible: true,
+          items: [
+            {
+              name: "geoReferenceAssertions[0].dwcDecimalLatitude",
+              visible: false
+            },
+            {
+              name: "geoReferenceAssertions[0].dwcDecimalLongitude",
+              visible: false
+            },
+            { name: "geoReferenceAssertions", visible: false }
+          ]
+        }
+      ]
+    },
+    {
+      name: ASSOCIATIONS_COMPONENT_NAME,
+      visible: true,
+      order: 2,
+      sections: [
+        {
+          name: "associations-material-sample-section",
+          visible: true,
+          items: [
+            {
+              name: "associations[0].associationType",
+              visible: true,
+              defaultValue: "host"
+            },
+            { name: "associations[0].associatedSample", visible: false },
+            { name: "associations[0].remarks", visible: false }
+          ]
+        }
+      ]
+    },
+    {
+      name: CITATIONS_COMPONENT_NAME,
+      visible: true,
+      order: 3,
+      sections: [
+        {
+          name: "citations-add-section",
+          visible: true,
+          items: [
+            {
+              name: "citation.title",
+              visible: true,
+              defaultValue: "Default Paper Title"
+            },
+            { name: "citation.doi", visible: false }
+          ]
+        }
+      ]
+    },
+    {
+      name: "material-sample-attachments-component",
+      visible: true,
+      order: 4,
+      sections: [
+        {
+          name: "material-sample-attachments-sections",
+          visible: true,
+          items: [
+            {
+              name: "attachmentsConfig.allowNew",
+              visible: true,
+              defaultValue: true
+            },
+            {
+              name: "attachmentsConfig.allowExisting",
+              visible: true,
+              defaultValue: false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/controlled-vocabulary-item":
@@ -305,6 +456,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           }
         ]
       };
+    case `collection-api/form-template/${TEST_APPLY_FORM_TEMPLATE_ID}`:
+      return { data: TEST_APPLY_FORM_TEMPLATE };
     default:
       return { data: [], meta: { totalResourceCount: 0 } };
   }
@@ -329,14 +482,25 @@ const mockSave = jest.fn<any, any>(async (saves) => {
   });
 });
 
+const mockAxiosGet = jest.fn<any, any>(async () => ({
+  data: { hits: { total: { value: 0 }, hits: [] } }
+}));
+const mockAxiosPost = jest.fn<any, any>(async () => ({
+  data: { hits: { total: { value: 0 }, hits: [] } }
+}));
+
 const testCtx = {
   apiContext: {
     save: mockSave,
     apiClient: {
-      get: mockGet
+      get: mockGet,
+      axios: {
+        get: mockAxiosGet,
+        post: mockAxiosPost
+      }
     }
   }
-};
+} as any;
 
 const mockOnSaved = jest.fn();
 
@@ -4539,6 +4703,48 @@ describe("Material Sample Edit Page", () => {
         ])
       );
     });
+
+    it("Hides fields based on the active Form Template.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms"
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "scheduled-actions-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "scheduled-actions-add-section",
+                    visible: true,
+                    items: [
+                      { name: "scheduledAction.actionType", visible: true },
+                      { name: "scheduledAction.assignedTo", visible: false }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("textbox", { name: /action type/i })
+        ).toBeInTheDocument()
+      );
+      expect(
+        wrapper.queryByRole("combobox", { name: /assigned to/i })
+      ).not.toBeInTheDocument();
+    });
   });
 
   describe("save and copy to next functionality", () => {
@@ -4907,6 +5113,573 @@ describe("Material Sample Edit Page", () => {
       expect(routerPushMock).not.toHaveBeenCalledWith(
         expect.stringContaining("copyFromId")
       );
+    });
+  });
+
+  describe("Applying a Form Template", () => {
+    beforeEach(() => {
+      // The selected Form Template's UUID is persisted in localStorage
+      // (keyed by username), independently of the router query param:
+      window.localStorage.clear();
+    });
+
+    afterEach(() => {
+      window.localStorage.clear();
+    });
+
+    it("Populates default values and hides fields based on a Form Template selected via the ?formTemplateId= query param.", async () => {
+      (useRouter as jest.Mock).mockReturnValue({
+        query: { formTemplateId: TEST_APPLY_FORM_TEMPLATE_ID },
+        push: routerPushMock,
+        pathname: "/collection/material-sample/edit"
+      });
+
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // --- Managed Attributes: default value populated, order/visibility applied ---
+      // Attribute 1 has a default value from the template:
+      await waitFor(() =>
+        expect(
+          wrapper.getByDisplayValue(/default attribute 1 value/i)
+        ).toBeInTheDocument()
+      );
+      // Attribute 2 is visible (in the template's managedAttributesOrder) but has no default:
+      expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
+
+      // --- Collecting Event: enabled automatically by the template (no manual toggle needed) ---
+      // Expedition is visible and pre-filled with the template's default value:
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelector(".expedition-field")
+        ).toBeInTheDocument()
+      );
+      expect(wrapper.getByText(/test expedition/i)).toBeInTheDocument();
+      // Site is hidden by the template, even though it's in the same section as Expedition:
+      expect(
+        wrapper.container.querySelector(".site-field")
+      ).not.toBeInTheDocument();
+
+      // --- Associations: default value creates the entry, mixed field visibility applies ---
+      // The association tab/panel exists because the template gave it a default value
+      // (associations[0].associationType), even though nothing was added manually:
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelector(
+            ".associations_0__associationType-field"
+          )
+        ).toBeInTheDocument()
+      );
+      // Associated Sample and Remarks are hidden by the template on that same entry:
+      expect(
+        wrapper.container.querySelector(
+          ".associations_0__associatedSample-field"
+        )
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".associations_0__remarks-field")
+      ).not.toBeInTheDocument();
+
+      // --- Citations: default value populated, doi field hidden ---
+      await waitFor(() =>
+        expect(
+          wrapper.getByDisplayValue(/default paper title/i)
+        ).toBeInTheDocument()
+      );
+      expect(
+        wrapper.container.querySelector(".doi-field")
+      ).not.toBeInTheDocument();
+
+      // --- Georeferencing: nothing checked in the template, so the whole
+      // Georeferencing widget is hidden (a Form Template with every field in a
+      // section marked not-visible hides the whole section), instead of showing
+      // a phantom pre-existing "Assertion 1 (Primary)" entry:
+      expect(
+        wrapper.container.querySelector("#geoReferencingLegend")
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.queryByRole("button", {
+          name: /add new georeference assertion/i
+        })
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.queryByRole("button", { name: /make primary/i })
+      ).not.toBeInTheDocument();
+    });
+
+    it("Strips the UI-only attachmentsConfig field from the submitted payload.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={
+            {
+              type: "material-sample",
+              group: "aafc",
+              attachmentsConfig: { allowNew: true, allowExisting: false }
+            } as any
+          }
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitForLoadingToDisappear();
+
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /primary id/i }),
+        "test-material-sample-id"
+      );
+
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalled());
+
+      const savedResource = mockSave.mock.calls[0][0][0].resource;
+      expect(savedResource.attachmentsConfig).toBeUndefined();
+    });
+
+    it("Hides fields on an EXISTING Citation being edited on an existing Material Sample, based on the active Form Template.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            id: "333",
+            group: "test-group",
+            materialSampleName: "test-ms",
+            citations: [
+              {
+                title: "Existing Title",
+                doi: "https://doi.org/10.1234/existing"
+              }
+            ]
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "citations-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "citations-add-section",
+                    visible: true,
+                    items: [
+                      { name: "citation.title", visible: true },
+                      { name: "citation.doi", visible: false }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      // Switch to the detail table view to reveal the per-row Edit button:
+      await waitFor(() =>
+        expect(wrapper.getByLabelText(/view detail/i)).toBeInTheDocument()
+      );
+      await userEvent.click(wrapper.getByLabelText(/view detail/i));
+
+      // Open the existing citation for editing:
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /^edit$/i })
+        ).toBeInTheDocument()
+      );
+      await userEvent.click(wrapper.getByRole("button", { name: /^edit$/i }));
+
+      // The visible "title" field shows the existing value:
+      await waitFor(() =>
+        expect(wrapper.getByDisplayValue(/existing title/i)).toBeInTheDocument()
+      );
+      // The hidden "doi" field does not show, even though it has an existing value:
+      expect(
+        wrapper.container.querySelector(".doi-field")
+      ).not.toBeInTheDocument();
+    });
+
+    it("Still shows Preparation Managed Attributes when every other Preparation field is hidden by the Form Template", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms"
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "preparations-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "general-section",
+                    visible: true,
+                    items: [
+                      { name: "preparationType", visible: false },
+                      { name: "preparationMethod", visible: false },
+                      { name: "preservationType", visible: false },
+                      { name: "preparationFixative", visible: false },
+                      { name: "preparationMaterials", visible: false },
+                      { name: "preparationSubstrate", visible: false },
+                      { name: "preparationRemarks", visible: false },
+                      { name: "dwcDegreeOfEstablishment", visible: false },
+                      { name: "preparedBy", visible: false },
+                      { name: "preparationDate", visible: false },
+                      { name: "preparationProtocol", visible: false }
+                    ]
+                  },
+                  {
+                    name: "preparations-managed-attributes-section",
+                    visible: true,
+                    items: [
+                      { name: "preparationManagedAttributes", visible: true },
+                      {
+                        name: "preparationManagedAttributesOrder",
+                        visible: true
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      // Every individual Preparation field is correctly hidden:
+      expect(
+        wrapper.container.querySelector(".preparation-type")
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".preservationType-field")
+      ).not.toBeInTheDocument();
+
+      // But the Preparation Managed Attributes section still shows, including its
+      // "add an attribute" selector:
+      expect(
+        wrapper.getByText(/preparation managed attributes/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".visible-attribute-menu")
+      ).toBeInTheDocument();
+    });
+
+    it("Still shows Organism Managed Attributes when every other Organism field is hidden by the Form Template.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms",
+            organismsQuantity: 1,
+            organism: [{ type: "organism" }]
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "organisms-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "organisms-general-section",
+                    visible: true,
+                    items: [
+                      { name: "organism[0].lifeStage", visible: false },
+                      { name: "organism[0].sex", visible: false },
+                      { name: "organism[0].remarks", visible: false },
+                      {
+                        name: "organism[0].dwcVernacularName",
+                        visible: false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      expect(
+        wrapper.container.querySelector(".lifeStage-field")
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.getByText(/organism managed attributes/i)
+      ).toBeInTheDocument();
+    });
+
+    it("Still shows Determination Managed Attributes when every other Determination field is hidden by the Form Template.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms",
+            organism: [
+              {
+                type: "organism",
+                determination: [{ isPrimary: true }]
+              }
+            ]
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "organisms-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "organism-verbatim-determination-section",
+                    visible: true,
+                    items: [
+                      {
+                        name: "organism[0].determination[0].verbatimScientificName",
+                        visible: false
+                      }
+                    ]
+                  },
+                  {
+                    name: "organism-determination-section",
+                    visible: true,
+                    items: [
+                      {
+                        name: "organism[0].determination[0].scientificName",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].scientificNameInput",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determiner",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determinedOn",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determinationRemarks",
+                        visible: false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      expect(
+        wrapper.container.querySelector(".verbatimScientificName-field")
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.getByText(/determination managed attributes/i)
+      ).toBeInTheDocument();
+    });
+
+    it("Hides the whole 'Determination' and 'Type Specimen' sections when every field within them is hidden by the Form Template", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms",
+            organism: [
+              {
+                type: "organism",
+                determination: [{ isPrimary: true }]
+              }
+            ]
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "organisms-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "organism-verbatim-determination-section",
+                    visible: true,
+                    items: [
+                      {
+                        name: "organism[0].determination[0].verbatimScientificName",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].verbatimDeterminer",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].verbatimDate",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].verbatimRemarks",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].transcriberRemarks",
+                        visible: false
+                      }
+                    ]
+                  },
+                  {
+                    name: "organism-determination-section",
+                    visible: true,
+                    items: [
+                      {
+                        name: "organism[0].determination[0].scientificName",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].scientificNameInput",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determiner",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determinedOn",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determinationRemarks",
+                        visible: false
+                      }
+                    ]
+                  },
+                  {
+                    name: "organism-type-specimen-section",
+                    visible: true,
+                    items: [
+                      {
+                        name: "organism[0].determination[0].typeStatus",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].typeStatusEvidence",
+                        visible: false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      // Nothing is checked in any of these three sections, so none of them should
+      // render at all - not even their empty legend/fieldset:
+      expect(
+        wrapper.queryByText("Verbatim Determination")
+      ).not.toBeInTheDocument();
+      expect(wrapper.queryByText("Determination")).not.toBeInTheDocument();
+      expect(wrapper.queryByText("Type Specimen")).not.toBeInTheDocument();
+
+      // Managed Attributes is a separate, always-shown section - unaffected by the above:
+      expect(
+        wrapper.getByText(/determination managed attributes/i)
+      ).toBeInTheDocument();
+    });
+
+    it("Hides the whole 'Collecting Event Details' section when every field within it is hidden by the Form Template, while a sibling section sharing the same component stays visible", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms"
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "collecting-event-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "collecting-event-details",
+                    visible: true,
+                    items: [
+                      {
+                        name: "expedition",
+                        visible: true,
+                        defaultValue: {
+                          id: "expedition-1",
+                          type: "expedition",
+                          name: "Test Expedition"
+                        }
+                      },
+                      { name: "site", visible: false }
+                    ]
+                  },
+                  {
+                    name: "collecting-event-additional-details-section",
+                    visible: true,
+                    items: [
+                      { name: "habitat", visible: false },
+                      { name: "host", visible: false },
+                      { name: "collectionMethod", visible: false },
+                      { name: "substrate", visible: false },
+                      { name: "dwcMinimumElevationInMeters", visible: false },
+                      { name: "dwcMaximumElevationInMeters", visible: false },
+                      { name: "dwcMinimumDepthInMeters", visible: false },
+                      { name: "dwcMaximumDepthInMeters", visible: false },
+                      { name: "remarks", visible: false }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      // Nothing is checked in the "additional details" section (habitat, host, etc.),
+      // so its box should not render at all - not even its empty legend/fieldset:
+      expect(
+        wrapper.queryByText("Collecting Event Details")
+      ).not.toBeInTheDocument();
+
+      // Expedition is visible (a sibling box sharing the "collecting-event-details"
+      // section id) and must not be affected by the above:
+      expect(
+        wrapper.getByText(/collecting event expedition/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".expedition-field")
+      ).toBeInTheDocument();
     });
   });
 });

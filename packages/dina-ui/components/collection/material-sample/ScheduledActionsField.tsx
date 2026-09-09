@@ -264,7 +264,7 @@ export function ScheduledActionSubForm({
   actionToEdit,
   defaultDate
 }: ScheduledActionSubFormProps) {
-  const { initialValues, isTemplate } = useDinaFormContext();
+  const { initialValues, isTemplate, formTemplate } = useDinaFormContext();
 
   // TODO: This needs to be fixed.
   const enabledFields: string[] = [];
@@ -330,6 +330,7 @@ export function ScheduledActionSubForm({
       <FieldSet legend={<DinaMessage id="addScheduledAction" />}>
         <FormWrapper
           validationSchema={scheduledActionSchema}
+          {...(!isTemplate ? { formTemplate } : {})}
           initialValues={
             actionToEdit ?? actionTemplateInitialValues ?? defaultInitialValues
           }
