@@ -1525,11 +1525,6 @@ const expected = {
               defaultValue: undefined,
               name: "organism[0].dwcVernacularName",
               visible: false
-            },
-            {
-              defaultValue: undefined,
-              name: "organism[0].managedAttributes",
-              visible: false
             }
           ]
         },
@@ -1614,7 +1609,28 @@ const expected = {
         {
           name: "organism-managed-attributes-section",
           visible: true,
-          items: []
+          items: [
+            {
+              defaultValue: undefined,
+              name: "organism[0].managedAttributes",
+              visible: true
+            },
+            {
+              defaultValue: undefined,
+              name: "organismManagedAttributesOrder",
+              visible: true
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].managedAttributes",
+              visible: true
+            },
+            {
+              defaultValue: undefined,
+              name: "determinationManagedAttributesOrder",
+              visible: true
+            }
+          ]
         }
       ]
     },
@@ -2019,5 +2035,88 @@ describe("Form template edit page", () => {
       ?.items?.find((item) => item.name === "authors");
 
     expect(savedAuthorsItem?.visible).toEqual(true);
+  });
+
+  it("Persists Organism and Determination Managed Attributes selections through a save/reload round-trip.", async () => {
+    const existingTemplateWithOrganismManagedAttributes: PersistedResource<FormTemplate> =
+      {
+        ...formTemplate,
+        components: formTemplate.components?.map((component) =>
+          component.name === ORGANISMS_COMPONENT_NAME
+            ? {
+                ...component,
+                visible: true,
+                sections: component.sections?.map((section) =>
+                  section.name === "organism-managed-attributes-section"
+                    ? {
+                        ...section,
+                        items: [
+                          {
+                            name: "organism[0].managedAttributes",
+                            visible: true,
+                            defaultValue: { attribute_1: "organism value" }
+                          },
+                          {
+                            name: "organismManagedAttributesOrder",
+                            visible: true,
+                            defaultValue: ["attribute_1"]
+                          },
+                          {
+                            name: "organism[0].determination[0].managedAttributes",
+                            visible: true,
+                            defaultValue: {
+                              attribute_1: "determination value"
+                            }
+                          },
+                          {
+                            name: "determinationManagedAttributesOrder",
+                            visible: true,
+                            defaultValue: ["attribute_1"]
+                          }
+                        ]
+                      }
+                    : section
+                )
+              }
+            : component
+        )
+      };
+
+    const { submitForm } = await mountForm(
+      existingTemplateWithOrganismManagedAttributes
+    );
+
+    await submitForm();
+
+    const savedOrganismsComponent =
+      mockOnSaved.mock.calls[0][0].components.find(
+        (comp) => comp.name === ORGANISMS_COMPONENT_NAME
+      );
+    const savedSection = savedOrganismsComponent?.sections?.find(
+      (section) => section.name === "organism-managed-attributes-section"
+    );
+
+    expect(savedSection?.items).toEqual([
+      {
+        name: "organism[0].managedAttributes",
+        visible: true,
+        defaultValue: { attribute_1: "organism value" }
+      },
+      {
+        name: "organismManagedAttributesOrder",
+        visible: true,
+        defaultValue: ["attribute_1"]
+      },
+      {
+        name: "organism[0].determination[0].managedAttributes",
+        visible: true,
+        defaultValue: { attribute_1: "determination value" }
+      },
+      {
+        name: "determinationManagedAttributesOrder",
+        visible: true,
+        defaultValue: ["attribute_1"]
+      }
+    ]);
   });
 });

@@ -72,9 +72,25 @@ export function AttachmentsField(props: AttachmentsFieldProps) {
       {(value, { form }) => {
         const metadatas =
           _.uniqBy(value as ResourceIdentifierObject[] | undefined, "id") ?? [];
+
+        const allowNew = props.allowNewFieldName
+          ? _.get(form.values, props.allowNewFieldName)
+          : undefined;
+        const allowExisting = props.allowExistingFieldName
+          ? _.get(form.values, props.allowExistingFieldName)
+          : undefined;
+        const allowAttachmentsConfig =
+          allowNew !== undefined || allowExisting !== undefined
+            ? {
+                allowNew: allowNew ?? true,
+                allowExisting: allowExisting ?? true
+              }
+            : props.allowAttachmentsConfig;
+
         return (
           <AttachmentsEditor
             {...props}
+            allowAttachmentsConfig={allowAttachmentsConfig}
             value={metadatas}
             onChange={(newMetadatas) =>
               form.setFieldValue(props.name, newMetadatas)

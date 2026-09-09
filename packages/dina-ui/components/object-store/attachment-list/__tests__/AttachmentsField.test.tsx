@@ -447,4 +447,43 @@ describe("AttachmentsField component", () => {
       ).toEqual(true);
     });
   });
+
+  describe("Applying a Form Template's Allow New/Allow Existing config", () => {
+    it("Hides the 'Attach Existing Objects' tab when the applied Form Template set allowExisting to false (regression test).", async () => {
+      const wrapper = mountWithAppContext(
+        <DinaForm
+          initialValues={{
+            attachment: [],
+            attachmentsConfig: { allowNew: true, allowExisting: false }
+          }}
+          onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
+        >
+          <AttachmentsField
+            name="attachment"
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+          />
+        </DinaForm>,
+        testCtx as any
+      );
+
+      const addButton = await waitFor(() => {
+        const button = wrapper.getByRole("button", {
+          name: /add attachments/i
+        });
+        expect(button).toBeInTheDocument();
+        return button;
+      });
+      await userEvent.click(addButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("tab", { name: /upload new attachments/i })
+        ).toBeInTheDocument();
+      });
+      expect(
+        screen.queryByRole("tab", { name: /attach existing objects/i })
+      ).not.toBeInTheDocument();
+    });
+  });
 });

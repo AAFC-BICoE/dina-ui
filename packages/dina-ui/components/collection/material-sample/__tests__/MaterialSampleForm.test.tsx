@@ -327,6 +327,29 @@ const TEST_APPLY_FORM_TEMPLATE: PersistedResource<FormTemplate> = {
           ]
         }
       ]
+    },
+    {
+      name: "material-sample-attachments-component",
+      visible: true,
+      order: 4,
+      sections: [
+        {
+          name: "material-sample-attachments-sections",
+          visible: true,
+          items: [
+            {
+              name: "attachmentsConfig.allowNew",
+              visible: true,
+              defaultValue: true
+            },
+            {
+              name: "attachmentsConfig.allowExisting",
+              visible: true,
+              defaultValue: false
+            }
+          ]
+        }
+      ]
     }
   ]
 };
@@ -5146,6 +5169,41 @@ describe("Material Sample Edit Page", () => {
       expect(
         wrapper.container.querySelector(".doi-field")
       ).not.toBeInTheDocument();
+    });
+
+    it("Strips the UI-only attachmentsConfig field from the submitted payload (regression test).", async () => {
+      // attachmentsConfig.allowNew/allowExisting is populated into the real form's
+      // initialValues from a Form Template's defaults (getMaterialSampleComponentValues),
+      // but it isn't a real Material Sample API field - it must never reach the backend.
+      // Use a NEW (no id) sample so the full submitted values are sent as-is, rather
+      // than an unchanged-field diff against an existing sample - which would hide this
+      // bug even without the fix, since attachmentsConfig wouldn't have changed from
+      // its initial value.
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={
+            {
+              type: "material-sample",
+              group: "aafc",
+              attachmentsConfig: { allowNew: true, allowExisting: false }
+            } as any
+          }
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitForLoadingToDisappear();
+
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /primary id/i }),
+        "test-material-sample-id"
+      );
+
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalled());
+
+      const savedResource = mockSave.mock.calls[0][0][0].resource;
+      expect(savedResource.attachmentsConfig).toBeUndefined();
     });
 
     it("Hides fields on an EXISTING Citation being edited on an existing Material Sample, based on the active Form Template (regression test).", async () => {
