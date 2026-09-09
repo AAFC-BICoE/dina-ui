@@ -5517,5 +5517,117 @@ describe("Material Sample Edit Page", () => {
         wrapper.getByText(/determination managed attributes/i)
       ).toBeInTheDocument();
     });
+
+    it("Hides the whole 'Determination' and 'Type Specimen' sections when every field within them is hidden by the Form Template", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group",
+            materialSampleName: "test-ms",
+            organism: [
+              {
+                type: "organism",
+                determination: [{ isPrimary: true }]
+              }
+            ]
+          }}
+          formTemplate={{
+            type: "form-template",
+            components: [
+              {
+                name: "organisms-component",
+                visible: true,
+                sections: [
+                  {
+                    name: "organism-verbatim-determination-section",
+                    visible: true,
+                    items: [
+                      {
+                        name: "organism[0].determination[0].verbatimScientificName",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].verbatimDeterminer",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].verbatimDate",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].verbatimRemarks",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].transcriberRemarks",
+                        visible: false
+                      }
+                    ]
+                  },
+                  {
+                    name: "organism-determination-section",
+                    visible: true,
+                    items: [
+                      {
+                        name: "organism[0].determination[0].scientificName",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].scientificNameInput",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determiner",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determinedOn",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].determinationRemarks",
+                        visible: false
+                      }
+                    ]
+                  },
+                  {
+                    name: "organism-type-specimen-section",
+                    visible: true,
+                    items: [
+                      {
+                        name: "organism[0].determination[0].typeStatus",
+                        visible: false
+                      },
+                      {
+                        name: "organism[0].determination[0].typeStatusEvidence",
+                        visible: false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      // Nothing is checked in any of these three sections, so none of them should
+      // render at all - not even their empty legend/fieldset:
+      expect(
+        wrapper.queryByText("Verbatim Determination")
+      ).not.toBeInTheDocument();
+      expect(wrapper.queryByText("Determination")).not.toBeInTheDocument();
+      expect(wrapper.queryByText("Type Specimen")).not.toBeInTheDocument();
+
+      // Managed Attributes is a separate, always-shown section - unaffected by the above:
+      expect(
+        wrapper.getByText(/determination managed attributes/i)
+      ).toBeInTheDocument();
+    });
   });
 });
