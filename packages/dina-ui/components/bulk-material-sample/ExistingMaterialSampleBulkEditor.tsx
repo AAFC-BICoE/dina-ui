@@ -1,6 +1,7 @@
 import { LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import _ from "lodash";
+import { ReactNode } from "react";
 import { Promisable } from "type-fest";
 import { MaterialSampleBulkEditor, useMaterialSampleQueries } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -10,12 +11,19 @@ export interface ExistingMaterialSampleBulkEditorProps {
   ids: string[];
   onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
   onPreviousClick?: () => void;
+
+  /**
+   * Customize where the button bar and the rest of the editor's content are placed on the page.
+   * Defaults to rendering the button bar directly above the rest of the content.
+   */
+  renderLayout?: (buttonBar: ReactNode, content: ReactNode) => ReactNode;
 }
 
 export function ExistingMaterialSampleBulkEditor({
   ids,
   onSaved,
-  onPreviousClick
+  onPreviousClick,
+  renderLayout
 }: ExistingMaterialSampleBulkEditorProps) {
   const sampleQueries = useMaterialSampleQueries(ids);
 
@@ -59,6 +67,7 @@ export function ExistingMaterialSampleBulkEditor({
         samples={samples}
         onSaved={onSaved}
         onPreviousClick={onPreviousClick}
+        renderLayout={renderLayout}
       />
     );
   }

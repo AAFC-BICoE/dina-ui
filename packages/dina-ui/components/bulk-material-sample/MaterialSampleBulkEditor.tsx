@@ -16,7 +16,14 @@ import {
 } from "common-ui";
 import _ from "lodash";
 import { InputResource, PersistedResource, KitsuResource } from "kitsu";
-import { useEffect, useMemo, useRef, useState, RefObject } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  RefObject,
+  ReactNode
+} from "react";
 import { Promisable } from "type-fest";
 import {
   MaterialSampleFormTemplateSelect,
@@ -50,6 +57,13 @@ export interface MaterialSampleBulkEditorProps {
   onPreviousClick?: () => void;
   overrideMaterialSampleType?: string;
   initialFormTemplateUUID?: string;
+
+  /**
+   * Customize where the button bar and the rest of the editor's content are placed on the page
+   * (e.g. to render the button bar above a page's <main> element, outside of its padding).
+   * Defaults to rendering the button bar directly above the rest of the content.
+   */
+  renderLayout?: (buttonBar: ReactNode, content: ReactNode) => ReactNode;
 }
 
 export function MaterialSampleBulkEditor({
@@ -58,7 +72,8 @@ export function MaterialSampleBulkEditor({
   onSaved,
   onPreviousClick,
   initialFormTemplateUUID,
-  overrideMaterialSampleType
+  overrideMaterialSampleType,
+  renderLayout
 }: MaterialSampleBulkEditorProps) {
   // Allow selecting a custom view for the form:
   const {
@@ -142,42 +157,45 @@ export function MaterialSampleBulkEditor({
     : -1;
   const isEditAll = selectedTab?.key === "EDIT_ALL";
 
-  return (
-    <div>
-      <DinaForm initialValues={{}}>
-        <ButtonBar className="mb-3">
-          {onPreviousClick && (
-            <div className="col-md-4">
-              <FormikButton
-                className="btn btn-outline-secondary previous-button"
-                onClick={onPreviousClick}
-                buttonProps={() => ({ style: { width: "13rem" } })}
-              >
-                <DinaMessage id="goToThePreviousStep" />
-              </FormikButton>
-            </div>
-          )}
-          <div className="col-md-5">
-            <div className="mx-auto">
-              <MaterialSampleFormTemplateSelect
-                value={sampleFormTemplate}
-                onChange={setSampleFormTemplateUUID}
-              />
-            </div>
+  const buttonBar = (
+    <DinaForm initialValues={{}}>
+      <ButtonBar className="mb-3">
+        {onPreviousClick && (
+          <div className="col-md-4">
+            <FormikButton
+              className="btn btn-outline-secondary previous-button"
+              onClick={onPreviousClick}
+              buttonProps={() => ({ style: { width: "13rem" } })}
+            >
+              <DinaMessage id="goToThePreviousStep" />
+            </FormikButton>
           </div>
-          <div className="col-md-3 flex d-flex">
-            <div className="ms-auto">
-              <FormikButton
-                className="btn btn-primary bulk-save-button"
-                onClick={saveAll}
-                buttonProps={() => ({ style: { width: "10rem" } })}
-              >
-                <DinaMessage id="saveAll" />
-              </FormikButton>
-            </div>
+        )}
+        <div className="col-md-5">
+          <div className="mx-auto">
+            <MaterialSampleFormTemplateSelect
+              value={sampleFormTemplate}
+              onChange={setSampleFormTemplateUUID}
+            />
           </div>
-        </ButtonBar>
-      </DinaForm>
+        </div>
+        <div className="col-md-3 flex d-flex">
+          <div className="ms-auto">
+            <FormikButton
+              className="btn btn-primary bulk-save-button"
+              onClick={saveAll}
+              buttonProps={() => ({ style: { width: "10rem" } })}
+            >
+              <DinaMessage id="saveAll" />
+            </FormikButton>
+          </div>
+        </div>
+      </ButtonBar>
+    </DinaForm>
+  );
+
+  const content = (
+    <>
       {selectedTab && (
         <div className="alert alert-info py-2 px-3 mb-2 bulk-edit-status-banner">
           {isEditAll ? (
@@ -228,6 +246,15 @@ export function MaterialSampleBulkEditor({
           )}
         />
       )}
+    </>
+  );
+
+  return renderLayout ? (
+    renderLayout(buttonBar, content)
+  ) : (
+    <div>
+      {buttonBar}
+      {content}
     </div>
   );
 }
