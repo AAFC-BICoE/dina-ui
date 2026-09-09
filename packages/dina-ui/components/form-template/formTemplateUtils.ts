@@ -135,11 +135,8 @@ export function getComponentValues(
         if (component.visible) {
           component.sections?.forEach((section) => {
             section.items?.forEach((item) => {
-              if (
-                (item.name && item.visible) ||
-                item.name === "geoReferenceAssertions"
-              ) {
-                _.set(componentValues, item.name!, item.defaultValue);
+              if (item.name && item.visible) {
+                _.set(componentValues, item.name, item.defaultValue);
                 templateCheckboxes[
                   component.name + "." + section.name + "." + item.name
                 ] = true;

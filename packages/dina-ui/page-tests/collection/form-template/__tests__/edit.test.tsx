@@ -1349,16 +1349,6 @@ const expected = {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferenceRemarks",
               visible: false
-            },
-            {
-              defaultValue: [
-                {
-                  dwcDecimalLatitude: "1",
-                  dwcDecimalLongitude: "2"
-                }
-              ],
-              name: "geoReferenceAssertions",
-              visible: false
             }
           ]
         },

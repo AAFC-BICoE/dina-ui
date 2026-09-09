@@ -286,6 +286,22 @@ const TEST_APPLY_FORM_TEMPLATE: PersistedResource<FormTemplate> = {
             // within the same section as the (visible) expedition field above:
             { name: "site", visible: false }
           ]
+        },
+        {
+          // Nothing in Georeferencing is checked: every field is hidden
+          name: "georeferencing-section",
+          visible: true,
+          items: [
+            {
+              name: "geoReferenceAssertions[0].dwcDecimalLatitude",
+              visible: false
+            },
+            {
+              name: "geoReferenceAssertions[0].dwcDecimalLongitude",
+              visible: false
+            },
+            { name: "geoReferenceAssertions", visible: false }
+          ]
         }
       ]
     },
@@ -5179,6 +5195,22 @@ describe("Material Sample Edit Page", () => {
       );
       expect(
         wrapper.container.querySelector(".doi-field")
+      ).not.toBeInTheDocument();
+
+      // --- Georeferencing: nothing checked in the template, so the whole
+      // Georeferencing widget is hidden (a Form Template with every field in a
+      // section marked not-visible hides the whole section), instead of showing
+      // a phantom pre-existing "Assertion 1 (Primary)" entry:
+      expect(
+        wrapper.container.querySelector("#geoReferencingLegend")
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.queryByRole("button", {
+          name: /add new georeference assertion/i
+        })
+      ).not.toBeInTheDocument();
+      expect(
+        wrapper.queryByRole("button", { name: /make primary/i })
       ).not.toBeInTheDocument();
     });
 

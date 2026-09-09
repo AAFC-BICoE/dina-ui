@@ -298,9 +298,6 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "geoReferenceAssertions[0].dwcGeoreferenceRemarks"
-          },
-          {
-            id: "geoReferenceAssertions"
           }
         ]
       },
