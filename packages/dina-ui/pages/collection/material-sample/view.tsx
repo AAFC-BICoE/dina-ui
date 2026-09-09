@@ -347,7 +347,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
 
                 <MaterialSampleInfoSection />
-                <MaterialSampleInfoManagedAttributes />
+                <MaterialSampleInfoManagedAttributes
+                  visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+                />
                 {withResponse(colEventQuery, ({ data: colEvent }) => {
                   function legendWrapper():
                     | ((legendElement: React.JSX.Element) => React.JSX.Element)
