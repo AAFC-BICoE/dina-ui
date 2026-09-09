@@ -2,16 +2,26 @@ import { PersistedResource } from "kitsu";
 import { MaterialSampleViewPage } from "../../../../pages/collection/material-sample/view";
 import { mountWithAppContext } from "common-ui";
 import {
+  COLLECTING_EVENT_COMPONENT_NAME,
   CollectingEvent,
+  FormTemplate,
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
   MaterialSample
 } from "../../../../types/collection-api";
 import "@testing-library/jest-dom";
 import { waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useRouter } from "next/router";
 import { GenericMolecularAnalysis } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { TEST_QUALITY_CONTROL_TYPES } from "../../../seqdb/molecular-analysis-run/__mocks__/MolecularAnalysisRunViewMocks";
 import { Transaction } from "../../../../types/loan-transaction-api";
+
+jest.mock("next/router", () => ({
+  useRouter: jest.fn(),
+  withRouter: (Component) => Component
+}));
 
 const TEST_COLLECTION_EVENT: CollectingEvent = {
   startEventDateTime: "2019_01_01_10_10_10",
@@ -28,6 +38,125 @@ const TEST_MATERIAL_SAMPLE: MaterialSample = {
   type: "material-sample",
   materialSampleName: "my-sample-name",
   collectingEvent: { id: "1", type: "collecting-event" } as CollectingEvent
+};
+
+const TEST_SAMPLE_WITH_MANAGED_ATTRIBUTES: PersistedResource<MaterialSample> = {
+  id: "ms-with-managed-attributes",
+  type: "material-sample",
+  materialSampleName: "sample-with-managed-attributes",
+  managedAttributes: {
+    attribute_1: "attribute 1 value"
+  }
+};
+
+const TEST_COLLECTION_EVENT_WITH_MANAGED_ATTRIBUTES: PersistedResource<CollectingEvent> =
+  {
+    id: "ce-with-managed-attributes",
+    type: "collecting-event",
+    group: "aafc",
+    managedAttributes: {
+      ce_attribute_1: "ce attribute 1 value"
+    }
+  };
+
+const TEST_SAMPLE_WITH_CE_MANAGED_ATTRIBUTES: PersistedResource<MaterialSample> =
+  {
+    id: "ms-with-ce-managed-attributes",
+    type: "material-sample",
+    materialSampleName: "sample-with-ce-managed-attributes",
+    collectingEvent: {
+      id: "ce-with-managed-attributes",
+      type: "collecting-event"
+    } as any
+  };
+
+/**
+ * A Form Template where nothing in the "Material Sample Info" section or the Collecting
+ * Event's "Additional Details" section is visible, but both Managed Attributes sections
+ * (Material Sample level and Collecting Event level) are. Used to prove that the Managed
+ * Attributes sections render independently of their (unrelated, and here fully hidden)
+ * sibling sections.
+ */
+const TEST_VIEW_FORM_TEMPLATE_ID = "test-view-form-template-uuid";
+const TEST_VIEW_FORM_TEMPLATE: PersistedResource<FormTemplate> = {
+  id: TEST_VIEW_FORM_TEMPLATE_ID,
+  type: "form-template",
+  name: "Test View Form Template",
+  group: "aafc",
+  viewConfiguration: { type: "material-sample-form-template" } as any,
+  components: [
+    {
+      name: MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
+      visible: true,
+      order: 0,
+      sections: [
+        {
+          name: "material-sample-info-section",
+          visible: true,
+          items: [
+            { name: "materialSampleType", visible: false },
+            { name: "materialSampleRemarks", visible: false },
+            { name: "materialSampleState", visible: false },
+            { name: "stateChangeRemarks", visible: false },
+            { name: "stateChangedOn", visible: false }
+          ]
+        }
+      ]
+    },
+    {
+      name: MANAGED_ATTRIBUTES_COMPONENT_NAME,
+      visible: true,
+      order: 1,
+      sections: [
+        {
+          name: "managed-attributes-section",
+          visible: true,
+          items: [
+            { name: "managedAttributes", visible: true },
+            {
+              name: "managedAttributesOrder",
+              visible: true,
+              defaultValue: ["attribute_1"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: COLLECTING_EVENT_COMPONENT_NAME,
+      visible: true,
+      order: 2,
+      sections: [
+        {
+          name: "collecting-event-additional-details-section",
+          visible: true,
+          items: [
+            { name: "habitat", visible: false },
+            { name: "host", visible: false },
+            { name: "collectionMethod", visible: false },
+            { name: "substrate", visible: false },
+            { name: "dwcMinimumElevationInMeters", visible: false },
+            { name: "dwcMaximumElevationInMeters", visible: false },
+            { name: "dwcMinimumDepthInMeters", visible: false },
+            { name: "dwcMaximumDepthInMeters", visible: false },
+            { name: "remarks", visible: false }
+          ]
+        },
+        {
+          name: "collecting-event-managed-attributes-section",
+          visible: true,
+          items: [
+            { name: "managedAttributes", visible: true },
+            {
+              name: "managedAttributesOrder",
+              visible: true,
+              defaultValue: ["ce_attribute_1"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 };
 
 const TEST_SAMPLE_WITH_ORGANISMS: PersistedResource<MaterialSample> = {
@@ -85,20 +214,43 @@ const TEST_TRANSACTION: PersistedResource<Transaction> = {
   ]
 };
 
-const mockGet = jest.fn<any, any>(async (path) => {
+const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/material-sample/1":
       return { data: TEST_MATERIAL_SAMPLE };
     case "collection-api/material-sample/ms-with-organisms":
       return { data: TEST_SAMPLE_WITH_ORGANISMS };
+    case "collection-api/material-sample/ms-with-managed-attributes":
+      return { data: TEST_SAMPLE_WITH_MANAGED_ATTRIBUTES };
+    case "collection-api/material-sample/ms-with-ce-managed-attributes":
+      return { data: TEST_SAMPLE_WITH_CE_MANAGED_ATTRIBUTES };
+    case "collection-api/form-template/test-view-form-template-uuid":
+      return { data: TEST_VIEW_FORM_TEMPLATE };
     case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: TEST_COLLECTION_EVENT };
+    case "collection-api/collecting-event/ce-with-managed-attributes?include=collectors,attachment,collectionMethod,protocol,expedition,site":
+      return { data: TEST_COLLECTION_EVENT_WITH_MANAGED_ATTRIBUTES };
     case "collection-api/collecting-event/1/attachment":
+    case "collection-api/collecting-event/ce-with-managed-attributes/attachment":
     case "user-api/group":
     case "objectstore-api/metadata":
     case "collection-api/material-sample/1/attachment":
+    case "collection-api/material-sample/ms-with-managed-attributes/attachment":
+    case "collection-api/material-sample/ms-with-ce-managed-attributes/attachment":
     case "collection-api/collection":
       return { data: [] };
+    case "collection-api/controlled-vocabulary-item":
+      if (params?.filter?.key?.EQ === "attribute_1") {
+        return {
+          data: [{ id: "1", key: "attribute_1", name: "Attribute 1" }]
+        };
+      }
+      if (params?.filter?.key?.EQ === "ce_attribute_1") {
+        return {
+          data: [{ id: "10", key: "ce_attribute_1", name: "CE Attribute 1" }]
+        };
+      }
+      return { data: [], meta: { totalResourceCount: 0 } };
     case "seqdb-api/generic-molecular-analysis-item":
       return {
         data: TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS
@@ -192,6 +344,11 @@ const testCtx = {
 } as any;
 
 describe("Material Sample View Page", () => {
+  afterEach(() => {
+    // Reset the router mock so a formTemplateId set by one test doesn't leak into the next:
+    (useRouter as jest.Mock).mockReturnValue(undefined);
+  });
+
   it("Renders the Material Sample with the linked Collecting Event", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleViewPage router={{ query: { id: "1" } } as any} />,
@@ -203,6 +360,71 @@ describe("Material Sample View Page", () => {
       expect(wrapper.getAllByText("my-sample-name")[0]).toBeInTheDocument();
       expect(wrapper.getByText("2019_01_01_10_10_10")).toBeInTheDocument();
     });
+  });
+
+  it("Displays the Managed Attributes section when a Form Template hides the unrelated Material Sample Info section.", async () => {
+    (useRouter as jest.Mock).mockReturnValue({
+      query: { formTemplateId: TEST_VIEW_FORM_TEMPLATE_ID },
+      push: jest.fn(),
+      pathname: "/collection/material-sample/view"
+    });
+
+    const wrapper = mountWithAppContext(
+      <MaterialSampleViewPage
+        router={{ query: { id: "ms-with-managed-attributes" } } as any}
+      />,
+      testCtx
+    );
+
+    await waitFor(() => {
+      expect(
+        wrapper.getAllByText("sample-with-managed-attributes")[0]
+      ).toBeInTheDocument();
+    });
+
+    // Managed Attributes should still be displayed, even though the sibling
+    // "Material Sample Info" section has nothing visible in the Form Template:
+    await waitFor(() => {
+      expect(wrapper.getByText("Attribute 1")).toBeInTheDocument();
+      expect(wrapper.getByText(/attribute 1 value/i)).toBeInTheDocument();
+    });
+
+    // Fields within the hidden "Material Sample Info" section should not render:
+    expect(
+      wrapper.queryByText(/material sample remarks/i)
+    ).not.toBeInTheDocument();
+  });
+
+  it("Displays the Collecting Event's Managed Attributes section when a Form Template hides the unrelated Collecting Event Additional Details section.", async () => {
+    (useRouter as jest.Mock).mockReturnValue({
+      query: { formTemplateId: TEST_VIEW_FORM_TEMPLATE_ID },
+      push: jest.fn(),
+      pathname: "/collection/material-sample/view"
+    });
+
+    const wrapper = mountWithAppContext(
+      <MaterialSampleViewPage
+        router={{ query: { id: "ms-with-ce-managed-attributes" } } as any}
+      />,
+      testCtx
+    );
+
+    await waitFor(() => {
+      expect(
+        wrapper.getAllByText("sample-with-ce-managed-attributes")[0]
+      ).toBeInTheDocument();
+    });
+
+    // The Collecting Event's Managed Attributes should still be displayed, even though the
+    // sibling "Collecting Event Additional Details" section has nothing visible in the
+    // Form Template:
+    await waitFor(() => {
+      expect(wrapper.getByText("CE Attribute 1")).toBeInTheDocument();
+      expect(wrapper.getByText(/ce attribute 1 value/i)).toBeInTheDocument();
+    });
+
+    // Fields within the hidden "Collecting Event Additional Details" section should not render:
+    expect(wrapper.queryByText(/^habitat$/i)).not.toBeInTheDocument();
   });
 
   it("Renders the organisms expanded by default.", async () => {
