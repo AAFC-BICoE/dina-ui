@@ -446,6 +446,60 @@ describe("AttachmentsField component", () => {
         ]
       ).toEqual(true);
     });
+
+    it("Keeps the templateCheckboxes entry set to true after unchecking 'Allow Existing' back to false", async () => {
+      const mockSubmit = jest.fn();
+
+      const wrapper = mountWithAppContext(
+        <DinaForm
+          initialValues={{ attachmentsConfig: {}, templateCheckboxes: {} }}
+          isTemplate={true}
+          onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+        >
+          <DinaFormSection
+            componentName="material-sample-attachments-component"
+            sectionName="material-sample-attachments-sections"
+          >
+            <AttachmentsField
+              name="attachment"
+              allowNewFieldName="attachmentsConfig.allowNew"
+              allowExistingFieldName="attachmentsConfig.allowExisting"
+            />
+          </DinaFormSection>
+        </DinaForm>,
+        testCtx as any
+      );
+
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelector("input.allow-existing-checkbox")
+        ).toBeInTheDocument()
+      );
+
+      const checkbox = wrapper.container.querySelector(
+        "input.allow-existing-checkbox"
+      )!;
+
+      // Check it (true), then uncheck it again (explicitly false):
+      await userEvent.click(checkbox);
+      await userEvent.click(checkbox);
+
+      const form = wrapper.container.querySelector("form");
+      fireEvent.submit(form!);
+
+      await waitFor(() => expect(mockSubmit).toHaveBeenCalled());
+
+      const submitted = mockSubmit.mock.calls[0][0];
+      // The field's own value should reflect the explicit "false":
+      expect(submitted.attachmentsConfig.allowExisting).toEqual(false);
+      // But the field must still be marked as included/visible in the template,
+      // otherwise the "false" default value gets discarded when the template is used:
+      expect(
+        submitted.templateCheckboxes[
+          "material-sample-attachments-component.material-sample-attachments-sections.attachmentsConfig.allowExisting"
+        ]
+      ).toEqual(true);
+    });
   });
 
   describe("Applying a Form Template's Allow New/Allow Existing config", () => {
@@ -484,6 +538,71 @@ describe("AttachmentsField component", () => {
       expect(
         screen.queryByRole("tab", { name: /attach existing objects/i })
       ).not.toBeInTheDocument();
+    });
+
+    it("Hides the 'Upload New Attachments' tab when the applied Form Template set allowNew to false", async () => {
+      const wrapper = mountWithAppContext(
+        <DinaForm
+          initialValues={{
+            attachment: [],
+            attachmentsConfig: { allowNew: false, allowExisting: true }
+          }}
+          onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
+        >
+          <AttachmentsField
+            name="attachment"
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+          />
+        </DinaForm>,
+        testCtx as any
+      );
+
+      const addButton = await waitFor(() => {
+        const button = wrapper.getByRole("button", {
+          name: /add attachments/i
+        });
+        expect(button).toBeInTheDocument();
+        return button;
+      });
+      await userEvent.click(addButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("tab", { name: /attach existing objects/i })
+        ).toBeInTheDocument();
+      });
+      expect(
+        screen.queryByRole("tab", { name: /upload new attachments/i })
+      ).not.toBeInTheDocument();
+    });
+
+    it("Disables the 'Add Attachments' button when the applied Form Template disallows both new and existing attachments.", async () => {
+      const wrapper = mountWithAppContext(
+        <DinaForm
+          initialValues={{
+            attachment: [],
+            attachmentsConfig: { allowNew: false, allowExisting: false }
+          }}
+          onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
+        >
+          <AttachmentsField
+            name="attachment"
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+          />
+        </DinaForm>,
+        testCtx as any
+      );
+
+      const addButton = await waitFor(() => {
+        const button = wrapper.getByRole("button", {
+          name: /add attachments/i
+        });
+        expect(button).toBeInTheDocument();
+        return button;
+      });
+      expect(addButton).toBeDisabled();
     });
   });
 });

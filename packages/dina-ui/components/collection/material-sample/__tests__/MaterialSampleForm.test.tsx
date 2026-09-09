@@ -466,14 +466,25 @@ const mockSave = jest.fn<any, any>(async (saves) => {
   });
 });
 
+const mockAxiosGet = jest.fn<any, any>(async () => ({
+  data: { hits: { total: { value: 0 }, hits: [] } }
+}));
+const mockAxiosPost = jest.fn<any, any>(async () => ({
+  data: { hits: { total: { value: 0 }, hits: [] } }
+}));
+
 const testCtx = {
   apiContext: {
     save: mockSave,
     apiClient: {
-      get: mockGet
+      get: mockGet,
+      axios: {
+        get: mockAxiosGet,
+        post: mockAxiosPost
+      }
     }
   }
-};
+} as any;
 
 const mockOnSaved = jest.fn();
 

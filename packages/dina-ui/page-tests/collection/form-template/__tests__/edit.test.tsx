@@ -130,13 +130,24 @@ const mockSave = jest.fn<any, any>(async (saves: SaveArgs[]) =>
   }))
 );
 
+const mockAxiosGet = jest.fn<any, any>(async () => ({
+  data: { hits: { total: { value: 0 }, hits: [] } }
+}));
+const mockAxiosPost = jest.fn<any, any>(async () => ({
+  data: { hits: { total: { value: 0 }, hits: [] } }
+}));
+
 const apiContext = {
   bulkGet: mockBulkGet,
   apiClient: {
-    get: mockGet
+    get: mockGet,
+    axios: {
+      get: mockAxiosGet,
+      post: mockAxiosPost
+    }
   },
   save: mockSave
-};
+} as any;
 
 /** Mount the form and provide test util functions. */
 async function mountForm(
@@ -1404,14 +1415,14 @@ const expected = {
           visible: true,
           items: [
             {
-              defaultValue: undefined,
+              defaultValue: true,
               name: "attachmentsConfig.allowNew",
-              visible: false
+              visible: true
             },
             {
-              defaultValue: undefined,
+              defaultValue: true,
               name: "attachmentsConfig.allowExisting",
-              visible: false
+              visible: true
             }
           ]
         }
@@ -1883,14 +1894,14 @@ const expected = {
           visible: true,
           items: [
             {
-              defaultValue: undefined,
+              defaultValue: true,
               name: "attachmentsConfig.allowNew",
-              visible: false
+              visible: true
             },
             {
-              defaultValue: undefined,
+              defaultValue: true,
               name: "attachmentsConfig.allowExisting",
-              visible: false
+              visible: true
             }
           ]
         }
@@ -2035,6 +2046,50 @@ describe("Form template edit page", () => {
       ?.items?.find((item) => item.name === "authors");
 
     expect(savedAuthorsItem?.visible).toEqual(true);
+  });
+
+  it("Persists an explicit 'Allow Existing: false' attachments config, leaving 'Allow New' at its default", async () => {
+    const { submitForm, wrapper } = await mountForm(formTemplate);
+
+    const allowNewCheckbox = wrapper.container.querySelector(
+      "input.allow-new-checkbox"
+    )!;
+    const allowExistingCheckbox = wrapper.container.querySelector(
+      "input.allow-existing-checkbox"
+    )!;
+
+    // Both checkboxes default to checked (allowed), since that's the actual
+    // runtime default when neither option has been configured:
+    expect(allowNewCheckbox).toBeChecked();
+    expect(allowExistingCheckbox).toBeChecked();
+
+    // Uncheck only "Allow Existing", leaving "Allow New" untouched at its default:
+    await userEvent.click(allowExistingCheckbox);
+    await waitFor(() => expect(allowExistingCheckbox).not.toBeChecked());
+
+    await submitForm();
+
+    const savedAttachmentsComponent =
+      mockOnSaved.mock.calls[0][0].components.find(
+        (comp) => comp.name === MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME
+      );
+    const savedItems = savedAttachmentsComponent?.sections?.find(
+      (section) => section.name === "material-sample-attachments-sections"
+    )?.items;
+    const savedAllowNewItem = savedItems?.find(
+      (item) => item.name === "attachmentsConfig.allowNew"
+    );
+    const savedAllowExistingItem = savedItems?.find(
+      (item) => item.name === "attachmentsConfig.allowExisting"
+    );
+
+    // Both items must stay visible/included in the template so that their default
+    // values are actually applied when the template is used, instead of being
+    // discarded and falling back to allowing both options:
+    expect(savedAllowNewItem?.visible).toEqual(true);
+    expect(savedAllowNewItem?.defaultValue).toEqual(true);
+    expect(savedAllowExistingItem?.visible).toEqual(true);
+    expect(savedAllowExistingItem?.defaultValue).toEqual(false);
   });
 
   it("Persists Organism and Determination Managed Attributes selections through a save/reload round-trip.", async () => {

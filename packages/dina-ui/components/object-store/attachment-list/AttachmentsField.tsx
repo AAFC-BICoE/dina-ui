@@ -147,15 +147,11 @@ export function AttachmentsEditor({
   const addingAttachmentsDisabled =
     !allowAttachmentsConfig?.allowExisting && !allowAttachmentsConfig?.allowNew;
 
-  function setTemplateCheckboxValue(
-    fieldName: string | undefined,
-    form,
-    checked: boolean
-  ) {
+  function setTemplateCheckboxValue(fieldName: string | undefined, form) {
     if (fieldName && componentName && sectionName) {
       form.setFieldValue(
         `templateCheckboxes['${componentName}.${sectionName}.${fieldName}']`,
-        checked
+        true
       );
     }
   }
@@ -297,12 +293,8 @@ export function AttachmentsEditor({
               className="allow-new-checkbox"
               name={allowNewFieldName}
               includeAllLabel={formatMessage("allowNew")}
-              onClickIncludeAll={(e, form) =>
-                setTemplateCheckboxValue(
-                  allowNewFieldName,
-                  form,
-                  e.target.checked
-                )
+              onClickIncludeAll={(_e, form) =>
+                setTemplateCheckboxValue(allowNewFieldName, form)
               }
             />
           )}
@@ -311,12 +303,8 @@ export function AttachmentsEditor({
               className="allow-existing-checkbox"
               name={allowExistingFieldName}
               includeAllLabel={formatMessage("allowExisting")}
-              onClickIncludeAll={(e, form) =>
-                setTemplateCheckboxValue(
-                  allowExistingFieldName,
-                  form,
-                  e.target.checked
-                )
+              onClickIncludeAll={(_e, form) =>
+                setTemplateCheckboxValue(allowExistingFieldName, form)
               }
             />
           )}

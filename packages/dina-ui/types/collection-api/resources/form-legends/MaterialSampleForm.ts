@@ -340,10 +340,12 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "attachmentsConfig.allowNew"
+            id: "attachmentsConfig.allowNew",
+            visible: true
           },
           {
-            id: "attachmentsConfig.allowExisting"
+            id: "attachmentsConfig.allowExisting",
+            visible: true
           }
         ]
       }
@@ -710,10 +712,12 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "attachmentsConfig.allowNew"
+            id: "attachmentsConfig.allowNew",
+            visible: true
           },
           {
-            id: "attachmentsConfig.allowExisting"
+            id: "attachmentsConfig.allowExisting",
+            visible: true
           }
         ]
       }
