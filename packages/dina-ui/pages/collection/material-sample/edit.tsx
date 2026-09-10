@@ -1,6 +1,8 @@
-import { BackButton, ButtonBar, SubmitButton, withResponse } from "common-ui";
+import { BackButton, ButtonBar, LoadingSpinner, withResponse } from "common-ui";
+import { FormikProps } from "formik";
+import { InputResource } from "kitsu";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Footer,
   Head,
@@ -15,7 +17,8 @@ import {
   NotCopiedOverWarning
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { FaCopy } from "react-icons/fa6";
+import { MaterialSample } from "../../../types/collection-api";
+import { FaCopy, FaFloppyDisk } from "react-icons/fa6";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -36,6 +39,22 @@ export default function MaterialSampleEditPage() {
   const [copyWarnings, setCopyWarnings] = useState<
     NotCopiedOverWarning[] | undefined
   >(undefined);
+
+  // The button bar is rendered outside of the form (so it can be positioned directly under the
+  // nav bar, above the page title), so a ref is needed to trigger the form's submission from there:
+  const materialSampleFormRef =
+    useRef<FormikProps<InputResource<MaterialSample>>>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function submit(redirect: PostSaveRedirect) {
+    setSaveRedirect(redirect);
+    setIsSubmitting(true);
+    try {
+      await materialSampleFormRef.current?.submitForm();
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   async function moveToViewPage(savedId: string) {
     await router.push(`/collection/material-sample/view?id=${savedId}`);
@@ -61,62 +80,66 @@ export default function MaterialSampleEditPage() {
     materialSample: materialSampleInitialValues,
     collectingEventInitialValues,
     enableStoredDefaultGroup: true,
-    buttonBar: (
-      <ButtonBar className="mb-3">
-        {/*
-         * Dummy submit button, kept first in DOM order.
-         * Browsers implicitly activate the first type="submit" button in the form when the user
-         * presses Enter, regardless of visual position. Without this, Enter would trigger
-         * the "Save and Copy to Next" button below since it's declared before the plain "Save"
-         * button.
-         */}
-        <button
-          type="submit"
-          className="visually-hidden"
-          tabIndex={-1}
-          aria-hidden="true"
-          onClick={() => setSaveRedirect("VIEW")}
-        />
-
-        <div className="col-md-3 col-sm-12 mt-2">
-          <BackButton entityId={id} entityLink="/collection/material-sample" />
-        </div>
-        <div className="col-md-4 flex-grow-1 d-flex">
-          <div className="mx-auto">
-            <MaterialSampleFormTemplateSelect
-              value={sampleFormTemplate}
-              onChange={setSampleFormTemplateUUID}
-            />
-          </div>
-        </div>
-        <div className="col-md-3 flex-grow-1 d-flex gap-2">
-          <div className="ms-auto" />
-          <SubmitButton
-            buttonProps={() => ({
-              style: { width: "13rem" },
-              onClick: () => setSaveRedirect("CREATE_NEXT")
-            })}
-            showSaveIcon={false}
-          >
-            <FaCopy className="me-2" />
-            <DinaMessage id="saveAndCopyToNext" />
-          </SubmitButton>
-          <SubmitButton
-            buttonProps={() => ({ onClick: () => setSaveRedirect("VIEW") })}
-          />
-        </div>
-      </ButtonBar>
-    ),
+    materialSampleFormRef,
+    // No button bar inside the form; it's rendered above the form instead:
+    buttonBar: <></>,
     // On save either redirect to the view page or create the next sample with the same values:
     onSaved:
       saveRedirect === "CREATE_NEXT" ? moveToNextSamplePage : moveToViewPage
   };
 
+  const buttonBar = (
+    <ButtonBar>
+      <div className="col-md-3 col-sm-12 mt-2">
+        <BackButton entityId={id} entityLink="/collection/material-sample" />
+      </div>
+      <div className="col-md-4 flex-grow-1 d-flex">
+        <div className="mx-auto">
+          <MaterialSampleFormTemplateSelect
+            value={sampleFormTemplate}
+            onChange={setSampleFormTemplateUUID}
+          />
+        </div>
+      </div>
+      <div className="col-md-3 flex-grow-1 d-flex gap-2">
+        <div className="ms-auto" />
+        {isSubmitting ? (
+          <LoadingSpinner loading={true} />
+        ) : (
+          <>
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ width: "13rem" }}
+              onClick={() => submit("CREATE_NEXT")}
+            >
+              <FaCopy className="me-2" />
+              <DinaMessage id="saveAndCopyToNext" />
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ width: "10rem" }}
+              onClick={() => submit("VIEW")}
+            >
+              <FaFloppyDisk className="me-2" />
+              <DinaMessage id="submitBtnText" />
+            </button>
+          </>
+        )}
+      </div>
+    </ButtonBar>
+  );
+
   return (
     <div>
       <Head title={formatMessage(title)} />
-      <Nav />
+      <Nav marginBottom={false} />
+      {buttonBar}
       <main className="container-fluid">
+        <h1 id="wb-cont">
+          <DinaMessage id={title} />
+        </h1>
         {id ? (
           withResponse(materialSampleQuery, ({ data: sample }) => {
             if (sampleFormTemplate?.id) {
@@ -127,18 +150,13 @@ export default function MaterialSampleEditPage() {
               });
             }
             return (
-              <>
-                <h1 id="wb-cont">
-                  <DinaMessage id={title} />
-                </h1>
-                <MaterialSampleForm
-                  enableReinitialize={true}
-                  navOrder={navOrder}
-                  {...sampleFormProps}
-                  materialSample={sample}
-                  defaultToNotReleasable={true}
-                />
-              </>
+              <MaterialSampleForm
+                enableReinitialize={true}
+                navOrder={navOrder}
+                {...sampleFormProps}
+                materialSample={sample}
+                defaultToNotReleasable={true}
+              />
             );
           })
         ) : copyFromId ? (
@@ -182,17 +200,12 @@ export default function MaterialSampleEditPage() {
             );
           })
         ) : (
-          <>
-            <h1 id="wb-cont">
-              <DinaMessage id={title} />
-            </h1>
-            <MaterialSampleForm
-              enableReinitialize={true}
-              navOrder={navOrder}
-              {...sampleFormProps}
-              defaultToNotReleasable={true}
-            />
-          </>
+          <MaterialSampleForm
+            enableReinitialize={true}
+            navOrder={navOrder}
+            {...sampleFormProps}
+            defaultToNotReleasable={true}
+          />
         )}
       </main>
       <Footer />

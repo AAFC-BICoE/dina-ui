@@ -47,19 +47,25 @@ export default function MaterialSampleBulkEditPage() {
   return (
     <div>
       <Head title={formatMessage(title)} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">{formatMessage(title)}</h1>
-        {ids && (
-          <ExistingMaterialSampleBulkEditor
-            ids={ids ?? []}
-            onSaved={moveToResultPage}
-            onPreviousClick={() =>
-              router.push("/collection/material-sample/list")
-            }
-          />
-        )}
-      </main>
+      <Nav marginBottom={false} />
+      {ids && (
+        <ExistingMaterialSampleBulkEditor
+          ids={ids ?? []}
+          onSaved={moveToResultPage}
+          onPreviousClick={() =>
+            router.push("/collection/material-sample/list")
+          }
+          renderLayout={(buttonBar, content) => (
+            <>
+              {buttonBar}
+              <main className="container-fluid">
+                <h1 id="wb-cont">{formatMessage(title)}</h1>
+                {content}
+              </main>
+            </>
+          )}
+        />
+      )}
       <Footer />
     </div>
   );
