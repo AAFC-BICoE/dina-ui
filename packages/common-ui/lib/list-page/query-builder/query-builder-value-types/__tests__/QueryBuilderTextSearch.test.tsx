@@ -6,6 +6,8 @@ import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import _ from "lodash";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
 import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
+import React from "react";
 
 describe("QueryBuilderTextSearch", () => {
   describe("QueryBuilderTextSearch Component", () => {
@@ -91,6 +93,102 @@ describe("QueryBuilderTextSearch", () => {
       expect(textSearchNotIn.asFragment()).toMatchSnapshot(
         "Expect text field to be displayed with a different placeholder."
       );
+    });
+
+    it("Display info message when using IN operator and you have more than 100 items", async () => {
+      const INFO_MESSAGE_REGEX = /case-sensitive/i;
+
+      function TestWrapper() {
+        const [val, setVal] = React.useState("");
+        return (
+          <DinaForm initialValues={{}}>
+            <QueryBuilderContextProvider
+              value={{ performSubmit: _.noop, groups: [] }}
+            >
+              <QueryBuilderTextSearch
+                matchType="in"
+                value={val}
+                setValue={(newValue) => setVal(newValue)}
+              />
+            </QueryBuilderContextProvider>
+          </DinaForm>
+        );
+      }
+
+      const wrapper = mountWithAppContext(<TestWrapper />);
+
+      const input = wrapper.getByRole("textbox");
+
+      // Initial state: No info message should be displayed
+      expect(wrapper.queryByText(INFO_MESSAGE_REGEX)).not.toBeInTheDocument();
+
+      // Type 50 items: Info message should STILL NOT be displayed
+      const fiftyItems = Array.from({ length: 50 }, (_, i) => `item${i}`).join(
+        ","
+      );
+      await userEvent.type(input, fiftyItems);
+
+      expect(wrapper.queryByText(INFO_MESSAGE_REGEX)).not.toBeInTheDocument();
+
+      // Clear and enter 101 items: Info message SHOULD appear
+      await userEvent.clear(input);
+      const hundredAndOneItems = Array.from(
+        { length: 101 },
+        (_, i) => `item${i}`
+      ).join(",");
+
+      // It's likely users will be pasting this amount and not be typing it by hand.
+      await userEvent.paste(hundredAndOneItems);
+
+      expect(wrapper.getByText(INFO_MESSAGE_REGEX)).toBeInTheDocument();
+    });
+
+    it("Display info message when using NOT IN operator and you have more than 100 items", async () => {
+      const INFO_MESSAGE_REGEX = /case-sensitive/i;
+
+      function TestWrapper() {
+        const [val, setVal] = React.useState("");
+        return (
+          <DinaForm initialValues={{}}>
+            <QueryBuilderContextProvider
+              value={{ performSubmit: _.noop, groups: [] }}
+            >
+              <QueryBuilderTextSearch
+                matchType="notIn"
+                value={val}
+                setValue={(newValue) => setVal(newValue)}
+              />
+            </QueryBuilderContextProvider>
+          </DinaForm>
+        );
+      }
+
+      const wrapper = mountWithAppContext(<TestWrapper />);
+
+      const input = wrapper.getByRole("textbox");
+
+      // Initial state: No info message should be displayed
+      expect(wrapper.queryByText(INFO_MESSAGE_REGEX)).not.toBeInTheDocument();
+
+      // Type 50 items: Info message should STILL NOT be displayed
+      const fiftyItems = Array.from({ length: 50 }, (_, i) => `item${i}`).join(
+        ","
+      );
+      await userEvent.type(input, fiftyItems);
+
+      expect(wrapper.queryByText(INFO_MESSAGE_REGEX)).not.toBeInTheDocument();
+
+      // Clear and enter 101 items: Info message SHOULD appear
+      await userEvent.clear(input);
+      const hundredAndOneItems = Array.from(
+        { length: 101 },
+        (_, i) => `item${i}`
+      ).join(",");
+
+      // It's likely users will be pasting this amount and not be typing it by hand.
+      await userEvent.paste(hundredAndOneItems);
+
+      expect(wrapper.getByText(INFO_MESSAGE_REGEX)).toBeInTheDocument();
     });
 
     it("Should call performSubmit on enter key press in textfield", async () => {
@@ -181,8 +279,23 @@ describe("QueryBuilderTextSearch", () => {
       });
     });
 
+    // Helper to generate a comma-separated string with a given number of items
+    const generateItems = (count: number) =>
+      Array.from({ length: count }, (_, i) => `test${i + 1}`).join(", ");
+
+    const relationshipFieldInfo = {
+      label: "determination.scientificName",
+      parentName: "organism",
+      parentPath: "included",
+      parentType: "organism",
+      path: "attributes.determination",
+      type: "text",
+      value: "organism.determination.scientificName",
+      keywordMultiFieldSupport: true
+    };
+
     describe("in operator", () => {
-      test("Normal field", async () => {
+      test("Normal field - under threshold (case-insensitive term query)", async () => {
         expect(
           transformTextSearchToDSL({
             operation: "in",
@@ -193,10 +306,64 @@ describe("QueryBuilderTextSearch", () => {
           })
         ).toMatchSnapshot();
       });
+
+      test("Normal field - over 100 items (case-sensitive terms query)", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "in",
+          value: generateItems(101),
+          fieldInfo: {} as any,
+          fieldPath: "data.attributes.textField",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
+
+        // Explicit structural check for terms query
+        expect(dsl).toEqual({
+          bool: {
+            must: {
+              terms: {
+                "data.attributes.textField": expect.arrayContaining([
+                  "test1",
+                  "test101"
+                ])
+              }
+            }
+          }
+        });
+
+        expect(dsl.bool.must.terms["data.attributes.textField"]).toHaveLength(
+          101
+        );
+      });
+
+      test("Relationship field - under threshold", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "in",
+          value: "Homo sapiens, Canis lupus",
+          fieldInfo: relationshipFieldInfo as any,
+          fieldPath: "included.attributes.determination.scientificName",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
+      });
+
+      test("Relationship field - over 100 items", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "in",
+          value: generateItems(101),
+          fieldInfo: relationshipFieldInfo as any,
+          fieldPath: "included.attributes.determination.scientificName",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
+      });
     });
 
     describe("not in operator", () => {
-      test("Normal field", async () => {
+      test("Normal field - under threshold (case-insensitive term query)", async () => {
         expect(
           transformTextSearchToDSL({
             operation: "notIn",
@@ -206,6 +373,60 @@ describe("QueryBuilderTextSearch", () => {
             queryType: "in"
           })
         ).toMatchSnapshot();
+      });
+
+      test("Normal field - over 100 items (case-sensitive terms query)", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "notIn",
+          value: generateItems(101),
+          fieldInfo: {} as any,
+          fieldPath: "data.attributes.textField",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
+
+        // Explicit structural check for terms query under must_not
+        expect(dsl).toEqual({
+          bool: {
+            must_not: {
+              terms: {
+                "data.attributes.textField": expect.arrayContaining([
+                  "test1",
+                  "test101"
+                ])
+              }
+            }
+          }
+        });
+
+        expect(
+          dsl.bool.must_not.terms["data.attributes.textField"]
+        ).toHaveLength(101);
+      });
+
+      test("Relationship field - under threshold", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "notIn",
+          value: "Homo sapiens, Canis lupus",
+          fieldInfo: relationshipFieldInfo as any,
+          fieldPath: "included.attributes.determination.scientificName",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
+      });
+
+      test("Relationship field - over 100 items", async () => {
+        const dsl = transformTextSearchToDSL({
+          operation: "notIn",
+          value: generateItems(101),
+          fieldInfo: relationshipFieldInfo as any,
+          fieldPath: "included.attributes.determination.scientificName",
+          queryType: "in"
+        });
+
+        expect(dsl).toMatchSnapshot();
       });
     });
 

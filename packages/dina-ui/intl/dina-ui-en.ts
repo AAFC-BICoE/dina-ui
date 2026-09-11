@@ -951,6 +951,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   protocolViewTitle: "Protocol",
   publiclyReleasableOption: "Yes - Publicly Releasable",
   notPubliclyReleasableOption: "No - Not Publicly Releasable",
+  queryBuilder_value_in_case_sensitivity_notice:
+    "{count} items entered. Searches with over 100 items automatically run as case-sensitive to optimize performance.",
   queryBuilder_addSearchGroup: "Add sub-query",
   queryBuilder_addSearchRule: "Add query",
   queryBuilder_conjunction_and: "AND",
