@@ -75,6 +75,12 @@ export default function QueryRowVocabularySearch({
                     )
                   }
                   onKeyDown={onKeyDown}
+                  styles={{
+                    menu: (base) => ({
+                      ...base,
+                      zIndex: 9999
+                    })
+                  }}
                 />
               ) : (
                 <Select
@@ -90,6 +96,12 @@ export default function QueryRowVocabularySearch({
                     setValue?.(pickListOption?.value ?? "")
                   }
                   onKeyDown={onKeyDown}
+                  styles={{
+                    menu: (base) => ({
+                      ...base,
+                      zIndex: 9999
+                    })
+                  }}
                 />
               )}
             </>

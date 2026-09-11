@@ -122,7 +122,7 @@ export default function QueryRowRelationshipPresenceSearch({
         }
         menuPortalTarget={document.body}
         styles={{
-          menuPortal: (base) => ({
+          menu: (base) => ({
             ...base,
             zIndex: 9999
           })
@@ -150,7 +150,7 @@ export default function QueryRowRelationshipPresenceSearch({
             }
             menuPortalTarget={document.body}
             styles={{
-              menuPortal: (base) => ({
+              menu: (base) => ({
                 ...base,
                 zIndex: 9999
               })
