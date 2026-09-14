@@ -18,7 +18,7 @@ import {
   ManagedAttribute
 } from "../../../types/collection-api";
 import { ManagedAttributeField } from "../ManagedAttributeField";
-import { useManagedAttributeQueries } from "../useManagedAttributeQueries";
+import { useBulkManagedAttributes } from "../useBulkManagedAttributes";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "../../controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   DndContext,
@@ -240,10 +240,10 @@ function AttributesViewList({
   controlledVocabularyId = COLLECTION_MANAGED_ATTRIBUTE_ID
 }: AttributesViewListProps) {
   // Fetch the attributes, but omit any that are missing e.g. were deleted.
-  const { data: fetchedAttributes } = useManagedAttributeQueries({
+  const { data: fetchedAttributes } = useBulkManagedAttributes({
     keys,
-    managedAttributeApiPath,
-    managedAttributeComponent,
+    baseApiPath: managedAttributeApiPath,
+    dinaComponent: managedAttributeComponent,
     disabled: !keys.length,
     isControlledVocabulary,
     controlledVocabularyId
@@ -256,6 +256,10 @@ function AttributesViewList({
   >([]);
   if (fetchedAttributes) {
     lastFetchedAttributes.current = _.compact(fetchedAttributes);
+  } else if (!keys.length) {
+    // Fetching is disabled when there are no keys left, so the ref must be
+    // cleared manually or it would keep showing the last-removed attribute.
+    lastFetchedAttributes.current = [];
   }
 
   const visibleAttributes = lastFetchedAttributes.current;
@@ -357,10 +361,7 @@ function SortableAttributesViewItem({
               </div>
               <FormikButton
                 className="btn remove-attribute"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemoveClick();
-                }}
+                onClick={() => onRemoveClick()}
               >
                 <RiDeleteBinLine size="1.8em" />
               </FormikButton>

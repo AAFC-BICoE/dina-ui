@@ -105,7 +105,9 @@ export function useBulkManagedAttributes({
       page: { limit: keysToFetch.length }
     });
 
-    return data ?? [];
+    return _.compact(
+      keysToFetch.map((key) => data?.find((attribute) => attribute.key === key))
+    );
   };
 
   const shouldFetch = keys?.length > 0 && !disabled;
