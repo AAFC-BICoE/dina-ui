@@ -48,25 +48,44 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
   return (
     <div>
       <Head title={formatMessage(title)} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">{formatMessage(title)}</h1>
-        {mode === "EDIT" && generatedSamples && (
+      {mode === "EDIT" && generatedSamples ? (
+        <>
+          <Nav marginBottom={false} />
           <MaterialSampleBulkEditor
             disableSampleNameField={true}
             samples={generatedSamples}
             onSaved={moveToResultPage}
             onPreviousClick={() => setMode("GENERATE")}
+            renderLayout={(buttonBar, content) => (
+              <>
+                {buttonBar}
+                <main className="container-fluid">
+                  <h1 id="wb-cont">{formatMessage(title)}</h1>
+                  {content}
+                </main>
+              </>
+            )}
           />
-        )}
-        {mode === "GENERATE" && (
+        </>
+      ) : (
+        <>
+          <Nav marginBottom={false} />
           <MaterialSampleGenerationForm
             onGenerate={onGenerate}
             initialValues={lastSubmission?.submittedValues}
             initialMode={lastSubmission?.generationMode}
+            renderLayout={(buttonBar, content) => (
+              <>
+                {buttonBar}
+                <main className="container-fluid">
+                  <h1 id="wb-cont">{formatMessage(title)}</h1>
+                  {content}
+                </main>
+              </>
+            )}
           />
-        )}
-      </main>
+        </>
+      )}
       <Footer />
     </div>
   );

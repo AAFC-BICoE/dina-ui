@@ -324,7 +324,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
         </nav>
       </header>
       <div
-        class="button-bar button-bar-sticky undefined"
+        class="button-bar button-bar-sticky"
       >
         <div
           class="container-fluid centered"
@@ -1029,7 +1029,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
         </nav>
       </header>
       <div
-        class="button-bar button-bar-sticky undefined"
+        class="button-bar button-bar-sticky"
       >
         <div
           class="container-fluid centered"
