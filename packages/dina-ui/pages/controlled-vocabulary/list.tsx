@@ -101,6 +101,10 @@ const CV_MODULES: Array<ControlledVocabularyApiConfig & { titleKey: string }> =
     {
       titleKey: "objectStoreTitle",
       ...CONTROLLED_VOCABULARY_APIS.objectstore
+    },
+    {
+      titleKey: "seqDBTitle",
+      ...CONTROLLED_VOCABULARY_APIS.sequencing
     }
   ];
 
@@ -136,7 +140,17 @@ export default function ControlledVocabularyListPage() {
     limit: 1000,
     params: SHARED_CV_PARAMS
   });
-  const moduleSidebarData = [collectionSidebarData, objectStoreSidebarData];
+  const seqDBSidebarData = useControlledVocabularySidebarData({
+    apiBaseUrl: CV_MODULES[2].apiBaseUrl,
+    limit: 1000,
+    params: SHARED_CV_PARAMS
+  });
+
+  const moduleSidebarData = [
+    collectionSidebarData,
+    objectStoreSidebarData,
+    seqDBSidebarData
+  ];
 
   const activeModule = CV_MODULES[currentTab];
 
