@@ -17,6 +17,7 @@ import {
   Determination,
   MaterialSample,
   Organism,
+  ORGANISMS_COMPONENT_NAME,
   ScientificNameSource,
   ControlledVocabularyItem
 } from "../../../types/collection-api";
@@ -173,6 +174,7 @@ export function DeterminationField({
                 <FieldSet
                   legend={<DinaMessage id="verbatimDeterminationLegend" />}
                   className="non-strip"
+                  componentName={ORGANISMS_COMPONENT_NAME}
                   sectionName="organism-verbatim-determination-section"
                 >
                   <TextFieldWithMultiplicationButton
@@ -203,6 +205,7 @@ export function DeterminationField({
                 <FieldSet
                   legend={<DinaMessage id="typeSpecimen" />}
                   className="non-strip"
+                  componentName={ORGANISMS_COMPONENT_NAME}
                   sectionName="organism-type-specimen-section"
                 >
                   <AutoSuggestTextField<ControlledVocabularyItem>
@@ -229,6 +232,7 @@ export function DeterminationField({
                 <FieldSet
                   legend={<DinaMessage id="determination" />}
                   className="non-strip"
+                  componentName={ORGANISMS_COMPONENT_NAME}
                   sectionName="organism-determination-section"
                 >
                   <ScientificNameField

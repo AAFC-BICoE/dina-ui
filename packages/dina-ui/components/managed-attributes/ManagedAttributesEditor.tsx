@@ -157,6 +157,8 @@ function ManagedAttributesEditorInner({
                 name={managedAttributeOrderFieldName}
                 managedAttributeApiPath={managedAttributeApiPath}
                 valuesPath={valuesPath}
+                isControlledVocabulary={isControlledVocabulary}
+                controlledVocabularyId={controlledVocabularyId}
               />
             ) : (
               <div>
