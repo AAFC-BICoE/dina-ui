@@ -81,8 +81,15 @@ export default function MaterialSampleEditPage() {
     collectingEventInitialValues,
     enableStoredDefaultGroup: true,
     materialSampleFormRef,
-    // No button bar inside the form; it's rendered above the form instead:
-    buttonBar: <></>,
+    buttonBar: (
+      <button
+        type="submit"
+        className="visually-hidden"
+        tabIndex={-1}
+        aria-hidden="true"
+        onClick={() => setSaveRedirect("VIEW")}
+      />
+    ),
     // On save either redirect to the view page or create the next sample with the same values:
     onSaved:
       saveRedirect === "CREATE_NEXT" ? moveToNextSamplePage : moveToViewPage

@@ -324,7 +324,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
         </nav>
       </header>
       <div
-        class="button-bar button-bar-sticky undefined"
+        class="button-bar button-bar-sticky"
       >
         <div
           class="container-fluid centered"

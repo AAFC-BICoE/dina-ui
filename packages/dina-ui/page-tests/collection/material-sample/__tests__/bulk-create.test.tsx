@@ -2,7 +2,7 @@ import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
 import { clearAndType, mountWithAppContext } from "common-ui";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
@@ -125,7 +125,7 @@ describe("MaterialSampleBulkCreatePage", () => {
     );
 
     // Submit form
-    fireEvent.submit(wrapper.container.querySelector("form")!);
+    await userEvent.click(wrapper.getByRole("button", { name: /next/i }));
 
     // Click 'Go to the previous step' button
     await waitFor(() => {
