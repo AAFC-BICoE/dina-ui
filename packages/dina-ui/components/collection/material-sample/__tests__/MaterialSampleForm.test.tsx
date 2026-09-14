@@ -1325,7 +1325,7 @@ describe("Material Sample Edit Page", () => {
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", {
-          name: /verbatim scientific name × insert hybrid symbol/i
+          name: /verbatim scientific name/i
         })
       ).toBeInTheDocument()
     );
@@ -1333,7 +1333,7 @@ describe("Material Sample Edit Page", () => {
     async function fillOutDetermination(num: number) {
       await userEvent.type(
         wrapper.getByRole("textbox", {
-          name: /verbatim scientific name × insert hybrid symbol/i
+          name: /verbatim scientific name/i
         }),
         `test-name-${num}`
       );

@@ -87,6 +87,7 @@ export const TEST_BULK_EDIT_METADATA: InputResource<Metadata>[] = [
   {
     type: "metadata",
     id: "bulk-edit-1",
+    acTags: ["tag1", "tag2"],
     acCaption: "Same Caption",
     filename: "bulkEdit1",
     originalFilename: "bulkEdit1.jpg",
@@ -125,6 +126,7 @@ export const TEST_BULK_EDIT_METADATA: InputResource<Metadata>[] = [
   {
     type: "metadata",
     id: "bulk-edit-3",
+    acTags: ["tag3", "tag4"],
     acCaption: "Same Caption",
     filename: "bulkEdit3",
     originalFilename: "bulkEdit3.jpg",

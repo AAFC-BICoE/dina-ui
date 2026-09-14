@@ -88,7 +88,9 @@ export function MaterialSampleWorkflows({
           <>
             {attachments.map((metadata: any, index: number) => (
               <span key={metadata?.id ?? index}>
-                <ExternalLink href={`#`}>
+                <ExternalLink
+                  href={`/object-store/object/view?id=${metadata?.id}`}
+                >
                   {metadata?.filename ?? metadata?.id}
                 </ExternalLink>
                 {index < attachments.length - 1 && ", "}

@@ -1,5 +1,6 @@
 import RcTooltip from "rc-tooltip";
 import { ReactNode } from "react";
+import { FaInfoCircle } from "react-icons/fa";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export interface TooltipProps {
@@ -130,10 +131,10 @@ export function Tooltip({
               {visibleElement}
             </span>
           ) : (
-            <img
-              src="/static/images/iconInformation.gif"
-              alt={id ? formatMessage({ id }) : directText}
+            <FaInfoCircle
+              className="tooltip-info-icon"
               aria-describedby={id}
+              aria-description={id ? formatMessage({ id }) : directText}
               tabIndex={0}
             />
           )}

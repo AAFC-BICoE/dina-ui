@@ -56,7 +56,8 @@ describe("StorageUnitBreadCrumb component", () => {
     );
 
     // Hover over image to show tooltip
-    await userEvent.hover(wrapper.getByRole("img"));
+    const infoIcon = wrapper.container.querySelector(".tooltip-info-icon");
+    await userEvent.hover(infoIcon!);
 
     // Test tooltip rendering while hovering on the img element
     await waitFor(() => {
@@ -86,7 +87,8 @@ describe("StorageUnitBreadCrumb component", () => {
     );
 
     // Hover over image to show tooltip
-    await userEvent.hover(wrapper.getByRole("img"));
+    const infoIcon = wrapper.container.querySelector(".tooltip-info-icon");
+    await userEvent.hover(infoIcon!);
 
     // Test tooltip rendering while hovering on the img element
     await waitFor(() => {
@@ -109,6 +111,7 @@ describe("StorageUnitBreadCrumb component", () => {
       wrapper.getAllByRole("link", { name: /a \(box\)/i })[0]
     ).toHaveAttribute("href", "/collection/storage-unit/view?id=A");
   });
+
   it("Does not render a tooltip when parentStorageUnit exists but lacks hierarchy, and the unit itself has no hierarchy", async () => {
     const unitWithBareParent: PersistedResource<StorageUnit> = {
       id: "VIAL-1",
@@ -137,7 +140,10 @@ describe("StorageUnitBreadCrumb component", () => {
 
     // No tooltip should appear — parentStorageUnit exists but has no hierarchy,
     // and the unit itself has no hierarchy, so parentPath is empty.
-    expect(wrapper.queryByRole("img")).not.toBeInTheDocument();
+    expect(
+      wrapper.container.querySelector(".tooltip-info-icon")
+    ).not.toBeInTheDocument();
+
     // The unit name should still be displayed.
     expect(
       wrapper.getByRole("link", { name: /vial test \(vial\)/i })
