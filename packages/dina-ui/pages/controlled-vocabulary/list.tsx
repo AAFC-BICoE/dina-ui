@@ -103,7 +103,7 @@ const CV_MODULES: Array<ControlledVocabularyApiConfig & { titleKey: string }> =
       ...CONTROLLED_VOCABULARY_APIS.objectstore
     },
     {
-      titleKey: "seqDBTitle",
+      titleKey: "seqdbTitle",
       ...CONTROLLED_VOCABULARY_APIS.sequencing
     }
   ];

@@ -17,6 +17,7 @@ import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { Protocol } from "packages/dina-ui/types/collection-api";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { SEQDB_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface MolecularAnalysisDetailsStepProps {
   genericMolecularAnalysisId?: string;
@@ -142,12 +143,14 @@ export function MolecularAnalysisForm() {
         <div className="col-md-12">
           <ManagedAttributesEditor
             valuesPath="managedAttributes"
-            managedAttributeApiPath="seqdb-api/managed-attribute"
+            managedAttributeApiPath="seqdb-api/controlled-vocabulary-item"
             managedAttributeComponent="GENERIC_MOLECULAR_ANALYSIS"
+            controlledVocabularyId={SEQDB_MANAGED_ATTRIBUTE_ID}
             fieldSetProps={{
               legend: <DinaMessage id="managedAttributes" />
             }}
             disableClearButton={true}
+            isControlledVocabulary={true}
           />
         </div>
       </div>
