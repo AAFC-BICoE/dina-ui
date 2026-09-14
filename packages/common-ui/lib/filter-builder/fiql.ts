@@ -17,6 +17,24 @@ interface FiqlOperandGroup {
   operator: string;
 }
 
+/**
+ * Characters a fiql argument can contain without quotes, the intersection of what the RSQL
+ * grammar and the back-end's query-string grammar accept unquoted. Anything else (spaces,
+ * "@" in an email address, "+", quotes, etc.) requires the argument to be double-quoted.
+ */
+const UNQUOTED_FIQL_ARGUMENT = /^[A-Za-z0-9_\-.%/:*]*$/;
+
+/**
+ * Quotes a fiql argument when it contains characters that can't appear unquoted, e.g. a free-text
+ * search for "John Smith" or "john@example.com". Double quotes can't be escaped in the back-end's
+ * query-string grammar, so they are dropped from the value.
+ */
+export function fiqlArgument(value: string): string {
+  return UNQUOTED_FIQL_ARGUMENT.test(value)
+    ? value
+    : `"${value.replace(/"/g, "")}"`;
+}
+
 export function simpleSearchFilterToFiql(
   filter: FilterParam | undefined
 ): string {
@@ -270,6 +288,7 @@ function toPredicate(
     } else if (searchType === "EXACT_MATCH") {
       compare = predicate === "IS NOT" ? "!=" : "==";
     }
+    searchValue = fiqlArgument(searchValue);
   }
 
   return {
@@ -287,7 +306,7 @@ function toFreeTextSearch(
   const operands = filterAttributes.map((attribute) => {
     const selector = typeof attribute === "string" ? attribute : attribute.name;
     const operand: FiqlOperand = {
-      arguments: `*${value}*`,
+      arguments: fiqlArgument(`*${value}*`),
       comparison: "==",
       selector
     };

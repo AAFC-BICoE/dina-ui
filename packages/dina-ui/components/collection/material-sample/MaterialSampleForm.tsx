@@ -65,6 +65,7 @@ import { CollectionSelectSection } from "../CollectionSelectSection";
 import { ShowParentAttributesField } from "./ShowParentAttributesField";
 import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
 import { ParentSelectSection } from "../ParentSelectSection";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -420,6 +421,7 @@ export function MaterialSampleForm({
                 valuesPath="managedAttributes"
                 managedAttributeApiPath="collection-api/controlled-vocabulary-item"
                 managedAttributeComponent="MATERIAL_SAMPLE"
+                controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
                 fieldSetProps={{
                   id,
                   legend: <DinaMessage id="materialSampleManagedAttributes" />

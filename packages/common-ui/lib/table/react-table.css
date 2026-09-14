@@ -200,6 +200,7 @@
   transition: all 0.1s ease;
   cursor: pointer;
   outline-width: 0;
+  white-space: nowrap;
 }
 .ReactTable .-pagination .-btn[disabled] {
   opacity: 0.5;
@@ -214,7 +215,7 @@
 .ReactTable .-pagination .-first,
 .ReactTable .-pagination .-last {
   height: 35px;
-  width: 115px;
+  min-width: 115px;
   margin-top: 5px;
   text-align: center;
   margin-left: 5px;
@@ -225,6 +226,7 @@
 .ReactTable .-pagination-small .-first,
 .ReactTable .-pagination-small .-last {
   width: 35px !important;
+  min-width: 35px !important;
 }
 
 .ReactTable .-pagination .-last {

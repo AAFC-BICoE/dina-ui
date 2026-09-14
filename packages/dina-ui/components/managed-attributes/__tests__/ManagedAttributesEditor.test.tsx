@@ -59,18 +59,11 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/managed-attribute":
-      // Handle filter-based lookups used by useManagedAttributeQueries
-      if (params?.filter?.key?.EQ === "example_attribute_1") {
-        return { data: [EXAMPLE_MA_1] };
-      }
-      if (params?.filter?.key?.EQ === "example_attribute_2") {
-        return { data: [EXAMPLE_MA_2] };
-      }
-      if (params?.filter?.key?.EQ === "example_attribute_3") {
-        return { data: [EXAMPLE_MA_3] };
-      }
-      // Default: return all for the multiselect dropdown
-      return { data: [EXAMPLE_MA_1, EXAMPLE_MA_2] };
+      return {
+        data: [EXAMPLE_MA_1, EXAMPLE_MA_2, EXAMPLE_MA_3].filter((attribute) =>
+          params?.filter?.key?.IN?.split(",").includes(attribute.key)
+        )
+      };
     case "collection-api/form-template/existing-view-id":
       return {
         data: TEST_COLLECTING_EVENT_CUSTOM_VIEW
@@ -131,42 +124,23 @@ describe("ManagedAttributesEditor component", () => {
     await waitFor(() => {
       expect(mockGet.mock.calls).toEqual(
         expect.arrayContaining([
-          // Fetch for example_attribute_1 using filter query
+          // Fetch both visible attributes in one request.
           [
             "collection-api/managed-attribute",
             {
               header: {
                 Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json",
-                "Crnk-Compact": "true"
+                "Content-Type": "application/vnd.api+json"
               },
               filter: {
                 managedAttributeComponent: {
                   EQ: "COLLECTING_EVENT"
                 },
                 key: {
-                  EQ: "example_attribute_1"
+                  IN: "example_attribute_1,example_attribute_2"
                 }
-              }
-            }
-          ],
-          // Fetch for example_attribute_2 using filter query
-          [
-            "collection-api/managed-attribute",
-            {
-              header: {
-                Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json",
-                "Crnk-Compact": "true"
               },
-              filter: {
-                managedAttributeComponent: {
-                  EQ: "COLLECTING_EVENT"
-                },
-                key: {
-                  EQ: "example_attribute_2"
-                }
-              }
+              page: { limit: 2 }
             }
           ]
         ])
@@ -247,15 +221,9 @@ describe("ManagedAttributesEditor component", () => {
       dinaComponent: "SITE"
     };
 
-    const mockGetCV = jest.fn<any, any>(async (path, params) => {
+    const mockGetCV = jest.fn<any, any>(async (path) => {
       switch (path) {
         case "collection-api/controlled-vocabulary-item":
-          if (params?.filter?.key?.EQ === "example_attribute_1") {
-            return { data: [EXAMPLE_CV_1] };
-          }
-          if (params?.filter?.key?.EQ === "example_attribute_2") {
-            return { data: [EXAMPLE_CV_2] };
-          }
           return { data: [EXAMPLE_CV_1, EXAMPLE_CV_2] };
         case "user-api/group":
           return { data: [] };
@@ -276,6 +244,7 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/controlled-vocabulary-item"
           managedAttributeComponent="SITE"
+          controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
           disableClearButton={true}
           isControlledVocabulary={true}
         />
@@ -287,58 +256,29 @@ describe("ManagedAttributesEditor component", () => {
     await waitFor(() => {
       expect(mockGetCV.mock.calls).toEqual(
         expect.arrayContaining([
-          // Fetch for example_attribute_1 using dinaComponent filter
           [
             "collection-api/controlled-vocabulary-item",
             {
               header: {
                 Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json",
-                "Crnk-Compact": "true"
+                "Content-Type": "application/vnd.api+json"
               },
               filter: {
-                dinaComponent: {
-                  EQ: "SITE"
-                },
                 "controlledVocabulary.uuid": {
                   EQ: COLLECTION_MANAGED_ATTRIBUTE_ID
                 },
-                key: {
-                  EQ: "example_attribute_1"
-                }
-              }
-            }
-          ],
-          // Fetch for example_attribute_2 using dinaComponent filter
-          [
-            "collection-api/controlled-vocabulary-item",
-            {
-              header: {
-                Accept: "application/vnd.api+json",
-                "Content-Type": "application/vnd.api+json",
-                "Crnk-Compact": "true"
-              },
-              filter: {
                 dinaComponent: {
                   EQ: "SITE"
                 },
-                "controlledVocabulary.uuid": {
-                  EQ: COLLECTION_MANAGED_ATTRIBUTE_ID
-                },
                 key: {
-                  EQ: "example_attribute_2"
+                  IN: "example_attribute_1,example_attribute_2"
                 }
-              }
+              },
+              page: { limit: 2 }
             }
           ]
         ])
       );
-
-      // Also verify managedAttributeComponent filter was never used
-      const calls = mockGetCV.mock.calls;
-      calls.forEach(([_, params]) => {
-        expect(params?.filter).not.toHaveProperty("managedAttributeComponent");
-      });
     });
 
     // Verify that the correct input values are still rendered correctly.

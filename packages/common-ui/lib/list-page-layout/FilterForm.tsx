@@ -1,4 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
+import classNames from "classnames";
 import { FormikProps } from "formik";
 import _ from "lodash";
 import { useEffect } from "react";
@@ -13,9 +14,12 @@ import { FaArrowRotateLeft } from "react-icons/fa6";
 interface FilterFormProps {
   children?: (formik: FormikProps<any>) => React.ReactElement;
   filterAttributes: FilterAttribute[];
-  /** Unique ID for this form's name. */
+  /* Unique ID for this form's name. */
   id: string;
   onFilterFormSubmit?: (values: any) => void;
+
+  /* CSS classes added to the form's layout wrapper, e.g. "list-filter-panel". */
+  className?: string;
 }
 
 /** Formik form with the filter builder field. */
@@ -23,7 +27,8 @@ export function FilterForm({
   children,
   filterAttributes,
   id,
-  onFilterFormSubmit = _.noop
+  onFilterFormSubmit = _.noop,
+  className
 }: FilterFormProps) {
   const filterformKey = `${id}_filterForm`;
   const [filterForm, setFilterForm, removeFilterForm] = useLocalStorage(
@@ -55,7 +60,10 @@ export function FilterForm({
   return (
     <DinaForm initialValues={filterForm} onSubmit={onFilterFormSubmitInternal}>
       {(formikProps) => (
-        <div className="d-flex gap-3 flex-wrap mb-3" translate={undefined}>
+        <div
+          className={classNames("d-flex gap-3 flex-wrap mb-3", className)}
+          translate={undefined}
+        >
           <div>
             <strong>
               <CommonMessage id="filterRecordsTitle" />

@@ -51,6 +51,37 @@ jobs:
         run: echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npx jest
         env:
           CHUNKS: ${{ needs.setup.outputs['test-chunks'] }}
+          JEST_CI_STATS_FILE: chunk-stats-${{ matrix.chunk }}.json
+          DEBUG_PRINT_LIMIT: 500
+      - name: Upload chunk stats for the run-level test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-stats-chunk-${{ matrix.chunk }}
+          path: chunk-stats-${{ matrix.chunk }}.json
+          retention-days: 7
+          if-no-files-found: warn
+
+  # Merges every chunk's stats into one run-level report on the Summary page
+  test-report:
+    runs-on: ubuntu-latest
+    name: test report
+    needs: [setup, test-chunk]
+    if: always()
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download chunk stats
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-stats-chunk-*
+          path: test-stats
+          merge-multiple: true
+      - name: Compose run-level test report
+        env:
+          EXPECTED_CHUNKS: ${{ needs.setup.outputs['test-chunk-ids'] }}
+          TEST_RESULT: ${{ needs.test-chunk.result }}
+        run: node jest-ci-compose-report.js test-stats >> "$GITHUB_STEP_SUMMARY"
 
   build:
     runs-on: ubuntu-latest
