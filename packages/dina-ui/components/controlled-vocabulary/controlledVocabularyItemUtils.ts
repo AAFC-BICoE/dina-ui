@@ -9,6 +9,10 @@ import {
   OBJECT_STORE_MODULE_TYPE_LABELS,
   OBJECT_STORE_MODULE_TYPES
 } from "../../types/objectstore-api/resources/ObjectStoreModuleTypes";
+import {
+  SEQDB_MODULE_TYPE_LABELS,
+  SEQDB_MODULE_TYPES
+} from "../../types/seqdb-api/resources/SeqDBModuleType";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 
 export const COLLECTION_OTHER_IDENTIFIERS_ID =
@@ -20,7 +24,13 @@ export const COLLECTION_MANAGED_ATTRIBUTE_ID =
 export const OBJECT_STORE_MANAGED_ATTRIBUTE_ID =
   "b8527bdf-a1d2-465d-a8bb-2a66d552de23";
 
-export type ControlledVocabularyApi = "collection" | "objectstore";
+export const SEQDB_MANAGED_ATTRIBUTE_ID =
+  "fe62b8b4-875d-43b4-91a8-94f85b3aae42";
+
+export type ControlledVocabularyApi =
+  | "collection"
+  | "objectstore"
+  | "sequencing";
 
 export interface ControlledVocabularyApiConfig {
   apiPath: string;
@@ -66,6 +76,16 @@ export const CONTROLLED_VOCABULARY_APIS: Record<
       string,
       string
     >
+  },
+  sequencing: {
+    apiPath: "seqdb-api",
+    apiBaseUrl: "/seqdb-api",
+    entityLink: "/seqdb/controlled-vocabulary-item",
+    editRoute: "/seqdb/controlled-vocabulary-item/edit",
+    viewRoute: "/seqdb/controlled-vocabulary-item/view",
+    listRoute: "/controlled-vocabulary/list?tab=2",
+    componentTypes: SEQDB_MODULE_TYPES,
+    componentTypeLabels: SEQDB_MODULE_TYPE_LABELS as Record<string, string>
   }
 };
 

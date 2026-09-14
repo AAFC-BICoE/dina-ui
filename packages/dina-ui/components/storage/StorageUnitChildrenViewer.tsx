@@ -3,18 +3,22 @@ import {
   FieldSet,
   ReactTable,
   SimpleSearchFilterBuilder,
-  useApiClient
+  useApiClient,
+  useBulkGet
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
 import { TableColumn } from "../../../common-ui/lib/list-page/types";
 import { getScientificNames } from "../collection/material-sample/organismUtils";
+import { Metadata } from "../../types/objectstore-api";
+import { SmallThumbnail } from "../table/thumbnail-cell";
+import { useMetadataThumbnailPath } from "../object-store/metadata/useMetadataThumbnailPath";
 
 export interface StorageTreeFieldProps {
   storageUnit: StorageUnit;
@@ -189,11 +193,55 @@ export interface StorageUnitContentsProps {
   materialSamples: PersistedResource<MaterialSample>[] | undefined;
 }
 
+interface MaterialSampleThumbnailProps {
+  metadata: PersistedResource<Metadata>;
+}
+
+function MaterialSampleThumbnail({ metadata }: MaterialSampleThumbnailProps) {
+  const { filePath, altImage } = useMetadataThumbnailPath(
+    metadata,
+    "bucket",
+    true
+  );
+
+  return <SmallThumbnail filePath={filePath} altImage={altImage} />;
+}
+
 /** Material Sample table and nested Storage Units UI. */
 export function StorageUnitContents({
   storageUnit,
   materialSamples
 }: StorageUnitContentsProps) {
+  const attachmentIds = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          materialSamples
+            ?.map((sample) => sample.attachment?.[0]?.id)
+            .filter((id): id is string => Boolean(id)) ?? []
+        )
+      ),
+    [materialSamples]
+  );
+
+  const { dataWithNullForMissing: attachmentMetadatas } = useBulkGet<Metadata>({
+    ids: attachmentIds,
+    listPath: "objectstore-api/metadata?include=derivatives",
+    disabled: attachmentIds.length === 0
+  });
+
+  const attachmentMetadataById = useMemo(
+    () =>
+      new Map(
+        (attachmentMetadatas ?? [])
+          .filter(
+            (metadata): metadata is PersistedResource<Metadata> =>
+              metadata !== null
+          )
+          .map((metadata) => [metadata.id, metadata])
+      ),
+    [attachmentMetadatas]
+  );
   const materialSampleColumns: TableColumn<MaterialSample>[] = [
     {
       cell: ({
@@ -208,6 +256,21 @@ export function StorageUnitContents({
       header: () => <FieldHeader name="materialSampleName" />,
       id: "materialSampleName",
       accessorKey: "materialSampleName"
+    },
+    {
+      id: "thumbnail",
+      header: () => <FieldHeader name="thumbnail" />,
+      enableSorting: false,
+      cell: ({ row: { original } }) => {
+        const attachmentId = original.attachment?.[0]?.id;
+        const metadata = attachmentId
+          ? attachmentMetadataById.get(attachmentId)
+          : undefined;
+
+        return metadata ? (
+          <MaterialSampleThumbnail metadata={metadata} />
+        ) : null;
+      }
     },
     {
       id: "scientificName",

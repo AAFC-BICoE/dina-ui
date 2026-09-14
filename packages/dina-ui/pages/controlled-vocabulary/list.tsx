@@ -101,6 +101,10 @@ const CV_MODULES: Array<ControlledVocabularyApiConfig & { titleKey: string }> =
     {
       titleKey: "objectStoreTitle",
       ...CONTROLLED_VOCABULARY_APIS.objectstore
+    },
+    {
+      titleKey: "seqdbTitle",
+      ...CONTROLLED_VOCABULARY_APIS.sequencing
     }
   ];
 
@@ -121,7 +125,7 @@ export default function ControlledVocabularyListPage() {
 
   // Tab state
   const [currentTab, setCurrentTab] = useState<number>(() =>
-    router.query.tab === "1" ? 1 : 0
+    router.query.tab === "1" ? 1 : router.query.tab === "2" ? 2 : 0
   );
 
   // Sidebar data for each configured module. Hooks are called unconditionally
@@ -136,7 +140,17 @@ export default function ControlledVocabularyListPage() {
     limit: 1000,
     params: SHARED_CV_PARAMS
   });
-  const moduleSidebarData = [collectionSidebarData, objectStoreSidebarData];
+  const seqDBSidebarData = useControlledVocabularySidebarData({
+    apiBaseUrl: CV_MODULES[2].apiBaseUrl,
+    limit: 1000,
+    params: SHARED_CV_PARAMS
+  });
+
+  const moduleSidebarData = [
+    collectionSidebarData,
+    objectStoreSidebarData,
+    seqDBSidebarData
+  ];
 
   const activeModule = CV_MODULES[currentTab];
 
