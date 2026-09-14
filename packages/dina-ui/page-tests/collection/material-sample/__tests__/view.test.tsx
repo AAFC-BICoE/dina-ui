@@ -240,12 +240,12 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/collection":
       return { data: [] };
     case "collection-api/controlled-vocabulary-item":
-      if (params?.filter?.key?.EQ === "attribute_1") {
+      if (params?.filter?.key?.IN?.split(",").includes("attribute_1")) {
         return {
           data: [{ id: "1", key: "attribute_1", name: "Attribute 1" }]
         };
       }
-      if (params?.filter?.key?.EQ === "ce_attribute_1") {
+      if (params?.filter?.key?.IN?.split(",").includes("ce_attribute_1")) {
         return {
           data: [{ id: "10", key: "ce_attribute_1", name: "CE Attribute 1" }]
         };
