@@ -25,6 +25,7 @@ import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttribu
 import { TabbedArrayField } from "../TabbedArrayField";
 import { GlobalNamesField } from "../global-names/GlobalNamesField";
 import { ScientificNameField } from "./ScientificNameField";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 export interface DeterminationFieldProps {
   className?: string;
 }
@@ -321,6 +322,7 @@ export function DeterminationField({
                         valuesPath={fieldProps("managedAttributes").name}
                         managedAttributeApiPath="collection-api/controlled-vocabulary-item"
                         managedAttributeComponent="DETERMINATION"
+                        controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
                         attributeSelectorWidth={12}
                         fieldSetProps={{
                           legend: (
@@ -343,6 +345,7 @@ export function DeterminationField({
                       valuesPath={fieldProps("managedAttributes").name}
                       managedAttributeApiPath="collection-api/controlled-vocabulary-item"
                       managedAttributeComponent="DETERMINATION"
+                      controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
                       attributeSelectorWidth={12}
                       fieldSetProps={{
                         legend: (

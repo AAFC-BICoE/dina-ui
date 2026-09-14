@@ -24,6 +24,7 @@ import PolygonEditorCoordinates from "./PolygonEditorCoordinates";
 import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
 import { apiColumns } from "packages/dina-ui/pages/collection/collecting-event/list";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export default function SiteFormLayout({
   id,
@@ -110,6 +111,7 @@ export default function SiteFormLayout({
         valuesPath="managedAttributes"
         managedAttributeApiPath="collection-api/controlled-vocabulary-item"
         managedAttributeComponent="SITE"
+        controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
         fieldSetProps={{
           legend: <DinaMessage id="siteManagedAttributes" />
         }}

@@ -4,6 +4,7 @@ import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataDetails } from "../MetadataDetails";
 import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { OBJECT_STORE_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2"],
@@ -53,19 +54,39 @@ describe("MetadataDetails component", () => {
   it("Renders the metadata details.", async () => {
     const wrapper = mountWithAppContext(
       <MetadataDetails metadata={TEST_METADATA} />,
-      {
-        apiContext
-      }
+      { apiContext }
     );
 
     await waitFor(() => {
-      expect(wrapper.getByText(/attr1 value/i)).toBeInTheDocument();
-      expect(wrapper.getByText(/attr2 value/i)).toBeInTheDocument();
+      expect(wrapper.getAllByText(/attr1 value/i)[0]).toBeInTheDocument();
+      expect(wrapper.getAllByText(/attr2 value/i)[0]).toBeInTheDocument();
       expect(
         wrapper.getByRole("cell", {
           name: /cf99c285\-0353\-4fed\-a15d\-ac963e0514f3/i
         })
       ).toBeInTheDocument();
     });
+
+    expect(mockGet).toHaveBeenCalledWith(
+      "objectstore-api/controlled-vocabulary-item",
+      {
+        filter: {
+          "controlledVocabulary.uuid": {
+            EQ: OBJECT_STORE_MANAGED_ATTRIBUTE_ID
+          },
+          dinaComponent: {
+            EQ: "METADATA"
+          },
+          key: {
+            IN: "0763db31-a0c9-43f8-b7fc-705a783c35df,e5b9765e-1246-4119-b4e4-8d2267175662"
+          }
+        },
+        header: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json"
+        },
+        page: { limit: 2 } // Dynamically changes based on the total number of managed attribute keys.
+      }
+    );
   });
 });
