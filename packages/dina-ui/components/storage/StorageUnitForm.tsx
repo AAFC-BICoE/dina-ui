@@ -151,7 +151,7 @@ export function StorageUnitFormFields({
             .where("storageUnitUsage.storageUnit.uuid", "EQ", initialValues.id)
             .build()
         : undefined,
-      include: "storageUnitUsage,organism",
+      include: "storageUnitUsage,organism,attachment",
       page: { limit: 1000 }
     },
     {
