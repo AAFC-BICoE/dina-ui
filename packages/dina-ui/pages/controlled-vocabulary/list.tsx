@@ -125,7 +125,7 @@ export default function ControlledVocabularyListPage() {
 
   // Tab state
   const [currentTab, setCurrentTab] = useState<number>(() =>
-    router.query.tab === "1" ? 1 : 0
+    router.query.tab === "1" ? 1 : router.query.tab === "2" ? 2 : 0
   );
 
   // Sidebar data for each configured module. Hooks are called unconditionally
