@@ -103,20 +103,29 @@ export function InlineArrayField<T>({
                   <div className="d-flex align-items-start gap-2">
                     <div className="flex-grow-1">{rowInternal(index)}</div>
                     {!readOnly && !isTemplate && (
-                      <div className="d-inline-flex mt-4">
-                        <FormikButton
-                          className="btn btn-dark remove-row-button"
-                          onClick={() => removeElement(index)}
-                        >
-                          <div data-testid="remove-this-button">
-                            <FaMinus />
+                      <div>
+                        {/* Mirrors FieldWrapper's label block so the button
+                        lines up with the inputs on the row's first line. */}
+                        <div className="field-label mb-2" aria-hidden="true">
+                          <div className="d-flex align-items-center w-100">
+                            <strong className="me-2">&nbsp;</strong>
                           </div>
-                        </FormikButton>
-                        <Tooltip
-                          directText={formatMessage("removeThisElement", {
-                            typeName
-                          })}
-                        />
+                        </div>
+                        <div className="d-inline-flex">
+                          <FormikButton
+                            className="btn btn-dark remove-row-button"
+                            onClick={() => removeElement(index)}
+                          >
+                            <div data-testid="remove-this-button">
+                              <FaMinus />
+                            </div>
+                          </FormikButton>
+                          <Tooltip
+                            directText={formatMessage("removeThisElement", {
+                              typeName
+                            })}
+                          />
+                        </div>
                       </div>
                     )}
                   </div>

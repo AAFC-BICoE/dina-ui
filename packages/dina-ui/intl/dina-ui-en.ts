@@ -690,6 +690,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_title: "Title",
   "field_title.en": "English Title",
   "field_title.fr": "French Title",
+  "field_title.de": "German Title",
   field_transcriberRemarks: "Transcriber's Notes",
   field_type: "Type",
   field_typeStatus: "Type Status",

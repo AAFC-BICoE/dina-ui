@@ -4,6 +4,7 @@ import {
   MultilingualDescription,
   MultilingualTitle,
   NumberField,
+  ResourceSelectField,
   SelectField,
   StringArrayField,
   TextField,
@@ -18,6 +19,7 @@ import {
   TaxonomicCoverage
 } from "../../../types/collection-api";
 import { AgentRole } from "../../../types/loan-transaction-api";
+import { License } from "../../../types/objectstore-api";
 import { InlineArrayField, InlineRowCtx } from "../InlineArrayField";
 
 const DATASET_TYPE_OPTIONS: { label: string; value: DatasetType }[] = [
@@ -56,7 +58,7 @@ function AgentRoleRow({ fieldProps }: InlineRowCtx<AgentRole>) {
 
 export function DatasetFormLayout() {
   const { readOnly } = useDinaFormContext();
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
 
   return (
     <div>
@@ -96,22 +98,31 @@ export function DatasetFormLayout() {
         legend={<DinaMessage id="datasetUsageRights" />}
       >
         <div className="row">
+          {readOnly ? (
+            // The selected License isn't fetched for the read-only view, so show
+            // the name that was stored alongside the URL when it was picked.
+            <TextField
+              className="col-md-6"
+              name="usageRights.licenseName"
+              customName="licenseName"
+            />
+          ) : (
+            <ResourceSelectField<License>
+              className="col-md-6"
+              name="license"
+              filter={() => ({})}
+              model="objectstore-api/license"
+              optionLabel={(license) => license.titles[locale] ?? license.url}
+              removeDefaultSort={true}
+            />
+          )}
           <TextField
             className="col-md-6"
-            name="usageRights.licenseName"
-            customName="licenseName"
-          />
-          <TextField
-            className="col-md-6"
-            name="usageRights.licenseUrl"
-            customName="licenseUrl"
+            name="usageRights.usageTerms"
+            customName="usageTerms"
+            multiLines={true}
           />
         </div>
-        <TextField
-          name="usageRights.usageTerms"
-          customName="usageTerms"
-          multiLines={true}
-        />
       </FieldSet>
 
       <InlineArrayField<KeywordSet>

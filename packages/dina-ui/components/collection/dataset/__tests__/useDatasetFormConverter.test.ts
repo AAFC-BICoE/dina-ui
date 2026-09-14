@@ -1,10 +1,21 @@
-import { Dataset } from "../../../../types/collection-api";
-import { useDatasetFormConverter } from "../useDatasetFormConverter";
+import { License } from "../../../../types/objectstore-api";
+import {
+  DatasetWithLicense,
+  useDatasetFormConverter
+} from "../useDatasetFormConverter";
 
 const { convertDatasetToFormData, convertFormDataToDataset } =
   useDatasetFormConverter();
 
-const FULL_DATASET: Dataset = {
+const CC_BY: License = {
+  id: "license-1",
+  type: "license",
+  url: "https://creativecommons.org/licenses/by/4.0/",
+  titles: { en: "CC-BY", fr: "CC-BY (fr)" }
+};
+
+const FULL_DATASET: DatasetWithLicense = {
+  license: CC_BY,
   id: "123",
   type: "dataset",
   group: "test-group",
@@ -106,7 +117,52 @@ describe("useDatasetFormConverter", () => {
       convertDatasetToFormData(FULL_DATASET)
     );
 
-    expect(input).toEqual(FULL_DATASET);
+    // The client-only license field is dropped; usageRights is derived from it.
+    const { license: _license, ...expected } = FULL_DATASET;
+    expect(input).toEqual(expected);
+  });
+
+  it("Derives the licence name and URL from the selected License", () => {
+    const input = convertFormDataToDataset({
+      type: "dataset",
+      license: CC_BY,
+      usageRights: { usageTerms: "Free to use with attribution." }
+    });
+
+    expect(input.usageRights).toEqual({
+      licenseName: "CC-BY",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      usageTerms: "Free to use with attribution."
+    });
+  });
+
+  it("Stores the English licence name regardless of the editing locale", () => {
+    const input = convertFormDataToDataset({
+      type: "dataset",
+      license: { ...CC_BY, titles: { fr: "CC-BY (fr)", en: "CC-BY" } }
+    });
+
+    expect(input.usageRights?.licenseName).toEqual("CC-BY");
+  });
+
+  it("Falls back to the licence URL when the License has no titles", () => {
+    const input = convertFormDataToDataset({
+      type: "dataset",
+      license: { ...CC_BY, titles: {} }
+    });
+
+    expect(input.usageRights?.licenseName).toEqual(CC_BY.url);
+  });
+
+  it("Clears the stored licence when the dropdown is cleared", () => {
+    const formData = convertDatasetToFormData(FULL_DATASET);
+    const input = convertFormDataToDataset({ ...formData, license: null });
+
+    expect(input.usageRights).toEqual({
+      licenseName: undefined,
+      licenseUrl: undefined,
+      usageTerms: "Free to use with attribution."
+    });
   });
 
   it("Returns a blank dataset when there is nothing to convert", () => {

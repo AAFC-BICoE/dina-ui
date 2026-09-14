@@ -12,18 +12,21 @@ import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import {
   DatasetFormValues,
+  DatasetWithLicense,
   useDatasetFormConverter
 } from "../../../components/collection/dataset/useDatasetFormConverter";
 import { DatasetFormLayout } from "../../../components/collection/dataset/DatasetFormLayout";
 import PageLayout from "../../../components/page/PageLayout";
 import { Dataset } from "../../../types/collection-api";
+import { License } from "../../../types/objectstore-api";
 
 interface DatasetFormProps {
-  fetchedDataset?: Dataset;
+  fetchedDataset?: DatasetWithLicense;
   onSaved: (dataset: PersistedResource<Dataset>) => Promise<void>;
 }
 
 export default function DatasetEditPage() {
+  const { apiClient } = useApiClient();
   const router = useRouter();
   const {
     query: { id }
@@ -35,9 +38,22 @@ export default function DatasetEditPage() {
 
   const title = id ? "editDatasetTitle" : "addDatasetTitle";
 
-  const query = useQuery<Dataset>(
+  const query = useQuery<DatasetWithLicense>(
     { path: `collection-api/dataset/${id}` },
-    { disabled: !id }
+    {
+      disabled: !id,
+      onSuccess: async ({ data: dataset }) => {
+        // Resolve the License resource so the dropdown shows the stored licence:
+        const url = dataset.usageRights?.licenseUrl;
+        if (url) {
+          dataset.license = (
+            await apiClient.get<License[]>("objectstore-api/license", {
+              filter: { url }
+            })
+          ).data[0];
+        }
+      }
+    }
   );
 
   return (
