@@ -41,7 +41,6 @@ import {
   FaTemperatureHalf,
   FaWrench,
   FaPuzzlePiece,
-  FaFingerprint,
   FaLandmark,
   FaListCheck,
   FaFileLines,
@@ -301,13 +300,6 @@ const CONTROLLED_VOCAB_DEFAULTS: NavigationCard[] = [
     title: "fieldExtensions",
     icon: FaPuzzlePiece,
     href: "/collection/extension/list",
-    category: "controlled-vocabulary"
-  },
-  {
-    id: "identifiers",
-    title: "identifiers",
-    icon: FaFingerprint,
-    href: "/identifier/list",
     category: "controlled-vocabulary"
   },
   {
