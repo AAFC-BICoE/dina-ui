@@ -40,6 +40,7 @@ export * from "./formik-connected/safeSubmit";
 export * from "./formik-connected/SelectField";
 export * from "./formik-connected/StringArrayField";
 export * from "./formik-connected/SubmitButton";
+export * from "./formik-connected/RefSubmitButton";
 export * from "./formik-connected/TextField";
 export * from "./formik-connected/safeSubmit";
 export * from "./formik-connected/CheckBoxField";

@@ -221,18 +221,7 @@ export function DatasetFormLayout() {
           <TextField className="col-md-6" {...project("funding")} />
         </div>
         <TextField {...project("abstractText")} multiLines={true} />
-        <div className="row">
-          <TextField
-            className="col-md-6"
-            {...project("studyAreaDescription")}
-            multiLines={true}
-          />
-          <TextField
-            className="col-md-6"
-            {...project("designDescription")}
-            multiLines={true}
-          />
-        </div>
+        <TextField {...project("designDescription")} multiLines={true} />
 
         <InlineArrayField<AgentRole>
           name="project.personnel"

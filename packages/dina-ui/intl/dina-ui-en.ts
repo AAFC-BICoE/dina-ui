@@ -115,7 +115,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_rank: "Rank",
   field_samplingDescription: "Sampling Description",
   field_south: "South",
-  field_studyAreaDescription: "Study Area Description",
   field_studyExtent: "Study Extent",
   field_thesaurus: "Thesaurus",
   field_usageTerms: "Usage Terms",
