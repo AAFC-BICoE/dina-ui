@@ -27,7 +27,6 @@ export default function DatasetDetailsPage() {
       entityLink="/collection/dataset"
       type="dataset"
       apiBaseUrl="/collection-api"
-      showRevisionsLink={true}
     />
   );
 }
