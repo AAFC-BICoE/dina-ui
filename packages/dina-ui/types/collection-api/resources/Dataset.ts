@@ -15,63 +15,63 @@ export const DATASET_AGENT_ROLES = [
 export type DatasetType = "DWCA";
 
 /** Licence and conditions governing use and redistribution of the dataset. */
-export interface UsageRights {
+export interface DatasetUsageRights {
   licenseName?: string;
   licenseUrl?: string;
   usageTerms?: string;
 }
 
 /** Keywords describing the dataset, optionally from a controlled vocabulary. */
-export interface KeywordSet {
+export interface DatasetKeywordSet {
   keywords?: string[];
   thesaurus?: string;
 }
 
-export interface BoundingBox {
+export interface DatasetBoundingBox {
   west?: number;
   south?: number;
   east?: number;
   north?: number;
 }
 
-export interface GeographicCoverage {
+export interface DatasetGeographicCoverage {
   geographicDescription?: string;
-  boundingBox?: BoundingBox;
+  boundingBox?: DatasetBoundingBox;
 }
 
-export interface TemporalCoverage {
+export interface DatasetTemporalCoverage {
   beginDate?: string;
   endDate?: string;
 }
 
-export interface TaxonomicCoverage {
+export interface DatasetTaxonomicCoverage {
   rank?: string;
   scientificName?: string;
   commonName?: string;
 }
 
 /** The spatial, temporal and taxonomic scope of the dataset. */
-export interface Coverage {
-  geographic?: GeographicCoverage;
-  temporal?: TemporalCoverage;
-  taxonomic?: TaxonomicCoverage[];
+export interface DatasetCoverage {
+  geographic?: DatasetGeographicCoverage;
+  temporal?: DatasetTemporalCoverage;
+  taxonomic?: DatasetTaxonomicCoverage[];
 }
 
 /** Sampling procedures and study extent. */
-export interface Sampling {
+export interface DatasetSampling {
   studyExtent?: string;
   samplingDescription?: string;
 }
 
 /** Scientific methods used to collect or produce the dataset. */
-export interface Methods {
+export interface DatasetMethods {
   methodSteps?: string[];
-  sampling?: Sampling;
+  sampling?: DatasetSampling;
   qualityControlDescriptions?: string[];
 }
 
 /** Structured funding award information. */
-export interface Award {
+export interface DatasetAward {
   funderName?: string;
   funderIdentifiers?: string[];
   awardNumber?: string;
@@ -88,7 +88,7 @@ export interface DatasetProject {
   abstractText?: string;
   funding?: string;
   personnel?: AgentRole[];
-  awards?: Award[];
+  awards?: DatasetAward[];
   studyAreaDescription?: string;
   designDescription?: string;
 }
@@ -102,10 +102,10 @@ export interface DatasetAttributes {
   multilingualDescription?: MultilingualDescription;
   datasetType?: DatasetType;
   agentRoles?: AgentRole[];
-  usageRights?: UsageRights;
-  keywordSets?: KeywordSet[];
-  coverage?: Coverage;
-  methods?: Methods;
+  usageRights?: DatasetUsageRights;
+  keywordSets?: DatasetKeywordSet[];
+  coverage?: DatasetCoverage;
+  methods?: DatasetMethods;
   project?: DatasetProject;
   createdOn?: string;
   createdBy?: string;

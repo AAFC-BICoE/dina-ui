@@ -1,15 +1,8 @@
-import classNames from "classnames";
-import {
-  FieldSet,
-  FieldWrapperProps,
-  FormikButton,
-  Tooltip,
-  useDinaFormContext
-} from "common-ui";
-import { FieldArray } from "formik";
+import { FieldWrapperProps, FormikButton, Tooltip } from "common-ui";
 import { ReactNode } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { ArrayFieldContainer } from "./ArrayFieldContainer";
 
 export interface InlineArrayFieldProps<T> {
   className?: string;
@@ -34,65 +27,48 @@ export interface InlineRowCtx<T> {
 }
 
 /**
- * Renders an array of objects as stacked rows, each with its own remove button,
- * and an add button underneath. An alternative to TabbedArrayField for arrays
- * where seeing every element at once matters more than saving vertical space.
+ * Renders an array of objects as stacked rows, each with its own remove button.
+ * Use when seeing every element at once matters more than saving vertical space;
+ * otherwise see TabbedArrayField.
  */
 export function InlineArrayField<T>({
   className,
-  name,
-  typeName,
-  makeNewElement,
   sectionId,
+  typeName,
+  name,
   legend,
-  removePadding,
-  renderRow
+  makeNewElement,
+  renderRow,
+  removePadding
 }: InlineArrayFieldProps<T>) {
-  const { readOnly, isTemplate } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   return (
-    <FieldArray name={name}>
-      {(fieldArrayProps) => {
-        const elements = (fieldArrayProps.form.getFieldMeta(name).value ||
-          []) as T[];
-
-        function addElement() {
-          fieldArrayProps.push(makeNewElement(elements));
-        }
-
-        function removeElement(index: number) {
-          fieldArrayProps.remove(index);
-        }
-
-        function rowInternal(index: number) {
-          /** Applies name prefix to field props */
-          function fieldProps(fieldName: string) {
-            return {
-              name: `${name}[${index}].${fieldName}`,
-              // If the first element is enabled, then enable multiple elements:
-              templateCheckboxFieldName: `${name}[0].${fieldName}`,
-              // Don't use the prefix for the labels and tooltips:
-              customName: fieldName
-            };
-          }
-
-          return renderRow({ fieldProps, index, elements });
-        }
-
+    <ArrayFieldContainer<T>
+      className={className}
+      sectionId={sectionId}
+      name={name}
+      legend={legend}
+      makeNewElement={makeNewElement}
+      removePadding={removePadding}
+    >
+      {({
+        elements,
+        fieldProps,
+        addElement,
+        removeElement,
+        readOnly,
+        isTemplate
+      }) => {
         // Nothing to show in read-only mode when the array is empty:
         if (readOnly && !elements.length) {
           return null;
         }
 
+        const showControls = !readOnly && !isTemplate;
+
         return (
-          <FieldSet
-            className={classNames(sectionId, className)}
-            id={sectionId}
-            legend={legend}
-            fieldName={name}
-            removePadding={removePadding}
-          >
+          <>
             {/* Prevent stale values in the inputs after removing an element: */}
             <div key={elements.length}>
               {elements.map((_element, index) => (
@@ -101,8 +77,14 @@ export function InlineArrayField<T>({
                   key={index}
                 >
                   <div className="d-flex align-items-start gap-2">
-                    <div className="flex-grow-1">{rowInternal(index)}</div>
-                    {!readOnly && !isTemplate && (
+                    <div className="flex-grow-1">
+                      {renderRow({
+                        elements,
+                        index,
+                        fieldProps: fieldProps(index)
+                      })}
+                    </div>
+                    {showControls && (
                       <div>
                         {/* Mirrors FieldWrapper's label block so the button
                         lines up with the inputs on the row's first line. */}
@@ -132,7 +114,7 @@ export function InlineArrayField<T>({
                 </div>
               ))}
             </div>
-            {!readOnly && !isTemplate && (
+            {showControls && (
               <div className="d-flex mt-3">
                 {elements.length ? (
                   <div className="d-inline-flex">
@@ -158,9 +140,9 @@ export function InlineArrayField<T>({
                 )}
               </div>
             )}
-          </FieldSet>
+          </>
         );
       }}
-    </FieldArray>
+    </ArrayFieldContainer>
   );
 }

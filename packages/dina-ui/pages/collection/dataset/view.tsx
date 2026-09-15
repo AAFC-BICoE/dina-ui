@@ -3,14 +3,13 @@ import { ViewPageLayout } from "../../../components";
 import { DatasetFormLayout } from "../../../components/collection/dataset/DatasetFormLayout";
 import { getDatasetTitle } from "../../../components/collection/dataset/datasetTitle";
 import {
-  DatasetFormValues,
-  useDatasetFormConverter
-} from "../../../components/collection/dataset/useDatasetFormConverter";
+  convertDatasetToFormData,
+  DatasetFormValues
+} from "../../../components/collection/dataset/datasetFormConverter";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Dataset } from "../../../types/collection-api";
 
 export default function DatasetDetailsPage() {
-  const { convertDatasetToFormData } = useDatasetFormConverter();
   const { locale } = useDinaIntl();
 
   return (

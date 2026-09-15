@@ -1,11 +1,9 @@
 import { License } from "../../../../types/objectstore-api";
 import {
-  DatasetWithLicense,
-  useDatasetFormConverter
-} from "../useDatasetFormConverter";
-
-const { convertDatasetToFormData, convertFormDataToDataset } =
-  useDatasetFormConverter();
+  convertDatasetToFormData,
+  convertFormDataToDataset,
+  DatasetWithLicense
+} from "../datasetFormConverter";
 
 const CC_BY: License = {
   id: "license-1",
@@ -75,7 +73,7 @@ const FULL_DATASET: DatasetWithLicense = {
   }
 };
 
-describe("useDatasetFormConverter", () => {
+describe("datasetFormConverter", () => {
   it("Converts the multilingual fields to the editable dictionary format", () => {
     const formData = convertDatasetToFormData(FULL_DATASET);
 

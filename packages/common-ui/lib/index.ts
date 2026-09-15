@@ -28,6 +28,7 @@ export * from "./formik-connected/FieldSpy";
 export * from "./formik-connected/FieldSet";
 export * from "./formik-connected/FieldView";
 export * from "./formik-connected/FieldWrapper";
+export * from "./formik-connected/prefixedFieldProps";
 export * from "./formik-connected/FormikButton";
 export * from "./formik-connected/GeoSuggestSearchBox";
 export * from "./formik-connected/GroupedCheckBoxFields";

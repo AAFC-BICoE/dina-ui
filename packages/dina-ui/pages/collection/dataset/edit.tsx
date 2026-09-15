@@ -11,10 +11,11 @@ import {
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import {
+  convertDatasetToFormData,
+  convertFormDataToDataset,
   DatasetFormValues,
-  DatasetWithLicense,
-  useDatasetFormConverter
-} from "../../../components/collection/dataset/useDatasetFormConverter";
+  DatasetWithLicense
+} from "../../../components/collection/dataset/datasetFormConverter";
 import { DatasetFormLayout } from "../../../components/collection/dataset/DatasetFormLayout";
 import PageLayout from "../../../components/page/PageLayout";
 import { Dataset } from "../../../types/collection-api";
@@ -73,9 +74,6 @@ export default function DatasetEditPage() {
 
 export function DatasetForm({ fetchedDataset, onSaved }: DatasetFormProps) {
   const { save } = useApiClient();
-  const { convertDatasetToFormData, convertFormDataToDataset } =
-    useDatasetFormConverter();
-
   const initialValues = convertDatasetToFormData(fetchedDataset);
 
   const onSubmit: DinaFormOnSubmit<DatasetFormValues> = async ({

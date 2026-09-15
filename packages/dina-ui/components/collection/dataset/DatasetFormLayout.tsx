@@ -4,6 +4,7 @@ import {
   MultilingualDescription,
   MultilingualTitle,
   NumberField,
+  prefixedFieldProps,
   ResourceSelectField,
   SelectField,
   StringArrayField,
@@ -13,10 +14,11 @@ import {
 import { GroupSelectField, PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  Award,
-  DatasetType,
-  KeywordSet,
-  TaxonomicCoverage
+  DATASET_AGENT_ROLES,
+  DatasetAward,
+  DatasetKeywordSet,
+  DatasetTaxonomicCoverage,
+  DatasetType
 } from "../../../types/collection-api";
 import { AgentRole } from "../../../types/loan-transaction-api";
 import { License } from "../../../types/objectstore-api";
@@ -27,13 +29,10 @@ const DATASET_TYPE_OPTIONS: { label: string; value: DatasetType }[] = [
 ];
 
 /** Role value paired with its message key, so the keys stay type-checked. */
-const DATASET_AGENT_ROLE_OPTIONS = [
-  { value: "creator", labelKey: "datasetAgentRole_creator" },
-  { value: "metadataProvider", labelKey: "datasetAgentRole_metadataProvider" },
-  { value: "contact", labelKey: "datasetAgentRole_contact" },
-  { value: "associatedParty", labelKey: "datasetAgentRole_associatedParty" },
-  { value: "publisher", labelKey: "datasetAgentRole_publisher" }
-] as const;
+const DATASET_AGENT_ROLE_OPTIONS = DATASET_AGENT_ROLES.map((value) => ({
+  value,
+  labelKey: `datasetAgentRole_${value}` as const
+}));
 
 /** Shared by the agentRoles and project.personnel sections. */
 function AgentRoleRow({ fieldProps }: InlineRowCtx<AgentRole>) {
@@ -59,6 +58,15 @@ function AgentRoleRow({ fieldProps }: InlineRowCtx<AgentRole>) {
 export function DatasetFormLayout() {
   const { readOnly } = useDinaFormContext();
   const { formatMessage, locale } = useDinaIntl();
+
+  // Nested field paths, so labels stay keyed off the short field name:
+  const rights = prefixedFieldProps("usageRights");
+  const geographic = prefixedFieldProps("coverage.geographic");
+  const boundingBox = prefixedFieldProps("coverage.geographic.boundingBox");
+  const temporal = prefixedFieldProps("coverage.temporal");
+  const methods = prefixedFieldProps("methods");
+  const sampling = prefixedFieldProps("methods.sampling");
+  const project = prefixedFieldProps("project");
 
   return (
     <div>
@@ -101,11 +109,7 @@ export function DatasetFormLayout() {
           {readOnly ? (
             // The selected License isn't fetched for the read-only view, so show
             // the name that was stored alongside the URL when it was picked.
-            <TextField
-              className="col-md-6"
-              name="usageRights.licenseName"
-              customName="licenseName"
-            />
+            <TextField className="col-md-6" {...rights("licenseName")} />
           ) : (
             <ResourceSelectField<License>
               className="col-md-6"
@@ -118,14 +122,13 @@ export function DatasetFormLayout() {
           )}
           <TextField
             className="col-md-6"
-            name="usageRights.usageTerms"
-            customName="usageTerms"
+            {...rights("usageTerms")}
             multiLines={true}
           />
         </div>
       </FieldSet>
 
-      <InlineArrayField<KeywordSet>
+      <InlineArrayField<DatasetKeywordSet>
         name="keywordSets"
         sectionId="dataset-keyword-sets-section"
         typeName={formatMessage("datasetKeywordSet")}
@@ -150,31 +153,12 @@ export function DatasetFormLayout() {
           id="dataset-geographic-coverage-section"
           legend={<DinaMessage id="datasetGeographicCoverage" />}
         >
-          <TextField
-            name="coverage.geographic.geographicDescription"
-            customName="geographicDescription"
-          />
+          <TextField {...geographic("geographicDescription")} />
           <div className="row">
-            <NumberField
-              className="col-md-3"
-              name="coverage.geographic.boundingBox.west"
-              customName="west"
-            />
-            <NumberField
-              className="col-md-3"
-              name="coverage.geographic.boundingBox.south"
-              customName="south"
-            />
-            <NumberField
-              className="col-md-3"
-              name="coverage.geographic.boundingBox.east"
-              customName="east"
-            />
-            <NumberField
-              className="col-md-3"
-              name="coverage.geographic.boundingBox.north"
-              customName="north"
-            />
+            <NumberField className="col-md-3" {...boundingBox("west")} />
+            <NumberField className="col-md-3" {...boundingBox("south")} />
+            <NumberField className="col-md-3" {...boundingBox("east")} />
+            <NumberField className="col-md-3" {...boundingBox("north")} />
           </div>
         </FieldSet>
 
@@ -183,20 +167,12 @@ export function DatasetFormLayout() {
           legend={<DinaMessage id="datasetTemporalCoverage" />}
         >
           <div className="row">
-            <DateField
-              className="col-md-6"
-              name="coverage.temporal.beginDate"
-              customName="beginDate"
-            />
-            <DateField
-              className="col-md-6"
-              name="coverage.temporal.endDate"
-              customName="endDate"
-            />
+            <DateField className="col-md-6" {...temporal("beginDate")} />
+            <DateField className="col-md-6" {...temporal("endDate")} />
           </div>
         </FieldSet>
 
-        <InlineArrayField<TaxonomicCoverage>
+        <InlineArrayField<DatasetTaxonomicCoverage>
           name="coverage.taxonomic"
           sectionId="dataset-taxonomic-coverage-section"
           typeName={formatMessage("datasetTaxonomicCoverageItem")}
@@ -219,25 +195,20 @@ export function DatasetFormLayout() {
         id="dataset-methods-section"
         legend={<DinaMessage id="datasetMethods" />}
       >
-        <StringArrayField name="methods.methodSteps" customName="methodSteps" />
+        <StringArrayField {...methods("methodSteps")} />
         <div className="row">
           <TextField
             className="col-md-6"
-            name="methods.sampling.studyExtent"
-            customName="studyExtent"
+            {...sampling("studyExtent")}
             multiLines={true}
           />
           <TextField
             className="col-md-6"
-            name="methods.sampling.samplingDescription"
-            customName="samplingDescription"
+            {...sampling("samplingDescription")}
             multiLines={true}
           />
         </div>
-        <StringArrayField
-          name="methods.qualityControlDescriptions"
-          customName="qualityControlDescriptions"
-        />
+        <StringArrayField {...methods("qualityControlDescriptions")} />
       </FieldSet>
 
       <FieldSet
@@ -245,33 +216,19 @@ export function DatasetFormLayout() {
         legend={<DinaMessage id="datasetProject" />}
       >
         <div className="row">
-          <TextField
-            className="col-md-6"
-            name="project.title"
-            customName="title"
-          />
-          <TextField
-            className="col-md-6"
-            name="project.funding"
-            customName="funding"
-          />
+          <TextField className="col-md-6" {...project("title")} />
+          <TextField className="col-md-6" {...project("funding")} />
         </div>
-        <TextField
-          name="project.abstractText"
-          customName="abstractText"
-          multiLines={true}
-        />
+        <TextField {...project("abstractText")} multiLines={true} />
         <div className="row">
           <TextField
             className="col-md-6"
-            name="project.studyAreaDescription"
-            customName="studyAreaDescription"
+            {...project("studyAreaDescription")}
             multiLines={true}
           />
           <TextField
             className="col-md-6"
-            name="project.designDescription"
-            customName="designDescription"
+            {...project("designDescription")}
             multiLines={true}
           />
         </div>
@@ -285,7 +242,7 @@ export function DatasetFormLayout() {
           renderRow={(ctx) => <AgentRoleRow {...ctx} />}
         />
 
-        <InlineArrayField<Award>
+        <InlineArrayField<DatasetAward>
           name="project.awards"
           sectionId="dataset-project-awards-section"
           typeName={formatMessage("datasetAward")}
@@ -315,6 +272,7 @@ export function DatasetFormLayout() {
           <DateField
             className="col-md-6"
             name="createdOn"
+            showTime={true}
             label={formatMessage("field_createdOn")}
           />
           <TextField
