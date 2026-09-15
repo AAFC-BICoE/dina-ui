@@ -15,18 +15,19 @@ import { GroupSelectField, PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   DATASET_AGENT_ROLES,
+  DATASET_TYPES,
   DatasetAward,
   DatasetKeywordSet,
-  DatasetTaxonomicCoverage,
-  DatasetType
+  DatasetTaxonomicCoverage
 } from "../../../types/collection-api";
 import { AgentRole } from "../../../types/loan-transaction-api";
 import { License } from "../../../types/objectstore-api";
 import { InlineArrayField, InlineRowCtx } from "../InlineArrayField";
 
-const DATASET_TYPE_OPTIONS: { label: string; value: DatasetType }[] = [
-  { label: "DWCA", value: "DWCA" }
-];
+const DATASET_TYPE_OPTIONS = DATASET_TYPES.map((value) => ({
+  label: value,
+  value
+}));
 
 /** Role value paired with its message key, so the keys stay type-checked. */
 const DATASET_AGENT_ROLE_OPTIONS = DATASET_AGENT_ROLES.map((value) => ({

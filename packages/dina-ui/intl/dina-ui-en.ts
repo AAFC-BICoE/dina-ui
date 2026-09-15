@@ -85,6 +85,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   datasetMethods: "Methods",
   datasetPersonnel: "Personnel",
   datasetProject: "Project",
+  datasetSearchPlaceholder: "Search by title or version",
   datasetTaxonomicCoverage: "Taxonomic Coverage",
   datasetTaxonomicCoverageItem: "Taxonomic Coverage",
   datasetTemporalCoverage: "Temporal Coverage",

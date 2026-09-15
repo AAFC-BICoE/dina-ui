@@ -12,7 +12,10 @@ export const DATASET_AGENT_ROLES = [
   "publisher"
 ] as const;
 
-export type DatasetType = "DWCA";
+/** The dataset types the back-end currently supports. */
+export const DATASET_TYPES = ["DWCA"] as const;
+
+export type DatasetType = (typeof DATASET_TYPES)[number];
 
 /** Licence and conditions governing use and redistribution of the dataset. */
 export interface DatasetUsageRights {
