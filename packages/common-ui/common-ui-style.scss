@@ -680,7 +680,7 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   height: 17px;
   color: #1c578a;
   margin-bottom: 3px;
-  cursor: pointer;
+  cursor: help;
   border-radius: 50%;
   outline: none;
   transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
@@ -696,7 +696,7 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
 }
 
 .required-field-asterisk {
-  cursor: pointer;
+  cursor: help;
   outline: none;
   transition: transform 0.2s ease-in-out;
 }

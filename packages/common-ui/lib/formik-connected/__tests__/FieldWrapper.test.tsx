@@ -241,6 +241,20 @@ describe("FieldWrapper component.", () => {
     ).toBeInTheDocument();
   });
 
+  it("Does not show a required-field indicator when the form is read-only.", () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}} readOnly={true}>
+        <FieldWrapper name="fieldName" requiredField={true}>
+          {() => <div />}
+        </FieldWrapper>
+      </DinaForm>
+    );
+
+    expect(
+      wrapper.container.querySelector(".required-field-asterisk")
+    ).not.toBeInTheDocument();
+  });
+
   it("Does not show a required-field indicator by default.", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>

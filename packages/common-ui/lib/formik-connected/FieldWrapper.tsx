@@ -228,7 +228,7 @@ function LabelWrapper({
   },
   children
 }: PropsWithChildren<FieldWrapperInternalProps>) {
-  const { horizontal, isTemplate, componentName, sectionName } =
+  const { horizontal, isTemplate, componentName, sectionName, readOnly } =
     useDinaFormContext();
 
   const bulkTab = useBulkEditTabFieldIndicators({
@@ -250,18 +250,19 @@ function LabelWrapper({
     />
   );
 
-  const requiredIndicator = requiredField ? (
-    <Tooltip
-      id="requiredField"
-      visibleElement={
-        <FaAsterisk
-          className="required-field-asterisk text-danger ms-1"
-          size="0.6em"
-        />
-      }
-      disableSpanMargin={true}
-    />
-  ) : null;
+  const requiredIndicator =
+    requiredField && !readOnly ? (
+      <Tooltip
+        id="requiredField"
+        visibleElement={
+          <FaAsterisk
+            className="required-field-asterisk text-danger ms-1"
+            size="0.6em"
+          />
+        }
+        disableSpanMargin={true}
+      />
+    ) : null;
 
   const [labelClass, valueClass] =
     horizontal === true
