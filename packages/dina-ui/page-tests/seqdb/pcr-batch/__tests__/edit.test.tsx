@@ -53,13 +53,14 @@ const mockGet = jest.fn<any, any>(async (path) => {
       };
     case "seqdb-api/pcr-batch/" + PCR_BATCH_UUID:
       return { data: TEST_PCRBATCH };
-    case "user-api/group":
     case "seqdb-api/region":
     case "seqdb-api/pcr-primer":
     case "seqdb-api/pcr-batch-item":
     case "seqdb-api/thermocycler-profile":
     case "objectstore-api/metadata":
       return { data: [] };
+    case "user-api/group":
+      return { data: [{ name: "aafc", labels: { en: "AAFC" } }] };
     case "collection-api/storage-unit":
       return {
         data: [
@@ -182,6 +183,7 @@ describe("PcrBatch edit page", () => {
             resource: {
               createdBy: "test-user",
               name: "test new batch",
+              group: "aafc",
               type: "pcr-batch",
               // Storage Unit / Storage Unit type are always set for each request.
               storageUnit: {
@@ -310,6 +312,7 @@ describe("PcrBatch edit page", () => {
             resource: {
               createdBy: "test-user",
               name: "test new batch",
+              group: "aafc",
               type: "pcr-batch",
               storageUnit: {
                 id: null,
@@ -382,6 +385,7 @@ describe("PcrBatch edit page", () => {
             resource: {
               createdBy: "test-user",
               name: "test new batch",
+              group: "aafc",
               type: "pcr-batch",
               // Storage Unit / Storage Unit type are always set for each request.
               storageUnit: {

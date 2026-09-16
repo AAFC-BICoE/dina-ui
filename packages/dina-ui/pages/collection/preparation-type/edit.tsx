@@ -148,12 +148,14 @@ export function PreparationTypeFormLayout() {
           className="col-md-6 preparationTypeName"
           name="name"
           label={formatMessage("preparationTypeNameLabel")}
+          requiredField={true}
         />
         {!readOnly && (
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
             className="col-md-6"
+            requiredField={true}
           />
         )}
       </div>

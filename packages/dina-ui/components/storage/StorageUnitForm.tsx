@@ -202,6 +202,7 @@ export function StorageUnitFormFields({
               className="flex-grow-1"
               name="name"
               label={formatMessage("storageUnitName")}
+              requiredField={true}
             />
           )}
           {showTextAreaInput && (
@@ -209,6 +210,7 @@ export function StorageUnitFormFields({
               className="flex-grow-1"
               name="name"
               label={formatMessage("storageUnitName")}
+              requiredField={true}
             />
           )}
         </div>
@@ -217,6 +219,7 @@ export function StorageUnitFormFields({
             name="group"
             enableStoredDefaultGroup={true}
             className="col-md-6"
+            requiredField={true}
           />
         )}
       </div>
@@ -238,6 +241,7 @@ export function StorageUnitFormFields({
           }
           omitNullOption={true}
           readOnlyLink="/collection/storage-unit-type/view?id="
+          requiredField={true}
         />
       </div>
       {!reduceRendering &&

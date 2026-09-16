@@ -226,4 +226,90 @@ describe("FieldWrapper component.", () => {
     expect(wrapper.container.querySelector(".disabledField1")).toBeNull();
     expect(wrapper.container.querySelector(".disabledField2")).toBeNull();
   });
+
+  it("Shows a required-field indicator when requiredField is true.", () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <FieldWrapper name="fieldName" requiredField={true}>
+          {() => <div />}
+        </FieldWrapper>
+      </DinaForm>
+    );
+
+    expect(
+      wrapper.container.querySelector(".required-field-asterisk")
+    ).toBeInTheDocument();
+  });
+
+  it("Does not show a required-field indicator when the form is read-only.", () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}} readOnly={true}>
+        <FieldWrapper name="fieldName" requiredField={true}>
+          {() => <div />}
+        </FieldWrapper>
+      </DinaForm>
+    );
+
+    expect(
+      wrapper.container.querySelector(".required-field-asterisk")
+    ).not.toBeInTheDocument();
+  });
+
+  it("Does not show a required-field indicator by default.", () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <FieldWrapper name="fieldName">{() => <div />}</FieldWrapper>
+      </DinaForm>
+    );
+
+    expect(
+      wrapper.container.querySelector(".required-field-asterisk")
+    ).not.toBeInTheDocument();
+  });
+
+  it("Blocks submission and shows an error when a required field is empty.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ fieldName: "" }}
+        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        <FieldWrapper name="fieldName" requiredField={true}>
+          {({ value, setValue }) => (
+            <input
+              value={value ?? ""}
+              onChange={(e) => setValue(e.target.value)}
+            />
+          )}
+        </FieldWrapper>
+      </DinaForm>
+    );
+
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(
+        wrapper.container.querySelector(".invalid-feedback")
+      ).toHaveTextContent("Required field");
+    });
+    expect(mockSubmit).not.toHaveBeenCalled();
+  });
+
+  it("Allows submission when a required field has a value.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ fieldName: "a value" }}
+        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        <FieldWrapper name="fieldName" requiredField={true}>
+          {({ value }) => <>{value}</>}
+        </FieldWrapper>
+      </DinaForm>
+    );
+
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await waitFor(() =>
+      expect(mockSubmit).toHaveBeenCalledWith({ fieldName: "a value" })
+    );
+  });
 });

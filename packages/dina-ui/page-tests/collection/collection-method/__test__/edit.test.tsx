@@ -224,7 +224,31 @@ describe("collection-method edit page", () => {
   });
 
   it("Renders an error after form submit without specifying mandatory field.", async () => {
-    // The patch request will return an error.
+    mockQuery = {};
+
+    const { container } = mountWithAppContext(<CollectionMethodEditPage />, {
+      apiContext
+    });
+
+    // Submit the form without the required Name field.
+    const form = container.querySelector("form");
+    fireEvent.submit(form!);
+
+    // The requiredField validation should block the submission client-side,
+    // before any network request is made.
+    await waitFor(() => {
+      expect(
+        container.querySelector(".name-field .invalid-feedback")
+      ).toHaveTextContent("Required field");
+    });
+
+    expect(mockPost).toBeCalledTimes(0);
+    // Ensure no redirection happened
+    expect(mockPush).toBeCalledTimes(0);
+  });
+
+  it("Renders a server-side error, e.g. a constraint violation, after form submit.", async () => {
+    // The POST request will return a constraint violation error from the back-end.
     const MOCK_POST_ERROR = (() => {
       const error = new Error() as any;
       error.isAxiosError = true;
@@ -237,7 +261,7 @@ describe("collection-method edit page", () => {
               status: "422 UNPROCESSABLE_ENTITY",
               code: "422",
               title: "Constraint violation",
-              detail: "name must not be blank",
+              detail: "name size must be between 1 and 50",
               source: { pointer: "name" }
             }
           ]
@@ -252,21 +276,29 @@ describe("collection-method edit page", () => {
 
     mockQuery = {};
 
-    const { container, getByText } = mountWithAppContext(
+    const { container, getByLabelText } = mountWithAppContext(
       <CollectionMethodEditPage />,
       { apiContext }
     );
 
-    // Submit the form
+    // Fill in the required Name field so the requiredField validation passes
+    // and the submission actually reaches the (mocked) back-end.
+    const nameInput = getByLabelText(/name/i);
+    await waitFor(() => {
+      expect(nameInput).toBeInTheDocument();
+    });
+    await clearAndType(nameInput, "a name that is too long");
+
+    // Submit the form.
     const form = container.querySelector("form");
     fireEvent.submit(form!);
 
     const { title, detail } = MOCK_POST_ERROR.response.data.errors[0];
 
-    // Check that the error message is displayed
+    // The server-side error should be displayed to the user.
     await waitFor(() => {
       expect(
-        getByText((_, element) => {
+        screen.getByText((_, element) => {
           return !!(
             element &&
             element.classList.contains("error-message") &&
@@ -275,10 +307,9 @@ describe("collection-method edit page", () => {
           );
         })
       ).toBeInTheDocument();
-
-      // Ensure no redirection happened
-      expect(mockPush).toBeCalledTimes(0);
     });
+
+    expect(mockPush).toBeCalledTimes(0);
   });
 });
 
