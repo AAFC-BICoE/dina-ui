@@ -133,12 +133,13 @@ export function PcrPrimerFormFields() {
           model="seqdb-api/region"
           optionLabel={(region) => region.name}
         />
-        <TextField className="col-md-2" name="name" />
+        <TextField className="col-md-2" name="name" requiredField={true} />
         {!readOnly && (
           <GroupSelectField
             className="col-md-2"
             name="group"
             enableStoredDefaultGroup={true}
+            requiredField={true}
           />
         )}
         <NumberField className="col-md-2" name="lotNumber" />

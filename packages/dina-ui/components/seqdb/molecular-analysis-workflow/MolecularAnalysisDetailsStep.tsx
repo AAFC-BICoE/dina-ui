@@ -112,11 +112,12 @@ export function MolecularAnalysisForm() {
   return (
     <div>
       <div className="row">
-        <TextField className="col-md-6" name="name" />
+        <TextField className="col-md-6" name="name" requiredField={true} />
         <GroupSelectField
           name="group"
           enableStoredDefaultGroup={true}
           className="col-md-6"
+          requiredField={true}
         />
       </div>
       <div className="row">
@@ -124,6 +125,7 @@ export function MolecularAnalysisForm() {
           className="col-md-6"
           name="analysisType"
           path="seqdb-api/vocabulary/molecularAnalysisType"
+          requiredField={true}
         />
         <ResourceSelectField<Protocol>
           className="col-md-6"
@@ -156,7 +158,7 @@ export function MolecularAnalysisForm() {
       </div>
       {readOnly && (
         <div className="row">
-          <DateField className="col-md-6" name="createdOn" />
+          <DateField className="col-md-6" name="createdOn" showTime={true} />
           <TextField className="col-md-6" name="createdBy" />
         </div>
       )}
