@@ -61,7 +61,11 @@
     "mammoth": "1.6.0",
     "underscore": "1.13.1",
     "follow-redirects": "^1.15.4",
-    "axios": "1.18.1"
+    "axios": "1.18.1",
+    "shell-quote": "^1.10.0",
+    "flatted": "^3.4.4",
+    "**/sass/immutable": "^5.1.9",
+    "**/@react-awesome-query-builder/core/immutable": "^4.3.9"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
