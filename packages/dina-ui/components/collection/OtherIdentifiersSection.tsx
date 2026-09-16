@@ -10,7 +10,7 @@ import {
   useDinaFormContext,
   useFieldLabels,
   useModal
-} from "common-ui/lib";
+} from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
