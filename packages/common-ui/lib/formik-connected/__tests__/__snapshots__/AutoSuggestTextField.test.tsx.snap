@@ -22,7 +22,7 @@ exports[`AutoSuggestTextField Elastic Search only provided, results are fetched 
               class="d-flex align-items-center w-100"
             >
               <strong
-                class="me-2"
+                class="me-2 d-flex align-items-center"
               >
                 <div
                   class="examplePersonNameField-field-header truncate-text"
