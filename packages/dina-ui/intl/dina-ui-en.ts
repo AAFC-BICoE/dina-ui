@@ -574,7 +574,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_parentStorageUnit: "Location",
   field_participants: "Participants",
   field_path: "Path",
-  field_personMandatoryFieldsError: "The display name field is required.",
   field_personIdentifierTypeError: "Identifier type is required.",
   field_personIdentifierValueError: "Identifier value is required.",
   field_personIdentifierUniqueError: "Identifiers must be unique.",
