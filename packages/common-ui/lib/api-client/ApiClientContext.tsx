@@ -492,7 +492,7 @@ export class ApiClientImpl implements ApiClientI {
 
     // Check for errors. At least one error means that the entire request's transaction was
     // cancelled.
-    const { errorMessage, fieldErrors, individualErrors } =
+    const { errorMessage, fieldErrors, fieldErrorCodes, individualErrors } =
       getErrorMessages(responses);
 
     // If there is an error message, throw it.
@@ -500,7 +500,8 @@ export class ApiClientImpl implements ApiClientI {
       throw new DoOperationsError(
         errorMessage ?? "",
         fieldErrors,
-        individualErrors
+        individualErrors,
+        fieldErrorCodes
       );
     }
     // Return the successful jsonpatch response.
@@ -834,6 +835,8 @@ export interface OperationError {
   index: number | string;
   errorMessage: string | null;
   fieldErrors: FormikErrors<any>;
+  /** The JSON:API "code" of each field-level error, keyed by field name. */
+  fieldErrorCodes?: Record<string, string | undefined>;
 }
 
 /** Gets the error message as a string from the JSONAPI jsonpatch/operations response. */
@@ -842,6 +845,8 @@ export function getErrorMessages(
 ): {
   errorMessage: string | null;
   fieldErrors: FormikErrors<any>;
+  /** The JSON:API "code" of each field-level error, keyed by field name. */
+  fieldErrorCodes: Record<string, string | undefined>;
   /** The error messages for each indivisual operation with the operation's index. */
   individualErrors: OperationError[];
 } {
@@ -879,7 +884,17 @@ export function getErrorMessages(
         })
     );
 
-    return { index, errorMessage, fieldErrors };
+    const fieldErrorCodes: Record<string, string | undefined> = _.fromPairs(
+      jsonApiErrors
+        .filter((error) => error.source?.pointer && error.detail)
+        .map((error) => {
+          const pointer = error.source?.pointer?.toString?.() ?? "";
+          const fieldName = normalizeJsonApiPointer(pointer) || pointer;
+          return [fieldName, error.code];
+        })
+    );
+
+    return { index, errorMessage, fieldErrors, fieldErrorCodes };
   });
 
   const overallErrorMessage =
@@ -888,11 +903,16 @@ export function getErrorMessages(
     (total, curr) => ({ ...total, ...curr.fieldErrors }),
     {}
   );
+  const overallFieldErrorCodes = individualErrors.reduce(
+    (total, curr) => ({ ...total, ...curr.fieldErrorCodes }),
+    {}
+  );
 
   // Return the error message if there is one, or null otherwise.
   return {
     errorMessage: overallErrorMessage,
     fieldErrors: overallFieldErrors,
+    fieldErrorCodes: overallFieldErrorCodes,
     individualErrors
   };
 }
@@ -903,8 +923,10 @@ export class DoOperationsError extends Error {
     public message: string,
     public fieldErrors: FormikErrors<any> = {},
     public individualErrors: OperationError[] = [
-      { errorMessage: message, fieldErrors, index: 0 }
-    ]
+      { errorMessage: message, fieldErrors, fieldErrorCodes: {}, index: 0 }
+    ],
+    /** The JSON:API "code" of each field-level error, keyed by field name. */
+    public fieldErrorCodes: Record<string, string | undefined> = {}
   ) {
     super(message);
   }

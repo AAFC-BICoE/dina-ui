@@ -1,8 +1,14 @@
 import { AddPersonButton, PersonForm } from "../PersonForm";
-import { clearAndType, mountWithAppContext } from "common-ui";
+import {
+  clearAndType,
+  DoOperationsError,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { Person } from "../../../types/objectstore-api";
 import { waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 const mockSave = jest.fn();
 
@@ -363,5 +369,103 @@ describe("PersonForm", () => {
         }
       ]);
     });
+  });
+
+  it("Shows a friendly error and lets the user override a duplicate person name", async () => {
+    const duplicateMockSave = jest.fn(async (saves: any[]) => {
+      return saves.map((save) => {
+        if (
+          save.type === "person" &&
+          save.resource.familyNames === "Duplicate" &&
+          !save.resource.allowDuplicateName
+        ) {
+          throw new DoOperationsError(
+            "",
+            {
+              familyNames:
+                "Unprocessable Entity: Duplicate person detected. Existing resource ID: fd9af912-7a8d-4980-b34e-24919e3f48ab"
+            },
+            undefined,
+            { familyNames: "duplicate_resource" }
+          );
+        }
+        return {
+          ...save.resource,
+          id: save.resource.id ?? "22222222-2222-2222-2222-222222222222"
+        };
+      });
+    });
+
+    const mockOnSubmitSuccess = jest.fn();
+
+    const newPersonInput: Person = { type: "person" };
+
+    const wrapper = mountWithAppContext(
+      <PersonForm
+        person={newPersonInput as any}
+        onSubmitSuccess={mockOnSubmitSuccess}
+      />,
+      {
+        apiContext: {
+          apiClient: { get: mockGet } as any,
+          save: duplicateMockSave
+        }
+      }
+    );
+
+    // Fill in the required displayName plus the family name that will collide:
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "Jane Doe"
+    );
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /family names/i }),
+      "Duplicate"
+    );
+
+    // Attempt to save; the friendly duplicate error should be displayed.
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitForLoadingToDisappear();
+
+    await waitFor(() =>
+      expect(
+        wrapper.getByText(/already exists, would you like to continue/i)
+      ).toBeInTheDocument()
+    );
+    expect(wrapper.getByRole("textbox", { name: /family names/i })).toHaveClass(
+      "is-invalid"
+    );
+
+    // Saving again while the error is unresolved should not succeed:
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(mockOnSubmitSuccess).toHaveBeenCalledTimes(0));
+
+    // Click the "Allow Duplicate" button:
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /allow duplicate/i })
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /family names/i })
+      ).not.toHaveClass("is-invalid")
+    );
+
+    // Submit again, this time it should succeed with allowDuplicateName sent
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => expect(mockOnSubmitSuccess).toHaveBeenCalledTimes(1));
+    expect(duplicateMockSave).lastCalledWith(
+      [
+        {
+          resource: expect.objectContaining({
+            type: "person",
+            familyNames: "Duplicate",
+            allowDuplicateName: true
+          }),
+          type: "person"
+        }
+      ],
+      expect.anything()
+    );
   });
 });

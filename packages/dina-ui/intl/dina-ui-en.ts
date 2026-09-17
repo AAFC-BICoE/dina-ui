@@ -309,6 +309,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dragDropMouseInstructions: "Drag and drop the attribute to its new position.",
   duplicate: "Duplicate",
   duplicateFilesFound: "duplicate files found",
+  duplicatePersonFound:
+    'A person with the name "{name}" already exists, would you like to continue?',
   duplicatePrimaryIdFound: "Duplicate Primary ID Found",
   editAssemblageTitle: "Edit Assemblage",
   editCataloguedObjectTitle: "Edit Catalogued Object",
