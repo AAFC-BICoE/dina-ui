@@ -3,6 +3,7 @@ export * from "./resources/CollectingEvent";
 export * from "./resources/Collection";
 export * from "./resources/CollectorGroup";
 export * from "./resources/FormTemplate";
+export * from "./resources/Dataset";
 export * from "./resources/Determination";
 export * from "./resources/GeographicPlaceNameSourceDetail";
 export * from "./resources/GeoReferenceAssertion";
