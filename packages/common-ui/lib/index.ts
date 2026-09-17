@@ -44,6 +44,7 @@ export * from "./formik-connected/safeSubmit";
 export * from "./formik-connected/CheckBoxField";
 export * from "./formik-connected/NumberRangeFields";
 export * from "./formik-connected/ToggleField";
+export * from "./formik-connected/useDuplicateResourceCheck";
 export * from "./formik-connected/RadioButtonsField";
 export * from "./formik-connected/sortable-select/SortableSelect";
 export * from "./intl/common-ui-en";
