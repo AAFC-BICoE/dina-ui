@@ -438,6 +438,14 @@ describe("PersonForm", () => {
       )
     );
 
+    // Links to the existing person's view page, parsed from the API error's detail text:
+    expect(
+      wrapper.getByRole("link", { name: /view existing person/i })
+    ).toHaveAttribute(
+      "href",
+      "/person/view?id=fd9af912-7a8d-4980-b34e-24919e3f48ab"
+    );
+
     // Both given names and family names are highlighted, even though the API only
     // pointed at familyNames, since the duplicate check is based on both together:
     expect(wrapper.getByRole("textbox", { name: /given names/i })).toHaveClass(

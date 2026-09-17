@@ -201,6 +201,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   duplicateFilesFound: "fichiers en double trouvés",
   duplicatePersonFound:
     'Une personne portant le nom "{name}" existe déjà, voulez-vous continuer?',
+  duplicatePersonViewLink: "Voir la personne existante",
   duplicatePrimaryIdFound: "Copie du document d'identité principal trouvée ",
   editAssemblageTitle: "Modifier un assemblage",
   editCataloguedObjectTitle: "Modifier un objet catalogué",

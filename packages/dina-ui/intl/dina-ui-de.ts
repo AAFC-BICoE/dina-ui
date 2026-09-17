@@ -287,6 +287,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Diese Einträge existieren bereits im System mit derselben Primär-ID und Sammlungsbezeichnung: {duplicateNames}",
   duplicatePersonFound:
     'Eine Person mit dem Namen "{name}" existiert bereits, möchten Sie fortfahren?',
+  duplicatePersonViewLink: "Bestehende Person anzeigen",
   duplicatePrimaryIdFound: "doppete primäre ID gefunden",
   duplicateResourcesFound:
     "Warnung: doppelte Ressourcen gefunden {duplicateResources}",
