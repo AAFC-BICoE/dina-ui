@@ -1,70 +1,100 @@
-import { FormikContextType, useFormikContext } from "formik";
-import { ReactNode } from "react";
+import { FormikContextType } from "formik";
+import { ReactNode, useState } from "react";
 
-/** Hook to wrap a form submit so a duplicate-resource save error can be replaced with a friendly message and an override option, instead of the raw backend error. */
+export interface DuplicateResourceMatch {
+  /** The fields to highlight as invalid until the user allows the duplicate. */
+  highlightFields: string[];
+}
+
+/** Hook to wrap a form submit so a duplicate-resource save error can be shown as a dismissable warning with an override option, instead of the raw backend error. */
 export function useDuplicateResourceCheck() {
+  const [duplicate, setDuplicate] = useState<DuplicateResourceMatch>();
+
   async function withDuplicateCheck<T>(
     fn: () => Promise<T>,
-    formik: FormikContextType<any>,
-    /** Given the caught save error, the field to flag and its replacement message, or undefined if this isn't a duplicate-resource error. */
-    getDuplicateError: (
-      error: unknown
-    ) => { fieldName: string; renderError: () => ReactNode } | undefined
+    /** Given the caught save error, the fields to highlight, or undefined if this isn't a duplicate-resource error. */
+    getDuplicateFields: (error: unknown) => string[] | undefined
   ): Promise<T> {
     try {
       return await fn();
     } catch (error) {
-      const duplicate = getDuplicateError(error);
-      if (!duplicate) {
+      const highlightFields = getDuplicateFields(error);
+      if (!highlightFields?.length) {
         throw error;
       }
-      // Replace the server's error message with a custom one on the UI:
-      formik.setFieldError(duplicate.fieldName, duplicate.renderError as any);
+      setDuplicate({ highlightFields });
+      setImmediate(() =>
+        forEachFieldInput(highlightFields, (input) =>
+          input.classList.add("is-invalid")
+        )
+      );
       throw new Error("");
     }
   }
 
-  return { withDuplicateCheck };
+  /** Dismisses the warning and lets the flagged fields' values be saved as-is on the next submit. */
+  function allowDuplicate(
+    formik: FormikContextType<any>,
+    allowDuplicateField: string
+  ) {
+    if (!duplicate) {
+      return;
+    }
+    const { highlightFields } = duplicate;
+    formik.setFieldValue(allowDuplicateField, true);
+    setDuplicate(undefined);
+
+    // Non-react hack to add a success indicator when the "allow" button is clicked:
+    setImmediate(() =>
+      forEachFieldInput(highlightFields, (input) => {
+        input.classList.remove("is-invalid");
+        input.classList.add("is-valid");
+
+        // Remove "is-valid" class on input change:
+        input.addEventListener("keydown", () =>
+          input.classList.remove("is-valid")
+        );
+      })
+    );
+  }
+
+  return { withDuplicateCheck, duplicate, allowDuplicate };
 }
 
-export interface AllowDuplicateButtonProps {
-  /** The Formik field whose error is being overridden. */
-  fieldName: string;
-  /** The Formik field to set to true once the user opts to save the duplicate anyway. */
-  allowDuplicateField: string;
-  children: ReactNode;
+function forEachFieldInput(
+  fieldNames: string[],
+  fn: (input: HTMLInputElement) => void
+) {
+  for (const fieldName of fieldNames) {
+    const input = document?.querySelector?.(`.${fieldName}-field input`);
+    if (input) {
+      fn(input as HTMLInputElement);
+    }
+  }
 }
 
-/** Button shown alongside a duplicate-resource error, letting the user opt in to saving anyway. */
-export function AllowDuplicateButton({
-  fieldName,
-  allowDuplicateField,
-  children
-}: AllowDuplicateButtonProps) {
-  const formik = useFormikContext<any>();
+export interface DuplicateResourceAlertProps {
+  message: ReactNode;
+  allowLabel: ReactNode;
+  onAllow: () => void;
+}
 
+/** A dismissable warning banner shown when a duplicate resource is detected, with an override option. */
+export function DuplicateResourceAlert({
+  message,
+  allowLabel,
+  onAllow
+}: DuplicateResourceAlertProps) {
   return (
-    <button
-      type="button"
-      className="btn btn-primary btn-sm allow-duplicate-button"
-      onClick={() => {
-        formik.setFieldValue(allowDuplicateField, true);
-        formik.setFieldError(fieldName, undefined);
-
-        // Non-react hack to add a success indicator when the "allow" button is clicked:
-        setImmediate(() => {
-          const input = document?.querySelector?.(`.${fieldName}-field input`);
-          // Add the class:
-          input?.classList?.add?.("is-valid");
-
-          // Remove "is-valid" class on input change:
-          input?.addEventListener("keydown", () =>
-            input?.classList?.remove?.("is-valid")
-          );
-        });
-      }}
-    >
-      {children}
-    </button>
+    <div className="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+      <span>{message}</span>
+      <button
+        type="button"
+        className="btn btn-primary btn-sm allow-duplicate-button flex-shrink-0"
+        onClick={onAllow}
+      >
+        {allowLabel}
+      </button>
+    </div>
   );
 }

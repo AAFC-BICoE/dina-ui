@@ -413,24 +413,35 @@ describe("PersonForm", () => {
       }
     );
 
-    // Fill in the required displayName plus the family name that will collide:
+    // Fill in the required displayName plus the given/family names that will collide:
     await clearAndType(
       wrapper.getByRole("textbox", { name: /display name/i }),
       "Jane Doe"
+    );
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /given names/i }),
+      "Jane"
     );
     await clearAndType(
       wrapper.getByRole("textbox", { name: /family names/i }),
       "Duplicate"
     );
 
-    // Attempt to save; the friendly duplicate error should be displayed.
+    // Attempt to save; the friendly duplicate error should be displayed, showing
+    // only the given/family names (not the display name):
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitForLoadingToDisappear();
 
     await waitFor(() =>
-      expect(
-        wrapper.getByText(/already exists, would you like to continue/i)
-      ).toBeInTheDocument()
+      expect(wrapper.container.querySelector(".alert")).toHaveTextContent(
+        'A person with the name "Jane Duplicate" already exists, would you like to continue?'
+      )
+    );
+
+    // Both given names and family names are highlighted, even though the API only
+    // pointed at familyNames, since the duplicate check is based on both together:
+    expect(wrapper.getByRole("textbox", { name: /given names/i })).toHaveClass(
+      "is-invalid"
     );
     expect(wrapper.getByRole("textbox", { name: /family names/i })).toHaveClass(
       "is-invalid"
@@ -446,9 +457,12 @@ describe("PersonForm", () => {
     );
     await waitFor(() =>
       expect(
-        wrapper.getByRole("textbox", { name: /family names/i })
+        wrapper.getByRole("textbox", { name: /given names/i })
       ).not.toHaveClass("is-invalid")
     );
+    expect(
+      wrapper.getByRole("textbox", { name: /family names/i })
+    ).not.toHaveClass("is-invalid");
 
     // Submit again, this time it should succeed with allowDuplicateName sent
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -459,6 +473,7 @@ describe("PersonForm", () => {
         {
           resource: expect.objectContaining({
             type: "person",
+            givenNames: "Jane",
             familyNames: "Duplicate",
             allowDuplicateName: true
           }),

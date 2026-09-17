@@ -1,71 +1,57 @@
 import {
-  AllowDuplicateButton,
   DoOperationsError,
+  DuplicateResourceAlert,
   useDuplicateResourceCheck
 } from "common-ui";
-import { FormikContextType, useFormikContext } from "formik";
+import { useFormikContext } from "formik";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
 /**
- * A hook that provides a function to check for duplicate person names before saving.
- *
- * This is used in the PersonForm to prevent saving a person with a duplicate name unless the user explicitly allows it.
- * The hook uses the useDuplicateResourceCheck hook to perform the duplicate check and handle errors.
+ * Hook that wraps a Person save so a duplicate-name error from the API is shown as a
+ * dismissable warning (instead of the raw backend error), letting the user save the
+ * duplicate anyway.
  */
 export function useDuplicatePersonNameDetection() {
-  const { withDuplicateCheck } = useDuplicateResourceCheck();
+  const { withDuplicateCheck, duplicate, allowDuplicate } =
+    useDuplicateResourceCheck();
 
-  async function withDuplicatePersonCheck<T>(
-    fn: () => Promise<T>,
-    formik: FormikContextType<any>
-  ) {
-    return withDuplicateCheck(fn, formik, (error) => {
-      const fieldName =
-        error instanceof DoOperationsError
-          ? Object.keys(error.fieldErrorCodes).find(
-              (field) => error.fieldErrorCodes[field] === "duplicate_resource"
-            )
-          : undefined;
+  async function withDuplicatePersonCheck<T>(fn: () => Promise<T>) {
+    return withDuplicateCheck(fn, (error) => {
+      const isDuplicateName =
+        error instanceof DoOperationsError &&
+        Object.values(error.fieldErrorCodes).includes("duplicate_resource");
 
-      if (!fieldName) {
-        return undefined;
-      }
-      return {
-        fieldName,
-        renderError: () => <DuplicatePersonNameError fieldName={fieldName} />
-      };
+      // The duplicate check is based on givenNames + familyNames together,
+      // regardless of which one the API's error is attached to:
+      return isDuplicateName ? ["givenNames", "familyNames"] : undefined;
     });
   }
 
-  return { withDuplicatePersonCheck };
+  function DuplicatePersonAlert() {
+    const formik = useFormikContext<any>();
+    if (!duplicate) {
+      return null;
+    }
+    return (
+      <DuplicateResourceAlert
+        message={
+          <DinaMessage
+            id="duplicatePersonFound"
+            values={{ name: getDuplicatePersonName(formik.values) }}
+          />
+        }
+        allowLabel={<DinaMessage id="allowDuplicate" />}
+        onAllow={() => allowDuplicate(formik, "allowDuplicateName")}
+      />
+    );
+  }
+
+  return { withDuplicatePersonCheck, DuplicatePersonAlert };
 }
 
-/** Builds a "Given Names Family Names (Display Name)" style label for a Person's form values. */
+/** Builds a "Given Names Family Names" style label for a Person's form values. */
 function getDuplicatePersonName(values: any): string {
-  const namePart = [values?.givenNames, values?.familyNames]
+  return [values?.givenNames, values?.familyNames]
     .filter((part) => part?.trim())
     .join(" ");
-
-  if (namePart && values?.displayName) {
-    return `${namePart} (${values.displayName})`;
-  }
-  return namePart || values?.displayName || "";
-}
-
-/** Error message with "Allow" button */
-function DuplicatePersonNameError({ fieldName }: { fieldName: string }) {
-  const { values } = useFormikContext<any>();
-  const name = getDuplicatePersonName(values);
-
-  return (
-    <>
-      <DinaMessage id="duplicatePersonFound" values={{ name }} />{" "}
-      <AllowDuplicateButton
-        fieldName={fieldName}
-        allowDuplicateField="allowDuplicateName"
-      >
-        <DinaMessage id="allowDuplicate" />
-      </AllowDuplicateButton>
-    </>
-  );
 }
