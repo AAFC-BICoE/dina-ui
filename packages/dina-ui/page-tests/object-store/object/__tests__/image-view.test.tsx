@@ -40,7 +40,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 
     // Loading case
     case "objectstore-api/object-upload/loading":
-      return new Promise(() => { });
+      return new Promise(() => {});
 
     // Derivative fallback cases
     case "objectstore-api/derivative":

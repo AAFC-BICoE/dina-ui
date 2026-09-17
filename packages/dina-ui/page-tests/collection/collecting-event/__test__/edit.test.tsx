@@ -1,4 +1,8 @@
-import { OperationsResponse, clearAndType, makeAxiosErrorMoreReadable } from "common-ui";
+import {
+  OperationsResponse,
+  clearAndType,
+  makeAxiosErrorMoreReadable
+} from "common-ui";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../../types/agent-api/resources/Person";

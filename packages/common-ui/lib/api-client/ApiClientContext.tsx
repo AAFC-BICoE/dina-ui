@@ -187,7 +187,6 @@ export class ApiClientImpl implements ApiClientI {
   constructor(private cfg: ApiClientConfig = {}) {
     this.apiClient = new CustomDinaKitsu({
       baseURL: cfg.baseURL ?? "/api",
-      headers: { "Crnk-Compact": "true" },
       pluralize: false,
       resourceCase: "none"
     });
@@ -250,8 +249,7 @@ export class ApiClientImpl implements ApiClientI {
       const url = `${apiBaseUrl}/${operation.path}`;
       const headers = {
         Accept: "application/vnd.api+json",
-        "Content-Type": "application/vnd.api+json",
-        "Crnk-Compact": "true"
+        "Content-Type": "application/vnd.api+json"
       };
       try {
         switch (operation.op.toUpperCase()) {

@@ -58,7 +58,7 @@ const mockGet = jest.fn(async (path) => {
   switch (path) {
     case "search-api/search-ws/mapping":
       return MATERIAL_SAMPLE_MAPPING;
-    case "objectstore-api/managed-attribute":
+    case "objectstore-api/controlled-vocabulary-item":
       return { data: TEST_MANAGED_ATTRIBUTES };
     case "objectstore-api/metadata/b794d633-5a37-4628-977c-3a8c9067f7df":
       return { data: TEST_METADATA };

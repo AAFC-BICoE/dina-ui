@@ -43,7 +43,8 @@ import {
 } from "../../resource-select-fields/resource-select-fields";
 import {
   COLLECTION_MANAGED_ATTRIBUTE_ID,
-  COLLECTION_OTHER_IDENTIFIERS_ID
+  COLLECTION_OTHER_IDENTIFIERS_ID,
+  OBJECT_STORE_MANAGED_ATTRIBUTE_ID
 } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export function useColumnMapping() {
@@ -129,10 +130,17 @@ export function useColumnMapping() {
   });
 
   const { loading: attrLoadingMetadata, response: attrRespMetadata } = useQuery<
-    ManagedAttribute[]
+    ControlledVocabularyItem[]
   >(
     {
-      path: "objectstore-api/managed-attribute",
+      path: "objectstore-api/controlled-vocabulary-item",
+      filter: SimpleSearchFilterBuilder.create()
+        .where(
+          "controlledVocabulary.uuid",
+          "EQ",
+          OBJECT_STORE_MANAGED_ATTRIBUTE_ID
+        )
+        .build(),
       page: { limit: 1000 }
     },
     {

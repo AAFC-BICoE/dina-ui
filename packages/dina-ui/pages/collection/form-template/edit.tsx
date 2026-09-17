@@ -111,6 +111,12 @@ export function FormTemplateEditPageLoaded({
     allMaterialSampleComponentValues.associations = [{}];
   }
 
+  allMaterialSampleComponentValues.attachmentsConfig = {
+    allowNew: true,
+    allowExisting: true,
+    ...allMaterialSampleComponentValues.attachmentsConfig
+  };
+
   // collecting event components need to be isolated for useMaterialSample hook
   const collectingEventInitialValues =
     getComponentValues(
@@ -122,6 +128,12 @@ export function FormTemplateEditPageLoaded({
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
+
+  collectingEventInitialValues.attachmentsConfig = {
+    allowNew: true,
+    allowExisting: true,
+    ...collectingEventInitialValues.attachmentsConfig
+  };
 
   const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
 

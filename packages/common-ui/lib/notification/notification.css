@@ -55,6 +55,11 @@
   font-size: 0.875rem;
 }
 
+.notification-mark-all-delete-button {
+  font-size: 0.875rem;
+  color: #dc3545 !important;
+}
+
 .notification-mark-all-icon {
   font-size: 0.75rem;
 }

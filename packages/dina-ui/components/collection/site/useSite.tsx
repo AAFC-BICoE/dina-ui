@@ -80,6 +80,10 @@ export function useSiteSave({
       delete siteDiff.attachment;
     }
 
+    // This is a UI-only field used to store the Form Template's Allow New/Allow
+    // Existing attachment toggles - it is not a real API field:
+    delete (siteDiff as any).attachmentsConfig;
+
     // If multilingualDescription is provided, transform it to the correct edit format:
     if (siteDiff?.multilingualDescription) {
       const transformedDescription = {

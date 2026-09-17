@@ -151,8 +151,7 @@ describe("API client context", () => {
       expect(config).toEqual({
         headers: {
           Accept: "application/vnd.api+json",
-          "Content-Type": "application/vnd.api+json",
-          "Crnk-Compact": "true"
+          "Content-Type": "application/vnd.api+json"
         }
       });
 

@@ -17,33 +17,33 @@ import {
   TextField,
   Tooltip,
   useApiClient
-} from "packages/common-ui/lib";
+} from "common-ui";
 import {
   convertColumnsToAliases,
   convertColumnsToPaths,
   getColumnFunctions,
   getEntityKeyFromIndexName
-} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
+} from "common-ui/lib/column-selector/ColumnSelectorUtils";
 import {
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
   MAX_OBJECT_EXPORT_TOTAL
-} from "packages/common-ui/lib/export/exportUtils";
-import { QueryFieldSelector } from "packages/common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
-import QueryRowManagedAttributeSearch from "packages/common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+} from "common-ui/lib/export/exportUtils";
+import { QueryFieldSelector } from "common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
+import QueryRowManagedAttributeSearch from "common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import {
   DynamicFieldsMappingConfig,
   ESIndexMapping
-} from "packages/common-ui/lib/list-page/types";
-import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMapping";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+} from "common-ui/lib/list-page/types";
+import { useIndexMapping } from "common-ui/lib/list-page/useIndexMapping";
+import PageLayout from "dina-ui/components/page/PageLayout";
+import { DinaMessage } from "dina-ui/intl/dina-ui-intl";
 import {
   ColumnSeparator,
   DataExport,
   DataExportTemplate,
   ExportType
-} from "packages/dina-ui/types/dina-export-api";
-import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
+} from "dina-ui/types/dina-export-api";
+import { Metadata, ObjectExport } from "dina-ui/types/objectstore-api";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Button,
@@ -605,11 +605,14 @@ export default function ExportPage<TData extends KitsuResource>() {
                           onChange={(selection) => {
                             if (selection) {
                               setSelectedSeparator(selection);
+                              if (selectedSavedExport) {
+                                setChangesMade(true);
+                              }
                             }
                           }}
                           isLoading={loadingSavedExports}
                           isDisabled={loading}
-                          defaultValue={selectedSeparator}
+                          value={selectedSeparator}
                         />
                       </div>
                       <div className="col-md-4">
@@ -627,6 +630,15 @@ export default function ExportPage<TData extends KitsuResource>() {
                           onChange={(selection) => {
                             if (selection && selection.resource) {
                               setSelectedSavedExport(selection.resource);
+                              const separator = SEPARATOR_OPTIONS.find(
+                                (option) =>
+                                  option.value ===
+                                  selection.resource?.exportOptions
+                                    ?.columnSeparator
+                              );
+                              if (separator) {
+                                setSelectedSeparator(separator);
+                              }
                             }
                           }}
                           isLoading={loadingSavedExports}

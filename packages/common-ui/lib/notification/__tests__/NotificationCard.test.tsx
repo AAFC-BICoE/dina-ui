@@ -17,10 +17,14 @@ jest.mock("moment", () => {
 
 describe("NotificationCard", () => {
   const mockOnMarkAsRead = jest.fn();
+  const mockOnDeleted = jest.fn();
 
   beforeEach(() => {
     mockOnMarkAsRead.mockClear();
     mockOnMarkAsRead.mockResolvedValue(undefined);
+
+    mockOnDeleted.mockClear();
+    mockOnDeleted.mockResolvedValue(undefined);
   });
 
   describe("Basic rendering", () => {
@@ -40,6 +44,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -64,6 +69,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -87,6 +93,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -110,6 +117,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -134,6 +142,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -158,6 +167,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -187,6 +197,7 @@ describe("NotificationCard", () => {
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
           displayAsToast={true}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -212,6 +223,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -237,6 +249,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -264,6 +277,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -296,6 +310,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -320,6 +335,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -349,6 +365,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -381,6 +398,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -390,6 +408,38 @@ describe("NotificationCard", () => {
       await waitFor(() => {
         expect(mockOnMarkAsRead).toHaveBeenCalledWith("test-id");
       });
+      expect(mockOnDeleted).toHaveBeenCalledTimes(0);
+    });
+
+    it("Calls onDeleted when clicking the delete icon", async () => {
+      const notification: Notification = {
+        id: "test-id",
+        userIdentifier: "test-user",
+        group: "aafc",
+        type: "info",
+        title: "Unread",
+        message: "Click me",
+        status: "NEW",
+        createdOn: "2024-01-15T10:00:00Z"
+      };
+
+      const wrapper = render(
+        <NotificationCard
+          notification={notification}
+          onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
+        />
+      );
+
+      // Click the delete icon
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /delete notification/i })
+      );
+
+      await waitFor(() => {
+        expect(mockOnDeleted).toHaveBeenCalledWith("test-id");
+      });
+      expect(mockOnMarkAsRead).toHaveBeenCalledTimes(0);
     });
 
     it("Does not call onMarkAsRead when clicking read notification", async () => {
@@ -408,6 +458,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -436,6 +487,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -470,6 +522,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -509,6 +562,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -549,6 +603,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -579,6 +634,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -609,6 +665,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 
@@ -633,6 +690,7 @@ describe("NotificationCard", () => {
         <NotificationCard
           notification={notification}
           onMarkAsRead={mockOnMarkAsRead}
+          onDeleted={mockOnDeleted}
         />
       );
 

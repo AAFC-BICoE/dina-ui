@@ -243,6 +243,30 @@ describe("QueryTable component", () => {
     });
   });
 
+  it("Loads the whole dataset without a sort param in in-memory mode, where the table sorts client-side.", async () => {
+    mountWithAppContext(
+      <QueryTable<Todo>
+        path="todo"
+        columns={["id", "name", "description"]}
+        enableInMemoryFilter={true}
+        defaultSort={[{ id: "description", desc: false }]}
+      />,
+      { apiContext }
+    );
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledTimes(1);
+      expect(mockGet).lastCalledWith(
+        "todo",
+        objectContaining({ page: { limit: 1000, offset: 0 } })
+      );
+      expect(mockGet).lastCalledWith(
+        "todo",
+        expect.not.objectContaining({ sort: anything() })
+      );
+    });
+  });
+
   it.skip("Fetches sorted data when the header is clicked.", async () => {
     const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,

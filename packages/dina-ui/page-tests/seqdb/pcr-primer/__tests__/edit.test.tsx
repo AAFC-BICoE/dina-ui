@@ -1,7 +1,11 @@
 import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { PcrPrimerEditPage } from "../../../../pages/seqdb/pcr-primer/edit";
-import { clearAndType, mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  clearAndType,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";

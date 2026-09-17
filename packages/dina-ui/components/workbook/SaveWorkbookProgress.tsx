@@ -252,32 +252,65 @@ export function SaveWorkbookProgress({
   }
 
   async function deleteFailedImport() {
+    // Appending data should not delete the failed import records, only on create.
+    if (!sourceSet.current || appendData) {
+      onWorkbookFailed?.();
+      return;
+    }
+
     const fetchedMaterialSamples = await apiClient.get<MaterialSample[]>(
       "/collection-api/material-sample",
       {
-        include: "collectingEvent",
-        fiql: simpleSearchFilterToFiql(
-          SimpleSearchFilterBuilder.create<MaterialSample>()
-            .where("sourceSet", "EQ", sourceSet.current)
-            .build()
-        )
+        include: "collectingEvent,organism,storageUnitUsage",
+        filter: SimpleSearchFilterBuilder.create<MaterialSample>()
+          .where("sourceSet", "EQ", sourceSet.current)
+          .build()
       }
     );
+
+    // Retrieve all the IDs of everything that should be deleted that was created with the workbook uploader.
+    const materialSampleIds = fetchedMaterialSamples?.data
+      .map((materialSample) => materialSample.id)
+      .filter((id): id is string => Boolean(id));
+
     const collectingEventIds = fetchedMaterialSamples?.data
       .map((materialSample) => materialSample.collectingEvent?.id)
-      .filter((collectingEventId) => collectingEventId !== undefined);
-    const materialSampleIds = fetchedMaterialSamples?.data.map(
-      (materialSample) => materialSample.id
-    );
+      .filter((id): id is string => Boolean(id));
+
+    const organismIds = fetchedMaterialSamples?.data
+      .flatMap((materialSample) => materialSample.organism ?? [])
+      .map((organism) => organism?.id)
+      .filter((id): id is string => Boolean(id));
+
+    const storageUnitUsageIds = fetchedMaterialSamples?.data
+      .map((materialSample) => materialSample.storageUnitUsage?.id)
+      .filter((id): id is string => Boolean(id));
+
     if (apiBaseUrl) {
-      await bulkDeleteResources(materialSampleIds as string[], {
-        apiBaseUrl,
-        resourceType: "material-sample"
-      });
-      await bulkDeleteResources(collectingEventIds as string[], {
-        apiBaseUrl,
-        resourceType: "collecting-event"
-      });
+      if (materialSampleIds?.length) {
+        await bulkDeleteResources(materialSampleIds, {
+          apiBaseUrl,
+          resourceType: "material-sample"
+        });
+      }
+      if (collectingEventIds?.length) {
+        await bulkDeleteResources(collectingEventIds, {
+          apiBaseUrl,
+          resourceType: "collecting-event"
+        });
+      }
+      if (organismIds?.length) {
+        await bulkDeleteResources(organismIds, {
+          apiBaseUrl,
+          resourceType: "organism"
+        });
+      }
+      if (storageUnitUsageIds?.length) {
+        await bulkDeleteResources(storageUnitUsageIds, {
+          apiBaseUrl,
+          resourceType: "storage-unit-usage"
+        });
+      }
     }
 
     onWorkbookFailed?.();

@@ -102,8 +102,10 @@ export function useMaterialSampleFormTemplateProps<
         type: "collecting-event",
         id: collectingEvent.id
       };
-    } else {
+    } else if (collectingEvent.geoReferenceAssertions?.length) {
       _.set(collectingEvent, "geoReferenceAssertions[0].isPrimary", true);
+    } else {
+      collectingEvent.geoReferenceAssertions = [];
     }
 
     const collectingEventInitialValues = collectingEvent.id

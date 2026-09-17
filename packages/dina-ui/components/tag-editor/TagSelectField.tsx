@@ -4,17 +4,20 @@ import {
   SimpleSearchFilterBuilder,
   Tooltip,
   useAccount,
-  useQuery
+  useBulkEditTabContext,
+  useQuery,
+  SortableSelect
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
 import _ from "lodash";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
+import { FaPlus, FaRightLeft } from "react-icons/fa6";
+import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import { useDebounce } from "use-debounce";
 import { useElasticSearchDistinctTerm } from "../../../common-ui/lib/list-page/useElasticSearchDistinctTerm";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
-import { SortableSelect } from "common-ui";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
@@ -41,59 +44,127 @@ export function TagSelectField({
   indexName,
   ...props
 }: TagSelectFieldProps) {
+  const { formatMessage } = useDinaIntl();
+  const bulkCtx = useBulkEditTabContext();
+  const [editMode, setEditMode] = useState<"append" | "replace">("append");
+
+  useEffect(() => {
+    if (!bulkCtx?.setAppendFields) return;
+
+    if (editMode === "append") {
+      bulkCtx.setAppendFields((prev) => new Set(prev).add(props.name));
+    } else {
+      bulkCtx.setAppendFields((prev) => {
+        const next = new Set(prev);
+        next.delete(props.name);
+        return next;
+      });
+    }
+  }, [editMode]);
+
   return (
-    <FieldWrapper
-      {...props}
-      readOnlyRender={(tagsVal) =>
-        !!tagsVal?.length && (
-          <div className="d-flex flex-wrap gap-2 float-end">
-            {(tagsVal ?? []).map((tag, index) => (
+    <>
+      {/* Append / Replace Toggle */}
+      {bulkCtx && (
+        <div className="d-flex align-items-center justify-content-end mb-2">
+          <ToggleButtonGroup
+            type="radio"
+            name={`${tagsFieldName}-edit-mode`}
+            value={editMode}
+            onChange={(val) => setEditMode(val)}
+            size="sm"
+          >
+            <ToggleButton
+              id={`${tagsFieldName}-mode-append`}
+              value="append"
+              variant={editMode === "append" ? "primary" : "outline-primary"}
+              className="px-2 py-0 fs-7"
+            >
               <Tooltip
-                key={index}
-                visibleElement={
-                  <div
-                    className="card pill py-1 px-2 flex-row align-items-center gap-1"
-                    style={{ background: "rgb(24, 102, 109)" }}
-                  >
-                    <AiFillTag className="text-white" />
-                    <span className="text-white">{tag}</span>
-                  </div>
-                }
-                id="tag"
+                directText={formatMessage("append_tooltip")}
+                placement="top"
                 disableSpanMargin={true}
+                visibleElement={
+                  <span className="d-flex align-items-center gap-1">
+                    <FaPlus /> <DinaMessage id="append" />
+                  </span>
+                }
               />
-            ))}
-          </div>
-        )
-      }
-    >
-      {({ value, setValue, invalid, placeholder }) =>
-        indexName ? (
-          <TagSelectElasticSearch
-            value={value}
-            onChange={setValue}
-            invalid={invalid}
-            resourcePath={resourcePath}
-            groupSelectorName={props.groupSelectorName}
-            placeholder={placeholder}
-            tagsFieldName={tagsFieldName}
-            tagIncludedType={props.tagIncludedType}
-            indexName={indexName}
-          />
-        ) : (
-          <TagSelect
-            value={value}
-            onChange={setValue}
-            invalid={invalid}
-            resourcePath={resourcePath}
-            groupSelectorName={props.groupSelectorName}
-            placeholder={placeholder}
-            tagsFieldName={tagsFieldName}
-            tagIncludedType={props.tagIncludedType}
-          />
-        )
-      }
-    </FieldWrapper>
+            </ToggleButton>
+            <ToggleButton
+              id={`${tagsFieldName}-mode-replace`}
+              value="replace"
+              variant={editMode === "replace" ? "primary" : "outline-primary"}
+              className="px-2 py-0 fs-7"
+            >
+              <Tooltip
+                directText={formatMessage("replace_tooltip")}
+                placement="top"
+                disableSpanMargin={true}
+                visibleElement={
+                  <span className="d-flex align-items-center gap-1">
+                    <FaRightLeft /> <DinaMessage id="replace" />
+                  </span>
+                }
+              />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </div>
+      )}
+
+      <FieldWrapper
+        {...props}
+        readOnlyRender={(tagsVal) =>
+          !!tagsVal?.length && (
+            <div className="d-flex flex-wrap gap-2 float-end">
+              {(tagsVal ?? []).map((tag, index) => (
+                <Tooltip
+                  key={index}
+                  visibleElement={
+                    <div
+                      className="card pill py-1 px-2 flex-row align-items-center gap-1"
+                      style={{ background: "rgb(24, 102, 109)" }}
+                    >
+                      <AiFillTag className="text-white" />
+                      <span className="text-white">{tag}</span>
+                    </div>
+                  }
+                  id="tag"
+                  disableSpanMargin={true}
+                />
+              ))}
+            </div>
+          )
+        }
+      >
+        {({ value, setValue, invalid, placeholder }) =>
+          indexName ? (
+            <TagSelectElasticSearch
+              value={value}
+              onChange={setValue}
+              invalid={invalid}
+              resourcePath={resourcePath}
+              groupSelectorName={props.groupSelectorName}
+              placeholder={placeholder}
+              tagsFieldName={tagsFieldName}
+              tagIncludedType={props.tagIncludedType}
+              indexName={indexName}
+            />
+          ) : (
+            <TagSelect
+              value={value}
+              onChange={setValue}
+              invalid={invalid}
+              resourcePath={resourcePath}
+              groupSelectorName={props.groupSelectorName}
+              placeholder={placeholder}
+              tagsFieldName={tagsFieldName}
+              tagIncludedType={props.tagIncludedType}
+            />
+          )
+        }
+      </FieldWrapper>
+    </>
   );
 }
 
@@ -162,7 +233,7 @@ function TagSelect(props: TagSelectProps) {
   const { isAdmin, groupNames } = useAccount();
 
   const [inputValue, setInputValue] = useState("");
-  const [tagOptions, setTagOptions] = useState<TagSelectOption[]>([]); // ✅ destructure tuple properly
+  const [tagOptions, setTagOptions] = useState<TagSelectOption[]>([]);
 
   const typeName = _.last(resourcePath?.split("/"));
 

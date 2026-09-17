@@ -20,18 +20,31 @@ export interface UseNotificationParams {
 export interface UseNotificationReturn {
   /** All notifications */
   notifications: Notification[] | undefined;
+
   /** Unread notifications */
   unreadNotifications: Notification[] | undefined;
+
   /** Number of unread notifications */
   unreadCount: number;
+
   /** Whether the query is loading */
   loading: boolean;
+
   /** Error from fetching notifications */
   error: Error | undefined;
+
   /** Mark a notification as read */
   markAsRead: (id: string) => Promise<void>;
+
   /** Mark all notifications as read */
   markAllAsRead: () => Promise<void>;
+
+  /** Delete a single notification using the UUID. */
+  deleteNotification: (id: string) => Promise<void>;
+
+  /** Delete all notifications */
+  deleteAllNotifications: () => Promise<void>;
+
   /** Refresh notifications */
   refresh: () => Promise<void>;
 }
@@ -43,7 +56,7 @@ export function useNotification({
   pollingInterval = 30000
 }: UseNotificationParams = {}): UseNotificationReturn {
   const { subject: userId } = useAccount();
-  const { apiClient, doOperations } = useApiClient();
+  const { apiClient, doOperations, save } = useApiClient();
 
   // Fetch notifications
   const fetchNotifications = useCallback(async () => {
@@ -130,6 +143,73 @@ export function useNotification({
     [doOperations, cacheKey, userId]
   );
 
+  // Delete a single notification
+  const deleteNotification = useCallback(
+    async (id: string) => {
+      if (!userId) {
+        throw new Error("User ID is required to delete a notification");
+      }
+
+      if (!id) {
+        throw new Error("UUID required in order to delete a notification");
+      }
+
+      try {
+        await save<Notification>(
+          [
+            {
+              delete: {
+                id: id,
+                type: "notification"
+              }
+            }
+          ],
+          {
+            apiBaseUrl: "/user-api"
+          }
+        );
+
+        // Refresh the cache
+        await mutate(cacheKey);
+      } catch (error) {
+        console.error("Error deleting notification: ", error);
+        throw error;
+      }
+    },
+    [userId]
+  );
+
+  // Delete all available notifications
+  const deleteAllNotifications = useCallback(async () => {
+    if (!userId) {
+      throw new Error(
+        "User ID is required to delete all notifications for that user"
+      );
+    }
+
+    // Check if there is anything to be deleted.
+    if (!notifications || notifications.length === 0) {
+      return;
+    }
+
+    try {
+      const deletePayload: Operation[] = notifications.map((notification) => ({
+        op: "DELETE",
+        path: "notification/" + notification.id
+      }));
+
+      await doOperations(deletePayload, {
+        apiBaseUrl: "/user-api"
+      });
+
+      // Refresh the cache
+      await mutate(cacheKey);
+    } catch (error) {
+      console.error("Error deleting notifications: ", error);
+      throw error;
+    }
+  }, [userId, notifications]);
+
   // Mark as read
   const markAsRead = useCallback(
     async (id: string) => {
@@ -160,6 +240,8 @@ export function useNotification({
     error,
     markAsRead,
     markAllAsRead,
+    deleteNotification,
+    deleteAllNotifications,
     refresh
   };
 }

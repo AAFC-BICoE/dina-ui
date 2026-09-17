@@ -1,5 +1,9 @@
 import { writeStorage } from "@rehooks/local-storage";
-import { clearAndType, mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  clearAndType,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../group-select/useStoredDefaultGroup";
 import { MaterialSampleGenerationForm } from "../MaterialSampleGenerationForm";
 import { waitFor } from "@testing-library/react";
@@ -103,7 +107,7 @@ describe("MaterialSampleGenerationForm", () => {
     // Source Set
     await clearAndType(
       wrapper.getByRole("textbox", {
-        name: "Source Set User-defined name that can be used to retrieve all material samples that were created in the same batch."
+        name: "Source Set"
       }),
       "sourceSet1"
     );

@@ -54,6 +54,7 @@ import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
 import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 import { GeographyFormLayout } from "./GeographyFormLayout";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -181,6 +182,7 @@ export function CollectingEventFormLayout({
       valuesPath="managedAttributes"
       managedAttributeApiPath="collection-api/controlled-vocabulary-item"
       managedAttributeComponent="COLLECTING_EVENT"
+      controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
       fieldSetProps={{
         legend: <DinaMessage id="collectingEventManagedAttributes" />,
         componentName: COLLECTING_EVENT_COMPONENT_NAME,
@@ -520,7 +522,7 @@ export function CollectingEventFormLayout({
             legend={<DinaMessage id="collectingEventDetails" />}
             className="non-strip h-100"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
-            sectionName="collecting-event-details"
+            sectionName="collecting-event-additional-details-section"
           >
             <TextField name="habitat" />
             <TextField
@@ -589,12 +591,6 @@ export function CollectingEventFormLayout({
               labelMsg={<DinaMessage id="depthInMeters" />}
             />
             <TextField name="remarks" multiLines={true} />
-            <div className="row">
-              {readOnly &&
-              JSON.stringify(initialValues?.managedAttributes) !== "{}" // if read-only, check for managed attributes
-                ? collectingEventManagedAttributesComponent
-                : null}
-            </div>
           </FieldSet>
         </div>
       </div>
@@ -701,7 +697,20 @@ export function CollectingEventFormLayout({
           />
         </DinaFormSection>
       </div>
-      <>{!readOnly ? collectingEventManagedAttributesComponent : null}</>
+      <>
+        {!readOnly ? (
+          collectingEventManagedAttributesComponent
+        ) : JSON.stringify(initialValues?.managedAttributes) !== "{}" ? ( // if read-only, check for managed attributes
+          <FieldSet
+            legend={<DinaMessage id="collectingEventManagedAttributes" />}
+            className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="collecting-event-managed-attributes-section"
+          >
+            {collectingEventManagedAttributesComponent}
+          </FieldSet>
+        ) : null}
+      </>
       <div className="mb-3">
         {!readOnly
           ? collectingEventAttachmentsComponent

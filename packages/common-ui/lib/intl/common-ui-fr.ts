@@ -141,6 +141,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     subjectTermsForPage:
       "information gouvernemental, information scientifique, recherche scientifique",
     submitBtnText: "Enregistrer",
+    tableFilteredFromCount: "filtrés parmi {totalCount} au total",
     tableSelectedCount: "Nombre de documents sélectionnés : {totalCount}",
     tableTotalCount: "Nombre d'enregistrements correspondants : {totalCount}",
     targetField: "Champ cible",

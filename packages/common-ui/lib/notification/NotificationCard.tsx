@@ -8,10 +8,25 @@ import {
 } from "./notification-types/ExportReadyNotification";
 import React from "react";
 import { useIsVisible } from "../visibility/useIsVisible";
+import { FaTrash } from "react-icons/fa6";
 
 export interface NotificationCardProps {
+  /**
+   * The specific notification to be displayed by this component.
+   */
   notification: Notification;
+
+  /**
+   * When the user has clicked this notification, this callback will be triggered.
+   * @param id The notification ID.
+   */
   onMarkAsRead: (id: string) => Promise<void>;
+
+  /**
+   * When the user requests to delete the specific notification, this callback will be triggered.
+   * @param id The notification ID.
+   */
+  onDeleted: (id: string) => Promise<void>;
 
   /**
    * Whether to display the notification as a toast instead of a card in the dropdown.
@@ -40,11 +55,13 @@ export interface NotificationCardProps {
 export const NotificationCard = memo(function NotificationCard({
   notification,
   onMarkAsRead,
+  onDeleted,
   displayAsToast = false,
   showToast = false,
   onDismissToast
 }: NotificationCardProps) {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { id, message, messageParams, title, status, createdOn } = notification;
   const isUnread = status === "NEW";
@@ -53,9 +70,24 @@ export const NotificationCard = memo(function NotificationCard({
   const isVisible = useIsVisible({
     ref: visibleRef,
     doNotReset: true,
-    // Start loading images when it's 300px below the view port.
     offset: "0px 0px 300px 0px"
   });
+
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setIsDeleting(true);
+
+    setTimeout(async () => {
+      try {
+        await onDeleted(id);
+        setIsDeleting(false);
+      } catch (error) {
+        console.error("Error deleting notification:", error);
+        // Revert animation state if the API call fails
+        setIsDeleting(false);
+      }
+    }, 300);
+  };
 
   // Parse message template with parameters and render as React elements
   const renderParsedMessage = () => {
@@ -171,10 +203,17 @@ export const NotificationCard = memo(function NotificationCard({
   };
 
   const handleCardClick = async (e: React.MouseEvent<HTMLLIElement>) => {
-    // Don't mark as read if clicking on a link
+    // Don't mark as read if clicking on a link or button
     const target = e.target as HTMLElement;
     const closestLink = target.closest("a");
-    if (target.tagName === "A" || closestLink) {
+    const closestButton = target.closest("button");
+
+    if (
+      target.tagName === "A" ||
+      closestLink ||
+      target.tagName === "BUTTON" ||
+      closestButton
+    ) {
       return;
     }
 
@@ -228,23 +267,46 @@ export const NotificationCard = memo(function NotificationCard({
       <li
         className={`list-group-item notification-card ${
           isUnread ? "unread" : "read"
-        } ${isProcessing ? "processing" : ""}`}
+        } ${isProcessing ? "processing" : ""} ${
+          isDeleting ? "delete-notification pointer-events-none" : ""
+        }`}
         onClick={handleCardClick}
       >
-        {/* Title row with timestamp */}
+        {/* Title row with timestamp and delete action */}
         <div className="d-flex justify-content-between align-items-center mb-2">
-          <div className="d-flex align-items-center gap-2 flex-grow-1 text-start">
+          <div className="d-flex align-items-center gap-2 flex-grow-1 text-start overflow-hidden me-2">
             {/* Title */}
-            {title && <div className="notification-title fw-bold">{title}</div>}
+            {title && (
+              <div className="notification-title fw-bold text-truncate">
+                {title}
+              </div>
+            )}
             {/* Unread indicator dot */}
-            {isUnread && <span className="notification-unread-dot" />}
+            {isUnread && (
+              <span className="notification-unread-dot flex-shrink-0" />
+            )}
           </div>
-          {/* Timestamp */}
-          {createdOn && (
-            <div className="notification-timestamp text-muted">
-              {moment(createdOn).fromNow()}
-            </div>
-          )}
+
+          <div className="d-flex align-items-center gap-2 flex-shrink-0">
+            {/* Timestamp */}
+            {createdOn && (
+              <div className="notification-timestamp text-muted small">
+                {moment(createdOn).fromNow()}
+              </div>
+            )}
+
+            {/* Delete button */}
+            <button
+              type="button"
+              className="btn btn-link btn-sm p-0 text-muted notification-delete-btn"
+              aria-label="Delete notification"
+              title="Delete notification"
+              disabled={isDeleting}
+              onClick={handleDelete}
+            >
+              <FaTrash />
+            </button>
+          </div>
         </div>
 
         {/* Message */}

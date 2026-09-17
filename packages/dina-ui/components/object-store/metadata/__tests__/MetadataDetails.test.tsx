@@ -2,8 +2,9 @@ import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataDetails } from "../MetadataDetails";
-import { screen, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { OBJECT_STORE_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2"],
@@ -22,13 +23,17 @@ const TEST_METADATA: PersistedResource<Metadata> = {
 const TEST_MANAGED_ATTRIBUTES = [
   {
     id: "2c854835-f5b0-4258-8475-16c986810083",
-    type: "managed-attribute",
+    type: "controlled-vocabulary-item",
+    group: "system",
+    dinaComponent: "METADATA",
     name: "attr1 value",
     key: "0763db31-a0c9-43f8-b7fc-705a783c35df"
   },
   {
     id: "f04cff05-50d8-4544-a620-30993ed44736",
-    type: "managed-attribute",
+    type: "controlled-vocabulary-item",
+    group: "system",
+    dinaComponent: "METADATA",
     name: "attr2 value",
     key: "e5b9765e-1246-4119-b4e4-8d2267175662"
   }
@@ -36,7 +41,7 @@ const TEST_MANAGED_ATTRIBUTES = [
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async (path) => {
-  if (path.startsWith("objectstore-api/managed-attribute"))
+  if (path.startsWith("objectstore-api/controlled-vocabulary-item"))
     return { data: TEST_MANAGED_ATTRIBUTES };
   else return { data: TEST_METADATA };
 });
@@ -47,26 +52,41 @@ const apiContext: any = {
 
 describe("MetadataDetails component", () => {
   it("Renders the metadata details.", async () => {
-    mountWithAppContext(<MetadataDetails metadata={TEST_METADATA} />, {
-      apiContext
-    });
+    const wrapper = mountWithAppContext(
+      <MetadataDetails metadata={TEST_METADATA} />,
+      { apiContext }
+    );
 
     await waitFor(() => {
+      expect(wrapper.getAllByText(/attr1 value/i)[0]).toBeInTheDocument();
+      expect(wrapper.getAllByText(/attr2 value/i)[0]).toBeInTheDocument();
       expect(
-        screen.getByRole("img", {
-          name: /attr1 value/i
-        })
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole("img", {
-          name: /attr2 value/i
-        })
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole("cell", {
+        wrapper.getByRole("cell", {
           name: /cf99c285\-0353\-4fed\-a15d\-ac963e0514f3/i
         })
       ).toBeInTheDocument();
     });
+
+    expect(mockGet).toHaveBeenCalledWith(
+      "objectstore-api/controlled-vocabulary-item",
+      {
+        filter: {
+          "controlledVocabulary.uuid": {
+            EQ: OBJECT_STORE_MANAGED_ATTRIBUTE_ID
+          },
+          dinaComponent: {
+            EQ: "METADATA"
+          },
+          key: {
+            IN: "0763db31-a0c9-43f8-b7fc-705a783c35df,e5b9765e-1246-4119-b4e4-8d2267175662"
+          }
+        },
+        header: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json"
+        },
+        page: { limit: 2 } // Dynamically changes based on the total number of managed attribute keys.
+      }
+    );
   });
 });
