@@ -8,6 +8,8 @@ import { MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG } from "./revision-row-confi
 import { MATERIAL_SAMPLE_REVISION_ROW_CONFIG } from "./revision-row-configs/material-sample-revision-configs";
 import { METADATA_REVISION_ROW_CONFIG } from "./revision-row-configs/metadata-revision-config";
 import { ORGANISM_REVISION_ROW_CONFIG } from "./revision-row-configs/organism-revision-config";
+import { ORGANIZATION_REVISION_ROW_CONFIG } from "./revision-row-configs/organization-revision-config";
+import { PERSON_REVISION_ROW_CONFIG } from "./revision-row-configs/person-revision-config";
 import { PREPARATION_METHOD_REVISION_ROW_CONFIG } from "./revision-row-configs/preparation-method-revision-config";
 import { PREPARATION_TYPE_REVISION_ROW_CONFIG } from "./revision-row-configs/preparation-type-revision-config";
 import { PROJECT_REVISION_ROW_CONFIG } from "./revision-row-configs/project-revision-config";
@@ -40,3 +42,8 @@ export const LOAN_TRANSACTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByTy
   {
     transaction: TRANSACTION_REVISION_ROW_CONFIG
   };
+
+export const AGENT_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
+  person: PERSON_REVISION_ROW_CONFIG,
+  organization: ORGANIZATION_REVISION_ROW_CONFIG
+};
