@@ -357,12 +357,16 @@ export function useCollectingEventSave({
     delete collectingEventDiff.selectedSections;
     delete (collectingEventDiff as any).selectAll;
 
-    // Remove the coord system for new Collecting events with no coordinates specified:
+    // Remove the auto-populated default coord system for new Collecting events with no
+    // coordinates specified. Only clear it if the user never changed it away from that
+    // default; an explicit user selection should still be saved.
     if (
       !collectingEventDiff.id &&
       !collectingEventDiff.dwcVerbatimCoordinates?.trim?.() &&
       !collectingEventDiff.dwcVerbatimLatitude?.trim?.() &&
-      !collectingEventDiff.dwcVerbatimLongitude?.trim?.()
+      !collectingEventDiff.dwcVerbatimLongitude?.trim?.() &&
+      collectingEventDiff.dwcVerbatimCoordinateSystem ===
+        emptyCollectingEventInitialValues.dwcVerbatimCoordinateSystem
     ) {
       collectingEventDiff.dwcVerbatimCoordinateSystem = null;
     }
