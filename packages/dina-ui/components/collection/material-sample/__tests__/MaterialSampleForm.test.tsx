@@ -609,6 +609,47 @@ describe("Material Sample Edit Page", () => {
     ]);
   });
 
+  it("Preserves an explicitly-selected Verbatim Coordinate System on a new CollectingEvent even when no coordinates are entered.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
+      testCtx
+    );
+    await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      throw new Error("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /primary id/i }),
+      "test-material-sample-id"
+    );
+
+    // Set the Verbatim Coordinate System without entering any verbatim
+    // coordinates / latitude / longitude:
+    const coordinateSystemField = wrapper.getByRole("textbox", {
+      name: /verbatim coordinate system/i
+    });
+    await userEvent.clear(coordinateSystemField);
+    await userEvent.click(coordinateSystemField);
+    await userEvent.paste("Custom System");
+
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+
+    // The explicitly-selected value should be submitted, not nulled out:
+    const collectingEventSaveCall = mockSave.mock.calls[0][0][0];
+    expect(
+      collectingEventSaveCall.resource.dwcVerbatimCoordinateSystem
+    ).toEqual("Custom System");
+  });
+
   it("Assigns a parent material sample and saves the relationship", async () => {
     // Mock the search-ws results to return a single parent sample option.
     mockUseSearchWsResults([
