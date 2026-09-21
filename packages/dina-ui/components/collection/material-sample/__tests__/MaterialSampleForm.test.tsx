@@ -5367,6 +5367,24 @@ describe("Material Sample Edit Page", () => {
     });
   });
 
+  describe("Saving with no changes", () => {
+    it("Does not send a save request when clicking Save on an existing sample with no changes.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{ ...testMaterialSample(), resourceVersion: 1 }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitForLoadingToDisappear();
+
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() => expect(mockOnSaved).toHaveBeenCalledTimes(1));
+
+      expect(mockSave).not.toHaveBeenCalled();
+    });
+  });
+
   describe("Applying a Form Template", () => {
     beforeEach(() => {
       // The selected Form Template's UUID is persisted in localStorage
