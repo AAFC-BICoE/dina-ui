@@ -650,6 +650,43 @@ describe("Material Sample Edit Page", () => {
     ).toEqual("Custom System");
   });
 
+  it("Shows a blank Verbatim Coordinate System by default on a new CollectingEvent.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
+      testCtx
+    );
+    await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      throw new Error("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    // The field should be blank, not pre-filled with "decimal degrees":
+    expect(
+      wrapper.getByRole("textbox", { name: /verbatim coordinate system/i })
+    ).toHaveDisplayValue("");
+
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /primary id/i }),
+      "test-material-sample-id"
+    );
+
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+
+    // Nothing was selected, so no value should be submitted:
+    const collectingEventSaveCall = mockSave.mock.calls[0][0][0];
+    expect(
+      collectingEventSaveCall.resource.dwcVerbatimCoordinateSystem
+    ).toEqual(null);
+  });
+
   it("Assigns a parent material sample and saves the relationship", async () => {
     // Mock the search-ws results to return a single parent sample option.
     mockUseSearchWsResults([

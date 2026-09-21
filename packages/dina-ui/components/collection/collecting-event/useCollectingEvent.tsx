@@ -14,7 +14,6 @@ import { useMemo } from "react";
 import * as yup from "yup";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api";
-import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
 import { SourceAdministrativeLevel } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import { Person } from "../../../types/objectstore-api";
@@ -112,8 +111,7 @@ export function useEmptyCollectingEventInitialValues(): Partial<CollectingEvent>
       collectors: [],
       collectorGroups: [],
       geoReferenceAssertions: [{ isPrimary: true }],
-      dwcVerbatimCoordinateSystem:
-        defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
+      dwcVerbatimCoordinateSystem: defaultVerbatimCoordSys ?? undefined,
       dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
     }),
     [defaultVerbatimCoordSys, defaultVerbatimSRS]
