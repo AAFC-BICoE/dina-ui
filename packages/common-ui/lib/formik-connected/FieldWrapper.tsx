@@ -199,13 +199,19 @@ function LabelWrapper({
   },
   children
 }: PropsWithChildren<FieldWrapperInternalProps>) {
-  const { horizontal, isTemplate, componentName, sectionName } =
+  const { horizontal, isTemplate, componentName, sectionName, readOnly } =
     useDinaFormContext();
 
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
     currentValue: value
   });
+
+  const isEmptyValue =
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    (Array.isArray(value) && value.length === 0);
 
   const fieldLabel = label ?? (
     <FieldHeader
@@ -218,6 +224,7 @@ function LabelWrapper({
       tooltipLinkText={tooltipLinkText}
       startCaseLabel={startCaseLabel}
       combineFieldHeaderWithTooltip={false}
+      isEmptyValue={readOnly && isEmptyValue}
     />
   );
 
@@ -277,7 +284,8 @@ function LabelWrapper({
                 className={classNames(
                   "field-label",
                   labelClass,
-                  !horizontal && "mb-2"
+                  !horizontal && "mb-2",
+                  readOnly && isEmptyValue && "field-label-empty"
                 )}
               >
                 {!hideLabel && (
@@ -312,7 +320,8 @@ function LabelWrapper({
               className={classNames(
                 "field-label",
                 labelClass,
-                !horizontal && "mb-2"
+                !horizontal && "mb-2",
+                readOnly && isEmptyValue && "field-label-empty"
               )}
               style={labelStyle}
             >

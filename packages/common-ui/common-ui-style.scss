@@ -143,6 +143,19 @@ input[id^="react-select"] {
   background-color: #e9ecef;
 }
 
+.field-value-empty {
+  color: #ced4da;
+  font-size: 0.8rem;
+}
+
+.field-label-empty {
+  color: #9ea4ab; 
+}
+
+.tooltip-info-icon.tooltip-info-icon-empty {
+  color: #9ea4ab; 
+}
+
 /* Highlight the Edit All tab's bulk-edited fields in green. */
 .has-bulk-edit-value .field-label,
 .show-changed-indicators .changed-field .field-label {

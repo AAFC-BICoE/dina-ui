@@ -1,8 +1,10 @@
+import classNames from "classnames";
 import { useFormikContext } from "formik";
 import _ from "lodash";
 import { useIntl } from "react-intl";
 import { CommonMessage, Tooltip } from "..";
 import { useDinaFormContext } from "./DinaForm";
+import { EmptyFieldValue } from "./FieldView";
 import { MetersField } from "./MetersField";
 import { useMemo } from "react";
 
@@ -64,12 +66,18 @@ export function NumberRangeFields({
 
   const bothAreDefined = !_.isNil(minVal) && !_.isNil(maxVal);
   const neitherAreDefined = _.isNil(minVal) && _.isNil(maxVal);
+  const isEmptyValue = readOnly && neitherAreDefined;
 
   return (
     <label className="w-100">
       <div className="mb-2">
-        <strong>{labelMsg}</strong>
-        <Tooltip id="metersField_tooltip" />
+        <strong className={classNames(isEmptyValue && "field-label-empty")}>
+          {labelMsg}
+        </strong>
+        <Tooltip
+          id="metersField_tooltip"
+          iconClassName={isEmptyValue ? "tooltip-info-icon-empty" : undefined}
+        />
       </div>
       <div className="mb-3" style={{ minHeight: "25px" }}>
         {readOnly ? (
@@ -77,7 +85,9 @@ export function NumberRangeFields({
             <span>
               {minVal}–{maxVal}m
             </span>
-          ) : neitherAreDefined ? null : (
+          ) : neitherAreDefined ? (
+            <EmptyFieldValue />
+          ) : (
             <span>{minVal ?? maxVal ?? ""}m</span>
           )
         ) : (
