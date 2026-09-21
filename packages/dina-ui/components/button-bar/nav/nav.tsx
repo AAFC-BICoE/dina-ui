@@ -236,6 +236,11 @@ function NavCollectionDropdown({ formatMessage }) {
           <DinaMessage id="collectionListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/collection/dataset/list" passHref={true} legacyBehavior>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="datasetListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/collection/expedition/list" passHref={true} legacyBehavior>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="expeditionListTitle" />

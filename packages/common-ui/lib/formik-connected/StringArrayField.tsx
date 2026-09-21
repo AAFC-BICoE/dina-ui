@@ -22,7 +22,11 @@ export function StringArrayField(
           {props.label ? (
             props.label
           ) : (
-            <FieldHeader name={props.name} customName={props.customName} />
+            <FieldHeader
+              name={props.name}
+              customName={props.customName}
+              combineFieldHeaderWithTooltip={false}
+            />
           )}
           <div className={horizontal ? "" : "ms-2"}>
             {!readOnly && (
@@ -66,7 +70,9 @@ function StringArrayFieldInternal(
     <TextareaAutosize
       minRows={4}
       {...inputProps}
-      onChange={(event) => onChange((event.target as HTMLTextAreaElement | HTMLInputElement).value)}
+      onChange={(event) =>
+        onChange((event.target as HTMLTextAreaElement | HTMLInputElement).value)
+      }
       value={textValue}
     />
   );
