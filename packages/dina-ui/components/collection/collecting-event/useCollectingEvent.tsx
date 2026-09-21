@@ -1,5 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
+  DinaFormikBag,
   isResourceEmpty,
   processExtensionValuesLoading,
   processExtensionValuesSaving,
@@ -414,6 +415,13 @@ export function useCollectingEventSave({
     // Set the Collecting Event ID so if there is an error after this,
     // then subsequent submissions use PATCH instea of POST:
     collectingEventFormik.setFieldValue("id", savedCollectingEvent.id);
+
+    // These values are saved now, so they become what the unsaved-data warning
+    // compares against:
+    (collectingEventFormik as DinaFormikBag).markFormSaved?.({
+      ...submittedValues,
+      id: savedCollectingEvent.id
+    });
 
     return savedCollectingEvent;
   }

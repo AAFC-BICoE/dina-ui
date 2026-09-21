@@ -1,6 +1,7 @@
 import { InputResource, KitsuResourceLink, PersistedResource } from "kitsu";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
 import {
+  __resetUnsavedWarningState,
   mountWithAppContext,
   waitForLoadingToDisappear,
   clearAndType
@@ -4905,7 +4906,8 @@ describe("Material Sample Edit Page", () => {
                   }
                 },
                 materialSampleName: "Sample1",
-                publiclyReleasable: false
+                publiclyReleasable: false,
+                type: "material-sample"
               },
               type: "material-sample"
             }
@@ -5175,7 +5177,8 @@ describe("Material Sample Edit Page", () => {
               resource: {
                 group: "aafc",
                 materialSampleName: "Sample1",
-                publiclyReleasable: false
+                publiclyReleasable: false,
+                type: "material-sample"
               },
               type: "material-sample"
             }
@@ -5192,6 +5195,175 @@ describe("Material Sample Edit Page", () => {
       expect(routerPushMock).not.toHaveBeenCalledWith(
         expect.stringContaining("copyFromId")
       );
+    });
+  });
+
+  describe("Unsaved changes warning", () => {
+    /** The routeChangeStart handler DinaForm registers on the Next.js router. */
+    let routeChangeHandler: (() => void) | undefined;
+    let mockConfirm: jest.Mock;
+
+    /** DinaForm registers routeChangeStart synchronously inside router.push, so the
+     *  mock must emit it the same way to faithfully reproduce Next.js's behaviour. */
+    function mockRouter(query: Record<string, string>) {
+      (useRouter as jest.Mock).mockReturnValue({
+        query,
+        pathname: "/collection/material-sample/edit",
+        push: jest.fn(async (url) => {
+          routerPushMock(url);
+          routeChangeHandler?.();
+          return true;
+        }),
+        events: {
+          on: jest.fn((event, handler) => {
+            if (event === "routeChangeStart") routeChangeHandler = handler;
+          }),
+          off: jest.fn(),
+          emit: jest.fn()
+        }
+      });
+    }
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      __resetUnsavedWarningState();
+
+      routeChangeHandler = undefined;
+      mockConfirm = jest.fn().mockReturnValue(true);
+      window.confirm = mockConfirm;
+
+      mockRouter({ id: "1" });
+    });
+
+    /** Simulates the user navigating away, e.g. by clicking a nav link. */
+    function navigateAway() {
+      routeChangeHandler?.();
+    }
+
+    async function mountEditPageWithExistingCollectingEvent() {
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Wait for the linked Collecting Event's values to load into the form:
+      await waitFor(() => {
+        expect(
+          wrapper.getAllByRole("textbox", {
+            name: /verbatim event datetime/i
+          })[0]
+        ).toHaveDisplayValue("2021-04-13");
+      });
+      await waitForLoadingToDisappear();
+
+      return wrapper;
+    }
+
+    it("Does not warn when leaving an existing Material Sample that was never edited.", async () => {
+      await mountEditPageWithExistingCollectingEvent();
+
+      // Nothing was touched, so leaving the page must not prompt:
+      navigateAway();
+
+      expect(mockConfirm).not.toHaveBeenCalled();
+    });
+
+    it("Does not warn after saving a change made to the linked Collecting Event.", async () => {
+      const wrapper = await mountEditPageWithExistingCollectingEvent();
+
+      const coordinateSystemField = wrapper.getByRole("textbox", {
+        name: /verbatim coordinate system/i
+      });
+      await userEvent.click(coordinateSystemField);
+      await userEvent.paste("UTM");
+
+      await userEvent.click(wrapper.getByRole("button", { name: "Save" }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalled());
+
+      // The save redirects to the view page. That navigation must not prompt,
+      // since the changes were just saved:
+      await waitFor(() => {
+        expect(routerPushMock).toHaveBeenCalledWith(
+          "/collection/material-sample/view?id=1"
+        );
+      });
+      expect(mockConfirm).not.toHaveBeenCalled();
+    });
+
+    it("Does not warn after saving a change made to the Material Sample itself.", async () => {
+      const wrapper = await mountEditPageWithExistingCollectingEvent();
+
+      await clearAndType(
+        wrapper.getByRole("textbox", { name: /barcode/i }),
+        "edited-barcode"
+      );
+
+      await userEvent.click(wrapper.getByRole("button", { name: "Save" }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalled());
+
+      await waitFor(() => {
+        expect(routerPushMock).toHaveBeenCalledWith(
+          "/collection/material-sample/view?id=1"
+        );
+      });
+      expect(mockConfirm).not.toHaveBeenCalled();
+    });
+
+    it("Warns when leaving with genuinely unsaved changes.", async () => {
+      const wrapper = await mountEditPageWithExistingCollectingEvent();
+
+      const coordinateSystemField = wrapper.getByRole("textbox", {
+        name: /verbatim coordinate system/i
+      });
+      await userEvent.click(coordinateSystemField);
+      await userEvent.paste("UTM");
+
+      await waitFor(() => expect(routeChangeHandler).toBeDefined());
+
+      // Leaving without saving should prompt, and cancelling should block it:
+      mockConfirm.mockReturnValue(false);
+      expect(() => navigateAway()).toThrow("routeChange aborted.");
+      expect(mockConfirm).toHaveBeenCalled();
+    });
+
+    it("Warns again about a new change made after a save.", async () => {
+      const wrapper = await mountEditPageWithExistingCollectingEvent();
+
+      await clearAndType(
+        wrapper.getByRole("textbox", { name: /barcode/i }),
+        "edited-barcode"
+      );
+      await userEvent.click(wrapper.getByRole("button", { name: "Save" }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalled());
+
+      // A brand new edit made after that save is genuinely unsaved:
+      const coordinateSystemField = wrapper.getByRole("textbox", {
+        name: /verbatim coordinate system/i
+      });
+      await userEvent.click(coordinateSystemField);
+      await userEvent.paste("UTM");
+
+      await waitFor(() => expect(routeChangeHandler).toBeDefined());
+
+      mockConfirm.mockReturnValue(false);
+      expect(() => navigateAway()).toThrow("routeChange aborted.");
+      expect(mockConfirm).toHaveBeenCalled();
+    });
+
+    it("Warns when leaving a new Material Sample with unsaved changes.", async () => {
+      mockRouter({});
+
+      const wrapper = mountWithAppContext(<MaterialSampleEditPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      await clearAndType(
+        wrapper.getByRole("textbox", { name: /barcode/i }),
+        "new-barcode"
+      );
+
+      await waitFor(() => expect(routeChangeHandler).toBeDefined());
+
+      mockConfirm.mockReturnValue(false);
+      expect(() => navigateAway()).toThrow("routeChange aborted.");
+      expect(mockConfirm).toHaveBeenCalled();
     });
   });
 
