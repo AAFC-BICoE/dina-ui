@@ -12,7 +12,11 @@ export default function FieldLabel({
     <label className={`field-label label-col ${className}`}>
       {
         <strong>
-          <FieldHeader name={fieldNameProps.name} startCaseLabel={true} />
+          <FieldHeader
+            name={fieldNameProps.name}
+            startCaseLabel={true}
+            combineFieldHeaderWithTooltip={false}
+          />
         </strong>
       }
     </label>
