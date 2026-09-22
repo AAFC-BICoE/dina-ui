@@ -121,8 +121,41 @@ input[id^="react-select"] {
 
 .fieldset-h2-adjustment {
   font-size: 1.7rem !important;
-  margin-top: 15px !important;
-  margin-bottom: 10px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+fieldset.card.border {
+  position: relative;
+  border-radius: 0.75rem !important;
+  padding-top: 1.75rem !important;
+}
+
+:has(> fieldset.card.border) {
+  padding-top: 30px;
+}
+
+fieldset.card.border > .legend-wrapper {
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  transform: translateY(calc(-50% + 3px));
+  margin: 0;
+  padding: 0 0.5rem;
+  background-color: var(--bs-body-bg, #fff);
+  z-index: 1;
+}
+
+fieldset.card.border:has(> .legend-wrapper > .row) {
+  padding-top: 0.5rem !important;
+}
+
+fieldset.card.border > .legend-wrapper:has(> .row) {
+  position: static;
+  transform: none;
+  padding: 0;
+  margin-bottom: 0.5rem;
+  background-color: transparent;
 }
 
 .modal-header {
