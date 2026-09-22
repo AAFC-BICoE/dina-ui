@@ -69,19 +69,22 @@ function useGroupLabel(groupName: string) {
     let active = true;
 
     if (!groupLabelInFlight.has(cacheKey)) {
-      const request = apiClient
-        .get("user-api/group", { filter: { name: cacheKey } })
-        .then((response: any) => {
+      const request = (async () => {
+        try {
+          const response: any = await apiClient.get("user-api/group", {
+            filter: { name: cacheKey }
+          });
           const fetchedGroup = response?.data?.[0] as Group | undefined;
           if (fetchedGroup) {
             groupLabelCache.set(cacheKey, fetchedGroup);
           }
           return fetchedGroup;
-        })
-        .catch(() => undefined)
-        .finally(() => {
+        } catch {
+          return undefined;
+        } finally {
           groupLabelInFlight.delete(cacheKey);
-        });
+        }
+      })();
       groupLabelInFlight.set(cacheKey, request);
     }
 
