@@ -1,5 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
+  DinaFormikBag,
   isResourceEmpty,
   processExtensionValuesLoading,
   processExtensionValuesSaving,
@@ -14,7 +15,6 @@ import { useMemo } from "react";
 import * as yup from "yup";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api";
-import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
 import { SourceAdministrativeLevel } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import { Person } from "../../../types/objectstore-api";
@@ -112,8 +112,7 @@ export function useEmptyCollectingEventInitialValues(): Partial<CollectingEvent>
       collectors: [],
       collectorGroups: [],
       geoReferenceAssertions: [{ isPrimary: true }],
-      dwcVerbatimCoordinateSystem:
-        defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
+      dwcVerbatimCoordinateSystem: defaultVerbatimCoordSys ?? undefined,
       dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
     }),
     [defaultVerbatimCoordSys, defaultVerbatimSRS]
@@ -357,12 +356,16 @@ export function useCollectingEventSave({
     delete collectingEventDiff.selectedSections;
     delete (collectingEventDiff as any).selectAll;
 
-    // Remove the coord system for new Collecting events with no coordinates specified:
+    // Remove the auto-populated default coord system for new Collecting events with no
+    // coordinates specified. Only clear it if the user never changed it away from that
+    // default; an explicit user selection should still be saved.
     if (
       !collectingEventDiff.id &&
       !collectingEventDiff.dwcVerbatimCoordinates?.trim?.() &&
       !collectingEventDiff.dwcVerbatimLatitude?.trim?.() &&
-      !collectingEventDiff.dwcVerbatimLongitude?.trim?.()
+      !collectingEventDiff.dwcVerbatimLongitude?.trim?.() &&
+      collectingEventDiff.dwcVerbatimCoordinateSystem ===
+        emptyCollectingEventInitialValues.dwcVerbatimCoordinateSystem
     ) {
       collectingEventDiff.dwcVerbatimCoordinateSystem = null;
     }
@@ -412,6 +415,13 @@ export function useCollectingEventSave({
     // Set the Collecting Event ID so if there is an error after this,
     // then subsequent submissions use PATCH instea of POST:
     collectingEventFormik.setFieldValue("id", savedCollectingEvent.id);
+
+    // These values are saved now, so they become what the unsaved-data warning
+    // compares against:
+    (collectingEventFormik as DinaFormikBag).markFormSaved?.({
+      ...submittedValues,
+      id: savedCollectingEvent.id
+    });
 
     return savedCollectingEvent;
   }

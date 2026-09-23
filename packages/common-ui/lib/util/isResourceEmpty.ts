@@ -9,8 +9,11 @@ export function isResourceEmpty(obj: any): boolean {
     return true;
   }
 
-  // Filter out keys that have undefined values
-  const definedKeys = Object.keys(obj).filter((key) => obj[key] !== undefined);
+  // Filter out keys that have undefined values. resourceVersion is always
+  // included by resourceDifference(), so it doesn't count as a real change.
+  const definedKeys = Object.keys(obj).filter(
+    (key) => obj[key] !== undefined && key !== "resourceVersion"
+  );
 
   return (
     definedKeys.length === 2 &&

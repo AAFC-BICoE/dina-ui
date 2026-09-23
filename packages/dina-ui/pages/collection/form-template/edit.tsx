@@ -291,7 +291,7 @@ export function FormTemplateEditPageLoaded({
           >
             <div className="row">
               <div className="col-md-6">
-                <TextField name="name" className="row" />
+                <TextField name="name" className="row" requiredField={true} />
                 <FieldSpy<string> fieldName={"group"}>
                   {(group) => (
                     <FieldSpy<boolean> fieldName={"restrictToCreatedBy"}>
@@ -325,6 +325,7 @@ export function FormTemplateEditPageLoaded({
                 <GroupSelectField
                   name="group"
                   enableStoredDefaultGroup={true}
+                  requiredField={true}
                 />
               </div>
             </div>

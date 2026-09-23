@@ -14,7 +14,8 @@ const PCR_BATCH: PcrBatch = {
   type: "pcr-batch",
   id: PCR_BATCH_ID,
   createdBy: "test-user",
-  isCompleted: false
+  isCompleted: false,
+  group: "aafc"
 };
 
 const mockOnSaved = jest.fn();
@@ -25,10 +26,11 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "seqdb-api/region":
     case "agent-api/person":
     case "seqdb-api/thermocycler-profile":
-    case "user-api/group":
     case "seqdb-api/pcr-batch-item":
     case "seqdb-api/pcr-batch/" + PCR_BATCH_ID + "/attachment":
       return { data: [] };
+    case "user-api/group":
+      return { data: [{ name: "aafc", labels: { en: "AAFC" } }] };
     case "seqdb-api/pcr-batch/" + PCR_BATCH_ID:
       return {
         data: {
@@ -85,6 +87,7 @@ describe("SangerPcrBatchStep component", () => {
 
     await waitFor(() => {
       expect(mockOnSaved).lastCalledWith(1, {
+        group: "aafc",
         storageUnit: {
           id: null,
           type: "storage-unit"
@@ -151,6 +154,7 @@ describe("SangerPcrBatchStep component", () => {
 
     await waitFor(() => {
       expect(mockOnSaved).lastCalledWith(1, {
+        group: "aafc",
         storageUnit: {
           id: null,
           type: "storage-unit"

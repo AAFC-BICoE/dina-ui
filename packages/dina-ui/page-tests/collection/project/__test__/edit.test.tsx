@@ -40,9 +40,10 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/333/attachment":
     case "objectstore-api/metadata":
     case "objectstore-api/config/file-upload":
-    case "user-api/group":
     case "[]":
       return { data: [] };
+    case "user-api/group":
+      return { data: [{ name: "aafc", labels: { en: "AAFC" } }] };
   }
 });
 
@@ -111,6 +112,7 @@ describe("ProjectForm.", () => {
           {
             resource: {
               name: "test-project",
+              group: "aafc",
               relationships: {
                 attachment: {
                   data: []
@@ -137,6 +139,7 @@ describe("ProjectForm.", () => {
       expect(mockOnSaved).lastCalledWith({
         id: "123",
         name: "test-project",
+        group: "aafc",
         relationships: {
           attachment: {
             data: []
@@ -207,6 +210,7 @@ describe("ProjectForm.", () => {
           {
             resource: {
               id: "333",
+              group: "aafc",
               multilingualDescription: {
                 descriptions: [
                   {
@@ -237,6 +241,7 @@ describe("ProjectForm.", () => {
       );
       expect(mockOnSaved).lastCalledWith({
         id: "333",
+        group: "aafc",
         multilingualDescription: {
           descriptions: [
             {

@@ -526,7 +526,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                     class="d-flex align-items-center w-100"
                   >
                     <strong
-                      class="me-2"
+                      class="me-2 d-flex align-items-center"
                     >
                       Material Samples to Create
                     </strong>
@@ -561,7 +561,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                     class="d-flex align-items-center w-100"
                   >
                     <strong
-                      class="me-2"
+                      class="me-2 d-flex align-items-center"
                     >
                       <div
                         class="sourceSet-field-header truncate-text"
@@ -1237,7 +1237,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                     class="d-flex align-items-center w-100"
                   >
                     <strong
-                      class="me-2"
+                      class="me-2 d-flex align-items-center"
                     >
                       Material Samples to Create
                     </strong>
@@ -1272,7 +1272,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                     class="d-flex align-items-center w-100"
                   >
                     <strong
-                      class="me-2"
+                      class="me-2 d-flex align-items-center"
                     >
                       <div
                         class="sourceSet-field-header truncate-text"

@@ -299,7 +299,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   editExpeditionTitle: "Expedition bearbeiten",
   editExternalResourceTitle: "Externe Ressource bearbeiten",
   editGroupTitle: "Gruppe bearbeiten",
-  editIdentifierTitle: "Bezeichner bearbeiten",
   editInstitutionTitle: "Institution bearbeiten",
   editManagedAttributeTitle: "Zusatzfeld bearbeiten",
   editManagedAttributesViewTitle: "Formularvorlage bearbeite",
@@ -564,7 +563,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_personIdentifierTypeError: "Identifikatortyp ist erforderlich.",
   field_personIdentifierUniqueError: "Identifikatoren müssen eindeutig sein.",
   field_personIdentifierValueError: "Identifikatorwert ist erforderlich.",
-  field_personMandatoryFieldsError: "Das Anzeigenamen-Feld ist erforderlich.",
   field_preparationDate: "Datum der Aufbereitung",
   field_preparationFixative: "Fixativ der Aufbereitung",
   field_preparationFixative_tooltip:

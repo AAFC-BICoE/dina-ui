@@ -1,5 +1,6 @@
 import { waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { IntlProvider } from "react-intl";
 import { clearAndType, mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { FormikButton } from "../FormikButton";
@@ -74,5 +75,19 @@ describe("StringArrayField component", () => {
     await waitFor(() => {
       expect(mockSubmit.mock.calls).toEqual([[{ lines: ["new", "value"] }]]);
     });
+  });
+
+  it("Dims the tooltip icon when the field is empty and read-only.", () => {
+    const wrapper = mountWithAppContext(
+      <IntlProvider locale="en" messages={{ field_lines_tooltip: "Tooltip" }}>
+        <DinaForm initialValues={{ lines: [] }} readOnly={true}>
+          <StringArrayField name="lines" />
+        </DinaForm>
+      </IntlProvider>
+    );
+
+    expect(
+      wrapper.container.querySelector(".tooltip-info-icon-empty")
+    ).not.toBeNull();
   });
 });
