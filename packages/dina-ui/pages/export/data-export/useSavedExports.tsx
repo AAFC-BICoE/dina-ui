@@ -1,5 +1,6 @@
 import {
-  FiqlSearchFilterBuilder,
+  SimpleSearchFilterBuilder,
+  simpleSearchFilterToFiql,
   useAccount,
   useApiClient
 } from "common-ui/lib";
@@ -93,11 +94,7 @@ export default function useSavedExports<TData extends KitsuResource>({
   // States for updating a saved export
   const [loadingUpdate, setLoadingUpdate] = useState<boolean>(false);
 
-  /**
-   * Close the create new saved export modal.
-   *
-   * Will not close if the create operation is loading.
-   */
+  /** Close the create new saved export modal. Will not close if the create operation is loading. */
   const handleCloseCreateSavedExportModal = () => {
     if (loadingCreateSavedExport) {
       return;
@@ -105,15 +102,11 @@ export default function useSavedExports<TData extends KitsuResource>({
     setShowCreateSavedExportModal(false);
   };
 
-  /**
-   * Display the create new saved export modal.
-   */
+  /** Display the create new saved export modal. */
   const handleShowCreateSavedExportModal = () =>
     setShowCreateSavedExportModal(true);
 
-  /**
-   * Create a new saved export.
-   */
+  /** Create a new saved export. */
   async function createSavedExport() {
     // Do not create if we are displaying the override warning.
     if (displayOverrideWarning) {
@@ -137,9 +130,7 @@ export default function useSavedExports<TData extends KitsuResource>({
     setSavedExportName("");
   }
 
-  /**
-   * Update the currently selected saved export.
-   */
+  /** Update the currently selected saved export. */
   async function updateSavedExport() {
     // Cannot update a saved export if no saved export is selected.
     if (!selectedSavedExport) {
@@ -160,9 +151,7 @@ export default function useSavedExports<TData extends KitsuResource>({
     setLoadingUpdate(false);
   }
 
-  /**
-   * Delete the currently selected saved export.
-   */
+  /** Delete the currently selected saved export. */
   async function deleteSavedExport() {
     // Cannot delete a saved export if no saved export is selected.
     if (!selectedSavedExport) {
@@ -183,9 +172,8 @@ export default function useSavedExports<TData extends KitsuResource>({
   }
 
   /**
-   * Patch selected savedExport and retrieves updated exports from back end
-   *
-   * @param savedExport The savedExportColumnSelection to be added to the user preferences.
+   * Patch selected savedExport and retrieves updated exports from the back-end.
+   * @param savedExport The savedExportColumnSelection to add to the user preferences.
    */
   async function performUpdateSavedExport(): Promise<DataExportTemplate> {
     const columnFunctions = getColumnFunctions(columnsToExport);
@@ -231,7 +219,7 @@ export default function useSavedExports<TData extends KitsuResource>({
       }
     );
 
-    // After changes are made perform a reload.
+    // Reload after changes are made.
     await retrieveSavedExports();
 
     return {
@@ -242,23 +230,21 @@ export default function useSavedExports<TData extends KitsuResource>({
   }
 
   /**
-   * Deletes savedExport and retrieves updated exports from back end
-   *
-   * @param savedExport The savedExportColumnSelection to be added to the user preferences.
+   * Deletes savedExport and retrieves updated exports from the back-end.
+   * @param savedExport The savedExportColumnSelection to add to the user preferences.
    */
   async function performDeleteSavedExport() {
     await apiClient.axios.delete(
       `/dina-export-api/data-export-template/${selectedSavedExport?.id}`
     );
 
-    // After changes are made perform a reload.
+    // Reload after changes are made.
     await retrieveSavedExports();
   }
 
   /**
-   * Creates savedExport and retrieves updated exports from back end
-   *
-   * @param savedExport The savedExportColumnSelection to be added to the user preferences.
+   * Creates savedExport and retrieves updated exports from the back-end.
+   * @param savedExport The savedExportColumnSelection to add to the user preferences.
    */
   async function performCreateSavedExport(): Promise<DataExportTemplate> {
     const columnFunctions = getColumnFunctions(columnsToExport);
@@ -304,7 +290,7 @@ export default function useSavedExports<TData extends KitsuResource>({
       }
     );
 
-    // After changes are made perform a reload.
+    // Reload after changes are made.
     await retrieveSavedExports();
     return {
       id: createdSavedExportResp.data.data.id,
@@ -314,10 +300,8 @@ export default function useSavedExports<TData extends KitsuResource>({
   }
 
   /**
-   * MIGRATION: For legacy records with columnFunctions, convert them to the new
-   * "functions" format and clear the old "columnFunctions" on the backend.
-   *
-   * This sends a minimal PATCH: only "functions" and "columnFunctions".
+   * MIGRATION: Convert legacy records with columnFunctions to the new functions format
+   * and clear the old columnFunctions on the backend using a minimal PATCH.
    */
   async function performSavedExportMigration(
     migratedExport: DataExportTemplate
@@ -348,23 +332,24 @@ export default function useSavedExports<TData extends KitsuResource>({
   }
 
   /**
-   * Retrieve the users user-preferences and find the savedExportColumnSelection
-   * filtered for this specific indexName.
+   * Retrieve user-preferences and find savedExportColumnSelection filtered for this indexName.
    */
   async function retrieveSavedExports() {
     setLoadingSavedExports(true);
 
-    // Fetch public items, plus items for the user's groups.
-    // Restricting by group reduces API permission checks, while user-level permissions are still enforced by the API.
+    // Fetch public items and items for the user's groups.
+    // Group restriction reduces API checks while the API enforces user-level permissions.
     await apiClient
       .get<DataExportTemplate[]>("dina-export-api/data-export-template", {
-        fiql: FiqlSearchFilterBuilder.create()
-          .or((b) =>
-            b
-              .where("publiclyReleasable", "EQ", true)
-              .whereIn("group", groupNames)
-          )
-          .build()
+        fiql: simpleSearchFilterToFiql(
+          SimpleSearchFilterBuilder.create<DataExportTemplate>()
+            .or((b) =>
+              b
+                .where("publiclyReleasable", "EQ", true)
+                .whereIn("group", groupNames)
+            )
+            .build()
+        )
       })
       .then((response) => {
         setLoadingSavedExports(false);
@@ -376,16 +361,12 @@ export default function useSavedExports<TData extends KitsuResource>({
       });
   }
 
-  /**
-   * First-load setup
-   */
+  /** First-load setup. */
   useEffect(() => {
     retrieveSavedExports();
   }, []);
 
-  /**
-   * When the user selects a saved export, load the columns in...
-   */
+  /** Load columns when the user selects a saved export. */
   useEffect(() => {
     if (selectedSavedExport) {
       // MIGRATION CODE: Handle legacy saved exports with column functions.
