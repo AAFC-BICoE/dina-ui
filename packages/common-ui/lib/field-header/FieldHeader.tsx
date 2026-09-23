@@ -31,6 +31,9 @@ export interface FieldNameProps {
 
   /** Encapsulate the field header with the tooltip, and concatenate the tooltip content with the field header if it is provided. */
   combineFieldHeaderWithTooltip?: boolean;
+
+  /** When true (a read-only field with no value), dims the tooltip "i" icon so it doesn't stand out. */
+  isEmptyValue?: boolean;
 }
 
 /** Get the field label and tooltip given the camelCase field key. */
@@ -45,7 +48,8 @@ export function useFieldLabels() {
     tooltipLink,
     tooltipLinkText,
     startCaseLabel = true,
-    combineFieldHeaderWithTooltip
+    combineFieldHeaderWithTooltip,
+    isEmptyValue
   }: FieldNameProps) {
     const messageKey = `field_${name}`;
     const tooltipKey = tooltipOverride
@@ -78,6 +82,7 @@ export function useFieldLabels() {
           link={tooltipLink}
           linkText={tooltipLinkText}
           visibleElement={<>{fieldLabel}</>}
+          iconClassName={isEmptyValue ? "tooltip-info-icon-empty" : undefined}
         />
       );
 
@@ -93,6 +98,7 @@ export function useFieldLabels() {
           altImage={tooltipImageAlt}
           link={tooltipLink}
           linkText={tooltipLinkText}
+          iconClassName={isEmptyValue ? "tooltip-info-icon-empty" : undefined}
         />
       ) : null;
 
@@ -117,7 +123,8 @@ export function FieldHeader({
   tooltipLink,
   tooltipLinkText,
   startCaseLabel,
-  combineFieldHeaderWithTooltip = true
+  combineFieldHeaderWithTooltip = true,
+  isEmptyValue
 }: FieldNameProps) {
   const { getFieldLabel } = useFieldLabels();
   const { fieldLabel, tooltip } = getFieldLabel({
@@ -128,7 +135,8 @@ export function FieldHeader({
     tooltipLink,
     tooltipLinkText,
     startCaseLabel,
-    combineFieldHeaderWithTooltip
+    combineFieldHeaderWithTooltip,
+    isEmptyValue
   });
 
   if (combineFieldHeaderWithTooltip) {

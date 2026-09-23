@@ -15,6 +15,11 @@ export interface ReadOnlyValueProps {
   bold?: boolean;
 }
 
+/** Placeholder shown in place of a read-only field's value when it's empty. */
+export function EmptyFieldValue() {
+  return <span className="field-value-empty">—</span>;
+}
+
 const COLLAPSED_HEIGHT = 100; //px
 const EXPANDED_MAX_HEIGHT = 500; //px
 
@@ -24,7 +29,15 @@ export function ReadOnlyValue({ value, link, bold }: ReadOnlyValueProps) {
   const [copyStatus, setCopyStatus] = useState<"" | "copied" | "error">("");
   const contentRef = useRef<HTMLDivElement | null>(null);
 
-  const content = link ? (
+  const isEmptyValue =
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    (Array.isArray(value) && value.length === 0);
+
+  const content = isEmptyValue ? (
+    <EmptyFieldValue />
+  ) : link ? (
     <Link href={link}>{value}</Link>
   ) : Array.isArray(value) ? (
     value.map((val, idx) => {

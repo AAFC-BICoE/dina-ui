@@ -20,7 +20,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/collection/123":
       return { data: TEST_COLLECTION };
     case "user-api/group":
-      return { data: [] };
+      return { data: [{ name: "aafc", labels: { en: "AAFC" } }] };
     case "collection-api/institution":
       return { data: [TEST_COLLECTION] };
     case "collection-api/collection":
@@ -86,6 +86,7 @@ describe("Collection edit page", () => {
             resource: expect.objectContaining({
               code: "test-code",
               name: "test-name",
+              group: "aafc",
               type: "collection"
             }),
             type: "collection"

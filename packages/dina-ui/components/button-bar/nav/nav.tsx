@@ -236,6 +236,11 @@ function NavCollectionDropdown({ formatMessage }) {
           <DinaMessage id="collectionListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/collection/dataset/list" passHref={true} legacyBehavior>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="datasetListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/collection/expedition/list" passHref={true} legacyBehavior>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="expeditionListTitle" />
@@ -566,11 +571,6 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
       <Link href="/collection/extension/list" passHref={true} legacyBehavior>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="fieldExtensions" />
-        </NavDropdown.Item>
-      </Link>
-      <Link href="/identifier/list" passHref={true} legacyBehavior>
-        <NavDropdown.Item role="menuitem">
-          <DinaMessage id="identifiers" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/institution/list" passHref={true} legacyBehavior>

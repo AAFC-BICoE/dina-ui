@@ -291,7 +291,7 @@ export default function QueryRowIdentifierSearch({
         minMenuHeight={600}
         menuPortalTarget={document.body}
         styles={{
-          menuPortal: (base) => ({
+          menu: (base) => ({
             ...base,
             zIndex: 9999
           })
@@ -316,7 +316,7 @@ export default function QueryRowIdentifierSearch({
           minMenuHeight={600}
           menuPortalTarget={document.body}
           styles={{
-            menuPortal: (base) => ({
+            menu: (base) => ({
               ...base,
               zIndex: 9999
             })

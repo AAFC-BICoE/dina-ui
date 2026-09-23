@@ -41,4 +41,21 @@ describe("isResourceEmpty", () => {
   it('Should return false if the object does not have "type" property', () => {
     expect(isResourceEmpty({ id: "123", name: "John" })).toBe(false);
   });
+
+  it("Should return true if the object only contains id, type and resourceVersion", () => {
+    expect(
+      isResourceEmpty({ id: "123", type: "test", resourceVersion: 1 })
+    ).toBe(true);
+  });
+
+  it("Should return false if the object has id, type, resourceVersion and another changed field", () => {
+    expect(
+      isResourceEmpty({
+        id: "123",
+        type: "test",
+        resourceVersion: 1,
+        name: "John"
+      })
+    ).toBe(false);
+  });
 });

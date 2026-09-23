@@ -202,9 +202,7 @@ describe("person edit page", () => {
     // Test expected error
     await waitFor(() => {
       expect(
-        wrapper.getByText(
-          /1 : display name \- the display name field is required\./i
-        )
+        wrapper.getByText(/1 : display name \- required field/i)
       ).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
     });

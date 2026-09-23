@@ -52,12 +52,14 @@ export function ProjectFormLayout() {
             name="group"
             enableStoredDefaultGroup={true}
             className="col-md-6"
+            requiredField={true}
           />
         )}
         <TextField
           className="col-md-6 name"
           name="name"
           label={formatMessage("field_projectName")}
+          requiredField={true}
         />
       </div>
       <div className="row">

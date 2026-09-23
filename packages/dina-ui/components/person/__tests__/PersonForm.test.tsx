@@ -12,8 +12,29 @@ import "@testing-library/jest-dom";
 
 const mockSave = jest.fn();
 
+const TEST_IDENTIFIER_VOCABULARY_ITEMS = [
+  {
+    id: "cv-item-1",
+    type: "controlled-vocabulary-item",
+    name: "Wikidata",
+    key: "wikidata",
+    multilingualTitle: { titles: [{ lang: "en", title: "Wikidata ID" }] }
+  },
+  {
+    id: "cv-item-2",
+    type: "controlled-vocabulary-item",
+    name: "ORCID",
+    key: "orcid",
+    multilingualTitle: { titles: [{ lang: "en", title: "ORCID iD" }] }
+  }
+];
+
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async () => {
+const mockGet = jest.fn(async (path) => {
+  if (String(path).startsWith("agent-api/controlled-vocabulary-item")) {
+    return { data: TEST_IDENTIFIER_VOCABULARY_ITEMS };
+  }
+
   // Return empty array for the dropdowns:
   return { data: [] };
 });
@@ -490,5 +511,85 @@ describe("PersonForm", () => {
       ],
       expect.anything()
     );
+  });
+
+  it("Lists the agent identifier types from the controlled vocabulary", async () => {
+    const wrapper = mountWithAppContext(
+      <PersonForm person={{ type: "person" } as any} />,
+      { apiContext: { apiClient: { get: mockGet } as any, save: mockSave } }
+    );
+
+    await userEvent.click(
+      await wrapper.findByRole("button", { name: /add identifier/i })
+    );
+
+    await waitFor(() =>
+      expect(mockGet).toHaveBeenCalledWith(
+        expect.stringContaining("agent-api/controlled-vocabulary-item"),
+        expect.anything()
+      )
+    );
+
+    await userEvent.click(
+      await wrapper.findByRole("combobox", { name: /identifier type/i })
+    );
+
+    await wrapper.findByRole("option", { name: "Wikidata ID" });
+    wrapper.getByRole("option", { name: "ORCID iD" });
+  });
+
+  it("Submits the selected identifier type key as the namespace", async () => {
+    mockSave.mockResolvedValueOnce([
+      {
+        id: "new-identifier-id-1",
+        type: "identifier",
+        namespace: "orcid",
+        value: "0000-0001"
+      }
+    ]);
+
+    const wrapper = mountWithAppContext(
+      <PersonForm person={{ type: "person" } as any} />,
+      { apiContext: { apiClient: { get: mockGet } as any, save: mockSave } }
+    );
+
+    await userEvent.click(
+      await wrapper.findByRole("button", { name: /add identifier/i })
+    );
+
+    await userEvent.click(
+      await wrapper.findByRole("combobox", { name: /identifier type/i })
+    );
+    await userEvent.click(
+      await wrapper.findByRole("option", { name: "ORCID iD" })
+    );
+
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /^identifier$/i }),
+      "0000-0001"
+    );
+
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "Identified Person"
+    );
+
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(mockSave).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            resource: {
+              namespace: "orcid",
+              value: "0000-0001"
+            },
+            type: "identifier"
+          }
+        ],
+        expect.anything()
+      );
+    });
   });
 });
