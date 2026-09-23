@@ -60,6 +60,11 @@ describe("DateField component", () => {
     );
   });
 
+  it("Disables browser autocomplete on the date input.", () => {
+    const wrapper = getWrapper();
+    expect(wrapper.getByRole("textbox")).toHaveAttribute("autocomplete", "off");
+  });
+
   it("Display a null date field as a blank input.", () => {
     const wrapper = getWrapper(null);
 

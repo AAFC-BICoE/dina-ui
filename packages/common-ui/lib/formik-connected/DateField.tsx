@@ -217,6 +217,7 @@ export function DateField(props: DateFieldProps) {
             }}
           >
             <DatePicker
+              autoComplete="off"
               className={classnames("form-control", invalid && "is-invalid")}
               wrapperClassName="w-100"
               isClearable={!isDisabled && !bulkTab}
