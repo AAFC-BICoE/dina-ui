@@ -13,6 +13,7 @@ import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { deserialize, OperationsResponse } from "..";
 import { serialize } from "../util/serialize";
+import { serializeKitsuParams } from "../util/simpleSearchFilterQueryString";
 import {
   normalizeJsonApiPointer,
   formatJsonApiErrorMessage
@@ -188,7 +189,9 @@ export class ApiClientImpl implements ApiClientI {
     this.apiClient = new CustomDinaKitsu({
       baseURL: cfg.baseURL ?? "/api",
       pluralize: false,
-      resourceCase: "none"
+      resourceCase: "none",
+      // Serializes "filter" objects with OR/AND groups to the back-end's grouped syntax:
+      query: serializeKitsuParams
     });
 
     // Add caching support for one second since it's likely it's going to be same response.
@@ -226,7 +229,7 @@ export class ApiClientImpl implements ApiClientI {
     operations: Operation[],
     { apiBaseUrl = "", returnNullForMissingResource }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
-    // Check if no operations were provided and skip performing anything.
+    // Skip if no operations were provided.
     if (operations.length === 0) {
       console.warn("Empty operation skipped... Returning empty array.");
       return [];
@@ -235,12 +238,11 @@ export class ApiClientImpl implements ApiClientI {
     // Unwrap the configured axios instance from the Kitsu instance.
     const { axios } = this.apiClient;
 
-    // This array will hold the responses from either the single or bulk request
+    // Array for single or bulk request responses.
     let responses: OperationsResponse | BulkGetOperation[] = [];
     const resourceType = operations[0].path.split("/").filter(Boolean)[0];
 
-    // Depending on the number of requests being made determines if it's an operation or just a
-    // single request.
+    // Single request or an operation depends on the number of requests.
     if (operations.length === 1) {
       // Single Request Only
       const operation = operations[0];
@@ -323,7 +325,7 @@ export class ApiClientImpl implements ApiClientI {
             }
           ];
         } else {
-          // extract JSON:API errors from response so getErrorMessages can parse them and throw a DoOperationsError with the correct field errors.
+          // Extract JSON:API errors for getErrorMessages to parse and throw a DoOperationsError.
           const responseData = error?.cause?.data ?? error?.response?.data;
           if (responseData?.errors) {
             responses = [
@@ -377,7 +379,7 @@ export class ApiClientImpl implements ApiClientI {
                 });
               }
 
-              // Extract the ID from before the '?' by splitting by '/' and getting the second item
+              // Extract ID from before the '?' by splitting by '/'.
               return pathParts[0].split("/").filter(Boolean)[1];
             });
 
@@ -405,7 +407,7 @@ export class ApiClientImpl implements ApiClientI {
               // Split path by "?"
               const pathParts = operation.path.split("/");
 
-              // Extract the ID from before the '?' by splitting by '/' and getting the second item
+              // Extract ID from before the '?' by splitting by '/'.
               return pathParts[1];
             });
 
@@ -462,7 +464,7 @@ export class ApiClientImpl implements ApiClientI {
         }
       } catch (error: any) {
         // bulk ops throw AxiosErrors on non-2xx responses
-        // extract JSON:API errors from response so getErrorMessages can parse them and throw a DoOperationsError with the correct field errors.
+        // Extract JSON:API errors for getErrorMessages to parse and throw a DoOperationsError.
         const responseData = error?.cause?.data ?? error?.response?.data;
         if (responseData?.errors) {
           responses = [
@@ -490,8 +492,7 @@ export class ApiClientImpl implements ApiClientI {
       console.warn(responses);
     }
 
-    // Check for errors. At least one error means that the entire request's transaction was
-    // cancelled.
+    // A single error means the entire transaction was cancelled.
     const { errorMessage, fieldErrors, individualErrors } =
       getErrorMessages(responses);
 
@@ -540,7 +541,7 @@ export class ApiClientImpl implements ApiClientI {
         jsonapiResource.id || this.cfg.newId?.() || uuidv4()
       );
 
-      // Omit the /{id} from the path if it's a POST, or if it's a PATCH where an ID wasn't originally present
+      // Omit /{id} from path for POST or PATCH without original ID.
       const path =
         method === "POST" || !jsonapiResource.id
           ? jsonapiResource.type
@@ -648,8 +649,7 @@ export class ApiClientImpl implements ApiClientI {
         });
         break;
       } catch (error) {
-        // if returnNullForMissingResource is true, we will handle the error
-        // by returning null for the missing resources instead of throwing an error.
+        // Return null for missing resources instead of throwing an error if returnNullForMissingResource is true.
         if (returnNullForMissingResource) {
           const errors = error.cause.data.errors;
           const missingIdsThisRun = errors.map((err: any) =>
@@ -796,8 +796,7 @@ export class ApiClientImpl implements ApiClientI {
       return [];
     }
 
-    // Use DataLoader to avoid requesting the same ID multiple times,
-    // which crnk-operations throws an error for:
+    // Use DataLoader to avoid requesting same ID multiple times to prevent crnk-operations errors:
     const batchLoader = new DataLoader<string, SuccessfulOperation>(
       async (uniquePaths) => {
         const getOperations = uniquePaths.map<Operation>((path) => ({
@@ -1014,7 +1013,7 @@ export class CustomDinaKitsu extends Kitsu {
         ? rawData.data
         : [rawData?.data];
 
-      // Helper to safely merge raw stubs (preserves 'uuid') with Kitsu resolved data
+      // Helper safely merging raw stubs with Kitsu resolved data.
       const mergeRelationship = (raw: any, resolved: any) => {
         if (!raw) return resolved;
         if (!resolved) return raw;
@@ -1042,7 +1041,7 @@ export class CustomDinaKitsu extends Kitsu {
           const currentValue = item[key];
           const rawRelData = rawRelationships[key]?.data;
 
-          // Check if Kitsu 11.1.0 wrapped this relationship in {data: {...}}
+          // Check if Kitsu wrapped relationship in {data: {...}}
           if (
             currentValue &&
             typeof currentValue === "object" &&
@@ -1052,13 +1051,13 @@ export class CustomDinaKitsu extends Kitsu {
             if (rawRelData === null || currentValue.data === null) {
               item[key] = null;
             } else if (rawRelData !== undefined) {
-              // MERGE raw stub with resolved data so we keep both 'uuid' and included attributes
+              // Merge raw stub with resolved data keeping 'uuid' and included attributes.
               item[key] = mergeRelationship(rawRelData, currentValue.data);
             } else {
               item[key] = currentValue.data;
             }
           }
-          // If Kitsu didn't resolve it (or left an empty array because of missing ids)
+          // If Kitsu did not resolve it or left an empty array.
           else if (
             currentValue === undefined ||
             (Array.isArray(currentValue) && currentValue.length === 0)
@@ -1075,8 +1074,7 @@ export class CustomDinaKitsu extends Kitsu {
           }
         }
 
-        // Remove any relationships that were NOT requested in includes
-        // (Kitsu 11.1.0 promotes all relationships, but we only want requested ones)
+        // Remove relationships not requested in includes.
         for (const key in item) {
           if (
             key === "id" ||
