@@ -1,0 +1,85 @@
+= Search Filters
+
+List pages, dropdowns, and lookups filter back-end resources using `SimpleSearchFilterBuilder` (`packages/common-ui/lib/util/simpleSearchFilterBuilder.ts`). The builder creates a single filter object, which the back-end receives in one of two formats:
+
+* *Simple filter* query params (e.g. `filter[name][ILIKE]=%test%`). Used by `ResourceSelect` and most `useQuery` calls.
+* A *FIQL* string (e.g. `fiql=name==*test*;group==aafc`). Used by list pages (`ListPageLayout`, `QueryTable`) and lookups requiring OR groups or null checks.
+
+FIQL is currently being retired. The back-end simple filter grammar supports groups as of `dina-base-api` 0.178. The UI generates all FIQL strings from a `SimpleSearchFilter` via `simpleSearchFilterToFiql`. Retiring FIQL means we will send the filter object directly instead of generating the FIQL string.
+
+== Building a Filter
+
+[source,typescript]
+----
+const filter = SimpleSearchFilterBuilder.create<FormTemplate>()
+  .whereProvided("group", "EQ", filterForm.group)   // skipped when blank
+  .searchFilter("name", searchValue)                 // name ILIKE %searchValue%
+  .whereIn("type", ["MANAGED_ATTRIBUTE", "SYSTEM"])  // comma-separated IN list
+  .where("dateUsed", "EQ", null)                     // blank field
+  .when(hideCompleted, (b) => b.where("isCompleted", "EQ", false))
+  .or((b) =>                                         // any member has to match
+    b
+      .whereProvided("createdBy", "EQ", username)
+      .where("restrictToCreatedBy", "EQ", false)
+  )
+  .build();
+----
+
+Available operators include: `EQ`, `NEQ`, `GT`, `GOE`, `LT`, `LOE`, `LIKE`, `ILIKE`, `IN`, and the UI-only `NOT_ILIKE`. The back-end simple filter cannot negate a partial match. `NOT_ILIKE` exists solely for the filter builder UI "IS NOT partial match" row and is sent as FIQL.
+
+The `IN` operator sends values as a comma-separated list with two important rules:
+
+* An empty list adds no condition and leaves the field unrestricted. Always guard the call site if an empty list should hide results.
+* Commas inside values cannot be escaped. Lists containing commas are built transparently as an OR of equalities instead.
+
+Conditions added inside `.or(...)` become members of the OR group. Use `.and(...)` for members requiring multiple conditions:
+
+[source,typescript]
+----
+.or((b) => b.where("a", "EQ", 1).and((b2) => b2.where("b", "EQ", 2).where("c", "EQ", 3)))
+----
+
+Skipped OR group conditions do not add anything to the filter. A single condition group is added strictly as that condition. The `.add(filter)` method merges filters built elsewhere.
+
+== The Filter Object
+
+Calling `build()` returns a `SimpleSearchFilter`:
+
+[source,typescript]
+----
+{
+  group: { EQ: "aafc" },                 // field conditions, all AND-ed
+  age: { GOE: 18, LOE: 65 },             // several operators on one field
+  $or: [                                 // members are OR-ed
+    { createdBy: { EQ: "me" } },
+    { restrictToCreatedBy: { EQ: false } }
+  ],
+  $and: [                                // extra AND-ed members: a second OR group, or the same
+    { group: { NEQ: "cnc" } }            // field + operator used twice
+  ]
+}
+----
+
+Plain filters serialize perfectly to `filter[field][OP]=value`. You can pass them as the `filter` param to `useQuery`, `QueryTable`, and `apiClient.get`.
+
+Legacy operator-less shapes like `{ name: "abc" }` act as equalities. Always prefer `{ name: { EQ: "abc" } }` in new code.
+
+== Sending the Filter
+
+The `simpleSearchFilterToFiql(filter)` function converts the object to FIQL: `group==aafc;age=ge=18;age=le=65;(createdBy==me,restrictToCreatedBy==false);group!=cnc`. The back-end FIQL parser lacks `=in=` support, so `IN` becomes an OR of equalities. Values with spaces or reserved characters are double-quoted.
+
+The `simpleSearchFilterToQueryString(filter)` function serializes the object to the back-end simple filter grammar including grouped syntax: `(filter[createdBy][EQ]=me|filter[restrictToCreatedBy][EQ]=false)&filter[group][EQ]=aafc`.
+The API client uses this function for every `filter` param. A filter without groups serializes exactly like Kitsu did previously.
+
+The filter builder UI model combines easily with `additionalFilters` after being converted by `filterModelToSimpleSearchFilter`.
+
+== Retiring FIQL
+
+The following tasks remain for the complete removal of FIQL:
+
+. Replace `fiql: simpleSearchFilterToFiql(filter)` and `fiql={...}` with `filter: filter` and `filter={...}` everywhere (including `ListPageLayout`, `QueryTable`, `CollectingEventLinker`, `AutoSuggestTextField`, workbook queries, and storage-unit queries).
+. Update every module filtered with groups to `dina-base-api` 0.178 or newer. Older versions do not parse the grouped syntax.
+. Identify back-end equivalents for negated partial matches (`NOT_ILIKE`) and `null` comparisons. The simple filter grammar lacks both. Currently, `simpleSearchFilterToQueryString` emits these normally so the web app server-side can intercept and translate them. You must drop them from the UI if back-end equivalents are not created.
+. Removing FIQL fixes unescapable commas. The Apache CXF `FiqlParser` splits FIQL on `,` and `;` before evaluating quotes or backslashes. Currently, searches like `Smith, John` fail completely. Moving away from FIQL resolves this because the simple filter URL-encodes each value independently. Until FIQL is removed, splitting the value across an OR of equalities is the only workaround.
+. Avoid mixing `fiql=` and `filter[...]` params. The back-end will use FIQL and completely ignore the simple filter.
+. Remove `fiql` from `GetParams` (`packages/common-ui/types/kitsu.d.ts`), `useQuery`, `QueryTable`, and `fiql.ts`. Delete the `fiqlArgument` quoting rules as well.
