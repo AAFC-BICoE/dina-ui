@@ -51,6 +51,7 @@ export default function PersonDetailsPage() {
       type="person"
       apiBaseUrl="/agent-api"
       nameField="displayName"
+      showRevisionsLink={true}
     />
   );
 }

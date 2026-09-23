@@ -8,6 +8,25 @@ interface MultilingualPair {
   value: string;
 }
 
+/**
+ * Picks the pair matching the given locale out of a multilingual field's pairs
+ * (e.g. MultilingualTitle.titles, MultilingualDescription.descriptions),
+ * falling back to the first non-blank pair. Shared by every multilingual
+ * field lookup so there's one place defining which translation wins when the
+ * current locale isn't available.
+ */
+export function getPreferredMultilingualPair<
+  T extends { lang?: string | null }
+>(
+  pairs: T[] | null | undefined,
+  valueKey: keyof T,
+  locale?: string
+): T | undefined {
+  const nonBlankPairs = (pairs ?? []).filter((pair) => !!pair[valueKey]);
+
+  return nonBlankPairs.find((pair) => pair.lang === locale) ?? nonBlankPairs[0];
+}
+
 function getPreferredPair(
   original: any,
   accessorKey: string,
@@ -18,38 +37,16 @@ function getPreferredPair(
 
   // Get the multilingual field data provided.
   const multilingualField: any | null = _.get(original, accessorKey);
+  const fieldPairs = multilingualField?.[`${className}s`];
 
-  // If no data is provided, just leave the cell blank.
-  if (
-    multilingualField == null ||
-    multilingualField[`${className}s`] == null ||
-    multilingualField[`${className}s`].length === 0
-  ) {
-    return undefined;
-  }
-
-  // Remove any blank entries.
-  const fieldPairs = multilingualField[`${className}s`].filter(
-    (fieldItem) => fieldItem[`${type}`] !== ""
+  const preferredPair = getPreferredMultilingualPair<any>(
+    fieldPairs,
+    type,
+    locale
   );
 
-  // Loop through all of the entries provided, the preferred one is always the currently used language.
-  for (const fieldPair of fieldPairs) {
-    if (fieldPair.lang === locale) {
-      return {
-        lang: fieldPair.lang,
-        value: fieldPair[type]
-      };
-    }
-  }
-
-  // Preferred language could not be found above. Use another language and make sure it's indicated.
-  // There is also the possibility that this is blank.
-  return fieldPairs.length !== 0 && fieldPairs[0] !== null
-    ? {
-        lang: fieldPairs[0].lang,
-        value: fieldPairs[0][type]
-      }
+  return preferredPair
+    ? { lang: preferredPair.lang, value: preferredPair[type] }
     : undefined;
 }
 

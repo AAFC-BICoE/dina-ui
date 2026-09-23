@@ -61,6 +61,9 @@ describe("Region edit page", () => {
       "New Region"
     );
 
+    // Symbol is also a required field.
+    await clearAndType(wrapper.getByRole("textbox", { name: /symbol/i }), "NR");
+
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
@@ -71,7 +74,8 @@ describe("Region edit page", () => {
           data: {
             attributes: {
               group: "aafc",
-              name: "New Region"
+              name: "New Region",
+              symbol: "NR"
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "region"

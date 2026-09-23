@@ -111,6 +111,12 @@ export function FormTemplateEditPageLoaded({
     allMaterialSampleComponentValues.associations = [{}];
   }
 
+  allMaterialSampleComponentValues.attachmentsConfig = {
+    allowNew: true,
+    allowExisting: true,
+    ...allMaterialSampleComponentValues.attachmentsConfig
+  };
+
   // collecting event components need to be isolated for useMaterialSample hook
   const collectingEventInitialValues =
     getComponentValues(
@@ -122,6 +128,12 @@ export function FormTemplateEditPageLoaded({
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
+
+  collectingEventInitialValues.attachmentsConfig = {
+    allowNew: true,
+    allowExisting: true,
+    ...collectingEventInitialValues.attachmentsConfig
+  };
 
   const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
 
@@ -279,7 +291,7 @@ export function FormTemplateEditPageLoaded({
           >
             <div className="row">
               <div className="col-md-6">
-                <TextField name="name" className="row" />
+                <TextField name="name" className="row" requiredField={true} />
                 <FieldSpy<string> fieldName={"group"}>
                   {(group) => (
                     <FieldSpy<boolean> fieldName={"restrictToCreatedBy"}>
@@ -313,6 +325,7 @@ export function FormTemplateEditPageLoaded({
                 <GroupSelectField
                   name="group"
                   enableStoredDefaultGroup={true}
+                  requiredField={true}
                 />
               </div>
             </div>

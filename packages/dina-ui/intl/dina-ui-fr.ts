@@ -199,6 +199,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Glisser et déposer l'attribut à sa nouvelle position.",
   duplicate: "Dupliquer",
   duplicateFilesFound: "fichiers en double trouvés",
+  duplicatePersonFound:
+    'Une personne portant le nom "{name}" existe déjà, voulez-vous continuer?',
+  duplicatePersonViewLink: "Voir la personne existante",
   duplicatePrimaryIdFound: "Copie du document d'identité principal trouvée ",
   editAssemblageTitle: "Modifier un assemblage",
   editCataloguedObjectTitle: "Modifier un objet catalogué",
@@ -470,6 +473,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_title: "Titre",
   "field_title.en": "Titre en anglais",
   "field_title.fr": "Titre en français",
+  "field_title.de": "Titre en allemand",
   field_transcriberRemarks: "Notes du transcripteur",
   field_type: "Catégorie",
   field_typeStatus: "Type de statut",
@@ -966,7 +970,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   userListTitle: "Utilisateurs",
   userMissingAgent: "Non lié",
   userMustBelongToGroup: "L’utilisateur doit appartenir à un groupe",
-  userSearchPlaceholder: "Rechercher par nom d’utilisateur, nom, courriel ou agent",
+  userSearchPlaceholder:
+    "Rechercher par nom d’utilisateur, nom, courriel ou agent",
   userViewTitle: "Utilisateur",
   valueCad: "Valeur ($ CA)",
   verbatimDeterminationLegend: "Détermination verbatim",

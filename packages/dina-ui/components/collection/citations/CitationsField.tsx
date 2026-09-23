@@ -430,7 +430,13 @@ export function CitationSubForm({
   onCancelClick,
   referenceToEdit
 }: CitationSubFormProps) {
-  const { initialValues, isTemplate } = useDinaFormContext();
+  const {
+    initialValues,
+    isTemplate,
+    componentName,
+    sectionName,
+    formTemplate
+  } = useDinaFormContext();
   const [isManualInput, setIsManualInput] = useState(false);
   const [doiFetchError, setDoiFetchError] = useState<boolean>(false);
   const { formatMessage } = useDinaIntl();
@@ -490,6 +496,7 @@ export function CitationSubForm({
         </div>
         <FormWrapper
           validationSchema={citationSchema}
+          {...(!isTemplate ? { formTemplate } : {})}
           initialValues={
             referenceToEdit ??
             referenceTemplateInitialValues ??
@@ -651,7 +658,7 @@ export function CitationSubForm({
                             style={{ marginTop: "3px", marginRight: "20px" }}
                           >
                             <CheckBoxWithoutWrapper
-                              name={`templateCheckboxes['citation-component.authors']`}
+                              name={`templateCheckboxes['${componentName}.${sectionName}.authors']`}
                               className={`col-sm-1 templateCheckBox`}
                             />
                           </div>

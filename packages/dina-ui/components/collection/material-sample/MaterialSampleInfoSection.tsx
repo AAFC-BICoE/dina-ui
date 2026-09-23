@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   ControlledVocabularySelectField,
   DateField,
+  DinaFormSection,
   FieldSet,
   FieldSpy,
   TextField,
@@ -10,6 +11,7 @@ import {
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../..//intl/dina-ui-intl";
 import {
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MaterialSample,
   MATERIAL_SAMPLE_INFO_COMPONENT_NAME
 } from "../../..//types/collection-api";
@@ -25,13 +27,7 @@ export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
   "materialSampleType"
 ];
 
-export function MaterialSampleInfoSection({
-  id,
-  visibleManagedAttributeKeys
-}: {
-  id?: string;
-  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
-}) {
+export function MaterialSampleInfoSection({ id }: { id?: string }) {
   const { locale, formatMessage } = useDinaIntl();
 
   const { readOnly, isTemplate } = useDinaFormContext();
@@ -116,25 +112,45 @@ export function MaterialSampleInfoSection({
           }
         </FieldSpy>
       )}
-      {readOnly && (
-        <div className="row">
-          <div className="col-md-12">
-            <ManagedAttributesEditor
-              valuesPath="managedAttributes"
-              managedAttributeApiPath="collection-api/controlled-vocabulary-item"
-              managedAttributeComponent="MATERIAL_SAMPLE"
-              fieldSetProps={{
-                id,
-                legend: <DinaMessage id="materialSampleManagedAttributes" />
-              }}
-              managedAttributeOrderFieldName="managedAttributesOrder"
-              visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
-              disableClearButton={true}
-              isControlledVocabulary={true}
-            />
-          </div>
-        </div>
-      )}
     </FieldSet>
+  );
+}
+
+export function MaterialSampleInfoManagedAttributes({
+  id,
+  visibleManagedAttributeKeys
+}: {
+  id?: string;
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
+}) {
+  const { readOnly } = useDinaFormContext();
+
+  if (!readOnly) {
+    return null;
+  }
+
+  return (
+    <DinaFormSection
+      componentName={MANAGED_ATTRIBUTES_COMPONENT_NAME}
+      sectionName="managed-attributes-section"
+    >
+      <div className="row">
+        <div className="col-md-12">
+          <ManagedAttributesEditor
+            valuesPath="managedAttributes"
+            managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+            managedAttributeComponent="MATERIAL_SAMPLE"
+            fieldSetProps={{
+              id,
+              legend: <DinaMessage id="materialSampleManagedAttributes" />
+            }}
+            managedAttributeOrderFieldName="managedAttributesOrder"
+            visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
+            disableClearButton={true}
+            isControlledVocabulary={true}
+          />
+        </div>
+      </div>
+    </DinaFormSection>
   );
 }

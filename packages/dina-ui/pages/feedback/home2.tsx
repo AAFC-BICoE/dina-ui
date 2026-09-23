@@ -15,6 +15,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 
 import {
+  FaDatabase,
   FaLayerGroup,
   FaLocationDot,
   FaBoxArchive,
@@ -41,7 +42,6 @@ import {
   FaTemperatureHalf,
   FaWrench,
   FaPuzzlePiece,
-  FaFingerprint,
   FaLandmark,
   FaListCheck,
   FaFileLines,
@@ -76,6 +76,13 @@ const COLLECTION_DEFAULTS: NavigationCard[] = [
     title: "collectionListTitle",
     icon: FaBoxArchive,
     href: "/collection/collection/list",
+    category: "collection"
+  },
+  {
+    id: "datasets",
+    title: "datasetListTitle",
+    icon: FaDatabase,
+    href: "/collection/dataset/list",
     category: "collection"
   },
   {
@@ -301,13 +308,6 @@ const CONTROLLED_VOCAB_DEFAULTS: NavigationCard[] = [
     title: "fieldExtensions",
     icon: FaPuzzlePiece,
     href: "/collection/extension/list",
-    category: "controlled-vocabulary"
-  },
-  {
-    id: "identifiers",
-    title: "identifiers",
-    icon: FaFingerprint,
-    href: "/identifier/list",
     category: "controlled-vocabulary"
   },
   {

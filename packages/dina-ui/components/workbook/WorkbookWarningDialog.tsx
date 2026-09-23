@@ -1,6 +1,10 @@
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
+import {
+  DuplicatePrimaryId,
+  getDuplicateRowNumbers
+} from "./utils/workbookDuplicateUtils";
 
 export interface WorkbookWarningDialogProps {
   /**
@@ -12,27 +16,75 @@ export interface WorkbookWarningDialogProps {
    * List of all the columns that are unmapped relationships. An empty array if no columns are unmapped.
    */
   unmappedRelationshipsError: string[];
+
+  /**
+   * Primary IDs found in the workbook. Only the local or server duplicates are displayed.
+   */
+  duplicatePrimaryIds?: DuplicatePrimaryId[];
+}
+
+/** The maximum items to be displayed if not opened. */
+const MAX_VISIBLE_ELEMENTS = 2;
+
+function ExpandableList({ items }: { items: string[] }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="card well px-2 py-2 mb-3">
+      <span>
+        <span style={{ lineHeight: "31px" }}>
+          {!isExpanded ? (
+            items.slice(0, MAX_VISIBLE_ELEMENTS).join(", ")
+          ) : (
+            <ul style={{ textAlign: "left" }}>
+              {items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
+        </span>
+        {items.length > MAX_VISIBLE_ELEMENTS && (
+          <>
+            {!isExpanded && "..."}
+            <Button
+              size={"sm"}
+              variant="secondary"
+              className="ms-3"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? (
+                <DinaMessage id="showLess" />
+              ) : (
+                <DinaMessage id="showMore" />
+              )}
+            </Button>
+          </>
+        )}
+      </span>
+    </div>
+  );
+}
+
+function formatDuplicate({
+  materialSampleName,
+  collectionName
+}: DuplicatePrimaryId) {
+  return collectionName
+    ? `${materialSampleName} (${collectionName})`
+    : materialSampleName;
 }
 
 export function WorkbookWarningDialog({
   skippedColumns,
-  unmappedRelationshipsError
+  unmappedRelationshipsError,
+  duplicatePrimaryIds = []
 }: WorkbookWarningDialogProps) {
-  /** The maximum columns to be displayed if not opened. */
-  const MAX_VISIBLE_ELEMENTS = 2;
-
-  const [isSkippedColumnExpanded, setIsSkippedColumnExpanded] = useState(false);
-  const [isUnmappedRelationshipsExpanded, setIsUnmappedRelationshipsExpanded] =
-    useState(false);
-
-  const handleToggle =
-    (isOpenState: boolean, setIsOpen: (openState: boolean) => void) => () => {
-      setIsOpen(!isOpenState);
-    };
-
-  const displayedColumns = (columns: string[], isOpen: boolean) => {
-    return columns.slice(0, isOpen ? columns.length : MAX_VISIBLE_ELEMENTS);
-  };
+  const onSheetDuplicates = duplicatePrimaryIds
+    .filter((entry) => entry.localDuplicate)
+    .map(formatDuplicate);
+  const onServerDuplicates = duplicatePrimaryIds
+    .filter((entry) => !entry.localDuplicate && entry.serverDuplicate)
+    .map(formatDuplicate);
 
   return (
     <>
@@ -44,44 +96,7 @@ export function WorkbookWarningDialog({
           <p>
             <DinaMessage id="skippedColumnsDescription" />
           </p>
-          <div className="card well px-2 py-2 mb-3">
-            <span>
-              <span style={{ lineHeight: "31px" }}>
-                {!isSkippedColumnExpanded ? (
-                  displayedColumns(
-                    skippedColumns,
-                    isSkippedColumnExpanded
-                  ).join(", ")
-                ) : (
-                  <ul style={{ textAlign: "left" }}>
-                    {skippedColumns.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                )}
-              </span>
-              {skippedColumns.length > MAX_VISIBLE_ELEMENTS && (
-                <>
-                  {!isSkippedColumnExpanded && "..."}
-                  <Button
-                    size={"sm"}
-                    variant="secondary"
-                    className="ms-3"
-                    onClick={handleToggle(
-                      isSkippedColumnExpanded,
-                      setIsSkippedColumnExpanded
-                    )}
-                  >
-                    {isSkippedColumnExpanded ? (
-                      <DinaMessage id="showLess" />
-                    ) : (
-                      <DinaMessage id="showMore" />
-                    )}
-                  </Button>
-                </>
-              )}
-            </span>
-          </div>
+          <ExpandableList items={skippedColumns} />
         </>
       )}
 
@@ -93,44 +108,39 @@ export function WorkbookWarningDialog({
           <p>
             <DinaMessage id="unmappedRelationshipsDescription" />
           </p>
-          <div className="card well px-2 py-2 mb-3">
-            <span>
-              <span style={{ lineHeight: "31px" }}>
-                {!isUnmappedRelationshipsExpanded ? (
-                  displayedColumns(
-                    unmappedRelationshipsError,
-                    isUnmappedRelationshipsExpanded
-                  ).join(", ")
-                ) : (
-                  <ul style={{ textAlign: "left" }}>
-                    {unmappedRelationshipsError.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                )}
-              </span>
-              {unmappedRelationshipsError.length > MAX_VISIBLE_ELEMENTS && (
-                <>
-                  {!isUnmappedRelationshipsExpanded && "..."}
-                  <Button
-                    size={"sm"}
-                    variant="secondary"
-                    className="ms-3"
-                    onClick={handleToggle(
-                      isUnmappedRelationshipsExpanded,
-                      setIsUnmappedRelationshipsExpanded
-                    )}
-                  >
-                    {isUnmappedRelationshipsExpanded ? (
-                      <DinaMessage id="showLess" />
-                    ) : (
-                      <DinaMessage id="showMore" />
-                    )}
-                  </Button>
-                </>
-              )}
-            </span>
-          </div>
+          <ExpandableList items={unmappedRelationshipsError} />
+        </>
+      )}
+
+      {(onSheetDuplicates.length !== 0 || onServerDuplicates.length !== 0) && (
+        <>
+          <h4>
+            <DinaMessage id="duplicatePrimaryIdsTitle" />
+          </h4>
+          <p className="fw-bold">
+            <DinaMessage
+              id="duplicatePrimaryIdsRowsSkipped"
+              values={{
+                count: getDuplicateRowNumbers(duplicatePrimaryIds).length
+              }}
+            />
+          </p>
+          {onSheetDuplicates.length !== 0 && (
+            <>
+              <p>
+                <DinaMessage id="duplicatePrimaryIdsOnSheetDescription" />
+              </p>
+              <ExpandableList items={onSheetDuplicates} />
+            </>
+          )}
+          {onServerDuplicates.length !== 0 && (
+            <>
+              <p>
+                <DinaMessage id="duplicatePrimaryIdsOnServerDescription" />
+              </p>
+              <ExpandableList items={onServerDuplicates} />
+            </>
+          )}
         </>
       )}
     </>

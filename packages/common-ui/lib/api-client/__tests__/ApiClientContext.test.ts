@@ -151,8 +151,7 @@ describe("API client context", () => {
       expect(config).toEqual({
         headers: {
           Accept: "application/vnd.api+json",
-          "Content-Type": "application/vnd.api+json",
-          "Crnk-Compact": "true"
+          "Content-Type": "application/vnd.api+json"
         }
       });
 
@@ -1202,15 +1201,18 @@ describe("API client context", () => {
       expect(messages).toEqual({
         errorMessage: "Error 1\nError 2",
         fieldErrors: {},
+        fieldErrorCodes: {},
         individualErrors: [
           {
             errorMessage: "Error 1",
             fieldErrors: {},
+            fieldErrorCodes: {},
             index: 0
           },
           {
             errorMessage: "Error 2",
             fieldErrors: {},
+            fieldErrorCodes: {},
             index: 1
           }
         ]
@@ -1235,11 +1237,18 @@ describe("API client context", () => {
           field1: "Error 1",
           field2: "Error 2"
         },
+        fieldErrorCodes: {
+          field1: undefined,
+          field2: undefined
+        },
         individualErrors: [
           {
             errorMessage: null,
             fieldErrors: {
               field1: "Error 1"
+            },
+            fieldErrorCodes: {
+              field1: undefined
             },
             index: 0
           },
@@ -1247,6 +1256,9 @@ describe("API client context", () => {
             errorMessage: null,
             fieldErrors: {
               field2: "Error 2"
+            },
+            fieldErrorCodes: {
+              field2: undefined
             },
             index: 1
           }
@@ -1273,16 +1285,24 @@ describe("API client context", () => {
           field1: "Error 1",
           field2: "Error 2"
         },
+        fieldErrorCodes: {
+          field1: undefined,
+          field2: undefined
+        },
         individualErrors: [
           {
             errorMessage: "Form error",
             fieldErrors: {},
+            fieldErrorCodes: {},
             index: 0
           },
           {
             errorMessage: null,
             fieldErrors: {
               field1: "Error 1"
+            },
+            fieldErrorCodes: {
+              field1: undefined
             },
             index: 1
           },
@@ -1291,9 +1311,34 @@ describe("API client context", () => {
             fieldErrors: {
               field2: "Error 2"
             },
+            fieldErrorCodes: {
+              field2: undefined
+            },
             index: 2
           }
         ]
+      });
+    });
+
+    it("Gets the JSON:API error 'code' for each field-level error.", async () => {
+      const messages = getErrorMessages([
+        {
+          status: 422,
+          errors: [
+            {
+              status: "422",
+              code: "duplicate_resource",
+              title: "Unprocessable Entity",
+              detail:
+                "Duplicate person detected. Existing resource ID: fd9af912-7a8d-4980-b34e-24919e3f48ab",
+              source: { pointer: "familyNames" }
+            }
+          ]
+        }
+      ]);
+
+      expect(messages.fieldErrorCodes).toEqual({
+        familyNames: "duplicate_resource"
       });
     });
   });

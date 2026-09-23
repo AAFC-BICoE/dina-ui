@@ -179,4 +179,136 @@ describe("WorkbookWarningDialog", () => {
     expect(screen.queryByText("Unmapped Relationships")).toBeInTheDocument();
     expect(screen.queryByText("Skipped Columns")).toBeInTheDocument();
   });
+
+  it("Renders duplicate primary ids found on the spreadsheet and on the server", () => {
+    mountWithAppContext(
+      <WorkbookWarningDialog
+        skippedColumns={[]}
+        unmappedRelationshipsError={[]}
+        duplicatePrimaryIds={[
+          {
+            materialSampleName: "S-1",
+            collectionName: "Collection A",
+            rowNumbers: [1, 3],
+            localDuplicate: true,
+            serverDuplicate: false
+          },
+          {
+            materialSampleName: "S-2",
+            rowNumbers: [2],
+            localDuplicate: true,
+            serverDuplicate: false
+          },
+          {
+            materialSampleName: "S-4",
+            collectionName: "Collection A",
+            rowNumbers: [4],
+            localDuplicate: false,
+            serverDuplicate: true
+          },
+          {
+            materialSampleName: "S-5",
+            collectionName: "Collection A",
+            rowNumbers: [5],
+            localDuplicate: false,
+            serverDuplicate: false
+          }
+        ]}
+      />
+    );
+
+    expect(screen.getByText("Duplicate Primary IDs")).toBeInTheDocument();
+    expect(
+      screen.getByText("4 rows will be skipped if you proceed.")
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Skipped Columns")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Unmapped Relationships")
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText(/appear more than once in the spreadsheet/)
+    ).toBeInTheDocument();
+    expect(screen.getByText("S-1 (Collection A), S-2")).toBeInTheDocument();
+
+    expect(
+      screen.getByText(/already exist in the same collection/)
+    ).toBeInTheDocument();
+    expect(screen.getByText("S-4 (Collection A)")).toBeInTheDocument();
+
+    expect(screen.queryByText(/S-5/)).not.toBeInTheDocument();
+  });
+
+  it("Only renders the server duplicate list when there are no spreadsheet duplicates", () => {
+    mountWithAppContext(
+      <WorkbookWarningDialog
+        skippedColumns={[]}
+        unmappedRelationshipsError={[]}
+        duplicatePrimaryIds={[
+          {
+            materialSampleName: "S-4",
+            collectionName: "Collection A",
+            rowNumbers: [4],
+            localDuplicate: false,
+            serverDuplicate: true
+          }
+        ]}
+      />
+    );
+
+    expect(screen.getByText("Duplicate Primary IDs")).toBeInTheDocument();
+    expect(
+      screen.getByText("1 row will be skipped if you proceed.")
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/appear more than once in the spreadsheet/)
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/already exist in the same collection/)
+    ).toBeInTheDocument();
+  });
+
+  it("Does not render the duplicate section when no duplicates are found", () => {
+    mountWithAppContext(
+      <WorkbookWarningDialog
+        skippedColumns={["Column1"]}
+        unmappedRelationshipsError={[]}
+        duplicatePrimaryIds={[
+          {
+            materialSampleName: "S-5",
+            rowNumbers: [5],
+            localDuplicate: false,
+            serverDuplicate: false
+          }
+        ]}
+      />
+    );
+
+    expect(screen.queryByText("Duplicate Primary IDs")).not.toBeInTheDocument();
+  });
+
+  it("Expands duplicate primary ids on button click", async () => {
+    mountWithAppContext(
+      <WorkbookWarningDialog
+        skippedColumns={[]}
+        unmappedRelationshipsError={[]}
+        duplicatePrimaryIds={["S-1", "S-2", "S-3"].map((name, index) => ({
+          materialSampleName: name,
+          rowNumbers: [index, index + 10],
+          localDuplicate: true,
+          serverDuplicate: false
+        }))}
+      />
+    );
+
+    expect(screen.getByText("S-1, S-2")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Show More" }));
+
+    expect(screen.getByText("S-1")).toBeInTheDocument();
+    expect(screen.getByText("S-2")).toBeInTheDocument();
+    expect(screen.getByText("S-3")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Show Less" })
+    ).toBeInTheDocument();
+  });
 });

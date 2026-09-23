@@ -101,6 +101,14 @@ const CV_MODULES: Array<ControlledVocabularyApiConfig & { titleKey: string }> =
     {
       titleKey: "objectStoreTitle",
       ...CONTROLLED_VOCABULARY_APIS.objectstore
+    },
+    {
+      titleKey: "seqdbTitle",
+      ...CONTROLLED_VOCABULARY_APIS.sequencing
+    },
+    {
+      titleKey: "agentsSectionTitle",
+      ...CONTROLLED_VOCABULARY_APIS.agent
     }
   ];
 
@@ -114,15 +122,36 @@ const SHARED_CV_PARAMS = {
   sort: "name"
 };
 
+/**
+ * Groups raw controlled-vocabulary-items by their dinaComponent value into the
+ * SidebarOption shape used by the sidebar (one option per component type, with
+ * the number of items using that component).
+ */
+function groupChildItems(items: ControlledVocabularyItem[]): SidebarOption[] {
+  const counts = new Map<string, number>();
+
+  for (const item of items) {
+    const comp = (item as any).attributes?.dinaComponent ?? item.dinaComponent;
+    if (comp) {
+      counts.set(comp, (counts.get(comp) ?? 0) + 1);
+    }
+  }
+
+  return Array.from(counts, ([id, count]) => ({ id, label: id, count }));
+}
+
 export default function ControlledVocabularyListPage() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
   const router = useRouter();
 
   // Tab state
-  const [currentTab, setCurrentTab] = useState<number>(() =>
-    router.query.tab === "1" ? 1 : 0
-  );
+  const [currentTab, setCurrentTab] = useState<number>(() => {
+    const tab = Number(router.query.tab);
+    return Number.isInteger(tab) && tab > 0 && tab < CV_MODULES.length
+      ? tab
+      : 0;
+  });
 
   // Sidebar data for each configured module. Hooks are called unconditionally
   // and in a fixed order; add a new entry when a new module is introduced.
@@ -136,7 +165,23 @@ export default function ControlledVocabularyListPage() {
     limit: 1000,
     params: SHARED_CV_PARAMS
   });
-  const moduleSidebarData = [collectionSidebarData, objectStoreSidebarData];
+  const seqDBSidebarData = useControlledVocabularySidebarData({
+    apiBaseUrl: CV_MODULES[2].apiBaseUrl,
+    limit: 1000,
+    params: SHARED_CV_PARAMS
+  });
+  const agentSidebarData = useControlledVocabularySidebarData({
+    apiBaseUrl: CV_MODULES[3].apiBaseUrl,
+    limit: 1000,
+    params: SHARED_CV_PARAMS
+  });
+
+  const moduleSidebarData = [
+    collectionSidebarData,
+    objectStoreSidebarData,
+    seqDBSidebarData,
+    agentSidebarData
+  ];
 
   const activeModule = CV_MODULES[currentTab];
 
@@ -154,8 +199,8 @@ export default function ControlledVocabularyListPage() {
   });
 
   // 3. Load Children Helper — uses the active tab's API.
-  const loadChildren = useCallback(
-    async (parentUuid: string): Promise<SidebarOption[]> => {
+  const loadChildItems = useCallback(
+    async (parentUuid: string): Promise<ControlledVocabularyItem[]> => {
       const resp: any = await apiClient.get(
         `${activeModule.apiBaseUrl}/controlled-vocabulary-item`,
         {
@@ -165,64 +210,107 @@ export default function ControlledVocabularyListPage() {
         }
       );
 
-      const arr: any[] = Array.isArray(resp?.data) ? resp.data : [];
-      const counts = new Map<string, number>();
-
-      for (const it of arr) {
-        const comp = it?.attributes?.dinaComponent ?? it?.dinaComponent;
-        if (comp) {
-          counts.set(comp, (counts.get(comp) ?? 0) + 1);
-        }
-      }
-
-      return Array.from(counts, ([id, count]) => ({ id, label: id, count }));
+      return Array.isArray(resp?.data)
+        ? (resp.data as ControlledVocabularyItem[])
+        : [];
     },
     [apiClient, activeModule]
   );
+
+  const loadChildren = useCallback(
+    async (parentUuid: string): Promise<SidebarOption[]> =>
+      groupChildItems(await loadChildItems(parentUuid)),
+    [loadChildItems]
+  );
+
+  // Fetch all child items for the active module in a single bulk request.
+  // The per-parent loadChildItems/loadChildren above is kept only as a
+  // fallback for parents whose children were not part of the bulk result.
+  const loadAllChildItems = useCallback(async (): Promise<
+    ControlledVocabularyItem[]
+  > => {
+    const resp: any = await apiClient.get(
+      `${activeModule.apiBaseUrl}/controlled-vocabulary-item`,
+      {
+        page: { limit: 1000 },
+        include: "controlledVocabulary",
+        fields: {
+          "controlled-vocabulary-item": "id,dinaComponent",
+          "controlled-vocabulary": "id"
+        }
+      }
+    );
+
+    return Array.isArray(resp?.data)
+      ? (resp.data as ControlledVocabularyItem[])
+      : [];
+  }, [apiClient, activeModule]);
 
   const [parentCounts, setParentCounts] = useState<Record<string, number>>({});
   const [parentsWithChildren, setParentsWithChildren] = useState<Set<string>>(
     new Set()
   );
+  const [childrenMap, setChildrenMap] = useState<
+    Record<string, SidebarOption[]>
+  >({});
 
-  // Load counts whenever the active dataset changes (tab switch / new data).
+  // Load counts and sidebar children whenever the active dataset changes
+  // (tab switch / new data). All child items for the active module are fetched
+  // in a single bulk request and grouped by parent client-side, avoiding one
+  // request per controlled-vocabulary.
   useEffect(() => {
     if (!cvItems || cvItems.length === 0) return;
 
     const fetchAllCounts = async () => {
       const newCounts: Record<string, number> = {};
       const withChildren = new Set<string>();
+      const byParent: Record<string, SidebarOption[]> = {};
 
-      await Promise.all(
-        cvItems.map(async (cv: any) => {
-          try {
-            const children = await loadChildren(cv.id);
-            if (children.length > 0) {
-              withChildren.add(cv.id);
-            }
+      try {
+        const allChildItems = await loadAllChildItems();
 
-            const resp: any = await apiClient.get(
-              `${activeModule.apiBaseUrl}/controlled-vocabulary-item`,
-              {
-                page: { limit: 999 },
-                filter: { "controlledVocabulary.uuid": { EQ: cv.id } },
-                fields: { "controlled-vocabulary-item": "id" }
-              }
-            );
-            newCounts[cv.id] = resp?.data?.length || 0;
-          } catch (e) {
-            console.error("Error loading count for CV", cv.id, e);
-            newCounts[cv.id] = -1;
+        const itemsByParent = new Map<string, ControlledVocabularyItem[]>();
+        for (const item of allChildItems) {
+          const cv = (item as any).controlledVocabulary;
+          const parentId =
+            typeof cv === "string" ? cv : (cv?.id as string | undefined);
+          if (!parentId) continue;
+
+          const items = itemsByParent.get(parentId) ?? [];
+          items.push(item);
+          itemsByParent.set(parentId, items);
+        }
+
+        for (const cv of cvItems) {
+          newCounts[String((cv as any).id)] = 0;
+        }
+
+        for (const [parentId, items] of itemsByParent) {
+          const componentChildren = groupChildItems(items);
+          // Only treat a vocabulary as having children when it has at least
+          // one component child. Vocabularies whose items have no
+          // dinaComponent (e.g. association type) should not show an
+          // expand/contract arrow.
+          if (componentChildren.length > 0) {
+            withChildren.add(parentId);
           }
-        })
-      );
+          newCounts[parentId] = items.length;
+          byParent[parentId] = componentChildren;
+        }
+      } catch (e) {
+        console.error("Error loading counts for CV items", e);
+        for (const cv of cvItems) {
+          newCounts[String((cv as any).id)] = -1;
+        }
+      }
 
       setParentCounts(newCounts);
       setParentsWithChildren(withChildren);
+      setChildrenMap(byParent);
     };
 
     fetchAllCounts();
-  }, [cvItems, loadChildren, apiClient, activeModule]);
+  }, [cvItems, loadAllChildItems, activeModule]);
 
   // 4. Build Sidebar Options (merged with Counts)
   const parentOptions = useMemo(() => {
@@ -329,7 +417,7 @@ export default function ControlledVocabularyListPage() {
     return {
       columns: getColumns(activeModule.viewRoute),
       path: itemsPath,
-      filter
+      ...(Object.keys(filter).length > 0 ? { filter } : {})
     };
   }, [
     effectiveParents,
@@ -400,6 +488,7 @@ export default function ControlledVocabularyListPage() {
               <TypeFilterSideBarDynamic
                 title="Controlled Vocabularies"
                 parents={parentOptions}
+                childrenMap={childrenMap}
                 selected={typeFilter}
                 onChange={setTypeFilter}
                 loadChildren={loadChildren}

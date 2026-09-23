@@ -296,7 +296,7 @@ describe("ResourceSelectField component", () => {
     expect(
       wrapper.container.querySelector(".nullGroup-field .read-only-view")
         ?.textContent
-    ).toEqual("");
+    ).toEqual("—");
 
     expect(mockBulkGet.mock.calls).toEqual([
       [

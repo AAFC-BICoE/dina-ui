@@ -187,12 +187,14 @@ export function SplitConfigurationFormLayout() {
           className="col-md-6 splitConfigurationName"
           name="name"
           label={formatMessage("splitConfigurationNameLabel")}
+          requiredField={true}
         />
         {!readOnly && (
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
             className="col-md-6"
+            requiredField={true}
           />
         )}
       </div>
@@ -212,6 +214,7 @@ export function SplitConfigurationFormLayout() {
               path: "collection-api/vocabulary2/materialSampleType"
             })}
             isMulti={true}
+            requiredField={true}
           />
         </div>
       </FieldSet>
@@ -242,6 +245,7 @@ export function SplitConfigurationFormLayout() {
                   label: formatMessage("field_materialSampleType")
                 }
               ]}
+              requiredField={true}
             />
           </div>
           <div className="col-md-6">
@@ -262,6 +266,7 @@ export function SplitConfigurationFormLayout() {
                   label: formatMessage("splitGenerationOptionNumerical")
                 }
               ]}
+              requiredField={true}
             />
           </div>
         </div>
@@ -286,6 +291,7 @@ export function SplitConfigurationFormLayout() {
                   label: formatMessage("splitConfiguration_separator_space")
                 }
               ]}
+              requiredField={true}
             />
           </div>
         </div>

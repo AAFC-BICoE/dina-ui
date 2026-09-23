@@ -66,6 +66,12 @@ export default function QueryBuilderBooleanSearch({
           className="flex-fill"
           onChange={(selected) => setValue?.(selected?.value ?? "true")}
           onKeyDown={onKeyDown}
+          styles={{
+            menu: (base) => ({
+              ...base,
+              zIndex: 9999
+            })
+          }}
         />
       )}
     </>

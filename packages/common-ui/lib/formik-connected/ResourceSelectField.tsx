@@ -12,6 +12,7 @@ import {
   isShallowReference,
   useBulkGet
 } from "..";
+import { EmptyFieldValue } from "./FieldView";
 
 /** The value could be one element or an array. */
 export type SingleOrArray<T> = null | T | T[];
@@ -171,6 +172,10 @@ export function ReadOnlyResourceLink<TData extends KitsuResource>({
       listPath: model,
       disabled: !valueIsShallowReference
     }).data ?? values;
+
+  if (resources.length === 0) {
+    return <EmptyFieldValue />;
+  }
 
   return (
     <Fragment>

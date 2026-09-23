@@ -4925,6 +4925,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 }
 `;
 
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level tests Using the wildcard operator, undefined subtype 1`] = `
+{
+  "wildcard": {
+    "data.attributes.managedAttributes.attributeName.keyword": {
+      "case_insensitive": true,
+      "value": "*option*",
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
@@ -5162,6 +5173,33 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                     },
                   ],
                 },
+              },
+            },
+          },
+          {
+            "term": {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level tests Using the wildcard operator, undefined subtype 1`] = `
+{
+  "nested": {
+    "path": "included",
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "wildcard": {
+              "included.attributes.managedAttributes.attributeName.keyword": {
+                "case_insensitive": true,
+                "value": "*option*",
               },
             },
           },

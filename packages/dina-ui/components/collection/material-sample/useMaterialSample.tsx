@@ -764,7 +764,9 @@ export function useMaterialSampleSave({
   };
 
   const msInitialValues: InputResource<MaterialSample> =
-    withOrganismEditorValues(materialSample ?? defaultValues);
+    withOrganismEditorValues(
+      !_.isEmpty(materialSample) ? materialSample : defaultValues
+    );
   if (msInitialValues.identifiers) {
     (msInitialValues as any).identifiers = Object.entries(
       msInitialValues.identifiers
@@ -1004,6 +1006,7 @@ export function useMaterialSampleSave({
     delete materialSampleInput.cfia_ppc;
     delete materialSampleInput.useTargetOrganism;
     delete materialSampleInput.parentAttributes;
+    delete (materialSampleInput as any).attachmentsConfig;
 
     return materialSampleInput;
   }
@@ -1711,7 +1714,7 @@ export function useMaterialSampleSave({
       (isTemplate
         ? colEventTemplateInitialValues
         : isCreatingNewColEvent
-        ? emptyCollectingEventInitialValues
+        ? collectingEventInitialValuesProp ?? emptyCollectingEventInitialValues
         : collectingEventInitialValues);
     const hasMultipleUsages = Boolean(
       materialSampleUsageCount && materialSampleUsageCount > 1
