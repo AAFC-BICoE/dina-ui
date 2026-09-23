@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { DinaFormOnSubmit } from "common-ui"; 
+import { DinaFormOnSubmit } from "common-ui";
 import { pickChangedFields, DiffOptions } from "../util/diffUtils";
 import {
   applyRelationshipMappings,
@@ -31,19 +31,22 @@ export interface UseSubmitHandlerOptions<T extends Record<string, any>> {
 
   deletedManagedAttrFields?: Set<string>;
 
-  /** 
+  /**
    * Array of managed attribute field names to process.
    * Default: ["managedAttributes"]
    * Example: ["managedAttributes", "preparationManagedAttributes"]
    */
   managedAttributeFields?: string[];
 
-  beforeSave?: (payload: { resource: any; type: string }) => void | Promise<void>;
+  beforeSave?: (payload: {
+    resource: any;
+    type: string;
+  }) => void | Promise<void>;
   onSuccess?: (saved: any) => void | Promise<void> | undefined;
   afterSave?: () => void | Promise<void>;
 
-  /** 
-   * Optional: Override the default api.save function. 
+  /**
+   * Optional: Override the default api.save function.
    * Useful for permission checks or custom saving logic.
    */
   saveFn?: (operations: any[], options: SaveOptions) => Promise<any[]>;
@@ -63,11 +66,9 @@ export function useSubmitHandler<T extends Record<string, any>>({
   afterSave,
   saveFn
 }: UseSubmitHandlerOptions<T>) {
-
   // Return the function expected by DinaForm
   const onSubmit = useCallback(
     async ({ submittedValues, api }) => {
-
       try {
         // 0. PROCESS NESTED RESOURCES (if configured)
         // Handle saving/deleting nested resources before user transforms
@@ -94,8 +95,8 @@ export function useSubmitHandler<T extends Record<string, any>>({
 
         // 3. DIFF ATTRIBUTES
         const attributesDiff = pickChangedFields(
-          original ?? {}, 
-          processed ?? {}, 
+          original ?? {},
+          processed ?? {},
           diffOptions
         );
 
@@ -123,14 +124,14 @@ export function useSubmitHandler<T extends Record<string, any>>({
         );
 
         // 6. SKIP IF EMPTY (Optional safety check)
-        const isEmpty = 
-          Object.keys(attributesDiff).length === 0 && 
+        const isEmpty =
+          Object.keys(attributesDiff).length === 0 &&
           (!relationshipDiff || Object.keys(relationshipDiff).length === 0);
 
         // If creating record allow empty
         if (isEmpty && original?.id) {
-            if (onSuccess) await onSuccess(original);
-            return;
+          if (onSuccess) await onSuccess(original);
+          return;
         }
 
         // 7. BUILD PAYLOAD
@@ -160,11 +161,9 @@ export function useSubmitHandler<T extends Record<string, any>>({
         // 9. POST-SAVE
         if (onSuccess) await onSuccess(saved);
         if (afterSave) await afterSave();
-        
-        return saved;
 
+        return saved;
       } catch (error) {
-        console.error("Submit Handler Error:", error);
         throw error; // Re-throw so DinaForm handles the UI error state
       }
     },

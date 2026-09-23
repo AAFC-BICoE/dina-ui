@@ -173,12 +173,13 @@ export function SequencingFacilityFormFields({
     <div>
       <FieldSet legend={<></>}>
         <div className="row">
-          <TextField className="col-md-6" name="name" />
+          <TextField className="col-md-6" name="name" requiredField={true} />
           {!readOnly && (
             <GroupSelectField
               className="col-md-6"
               name="group"
               enableStoredDefaultGroup={true}
+              requiredField={true}
             />
           )}
         </div>

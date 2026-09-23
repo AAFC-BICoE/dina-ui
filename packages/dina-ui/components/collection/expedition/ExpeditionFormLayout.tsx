@@ -18,12 +18,14 @@ export function ExpeditionFormLayout() {
           className="col-md-6 name"
           name="name"
           label={formatMessage("field_expeditionName")}
+          requiredField={true}
         />
         {!readOnly && (
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
             className="col-md-6"
+            requiredField={true}
           />
         )}
       </div>

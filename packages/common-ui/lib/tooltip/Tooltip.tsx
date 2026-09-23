@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import RcTooltip from "rc-tooltip";
 import { ReactNode } from "react";
 import { FaInfoCircle } from "react-icons/fa";
@@ -45,6 +46,9 @@ export interface TooltipProps {
   visible?: boolean;
   className?: string;
   directComponent?: React.JSX.Element | React.JSX.Element[];
+
+  /** Additional class name applied to the default "i" icon, e.g. to dim it when the field is empty. */
+  iconClassName?: string;
 }
 
 export type tooltipPlacements = "top" | "bottom" | "left" | "right";
@@ -61,7 +65,8 @@ export function Tooltip({
   altImage,
   disableSpanMargin,
   placement = "top",
-  className
+  className,
+  iconClassName
 }: TooltipProps) {
   // Setup the internationalization functions.
   const { messages, formatMessage } = useIntl();
@@ -132,7 +137,7 @@ export function Tooltip({
             </span>
           ) : (
             <FaInfoCircle
-              className="tooltip-info-icon"
+              className={classNames("tooltip-info-icon", iconClassName)}
               aria-describedby={id}
               aria-description={id ? formatMessage({ id }) : directText}
               tabIndex={0}

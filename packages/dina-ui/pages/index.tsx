@@ -233,9 +233,6 @@ export function Home() {
                 <Link href="/collection/extension/list">
                   <DinaMessage id="fieldExtensions" />
                 </Link>
-                <Link href="/identifier/list">
-                  <DinaMessage id="identifiers" />
-                </Link>
                 <Link href="/collection/institution/list">
                   <DinaMessage id="institutionListTitle" />
                 </Link>

@@ -148,6 +148,7 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   refreshButtonText: "Aktualisieren",
   remarks: "Anmerkungen",
   remove: "Entfernen",
+  requiredField: "Erforderliches Feld",
   resetButtonText: "Zurücksetzen",
   resetFilters: "Filter zurücksetzen",
   resetSort: "Sortierung zurücksetzen",

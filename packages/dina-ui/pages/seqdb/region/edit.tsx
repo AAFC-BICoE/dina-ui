@@ -97,17 +97,18 @@ export function RegionFormFields() {
   return (
     <div>
       <div className="row">
-        <TextField className="col-md-6" name="name" />
+        <TextField className="col-md-6" name="name" requiredField={true} />
         {!readOnly && (
           <GroupSelectField
             className="col-md-6"
             name="group"
             enableStoredDefaultGroup={true}
+            requiredField={true}
           />
         )}
       </div>
       <div className="row">
-        <TextField className="col-md-6" name="symbol" />
+        <TextField className="col-md-6" name="symbol" requiredField={true} />
         <TextField className="col-md-6" name="description" />
       </div>
     </div>

@@ -7,6 +7,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { IdentifierRow } from "../identifier/IdentifierRow";
+import { AGENT_IDENTIFIERS_ID } from "../controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface PersonFormFieldsProps {
   divClassName?: string;
@@ -66,7 +67,11 @@ export function PersonFormFields({
                       <TabPanel key={index}>
                         <IdentifierRow
                           index={index}
-                          vocabularyOptionsEndpoint="agent-api/vocabulary/identifiers"
+                          controlledVocabulary={{
+                            apiPath: "agent-api",
+                            uuid: AGENT_IDENTIFIERS_ID,
+                            dinaComponent: "PERSON"
+                          }}
                         />
                         {!readOnly && (
                           <div className="list-inline mb-3">

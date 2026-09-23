@@ -3,9 +3,12 @@ import { FormikProps } from "formik";
 import _ from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { FieldSpyRenderProps } from "..";
+import { FaAsterisk } from "react-icons/fa";
+import { useIntl } from "react-intl";
+import { FieldSpyRenderProps, isBlankResourceAttribute } from "..";
 import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
 import { FieldHeader } from "../field-header/FieldHeader";
+import { Tooltip } from "../tooltip/Tooltip";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { FieldSpy } from "./FieldSpy";
@@ -71,6 +74,14 @@ export interface FieldWrapperProps {
   disableTemplateCheckbox?: boolean;
 
   validate?: (value: any) => string | void;
+
+  /**
+   * Marks this field as required. Shows a "*" indicator next to the field's label
+   * (with a tooltip), and adds a validation rule that blocks form submission with
+   * an error message when the field's value is empty.
+   */
+  requiredField?: boolean;
+
   children?:
     | React.JSX.Element
     | ((renderProps: FieldWrapperRenderProps) => React.JSX.Element);
@@ -106,8 +117,25 @@ export interface FieldWrapperRenderProps {
  * e.g. select the "description" text input using wrapper.find(".description-field input").
  */
 export function FieldWrapper(props: FieldWrapperProps) {
-  const { name, templateCheckboxFieldName, validate, disableTemplateCheckbox } =
-    props;
+  const {
+    name,
+    templateCheckboxFieldName,
+    validate,
+    requiredField,
+    disableTemplateCheckbox
+  } = props;
+
+  const { formatMessage } = useIntl();
+
+  const composedValidate = useMemo(() => {
+    if (!requiredField) {
+      return validate;
+    }
+    return (value: any) =>
+      isBlankResourceAttribute(value)
+        ? formatMessage({ id: "requiredField" })
+        : validate?.(value);
+  }, [requiredField, validate, formatMessage]);
 
   const { formTemplate, componentName, sectionName } = useDinaFormContext();
 
@@ -155,7 +183,7 @@ export function FieldWrapper(props: FieldWrapperProps) {
   }
 
   return (
-    <FieldSpy fieldName={name} validate={validate}>
+    <FieldSpy fieldName={name} validate={composedValidate}>
       {(_value, fieldSpyProps) => (
         <LabelWrapper fieldWrapperProps={props} fieldSpyProps={fieldSpyProps}>
           <FormikConnectedField
@@ -184,6 +212,7 @@ function LabelWrapper({
     name,
     removeBottomMargin,
     removeLabel,
+    requiredField,
     tooltipImage,
     templateCheckboxFieldName,
     tooltipOverride,
@@ -199,13 +228,19 @@ function LabelWrapper({
   },
   children
 }: PropsWithChildren<FieldWrapperInternalProps>) {
-  const { horizontal, isTemplate, componentName, sectionName } =
+  const { horizontal, isTemplate, componentName, sectionName, readOnly } =
     useDinaFormContext();
 
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
     currentValue: value
   });
+
+  const isEmptyValue =
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    (Array.isArray(value) && value.length === 0);
 
   const fieldLabel = label ?? (
     <FieldHeader
@@ -218,8 +253,23 @@ function LabelWrapper({
       tooltipLinkText={tooltipLinkText}
       startCaseLabel={startCaseLabel}
       combineFieldHeaderWithTooltip={false}
+      isEmptyValue={readOnly && isEmptyValue}
     />
   );
+
+  const requiredIndicator =
+    requiredField && !readOnly ? (
+      <Tooltip
+        id="requiredField"
+        visibleElement={
+          <FaAsterisk
+            className="required-field-asterisk text-danger ms-1"
+            size="0.6em"
+          />
+        }
+        disableSpanMargin={true}
+      />
+    ) : null;
 
   const [labelClass, valueClass] =
     horizontal === true
@@ -277,12 +327,16 @@ function LabelWrapper({
                 className={classNames(
                   "field-label",
                   labelClass,
-                  !horizontal && "mb-2"
+                  !horizontal && "mb-2",
+                  readOnly && isEmptyValue && "field-label-empty"
                 )}
               >
                 {!hideLabel && (
                   <div className="d-flex align-items-center w-100">
-                    <strong className="me-2">{fieldLabel}</strong>
+                    <strong className="me-2 d-flex align-items-center">
+                      {fieldLabel}
+                      {requiredIndicator}
+                    </strong>
                     <BulkEditBadge bulkTab={bulkTab} />
                   </div>
                 )}
@@ -312,13 +366,17 @@ function LabelWrapper({
               className={classNames(
                 "field-label",
                 labelClass,
-                !horizontal && "mb-2"
+                !horizontal && "mb-2",
+                readOnly && isEmptyValue && "field-label-empty"
               )}
               style={labelStyle}
             >
               {!hideLabel && (
                 <div className="d-flex align-items-center w-100">
-                  <strong className="me-2">{fieldLabel}</strong>
+                  <strong className="me-2 d-flex align-items-center">
+                    {fieldLabel}
+                    {requiredIndicator}
+                  </strong>
                   <BulkEditBadge bulkTab={bulkTab} />
                 </div>
               )}

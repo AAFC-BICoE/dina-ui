@@ -764,7 +764,9 @@ export function useMaterialSampleSave({
   };
 
   const msInitialValues: InputResource<MaterialSample> =
-    withOrganismEditorValues(materialSample ?? defaultValues);
+    withOrganismEditorValues(
+      !_.isEmpty(materialSample) ? materialSample : defaultValues
+    );
   if (msInitialValues.identifiers) {
     (msInitialValues as any).identifiers = Object.entries(
       msInitialValues.identifiers

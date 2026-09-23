@@ -30,6 +30,7 @@ exports[`QueryBuilderDateSearch QueryBuilderDateSearch Component Display field i
           class="react-datepicker__input-container"
         >
           <input
+            autocomplete="off"
             class="form-control w-100"
             placeholder="YYYY-MM-DD"
             type="text"
