@@ -470,6 +470,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_title: "Titre",
   "field_title.en": "Titre en anglais",
   "field_title.fr": "Titre en français",
+  "field_title.de": "Titre en allemand",
   field_transcriberRemarks: "Notes du transcripteur",
   field_type: "Catégorie",
   field_typeStatus: "Type de statut",
@@ -966,7 +967,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   userListTitle: "Utilisateurs",
   userMissingAgent: "Non lié",
   userMustBelongToGroup: "L’utilisateur doit appartenir à un groupe",
-  userSearchPlaceholder: "Rechercher par nom d’utilisateur, nom, courriel ou agent",
+  userSearchPlaceholder:
+    "Rechercher par nom d’utilisateur, nom, courriel ou agent",
   userViewTitle: "Utilisateur",
   valueCad: "Valeur ($ CA)",
   verbatimDeterminationLegend: "Détermination verbatim",

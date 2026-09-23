@@ -78,6 +78,9 @@ export function Home() {
                 <Link href="/collection/collection/list">
                   <DinaMessage id="collectionListTitle" />
                 </Link>
+                <Link href="/collection/dataset/list">
+                  <DinaMessage id="datasetListTitle" />
+                </Link>
                 <Link href="/collection/material-sample/list">
                   <DinaMessage id="materialSampleListTitle" />
                 </Link>

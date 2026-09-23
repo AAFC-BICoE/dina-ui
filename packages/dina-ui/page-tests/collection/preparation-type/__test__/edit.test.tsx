@@ -1,8 +1,7 @@
-import { makeAxiosErrorMoreReadable } from "common-ui";
 import PreparationTypeEditPage, {
   PreparationTypeForm
 } from "../../../../pages/collection/preparation-type/edit";
-import { mountWithAppContext } from "common-ui";
+import { makeAxiosErrorMoreReadable, mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
@@ -218,7 +217,29 @@ describe("preparation-type edit page", () => {
   });
 
   it("Renders an error after form submit without specifying mandatory field.", async () => {
-    // The patch request will return an error.
+    mockQuery = {};
+
+    const wrapper = mountWithAppContext(<PreparationTypeEditPage />, {
+      apiContext
+    });
+
+    // Submit form without name field value, which is required.
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    // The requiredField validation should block the submission client-side,
+    // before any network request is made.
+    await waitFor(() => {
+      expect(
+        wrapper.container.querySelector(".name-field .invalid-feedback")
+      ).toHaveTextContent("Required field");
+    });
+
+    expect(mockPost).toBeCalledTimes(0);
+    expect(mockPush).toBeCalledTimes(0);
+  });
+
+  it("Renders a server-side error, e.g. a constraint violation, after form submit.", async () => {
+    // The POST request will return a constraint violation error from the back-end.
     const MOCK_POST_ERROR = (() => {
       const error = new Error() as any;
       error.isAxiosError = true;
@@ -231,13 +252,12 @@ describe("preparation-type edit page", () => {
               status: "422 UNPROCESSABLE_ENTITY",
               code: "422",
               title: "Constraint violation",
-              detail: "name must not be blank",
+              detail: "name size must be between 1 and 50",
               source: { pointer: "name" }
             }
           ]
         }
       };
-
       return error;
     })();
 
@@ -251,12 +271,19 @@ describe("preparation-type edit page", () => {
       apiContext
     });
 
-    // Submit form without name field value
+    // Fill in the required Name field so the requiredField validation passes
+    // and the submission actually reaches the (mocked) back-end.
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "a name that is too long"
+    );
+
+    // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     const { title, detail } = MOCK_POST_ERROR.response.data.errors[0];
 
-    // Test expected error
+    // The server-side error should be displayed to the user.
     await waitFor(() => {
       expect(
         wrapper.getByText((_, element) => {
@@ -268,8 +295,8 @@ describe("preparation-type edit page", () => {
           );
         })
       ).toBeInTheDocument();
-
-      expect(mockPush).toBeCalledTimes(0);
     });
+
+    expect(mockPush).toBeCalledTimes(0);
   });
 });

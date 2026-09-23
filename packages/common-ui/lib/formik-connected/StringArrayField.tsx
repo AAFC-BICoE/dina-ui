@@ -1,3 +1,4 @@
+import { useField } from "formik";
 import _ from "lodash";
 import { useEffect } from "react";
 import { InputHTMLAttributes, useState } from "react";
@@ -12,6 +13,8 @@ export function StringArrayField(
   props: Omit<TextFieldProps, "customInput" | "multiLines">
 ) {
   const { horizontal, readOnly } = useDinaFormContext();
+  const [{ value }] = useField<string[] | undefined>(props.name);
+  const isEmptyValue = readOnly && (!value || value.length === 0);
 
   return (
     <TextField
@@ -22,7 +25,12 @@ export function StringArrayField(
           {props.label ? (
             props.label
           ) : (
-            <FieldHeader name={props.name} customName={props.customName} />
+            <FieldHeader
+              name={props.name}
+              customName={props.customName}
+              combineFieldHeaderWithTooltip={false}
+              isEmptyValue={isEmptyValue}
+            />
           )}
           <div className={horizontal ? "" : "ms-2"}>
             {!readOnly && (
@@ -66,7 +74,9 @@ function StringArrayFieldInternal(
     <TextareaAutosize
       minRows={4}
       {...inputProps}
-      onChange={(event) => onChange((event.target as HTMLTextAreaElement | HTMLInputElement).value)}
+      onChange={(event) =>
+        onChange((event.target as HTMLTextAreaElement | HTMLInputElement).value)
+      }
       value={textValue}
     />
   );

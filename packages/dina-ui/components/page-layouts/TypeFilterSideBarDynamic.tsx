@@ -58,7 +58,7 @@ export function TypeFilterSideBarDynamic({
       const newChildren: Record<string, SidebarOption[]> = {};
 
       for (const parent of parents) {
-        if (parent.hasChildren && !loadedChildren[parent.id]) {
+        if (parent.hasChildren && !allChildren[parent.id]) {
           newOpen[parent.id] = true;
           try {
             const loaded = await loadChildren(parent.id);
@@ -75,7 +75,7 @@ export function TypeFilterSideBarDynamic({
     };
 
     expandAll();
-  }, [parents, loadChildren, hasAutoExpanded, loadedChildren]);
+  }, [parents, loadChildren, hasAutoExpanded, allChildren]);
 
   const selectedParentSet = useMemo(
     () => new Set(selected.parent_cv_ids ?? []),

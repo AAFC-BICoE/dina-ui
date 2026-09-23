@@ -15,6 +15,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 
 import {
+  FaDatabase,
   FaLayerGroup,
   FaLocationDot,
   FaBoxArchive,
@@ -76,6 +77,13 @@ const COLLECTION_DEFAULTS: NavigationCard[] = [
     title: "collectionListTitle",
     icon: FaBoxArchive,
     href: "/collection/collection/list",
+    category: "collection"
+  },
+  {
+    id: "datasets",
+    title: "datasetListTitle",
+    icon: FaDatabase,
+    href: "/collection/dataset/list",
     category: "collection"
   },
   {

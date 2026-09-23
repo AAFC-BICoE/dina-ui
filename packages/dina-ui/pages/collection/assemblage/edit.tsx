@@ -198,12 +198,14 @@ export function AssemblageFormLayout() {
           className="col-md-6 name"
           name="name"
           label={formatMessage("field_assemblageName")}
+          requiredField={true}
         />
         {!readOnly && (
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
             className="col-md-6"
+            requiredField={true}
           />
         )}
       </div>

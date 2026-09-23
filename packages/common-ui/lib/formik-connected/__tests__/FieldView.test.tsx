@@ -55,6 +55,20 @@ describe("FieldView component", () => {
     expect(linkElement?.getAttribute("href")).toEqual("/linked-page"); // Check the href attribute
   });
 
+  it("Renders a muted dash placeholder when the value is empty.", () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{ testObject: { name: "" } }}>
+        <FieldView name="testObject.name" />
+      </DinaForm>
+    );
+
+    const fieldValueElement = wrapper.container.querySelector(".field-view");
+    expect(fieldValueElement?.textContent).toEqual("—");
+    expect(
+      fieldValueElement?.querySelector(".field-value-empty")
+    ).not.toBeNull();
+  });
+
   it("Renders field value as comma seperated string when it is string array object", () => {
     const wrapper = mountWithAppContext(
       <DinaForm
