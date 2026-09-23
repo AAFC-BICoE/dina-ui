@@ -37,7 +37,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
         ]
       };
     case "user-api/group":
-      return { data: [] };
+      return { data: [{ name: "aafc", labels: { en: "AAFC" } }] };
   }
 });
 
@@ -107,6 +107,7 @@ describe("Storage Unit edit page.", () => {
               resource: {
                 name: "test-storage-unit",
                 isGeneric: false,
+                group: "aafc",
                 parentStorageUnit: expect.objectContaining({
                   id: "A",
                   type: "storage-unit"

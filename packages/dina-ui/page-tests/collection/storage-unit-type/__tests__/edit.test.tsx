@@ -6,7 +6,7 @@ import "@testing-library/jest-dom";
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "user-api/group":
-      return { data: [] };
+      return { data: [{ name: "aafc", labels: { en: "AAFC" } }] };
   }
 });
 
@@ -57,6 +57,7 @@ describe("Storage Unit Type form.", () => {
           {
             resource: {
               name: "test-storage-type",
+              group: "aafc",
               type: "storage-unit-type"
             },
             type: "storage-unit-type"
@@ -67,6 +68,7 @@ describe("Storage Unit Type form.", () => {
       expect(mockOnSaved).lastCalledWith({
         id: "123",
         name: "test-storage-type",
+        group: "aafc",
         type: "storage-unit-type"
       });
     });

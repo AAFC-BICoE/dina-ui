@@ -31,9 +31,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   const { formatMessage } = useDinaIntl();
   const id = person?.id;
   const personFormValidationSchema = yup.object({
-    displayName: yup
-      .string()
-      .required(formatMessage("field_personMandatoryFieldsError")),
     identifiers: yup
       .array()
       .of(
@@ -112,7 +109,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     >
       {buttonBar}
       <div style={{ width: "30rem" }}>
-        <TextField name="displayName" />
+        <TextField name="displayName" requiredField={true} />
       </div>
       <div style={{ width: "30rem" }}>
         <TextField name="givenNames" />

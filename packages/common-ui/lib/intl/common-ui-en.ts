@@ -149,6 +149,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   queryTableMultiSortTooltipTitle: "Multi-column sorting",
   remarks: "Remarks",
   remove: "Remove",
+  requiredField: "Required field",
   resetButtonText: "Reset",
   resetFilters: "Reset Filters",
   resetSort: "Reset Sort",
