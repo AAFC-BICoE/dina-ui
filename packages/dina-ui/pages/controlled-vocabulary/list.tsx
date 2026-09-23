@@ -6,7 +6,8 @@ import {
   ListPageLayout,
   useApiClient,
   LoadingSpinner,
-  SimpleSearchFilterBuilder
+  SimpleSearchFilterBuilder,
+  simpleSearchFilterToFiql
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -113,15 +114,18 @@ const MODULE_TABS: ModuleTabConfig[] = CV_MODULES.map(({ titleKey }) => ({
 }));
 
 const SHARED_CV_PARAMS = {
-  fiql: "type==MANAGED_ATTRIBUTE,type==SYSTEM",
+  fiql: simpleSearchFilterToFiql(
+    SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+      .whereIn("type", ["MANAGED_ATTRIBUTE", "SYSTEM"])
+      .build()
+  ),
   fields: { "controlled-vocabulary": "id,name,key,type,vocabClass" },
   sort: "name"
 };
 
 /**
- * Groups raw controlled-vocabulary-items by their dinaComponent value into the
- * SidebarOption shape used by the sidebar (one option per component type, with
- * the number of items using that component).
+ * Groups controlled-vocabulary-items by dinaComponent into SidebarOptions
+ * representing component types and their item counts.
  */
 function groupChildItems(items: ControlledVocabularyItem[]): SidebarOption[] {
   const counts = new Map<string, number>();
@@ -146,8 +150,8 @@ export default function ControlledVocabularyListPage() {
     router.query.tab === "1" ? 1 : router.query.tab === "2" ? 2 : 0
   );
 
-  // Sidebar data for each configured module. Hooks are called unconditionally
-  // and in a fixed order; add a new entry when a new module is introduced.
+  // Sidebar data for each module. Hooks are called unconditionally in a fixed order.
+  // Add a new entry for new modules.
   const collectionSidebarData = useControlledVocabularySidebarData({
     apiBaseUrl: CV_MODULES[0].apiBaseUrl,
     limit: 1000,
@@ -185,7 +189,7 @@ export default function ControlledVocabularyListPage() {
     children: []
   });
 
-  // 3. Load Children Helper — uses the active tab's API.
+  // 3. Load Children Helper using the active tab API.
   const loadChildItems = useCallback(
     async (parentUuid: string): Promise<ControlledVocabularyItem[]> => {
       const resp: any = await apiClient.get(
@@ -211,8 +215,7 @@ export default function ControlledVocabularyListPage() {
   );
 
   // Fetch all child items for the active module in a single bulk request.
-  // The per-parent loadChildItems/loadChildren above is kept only as a
-  // fallback for parents whose children were not part of the bulk result.
+  // The per-parent loadChildItems is kept as a fallback for missing children.
   const loadAllChildItems = useCallback(async (): Promise<
     ControlledVocabularyItem[]
   > => {
@@ -241,10 +244,8 @@ export default function ControlledVocabularyListPage() {
     Record<string, SidebarOption[]>
   >({});
 
-  // Load counts and sidebar children whenever the active dataset changes
-  // (tab switch / new data). All child items for the active module are fetched
-  // in a single bulk request and grouped by parent client-side, avoiding one
-  // request per controlled-vocabulary.
+  // Load counts and sidebar children on dataset changes. Child items are fetched
+  // in a single bulk request and grouped client-side to reduce requests.
   useEffect(() => {
     if (!cvItems || cvItems.length === 0) return;
 
@@ -274,10 +275,8 @@ export default function ControlledVocabularyListPage() {
 
         for (const [parentId, items] of itemsByParent) {
           const componentChildren = groupChildItems(items);
-          // Only treat a vocabulary as having children when it has at least
-          // one component child. Vocabularies whose items have no
-          // dinaComponent (e.g. association type) should not show an
-          // expand/contract arrow.
+          // Treat vocabularies as having children only if they have component children.
+          // Vocabularies without a dinaComponent should not show an expand arrow.
           if (componentChildren.length > 0) {
             withChildren.add(parentId);
           }
@@ -368,7 +367,7 @@ export default function ControlledVocabularyListPage() {
     [parentsWithChildren, selectedChildren]
   );
 
-  // 9. Query table props — API path depends on the active tab.
+  // 9. Query table props with API path depending on active tab.
   const buildQueryTableProps = useCallback(() => {
     const filter: Record<string, any> = {};
     const itemsPath = `${activeModule.apiBaseUrl}/controlled-vocabulary-item`;
