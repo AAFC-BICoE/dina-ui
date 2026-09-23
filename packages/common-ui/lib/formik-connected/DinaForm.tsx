@@ -16,7 +16,8 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo
+  useMemo,
+  useRef
 } from "react";
 import {
   formatJsonApiErrorMessage,
@@ -95,6 +96,17 @@ export interface DinaFormSubmitParams<TValues> {
   formik: FormikContextType<TValues>;
   api: ApiClientI;
   account: AccountContextI;
+}
+
+/** A DinaForm's Formik bag, plus the helpers DinaForm adds onto it. */
+export interface DinaFormikBag<TValues = any>
+  extends FormikContextType<TValues> {
+  /**
+   * Records that these values are now saved, so the unsaved-data warning stops
+   * counting this form. Needed by forms that are submitted programmatically
+   * through a ref instead of their own <form> submit event.
+   */
+  markFormSaved?: (savedValues: TValues) => void;
 }
 
 function parseJsonApiErrors(error: any): Record<string, string> {
@@ -235,7 +247,10 @@ interface FormWrapperProps {
 
 // Singleton unsaved-data warning
 
-let dirtyFormCount = 0;
+/** IDs of the forms that currently have unsaved data. A Set (rather than a
+ *  plain counter) lets one specific form be cleared precisely -- see
+ *  `markFormSaved` below. */
+const dirtyFormIds = new Set<symbol>();
 let listenersRegistered = false;
 let suppressNextNav = false;
 
@@ -248,9 +263,68 @@ export function suppressUnsavedWarning() {
 
 /** @internal Exported for tests. Resets the singleton warning state */
 export function __resetUnsavedWarningState() {
-  dirtyFormCount = 0;
+  dirtyFormIds.clear();
   listenersRegistered = false;
   suppressNextNav = false;
+}
+
+function addDirtyForm(
+  id: symbol,
+  router: any,
+  formatMessage: (descriptor: { id: string }) => string
+) {
+  dirtyFormIds.add(id);
+  warningMessage = formatMessage({ id: "possibleDataLossWarning" });
+  routerRef = router;
+  registerListeners(router);
+}
+
+function removeDirtyForm(id: symbol) {
+  dirtyFormIds.delete(id);
+  if (dirtyFormIds.size === 0) {
+    unregisterListeners(routerRef);
+  }
+}
+
+/** Strips out values that represent "nothing entered": blank strings, nulls,
+ *  and objects/arrays that are empty once their own blanks are removed. Some
+ *  sections seed a blank row into form state purely so there's an empty input
+ *  to type into, which would otherwise make an untouched form look like it has
+ *  unsaved data.
+ *
+ *  `ancestors` guards against the cycles that linked resources can form (e.g.
+ *  a parent pointing back at its children). */
+function withoutBlankValues(value: any, ancestors = new WeakSet<any>()): any {
+  if (value === "" || value === null) {
+    return undefined;
+  }
+  if (typeof value !== "object" || ancestors.has(value)) {
+    return value;
+  }
+
+  const isArray = Array.isArray(value);
+  if (!isArray && !_.isPlainObject(value)) {
+    return value;
+  }
+
+  ancestors.add(value);
+
+  let stripped: any;
+  if (isArray) {
+    const items = value
+      .map((item) => withoutBlankValues(item, ancestors))
+      .filter((item) => item !== undefined);
+    stripped = items.length ? items : undefined;
+  } else {
+    const object = _.omitBy(
+      _.mapValues(value, (item) => withoutBlankValues(item, ancestors)),
+      _.isUndefined
+    );
+    stripped = _.isEmpty(object) ? undefined : object;
+  }
+
+  ancestors.delete(value);
+  return stripped;
 }
 
 const sharedBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -284,7 +358,7 @@ function sharedRouteChange() {
     suppressNextNav = false;
     return;
   }
-  if (dirtyFormCount > 0 && !window.confirm(warningMessage)) {
+  if (dirtyFormIds.size > 0 && !window.confirm(warningMessage)) {
     routerRef?.events?.emit("routeChangeError");
     throw "routeChange aborted.";
   }
@@ -306,27 +380,52 @@ function PromptIfDirty({
 }) {
   const { formatMessage } = useIntl();
   const router = useRouter();
-  const isDirty =
-    !readOnly && formik.dirty && formik.values.type && formik.submitCount === 0;
 
-  useEffect(() => {
-    if (isDirty) {
-      dirtyFormCount++;
-      warningMessage = formatMessage({ id: "possibleDataLossWarning" });
-      routerRef = router;
-      registerListeners(router);
-    }
+  const idRef = useRef<symbol | null>(null);
+  if (!idRef.current) {
+    idRef.current = Symbol("dina-form");
+  }
 
-    return () => {
-      if (isDirty) {
-        dirtyFormCount--;
-        if (dirtyFormCount <= 0) {
-          dirtyFormCount = 0;
-          unregisterListeners(router);
-        }
-      }
+  // A read-only or already-submitted form can't have unsaved data, so skip the
+  // comparison work entirely for it.
+  const skipTracking =
+    !!readOnly || !formik.values.type || formik.submitCount !== 0;
+
+  // The last saved state to compare the current values against, with blank
+  // values already stripped. Starts at the form's initial values, and moves
+  // forward whenever markFormSaved() is called.
+  const savedValuesRef = useRef<{ value: any } | null>(null);
+  if (!skipTracking && !savedValuesRef.current) {
+    savedValuesRef.current = {
+      value: withoutBlankValues(formik.initialValues)
     };
-  }, [isDirty]);
+  }
+
+  const currentValues = useMemo(
+    () => (skipTracking ? undefined : withoutBlankValues(formik.values)),
+    [formik.values, skipTracking]
+  );
+
+  const isDirty =
+    !skipTracking && !_.isEqual(currentValues, savedValuesRef.current?.value);
+
+  // markFormSaved takes effect immediately rather than on the next render,
+  // since a save is usually followed by a redirect and Next.js fires
+  // routeChangeStart synchronously inside router.push.
+  useEffect(() => {
+    formik.markFormSaved = (savedValues: any) => {
+      savedValuesRef.current = { value: withoutBlankValues(savedValues) };
+      removeDirtyForm(idRef.current!);
+    };
+
+    if (isDirty) {
+      addDirtyForm(idRef.current!, router, formatMessage);
+    } else {
+      removeDirtyForm(idRef.current!);
+    }
+  });
+
+  useEffect(() => () => removeDirtyForm(idRef.current!), []);
 
   return null;
 }
