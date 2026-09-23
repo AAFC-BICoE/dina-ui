@@ -1,6 +1,7 @@
 import { FilterParam } from "kitsu";
 import { FilterGroupModel } from "../FilterGroup";
 import { fiql, fiqlArgument, simpleSearchFilterToFiql } from "../fiql";
+import { SimpleSearchFilterBuilder } from "../../util/simpleSearchFilterBuilder";
 
 describe("fiql conversion", () => {
   it("Converts from a filter model to fiql.", () => {
@@ -643,8 +644,116 @@ describe("fiql conversion", () => {
       };
 
       const fiqlFilter = simpleSearchFilterToFiql(filterParam);
+      // FIQL has no "in" operator so IN becomes an OR of equalities.
       expect(fiqlFilter).toEqual(
-        "name==*test*;description==null;age=gt=18;age=lt=65;status=in=active,pending"
+        "name==*test*;description==null;age=gt=18;age=lt=65;(status==active,status==pending)"
+      );
+    });
+
+    it("Converts legacy operator-less values to equalities.", () => {
+      expect(
+        simpleSearchFilterToFiql({
+          name: "todo 2",
+          blank: "",
+          group: { EQ: "aafc" }
+        })
+      ).toEqual('name=="todo 2";group==aafc');
+    });
+
+    it("Converts a plain null to a blank-field search, like { EQ: null } does.", () => {
+      expect(simpleSearchFilterToFiql({ a: null, b: { EQ: null } })).toEqual(
+        "a==null;b==null"
+      );
+    });
+
+    it("Never renders an empty group, which the back-end's parser rejects.", () => {
+      // Members with no conditions widen the group to match anything.
+      expect(
+        simpleSearchFilterToFiql({ $or: [{ a: {} }, { b: { EQ: 1 } }] })
+      ).toEqual("b==1");
+      expect(simpleSearchFilterToFiql({ $or: [{ a: {} }, { b: {} }] })).toEqual(
+        ""
+      );
+    });
+
+    it('Emits no term for an empty IN list, rather than the invalid "field==".', () => {
+      expect(simpleSearchFilterToFiql({ group: { IN: "" } })).toEqual("");
+      expect(simpleSearchFilterToFiql({ group: { IN: [] } })).toEqual("");
+      expect(
+        simpleSearchFilterToFiql({ group: { IN: [] }, name: { EQ: "x" } })
+      ).toEqual("name==x");
+    });
+
+    it("Converts an IN given as an array without splitting its values.", () => {
+      // A lone IN at the root needs no parentheses but next to a sibling it does.
+      expect(
+        simpleSearchFilterToFiql({ group: { IN: ["aafc", "cnc"] } })
+      ).toEqual("group==aafc,group==cnc");
+      expect(
+        simpleSearchFilterToFiql({
+          group: { IN: ["aafc", "cnc"] },
+          name: { EQ: "x" }
+        })
+      ).toEqual("(group==aafc,group==cnc);name==x");
+      // Values containing commas survive as single values.
+      expect(
+        simpleSearchFilterToFiql({ city: { IN: ["New York, NY", "Ottawa"] } })
+      ).toEqual('city=="New York, NY",city==Ottawa');
+    });
+
+    it("Converts every operator.", () => {
+      expect(
+        simpleSearchFilterToFiql({
+          a: { EQ: "x", NEQ: "y", GT: 1, GOE: 2, LT: 3, LOE: 4 },
+          b: { LIKE: "x%", ILIKE: "%y%", NOT_ILIKE: "%z%", IN: "1" }
+        })
+      ).toEqual(
+        "a==x;a!=y;a=gt=1;a=ge=2;a=lt=3;a=le=4;b==x*;b==*y*;b!=*z*;b==1"
+      );
+    });
+
+    it("Converts OR and AND groups, only adding parentheses where needed.", () => {
+      expect(
+        simpleSearchFilterToFiql(
+          SimpleSearchFilterBuilder.create()
+            .where("group", "EQ", "aafc")
+            .or((b) =>
+              b
+                .where("createdBy", "EQ", "me")
+                .where("restrictToCreatedBy", "EQ", false)
+            )
+            .build()
+        )
+      ).toEqual("group==aafc;(createdBy==me,restrictToCreatedBy==false)");
+
+      // Lone OR groups at the root need no parentheses.
+      expect(
+        simpleSearchFilterToFiql({ $or: [{ a: { EQ: 1 } }, { b: { EQ: 2 } }] })
+      ).toEqual("a==1,b==2");
+
+      // Nested groups and $and members are added directly to the parent AND.
+      expect(
+        simpleSearchFilterToFiql({
+          $or: [{ a: { EQ: 1 } }, { b: { EQ: 2 }, c: { EQ: 3 } }],
+          $and: [
+            { d: { NEQ: "x" } },
+            { $or: [{ e: { EQ: 5 } }, { f: { IN: "6,7" } }] }
+          ]
+        })
+      ).toEqual("(a==1,(b==2;c==3));d!=x;(e==5,(f==6,f==7))");
+    });
+
+    it("Quotes values that can't appear unquoted in fiql.", () => {
+      expect(
+        simpleSearchFilterToFiql(
+          SimpleSearchFilterBuilder.create()
+            .searchFilter("name", "John Smith")
+            .where("email", "EQ", "john@example.com")
+            .whereIn("group", ["a b", "c"])
+            .build()
+        )
+      ).toEqual(
+        'name=="*John Smith*";email=="john@example.com";(group=="a b",group==c)'
       );
     });
 
