@@ -127,12 +127,9 @@ input[id^="react-select"] {
 
 fieldset.card.border {
   position: relative;
-  border-radius: 0.75rem !important;
+  border-radius: 0.5rem !important;
+  margin-top: 30px !important;
   padding-top: 1.75rem !important;
-}
-
-:has(> fieldset.card.border) {
-  padding-top: 30px;
 }
 
 fieldset.card.border > .legend-wrapper {
@@ -142,7 +139,11 @@ fieldset.card.border > .legend-wrapper {
   transform: translateY(calc(-50% + 3px));
   margin: 0;
   padding: 0 0.5rem;
-  background-color: var(--bs-body-bg, #fff);
+  background: linear-gradient(
+    to bottom,
+    var(--bs-body-bg, #fff) calc(50% - 3px),
+    var(--bs-body-bg, #fff) calc(50% - 3px)
+  );
   z-index: 1;
 }
 
@@ -156,6 +157,10 @@ fieldset.card.border > .legend-wrapper:has(> .row) {
   padding: 0;
   margin-bottom: 0.5rem;
   background-color: transparent;
+}
+
+.material-sample-nav .list-group-item:first-child {
+  border-top: 0;
 }
 
 .modal-header {

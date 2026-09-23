@@ -820,7 +820,16 @@ export function useMaterialSampleSave({
       ".data-components fieldset:not(.d-none, .non-strip)"
     );
     dataComponents?.forEach((element, index) => {
-      element.style.backgroundColor = index % 2 === 1 ? "#f3f3f3" : "";
+      const backgroundColor = index % 2 === 1 ? "#f3f3f3" : "";
+      element.style.backgroundColor = backgroundColor;
+
+      const legendWrapper = element.querySelector<HTMLDivElement>(
+        ":scope > .legend-wrapper"
+      );
+      if (legendWrapper) {
+        const cardBackgroundColor = backgroundColor || "#fff";
+        legendWrapper.style.background = `linear-gradient(to bottom, #fff calc(50% - 3px), ${cardBackgroundColor} calc(50% - 3px))`;
+      }
     });
   });
 
