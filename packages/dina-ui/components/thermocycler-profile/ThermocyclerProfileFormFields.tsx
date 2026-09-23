@@ -22,12 +22,14 @@ export function ThermocyclerProfileFormFields({
           className="col-md-2"
           name="name"
           label="Thermocycler Profile Name"
+          requiredField={true}
         />
         {!readOnly && (
           <GroupSelectField
             className="col-md-2"
             name="group"
             enableStoredDefaultGroup={true}
+            requiredField={true}
           />
         )}
       </div>

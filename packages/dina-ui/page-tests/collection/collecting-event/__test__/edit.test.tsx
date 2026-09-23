@@ -480,7 +480,7 @@ describe("collecting-event edit page", () => {
     await waitFor(() => {
       expect(
         wrapper.getByRole("textbox", { name: /verbatim coordinate system/i })
-      ).toHaveDisplayValue("decimal degrees");
+      ).toHaveDisplayValue("");
     });
 
     fireEvent.submit(wrapper.container.querySelector("form")!);

@@ -563,7 +563,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_personIdentifierTypeError: "Identifikatortyp ist erforderlich.",
   field_personIdentifierUniqueError: "Identifikatoren müssen eindeutig sein.",
   field_personIdentifierValueError: "Identifikatorwert ist erforderlich.",
-  field_personMandatoryFieldsError: "Das Anzeigenamen-Feld ist erforderlich.",
   field_preparationDate: "Datum der Aufbereitung",
   field_preparationFixative: "Fixativ der Aufbereitung",
   field_preparationFixative_tooltip:
@@ -629,6 +628,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_title: "Titel",
   "field_title.en": "Englischer Titel",
   "field_title.fr": "Französischer Titel",
+  "field_title.de": "Deutscher Titel",
   field_transactionNumber: "Transaktionsnummer",
   field_transactionType: "Transaktionstyp",
   field_transcriberRemarks: "Notizen des Übertragenden",

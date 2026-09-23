@@ -101,12 +101,13 @@ export function ProductFormFields() {
   return (
     <div>
       <div className="row">
-        <TextField className="col-md-2" name="name" />
+        <TextField className="col-md-2" name="name" requiredField={true} />
         {!readOnly && (
           <GroupSelectField
             className="col-md-2"
             name="group"
             enableStoredDefaultGroup={true}
+            requiredField={true}
           />
         )}
       </div>

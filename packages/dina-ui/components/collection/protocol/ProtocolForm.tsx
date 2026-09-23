@@ -101,12 +101,14 @@ export function ProtocolFormLayout() {
           className="col-md-6 protocolName"
           name="name"
           label={formatMessage("protocolNameLabel")}
+          requiredField={true}
         />
         {!readOnly && (
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
             className="col-md-6"
+            requiredField={true}
           />
         )}
       </div>

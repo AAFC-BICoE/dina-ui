@@ -282,9 +282,10 @@ function LibraryPrepBatchFormFields() {
             name="group"
             enableStoredDefaultGroup={true}
             className="col-md-12"
+            requiredField={true}
           />
         )}
-        <TextField className="col-md-6" name="name" />
+        <TextField className="col-md-6" name="name" requiredField={true} />
         {/* <CheckBoxField
           name="isCompleted"
           className="gap-3 col-md-6"
@@ -368,7 +369,7 @@ function LibraryPrepBatchFormFields() {
       </div>
       {readOnly && (
         <div className="row">
-          <DateField className="col-md-6" name="createdOn" />
+          <DateField className="col-md-6" name="createdOn" showTime={true} />
           <TextField className="col-md-6" name="createdBy" />
         </div>
       )}

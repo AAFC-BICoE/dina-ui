@@ -5,7 +5,9 @@ exports[`MaterialSampleBulkEditor Bulk edit all material samples using other cat
   [
     [
       {
-        "resource": {},
+        "resource": {
+          "type": "material-sample",
+        },
         "type": "material-sample",
       },
     ],

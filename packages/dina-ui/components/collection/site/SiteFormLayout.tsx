@@ -68,6 +68,7 @@ export default function SiteFormLayout({
           className="col-md-6"
           name="name"
           label={formatMessage("name")}
+          requiredField={true}
         />
         <TextField
           className="col-md-6"
@@ -125,6 +126,7 @@ export default function SiteFormLayout({
               className="col-md-6"
               name="createdOn"
               label={formatMessage("field_createdOn")}
+              showTime={true}
             />
             <TextField
               className="col-md-6"

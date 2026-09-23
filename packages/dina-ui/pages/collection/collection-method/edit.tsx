@@ -148,19 +148,21 @@ export function CollectionMethodFormLayout() {
           className="col-md-6 name"
           name="name"
           label={formatMessage("collectionMethodNameLabel")}
+          requiredField={true}
         />
         {!readOnly && (
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
             className="col-md-6"
+            requiredField={true}
           />
         )}
       </div>
       <MultilingualDescription />
       {readOnly && (
         <div className="row">
-          <DateField name="createdOn" />
+          <DateField name="createdOn" showTime={true} />
           <TextField name="createdBy" />
         </div>
       )}
