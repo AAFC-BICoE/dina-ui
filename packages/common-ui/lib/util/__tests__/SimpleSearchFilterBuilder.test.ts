@@ -1,5 +1,10 @@
 import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
-import { SimpleSearchFilterBuilder } from "../simpleSearchFilterBuilder";
+import {
+  SimpleSearchFilterBuilder,
+  isEmptySimpleSearchFilter,
+  mergeSimpleSearchFilters
+} from "../simpleSearchFilterBuilder";
+import { simpleSearchFilterToFiql } from "../../filter-builder/fiql";
 
 describe("SimpleSearchFilterBuilder", () => {
   it("should create a new instance using the static create method", () => {
@@ -263,6 +268,305 @@ describe("SimpleSearchFilterBuilder", () => {
         )
         .build();
       expect(filter).toEqual({ name: { EQ: "FalseCondition" } });
+    });
+  });
+
+  describe(".where() on the same field", () => {
+    it("merges different operators on the same field into one condition", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .where("age", "GOE", 18)
+        .where("age", "LOE", 65)
+        .build();
+      expect(filter).toEqual({ age: { GOE: 18, LOE: 65 } });
+    });
+
+    it("puts a repeated field + operator into an $and group instead of overwriting it", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .where("group", "NEQ", "a")
+        .where("group", "NEQ", "b")
+        .build();
+      expect(filter).toEqual({
+        group: { NEQ: "a" },
+        $and: [{ group: { NEQ: "b" } }]
+      });
+    });
+
+    it("only keeps identical conditions once", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .where("group", "EQ", "aafc")
+        .add({ group: { EQ: "aafc" } })
+        .build();
+      expect(filter).toEqual({ group: { EQ: "aafc" } });
+    });
+  });
+
+  describe(".or()", () => {
+    it("adds each condition of the callback as a member of an $or group", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .or((b) =>
+          b
+            .where("publiclyReleasable", "EQ", true)
+            .whereIn("group", ["aafc", "cnc"])
+        )
+        .build();
+      expect(filter).toEqual({
+        $or: [
+          { publiclyReleasable: { EQ: true } },
+          { group: { IN: "aafc,cnc" } }
+        ]
+      });
+    });
+
+    it("combines the $or group with the other conditions (AND)", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .where("group", "EQ", "aafc")
+        .or((b) =>
+          b
+            .where("createdBy", "EQ", "me")
+            .where("restrictToCreatedBy", "EQ", false)
+        )
+        .searchFilter("name", "test")
+        .build();
+      expect(filter).toEqual({
+        group: { EQ: "aafc" },
+        $or: [
+          { createdBy: { EQ: "me" } },
+          { restrictToCreatedBy: { EQ: false } }
+        ],
+        name: { ILIKE: "%test%" }
+      });
+    });
+
+    it("adds nothing when every condition in the group was skipped", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .or((b) => b.whereProvided("a", "EQ", "").whereIn("b", []))
+        .build();
+      expect(filter).toEqual({});
+    });
+
+    it("adds a single-member group as a plain condition", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .or((b) => b.whereProvided("a", "EQ", "").where("b", "EQ", 1))
+        .build();
+      expect(filter).toEqual({ b: { EQ: 1 } });
+    });
+
+    it("supports .when() and .add() inside the group", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .or((b) =>
+          b
+            .when(true, (b2) => b2.where("a", "EQ", 1))
+            .when(false, (b2) => b2.where("skipped", "EQ", 1))
+            .add({ c: { EQ: 3 }, d: { EQ: 4 } })
+        )
+        .build();
+      // The added object forms a single member: c AND d.
+      expect(filter).toEqual({
+        $or: [{ a: { EQ: 1 } }, { c: { EQ: 3 }, d: { EQ: 4 } }]
+      });
+    });
+
+    it("puts a second $or group into $and", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .or((b) => b.where("a", "EQ", 1).where("b", "EQ", 2))
+        .or((b) => b.where("c", "EQ", 3).where("d", "EQ", 4))
+        .build();
+      expect(filter).toEqual({
+        $or: [{ a: { EQ: 1 } }, { b: { EQ: 2 } }],
+        $and: [{ $or: [{ c: { EQ: 3 } }, { d: { EQ: 4 } }] }]
+      });
+    });
+
+    it("supports nested groups", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .or((b) =>
+          b
+            .where("a", "EQ", 1)
+            .and((b2) =>
+              b2
+                .where("b", "EQ", 2)
+                .or((b3) => b3.where("c", "EQ", 3).where("d", "EQ", 4))
+            )
+        )
+        .build();
+      expect(filter).toEqual({
+        $or: [
+          { a: { EQ: 1 } },
+          { b: { EQ: 2 }, $or: [{ c: { EQ: 3 } }, { d: { EQ: 4 } }] }
+        ]
+      });
+    });
+  });
+
+  describe(".and()", () => {
+    it("merges the callback's conditions into the filter", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .where("a", "EQ", 1)
+        .and((b) => b.where("b", "EQ", 2).where("c", "EQ", 3))
+        .build();
+      expect(filter).toEqual({ a: { EQ: 1 }, b: { EQ: 2 }, c: { EQ: 3 } });
+    });
+  });
+
+  describe("mergeSimpleSearchFilters()", () => {
+    it("does not mutate its inputs", () => {
+      const target = {
+        a: { EQ: 1 },
+        $or: [{ b: { EQ: 2 } }, { c: { EQ: 3 } }]
+      };
+      const source = {
+        a: { EQ: 9 },
+        $or: [{ d: { EQ: 4 } }, { e: { EQ: 5 } }]
+      };
+      const merged = mergeSimpleSearchFilters(target, source);
+      expect(merged).toEqual({
+        a: { EQ: 1 },
+        $or: [{ b: { EQ: 2 } }, { c: { EQ: 3 } }],
+        $and: [{ a: { EQ: 9 } }, { $or: [{ d: { EQ: 4 } }, { e: { EQ: 5 } }] }]
+      });
+      expect(target).toEqual({
+        a: { EQ: 1 },
+        $or: [{ b: { EQ: 2 } }, { c: { EQ: 3 } }]
+      });
+      expect(source).toEqual({
+        a: { EQ: 9 },
+        $or: [{ d: { EQ: 4 } }, { e: { EQ: 5 } }]
+      });
+    });
+
+    it("concatenates $and groups", () => {
+      expect(
+        mergeSimpleSearchFilters(
+          { $and: [{ a: { EQ: 1 } }] },
+          { $and: [{ b: { EQ: 2 } }] }
+        )
+      ).toEqual({ $and: [{ a: { EQ: 1 } }, { b: { EQ: 2 } }] });
+    });
+  });
+
+  describe("legacy operator-less values", () => {
+    it("keeps plain values as they are and drops blank ones", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .add({ name: "todo 2", description: "" })
+        .where("group", "EQ", "aafc")
+        .build();
+      expect(filter).toEqual({ name: "todo 2", group: { EQ: "aafc" } });
+      expect(
+        SimpleSearchFilterBuilder.create().add({ name: "" }).build()
+      ).toEqual({});
+    });
+
+    it("puts a conflicting plain value into $and", () => {
+      expect(
+        mergeSimpleSearchFilters({ name: "a" }, { name: "b", other: "a" })
+      ).toEqual({ name: "a", other: "a", $and: [{ name: "b" }] });
+      expect(
+        mergeSimpleSearchFilters({ name: "a" }, { name: { EQ: "b" } })
+      ).toEqual({ name: "a", $and: [{ name: { EQ: "b" } }] });
+    });
+  });
+
+  describe("hostile field names and values", () => {
+    it("keeps a field named __proto__ as a condition instead of losing it", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .where("__proto__", "EQ", "x")
+        .where("group", "EQ", "aafc")
+        .build();
+      // Plain assignment triggers Object.prototype's setter, dropping the condition
+      // and leaving an unfiltered query.
+      expect(Object.keys(filter).sort()).toEqual(["__proto__", "group"]);
+      expect(simpleSearchFilterToFiql(filter)).toEqual(
+        "__proto__==x;group==aafc"
+      );
+    });
+
+    it("expresses IN values containing a comma as an OR of equalities", () => {
+      // Commas cannot be escaped in IN lists. Values are compared individually
+      // to keep "New York, NY" as a single value.
+      expect(
+        SimpleSearchFilterBuilder.create()
+          .whereIn("city", ["New York, NY", "Ottawa"])
+          .build()
+      ).toEqual({
+        $or: [{ city: { EQ: "New York, NY" } }, { city: { EQ: "Ottawa" } }]
+      });
+      expect(
+        simpleSearchFilterToFiql(
+          SimpleSearchFilterBuilder.create()
+            .whereIn("city", ["New York, NY", "Ottawa"])
+            .build()
+        )
+      ).toEqual('city=="New York, NY",city==Ottawa');
+      // Comma-free lists retain the compact IN form:
+      expect(
+        SimpleSearchFilterBuilder.create()
+          .whereIn("city", ["Ottawa", "Montreal"])
+          .build()
+      ).toEqual({ city: { IN: "Ottawa,Montreal" } });
+      // Pre-joined strings indicate multiple values and are kept:
+      expect(
+        SimpleSearchFilterBuilder.create().where("city", "IN", "a,b").build()
+      ).toEqual({ city: { IN: "a,b" } });
+    });
+
+    it("adds nothing for an empty IN list, whichever entry point is used", () => {
+      for (const filter of [
+        SimpleSearchFilterBuilder.create().whereIn("group", []).build(),
+        SimpleSearchFilterBuilder.create()
+          .whereProvided("group", "IN", [])
+          .build(),
+        SimpleSearchFilterBuilder.create().where("group", "IN", []).build(),
+        // Hand-written empty lists are dropped in both shapes:
+        SimpleSearchFilterBuilder.create()
+          .add({ group: { IN: "" } })
+          .build(),
+        SimpleSearchFilterBuilder.create()
+          .add({ group: { IN: [] } })
+          .build()
+      ]) {
+        expect(filter).toEqual({});
+      }
+    });
+  });
+
+  describe("the built filter is the caller's to keep", () => {
+    it("does not alias the builder's own state", () => {
+      const builder = SimpleSearchFilterBuilder.create().or((b) =>
+        b.where("a", "EQ", 1).where("b", "EQ", 2)
+      );
+      const first = builder.build();
+      (first.$or as any[]).push({ c: { EQ: 3 } });
+      expect(builder.build()).toEqual({
+        $or: [{ a: { EQ: 1 } }, { b: { EQ: 2 } }]
+      });
+    });
+
+    it("does not alias an added filter", () => {
+      const added = { $or: [{ a: { EQ: 1 } }, { b: { EQ: 2 } }] };
+      const built = SimpleSearchFilterBuilder.create().add(added).build();
+      (built.$or as any[]).push({ c: { EQ: 3 } });
+      expect(added.$or).toHaveLength(2);
+    });
+  });
+
+  describe("isEmptySimpleSearchFilter()", () => {
+    it("detects empty filters", () => {
+      expect(isEmptySimpleSearchFilter(undefined)).toBe(true);
+      expect(isEmptySimpleSearchFilter(null)).toBe(true);
+      expect(isEmptySimpleSearchFilter({})).toBe(true);
+      expect(isEmptySimpleSearchFilter({ $or: [] })).toBe(true);
+      expect(isEmptySimpleSearchFilter({ $or: [{}] })).toBe(true);
+      expect(isEmptySimpleSearchFilter({ a: {} })).toBe(true);
+      expect(isEmptySimpleSearchFilter({ a: { EQ: null } })).toBe(false);
+      expect(isEmptySimpleSearchFilter({ a: { IN: "" } })).toBe(true);
+      expect(isEmptySimpleSearchFilter({ a: { IN: [] } })).toBe(true);
+      expect(isEmptySimpleSearchFilter({ a: { IN: "x" } })).toBe(false);
+      expect(isEmptySimpleSearchFilter({ a: "" })).toBe(true);
+      expect(isEmptySimpleSearchFilter({ a: "x" })).toBe(false);
+      expect(isEmptySimpleSearchFilter({ a: null })).toBe(false);
+      expect(isEmptySimpleSearchFilter({ $or: [{ a: { EQ: 1 } }] })).toBe(
+        false
+      );
     });
   });
 });
