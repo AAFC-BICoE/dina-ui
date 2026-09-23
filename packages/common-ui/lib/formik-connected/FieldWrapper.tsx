@@ -236,6 +236,12 @@ function LabelWrapper({
     currentValue: value
   });
 
+  const isEmptyValue =
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    (Array.isArray(value) && value.length === 0);
+
   const fieldLabel = label ?? (
     <FieldHeader
       name={name}
@@ -247,6 +253,7 @@ function LabelWrapper({
       tooltipLinkText={tooltipLinkText}
       startCaseLabel={startCaseLabel}
       combineFieldHeaderWithTooltip={false}
+      isEmptyValue={readOnly && isEmptyValue}
     />
   );
 
@@ -320,7 +327,8 @@ function LabelWrapper({
                 className={classNames(
                   "field-label",
                   labelClass,
-                  !horizontal && "mb-2"
+                  !horizontal && "mb-2",
+                  readOnly && isEmptyValue && "field-label-empty"
                 )}
               >
                 {!hideLabel && (
@@ -358,7 +366,8 @@ function LabelWrapper({
               className={classNames(
                 "field-label",
                 labelClass,
-                !horizontal && "mb-2"
+                !horizontal && "mb-2",
+                readOnly && isEmptyValue && "field-label-empty"
               )}
               style={labelStyle}
             >

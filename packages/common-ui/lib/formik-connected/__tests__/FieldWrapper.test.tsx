@@ -79,6 +79,20 @@ describe("FieldWrapper component.", () => {
     expect(fieldValueElement?.textContent).toEqual("my value");
   });
 
+  it("Dims the label and shows a dash placeholder for an empty field when read-only.", () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{ myField: "" }} readOnly={true}>
+        <FieldWrapper name="myField" />
+      </DinaForm>
+    );
+
+    const labelElement = wrapper.container.querySelector(".field-label");
+    expect(labelElement?.classList.contains("field-label-empty")).toEqual(true);
+
+    const fieldValueElement = wrapper.container.querySelector(".field-view");
+    expect(fieldValueElement?.textContent).toEqual("—");
+  });
+
   it("Can display a custom read-only view.", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ myField: "my value" }} readOnly={true}>
