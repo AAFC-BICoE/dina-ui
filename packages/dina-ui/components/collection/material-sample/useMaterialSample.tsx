@@ -816,19 +816,25 @@ export function useMaterialSampleSave({
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
-    const dataComponents = document?.querySelectorAll<HTMLDivElement>(
-      ".data-components fieldset:not(.d-none, .non-strip)"
+    const dataComponents = document?.querySelectorAll<HTMLFieldSetElement>(
+      ".data-components fieldset:not(.d-none)"
     );
-    dataComponents?.forEach((element, index) => {
-      const backgroundColor = index % 2 === 1 ? "#f3f3f3" : "";
-      element.style.backgroundColor = backgroundColor;
+    let stripeIndex = 0;
+    dataComponents?.forEach((element) => {
+      if (!element.classList.contains("non-strip")) {
+        element.style.backgroundColor = stripeIndex % 2 === 1 ? "#fafafa" : "";
+        stripeIndex++;
+      }
 
       const legendWrapper = element.querySelector<HTMLDivElement>(
         ":scope > .legend-wrapper"
       );
       if (legendWrapper) {
-        const cardBackgroundColor = backgroundColor || "#fff";
-        legendWrapper.style.background = `linear-gradient(to bottom, #fff calc(50% - 3px), ${cardBackgroundColor} calc(50% - 3px))`;
+        const cardBackgroundColor = element.style.backgroundColor || "#fff";
+        const outsideBackgroundColor =
+          element.parentElement?.closest<HTMLFieldSetElement>("fieldset")?.style
+            .backgroundColor || "#fff";
+        legendWrapper.style.background = `linear-gradient(to bottom, ${outsideBackgroundColor} calc(50% - 3px), ${cardBackgroundColor} calc(50% - 3px))`;
       }
     });
   });

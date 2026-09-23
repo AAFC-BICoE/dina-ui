@@ -61,6 +61,15 @@ const renderNav = process.env.NODE_ENV !== "test";
 
 const ScrollSpyNav = renderNav ? NativeScrollSpyNav : "div";
 
+const FORM_SECTION_HOVER_CLASS = "nav-hover-highlight";
+
+/** Highlights (or un-highlights) the form section a nav item points to. */
+function setFormSectionHovered(targetId: string, hovered: boolean) {
+  document
+    .getElementById(targetId)
+    ?.classList.toggle(FORM_SECTION_HOVER_CLASS, hovered);
+}
+
 export interface ScrollTarget {
   id: string;
   msg: string | React.JSX.Element;
@@ -70,6 +79,62 @@ export interface ScrollTarget {
   setDeleted?: (val: boolean) => void;
   customSwitch?: ComponentType<ReactSwitchProps>;
 }
+
+interface SubNavLink {
+  id: string;
+  msg: React.JSX.Element;
+}
+
+/** Sub-links shown under a top-level nav item while it's the active scroll target. */
+const SECTION_SUB_LINKS: Partial<Record<string, SubNavLink[]>> = {
+  [COLLECTING_EVENT_COMPONENT_NAME]: [
+    { id: "identifiers", msg: <DinaMessage id="identifiers" /> },
+    {
+      id: "collectingDateLegend",
+      msg: <DinaMessage id="collectingDateLegend" />
+    },
+    {
+      id: "collectingAgentsLegend",
+      msg: <DinaMessage id="collectingAgentsLegend" />
+    },
+    {
+      id: "verbatimLabelLegend",
+      msg: <DinaMessage id="verbatimLabelLegend" />
+    },
+    {
+      id: "collectingEventDetails",
+      msg: <DinaMessage id="collectingEventDetails" />
+    },
+    {
+      id: "georeferencing",
+      msg: <DinaMessage id="collectingEventGeoreferencing" />
+    },
+    {
+      id: "geographicPlace",
+      msg: <DinaMessage id="collectingEventGeographicPlace" />
+    },
+    {
+      id: "collectingEventPartOfExpedition",
+      msg: <DinaMessage id="collectingEventPartOfExpedition" />
+    },
+    {
+      id: "collectingEventSite",
+      msg: <DinaMessage id="collectingEventSite" />
+    },
+    {
+      id: "collectingEventFieldExtensions",
+      msg: <DinaMessage id="collectingEventFieldExtensions" />
+    },
+    {
+      id: "collectingEventManagedAttributes",
+      msg: <DinaMessage id="collectingEventManagedAttributes" />
+    },
+    {
+      id: "collectingEventAttachments",
+      msg: <DinaMessage id="collectingEventAttachments" />
+    }
+  ]
+};
 
 /** Form navigation and toggles to enable/disable form sections. */
 export function MaterialSampleFormNav({
@@ -116,6 +181,9 @@ export function MaterialSampleFormNav({
                   scrollTargetIds: sortedScrollTargets
                     .filter((it) => !it.disabled)
                     .map((it) => it.id),
+                  subScrollTargetIds: Object.values(SECTION_SUB_LINKS).flatMap(
+                    (links) => links?.map((link) => link.id) ?? []
+                  ),
                   activeNavClass: "active",
                   offset: -20
                 }
@@ -218,47 +286,68 @@ const DataComponentNavItem = ({
     }
   }
 
+  const subLinks = SECTION_SUB_LINKS[section.id];
+
   return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      data-dragging={isDragging}
-      className={classNames(
-        section.className,
-        "list-group-item d-flex gap-2 align-items-center"
-      )}
-      key={section.id}
-      style={{ ...style, height: "3rem", zIndex: 1030 }}
-    >
-      {isTemplate && <NavSortHandle {...listeners} isDragging={isDragging} />}
-      <Tag
-        className="flex-grow-1 text-decoration-none"
-        href={section.disabled ? undefined : `#${section.id}`}
+    <>
+      <div
+        ref={setNodeRef}
+        {...attributes}
+        data-dragging={isDragging}
+        className={classNames(
+          section.className,
+          "list-group-item d-flex gap-2 align-items-center"
+        )}
+        key={section.id}
+        style={{ ...style, height: "3rem", zIndex: 1030 }}
       >
-        {section.msg}
-      </Tag>
-      {section.setEnabled &&
-        (disableSwitch ? (
-          <Tooltip
-            id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
-            disableSpanMargin={true}
-            visibleElement={
-              <SwitchComponent
-                className="mt-2"
-                checked={!section.disabled}
-                onChange={toggle}
-                disabled={disableSwitch}
-              />
-            }
-          />
-        ) : (
-          <SwitchComponent
-            checked={!section.disabled}
-            onChange={toggle}
-            disabled={disableSwitch}
-          />
-        ))}
-    </div>
+        {isTemplate && <NavSortHandle {...listeners} isDragging={isDragging} />}
+        <Tag
+          className="flex-grow-1 text-decoration-none"
+          href={section.disabled ? undefined : `#${section.id}`}
+          onMouseEnter={() => setFormSectionHovered(section.id, true)}
+          onMouseLeave={() => setFormSectionHovered(section.id, false)}
+        >
+          {section.msg}
+        </Tag>
+        {section.setEnabled &&
+          (disableSwitch ? (
+            <Tooltip
+              id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
+              disableSpanMargin={true}
+              visibleElement={
+                <SwitchComponent
+                  className="mt-2"
+                  checked={!section.disabled}
+                  onChange={toggle}
+                  disabled={disableSwitch}
+                />
+              }
+            />
+          ) : (
+            <SwitchComponent
+              checked={!section.disabled}
+              onChange={toggle}
+              disabled={disableSwitch}
+            />
+          ))}
+      </div>
+      {subLinks && !section.disabled && (
+        <ul className="sub-nav-list list-unstyled">
+          {subLinks.map((subLink) => (
+            <li key={subLink.id}>
+              <a
+                href={`#${subLink.id}`}
+                onMouseEnter={() => setFormSectionHovered(subLink.id, true)}
+                onMouseLeave={() => setFormSectionHovered(subLink.id, false)}
+              >
+                {subLink.msg}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 };
 

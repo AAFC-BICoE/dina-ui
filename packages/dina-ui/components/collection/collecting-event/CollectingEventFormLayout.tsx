@@ -486,6 +486,7 @@ export function CollectingEventFormLayout({
         <div className="col-md-6">
           <FieldSet
             legend={<DinaMessage id="collectingEventDetails" />}
+            id="collectingEventDetails"
             className="non-strip h-100"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-additional-details-section"
@@ -561,7 +562,7 @@ export function CollectingEventFormLayout({
         </div>
       </div>
       <div className="row">
-        <div className="col-md-6">
+        <div className="col-md-6" id="georeferencing">
           {!readOnly ? (
             <GeoReferenceAssertionField
               onChangeTabIndex={setGeoAssertionTabIdx}
@@ -572,7 +573,7 @@ export function CollectingEventFormLayout({
             />
           ) : null}
         </div>
-        <div className="col-md-6">
+        <div className="col-md-6" id="geographicPlace">
           {supportedGeographicReferences.includes("OSM") ? (
             <div className="row">
               <div className="col">
@@ -602,6 +603,7 @@ export function CollectingEventFormLayout({
         <div className="col-md-6">
           <FieldSet
             legend={<DinaMessage id="collectingEventPartOfExpedition" />}
+            id="collectingEventPartOfExpedition"
             className="non-strip h-100"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-details"
@@ -623,6 +625,7 @@ export function CollectingEventFormLayout({
         <div className="col-md-6">
           <FieldSet
             legend={<DinaMessage id="collectingEventSite" />}
+            id="collectingEventSite"
             className="non-strip h-100"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-details"
@@ -644,7 +647,7 @@ export function CollectingEventFormLayout({
           </FieldSet>
         </div>
       </div>
-      <div>
+      <div id="collectingEventFieldExtensions">
         <DinaFormSection
           componentName={COLLECTING_EVENT_COMPONENT_NAME}
           sectionName="collecting-event-field-extension-section"
@@ -663,7 +666,7 @@ export function CollectingEventFormLayout({
           />
         </DinaFormSection>
       </div>
-      <>
+      <div id="collectingEventManagedAttributes">
         {!readOnly ? (
           collectingEventManagedAttributesComponent
         ) : JSON.stringify(initialValues?.managedAttributes) !== "{}" ? ( // if read-only, check for managed attributes
@@ -676,8 +679,8 @@ export function CollectingEventFormLayout({
             {collectingEventManagedAttributesComponent}
           </FieldSet>
         ) : null}
-      </>
-      <div className="mb-3">
+      </div>
+      <div className="mb-3" id="collectingEventAttachments">
         {!readOnly
           ? collectingEventAttachmentsComponent
           : initialValues?.attachment // if read-only, check for attachment
