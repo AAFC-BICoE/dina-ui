@@ -299,7 +299,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   editExpeditionTitle: "Expedition bearbeiten",
   editExternalResourceTitle: "Externe Ressource bearbeiten",
   editGroupTitle: "Gruppe bearbeiten",
-  editIdentifierTitle: "Bezeichner bearbeiten",
   editInstitutionTitle: "Institution bearbeiten",
   editManagedAttributeTitle: "Zusatzfeld bearbeiten",
   editManagedAttributesViewTitle: "Formularvorlage bearbeite",

@@ -573,11 +573,6 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
           <DinaMessage id="fieldExtensions" />
         </NavDropdown.Item>
       </Link>
-      <Link href="/identifier/list" passHref={true} legacyBehavior>
-        <NavDropdown.Item role="menuitem">
-          <DinaMessage id="identifiers" />
-        </NavDropdown.Item>
-      </Link>
       <Link href="/collection/institution/list" passHref={true} legacyBehavior>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="institutionListTitle" />

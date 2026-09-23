@@ -2,18 +2,25 @@ import { SelectOption, TextField, SelectField } from "common-ui";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Fragment } from "react";
 import Link from "next/link";
-import { VocabularySelectField } from "../collection/VocabularySelectField";
+import useControlledVocabularyOptions from "../controlled-vocabulary/useControlledVocabularyOptions";
+
+export interface IdentifierTypeVocabulary {
+  apiPath: string;
+  uuid: string;
+  dinaComponent: string;
+}
 
 export interface IdentifierRowProps {
   index: number;
   typeOptions?: SelectOption<string | undefined>[];
-  vocabularyOptionsEndpoint?: string;
+  /** Controlled vocabulary supplying the identifier types. */
+  controlledVocabulary?: IdentifierTypeVocabulary;
 }
 
 export function IdentifierRow({
   index,
   typeOptions,
-  vocabularyOptionsEndpoint
+  controlledVocabulary
 }: IdentifierRowProps) {
   const identifiersPath = "identifiers";
   const identifierPath = `${identifiersPath}[${index}]`;
@@ -30,15 +37,14 @@ export function IdentifierRow({
           label={formatMessage("identifierType")}
         />
       )}
-      {vocabularyOptionsEndpoint && (
-        <VocabularySelectField
+      {controlledVocabulary && (
+        <IdentifierTypeSelectField
           name={commonRoot + "namespace"}
-          path={vocabularyOptionsEndpoint}
-          label={formatMessage("identifierType")}
+          controlledVocabulary={controlledVocabulary}
         />
       )}
       <TextField
-        name={commonRoot + (vocabularyOptionsEndpoint ? "value" : "uri")}
+        name={commonRoot + (controlledVocabulary ? "value" : "uri")}
         label={formatMessage("identifierURI")}
         readOnlyRender={(value) => {
           try {
@@ -58,5 +64,37 @@ export function IdentifierRow({
         }}
       />
     </>
+  );
+}
+
+interface IdentifierTypeSelectFieldProps {
+  name: string;
+  controlledVocabulary: IdentifierTypeVocabulary;
+}
+
+/** Stores the selected controlled vocabulary item's key. */
+function IdentifierTypeSelectField({
+  name,
+  controlledVocabulary: { apiPath, uuid, dinaComponent }
+}: IdentifierTypeSelectFieldProps) {
+  const { formatMessage } = useDinaIntl();
+  const { vocabOptions } = useControlledVocabularyOptions({
+    path:
+      `${apiPath}/controlled-vocabulary-item` +
+      `?filter[controlledVocabulary.uuid][EQ]=${uuid}` +
+      `&filter[dinaComponent][EQ]=${dinaComponent}`
+  });
+
+  return (
+    <SelectField
+      name={name}
+      options={vocabOptions}
+      label={formatMessage("identifierType")}
+      readOnlyRender={(optionValue) =>
+        vocabOptions.find((option) => option.value === optionValue)?.label ??
+        optionValue ??
+        ""
+      }
+    />
   );
 }

@@ -1546,7 +1546,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addButtonText: "Add",
   removeButtonText: "Remove",
   removeAllButtonText: "Detach All",
-  editIdentifierTitle: "Edit Identifier",
   field_uriTemplate: "URI Template",
   attachmentsFoundBannerText: "{numAttachmentsFound} attachments were found.",
   singleAttachmentFoundBannerText: "1 attachment was found.",
