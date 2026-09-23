@@ -7,12 +7,14 @@ import {
   FormikButton,
   QueryTable,
   ReactTable,
+  SimpleSearchFilterBuilder,
+  simpleSearchFilterToFiql,
   useAccount,
   useApiClient,
   useGroupedCheckBoxes
 } from "common-ui";
 import { FormikContextType } from "formik";
-import { FilterParam, PersistedResource } from "kitsu";
+import { PersistedResource } from "kitsu";
 import _, { Dictionary } from "lodash";
 import { useEffect, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
@@ -56,7 +58,7 @@ export function LibraryPoolContentStep({
 }: LibraryPoolContentStepProps) {
   const { apiClient, bulkDeleteResources, save } = useApiClient();
   const { username } = useAccount();
-  // Check if a save was requested from the top level button bar.
+  // Check for save request from top-level button bar.
   useEffect(() => {
     async function performSaveInternal() {
       await saveLibraryPoolContents();
@@ -73,7 +75,7 @@ export function LibraryPoolContentStep({
     try {
       const resources = selectedResources.map((item) => {
         if (item.id?.startsWith("tmp_")) {
-          // newly added content should have empty id;
+          // Newly added content should have an empty ID.
           delete item.id;
         }
 
@@ -129,16 +131,12 @@ export function LibraryPoolContentStep({
   >([]);
   const [toDelete, setToDelete] = useState<LibraryPoolContent[]>([]);
 
-  /**
-   * When the page is first loaded, check if saved Library Pool Contents has already been chosen and reload them.
-   */
+  /** Reload saved Library Pool Contents on initial load. */
   useEffect(() => {
     fetchLibraryPoolContents();
   }, [editMode]);
 
-  /**
-   * Retrieve all of the PCR Batch Items that are associated with the PCR Batch from step 1.
-   */
+  /** Retrieve PCR Batch Items associated with the step 1 PCR Batch. */
   async function fetchLibraryPoolContents() {
     const response = await apiClient.get<LibraryPoolContent[]>(
       "/seqdb-api/library-pool-content",
@@ -187,14 +185,19 @@ export function LibraryPoolContentStep({
         ),
       1000
     );
-  const batchFilter: FilterParam = {
-    fiql: `name=='*${nameFilter}*'${hideUsedItems ? ";dateUsed==null" : ""}`
-  };
-  const poolFilter = {
-    fiql: `uuid!=${libraryPool.id};name=='*${nameFilter}*'${
-      hideUsedItems ? ";dateUsed==null" : ""
-    }`
-  };
+  const batchFilter = simpleSearchFilterToFiql(
+    SimpleSearchFilterBuilder.create<LibraryPrepBatch>()
+      .searchFilter("name", nameFilter)
+      .when(hideUsedItems, (b) => b.where("dateUsed", "EQ", null))
+      .build()
+  );
+  const poolFilter = simpleSearchFilterToFiql(
+    SimpleSearchFilterBuilder.create<LibraryPool>()
+      .where("uuid", "NEQ", libraryPool.id)
+      .searchFilter("name", nameFilter)
+      .when(hideUsedItems, (b) => b.where("dateUsed", "EQ", null))
+      .build()
+  );
 
   const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] =
     [
@@ -438,7 +441,7 @@ export function LibraryPoolContentStep({
                   <QueryTable<LibraryPrepBatch>
                     columns={LIBRARY_PREP_BATCH_TABLE_COLUMNS}
                     deps={[]}
-                    filter={batchFilter}
+                    fiql={batchFilter || undefined}
                     onSuccess={(res) => setAvailableBatches(res.data)}
                     path="seqdb-api/library-prep-batch"
                     enableFilters={true}
@@ -453,7 +456,7 @@ export function LibraryPoolContentStep({
                   <QueryTable<LibraryPool>
                     columns={LIBRARY_POOL_TABLE_COLUMNS}
                     deps={[]}
-                    filter={poolFilter}
+                    fiql={poolFilter || undefined}
                     enableFilters={true}
                     onSuccess={(res) => setAvailablePools(res.data)}
                     path="seqdb-api/library-pool"
