@@ -626,6 +626,57 @@ describe("workbookMappingUtils functions", () => {
         findMatchField(columnHeader, fieldOptions, "material-sample")
       ).toBe("organism.determination.scientificNameDetails");
     });
+
+    describe("relationship name columns", () => {
+      const relationshipFieldOptions = [
+        {
+          label: "Collection",
+          options: [
+            {
+              label: "Name",
+              value: "collection.name",
+              parentPath: "collection"
+            }
+          ]
+        },
+        {
+          label: "Preparation Type",
+          options: [
+            {
+              label: "Name",
+              value: "preparationType.name",
+              parentPath: "preparationType"
+            }
+          ]
+        }
+      ];
+
+      test.each([
+        ["Collection Name", "collection.name"],
+        ["collection name", "collection.name"],
+        ["COLLECTION_NAME", "collection.name"],
+        ["Collection", "collection.name"],
+        ["Preparation Type Name", "preparationType.name"]
+      ])("maps %s to %s", (header, expected) => {
+        expect(
+          findMatchField(
+            { columnHeader: header },
+            relationshipFieldOptions,
+            "material-sample"
+          )
+        ).toBe(expected);
+      });
+
+      test("does not map an ambiguous Name column", () => {
+        expect(
+          findMatchField(
+            { columnHeader: "Name" },
+            relationshipFieldOptions,
+            "material-sample"
+          )
+        ).toBeUndefined();
+      });
+    });
   });
 
   describe("getData", () => {

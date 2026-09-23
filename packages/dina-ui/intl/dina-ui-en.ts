@@ -1330,10 +1330,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookSkippedField: "Please select a field or skip importing it",
   missingParentMaterialSampleNames:
     "Missing parent material sample names: {missingNames}",
-  onSheetDuplicateMaterialSampleNames:
-    "Some entries in your spreadsheet have the same Primary ID and Collection Name. Please review the following duplicates: {duplicateNames}",
-  duplicateMaterialSampleNames:
-    "These entries already exist in the system with the same Primary ID and Collection Name: {duplicateNames}",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be a {dataType}",
   workBookInvalidEnumFormat: "must be one of the accepted values:",
@@ -1397,6 +1393,16 @@ export const DINAUI_MESSAGES_ENGLISH = {
   skippedColumnsTitle: "Skipped Columns",
   skippedColumnsDescription:
     "The workbook contains columns that will be skipped during import. These columns might contain important data.",
+  duplicatePrimaryIdsTitle: "Duplicate Primary IDs",
+  duplicatePrimaryIdsRowsSkipped:
+    "{count, plural, one {# row} other {# rows}} will be skipped if you proceed.",
+  duplicatePrimaryIdsOnSheetDescription:
+    "The following Primary IDs appear more than once in the spreadsheet. All rows using these Primary IDs will be skipped.",
+  duplicatePrimaryIdsOnServerDescription:
+    "The following Primary IDs already exist in the same collection. These rows will be skipped.",
+  workbookSkipDuplicatesButton: "Skip duplicates and import",
+  workbookAllRowsDuplicated:
+    "Every row in the spreadsheet has a duplicate Primary ID. There is nothing left to import.",
   unmappedRelationshipsTitle: "Unmapped Relationships",
   unmappedRelationshipsDescription:
     "The import identified relationships in the workbook that could not be automatically mapped. This might lead to incomplete data transfer.",

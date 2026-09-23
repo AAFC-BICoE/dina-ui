@@ -283,8 +283,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Ziehen Sie das Attribut per Drag & Drop an seine neue Position.",
   duplicate: "Duplikat",
   duplicateFilesFound: "doppelte Dateien gefunden",
-  duplicateMaterialSampleNames:
-    "Diese Einträge existieren bereits im System mit derselben Primär-ID und Sammlungsbezeichnung: {duplicateNames}",
   duplicatePersonFound:
     'Eine Person mit dem Namen "{name}" existiert bereits, möchten Sie fortfahren?',
   duplicatePersonViewLink: "Bestehende Person anzeigen",
@@ -895,8 +893,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   objectSubtypeListTitle: "Mediensubtypen",
   objectSubtypeTitle: "Mediensubtyp",
   objectsLabel: "Medienobjekte",
-  onSheetDuplicateMaterialSampleNames:
-    "Einige Einträge in Ihrer Tabelle besitzen dieselbe Primär-ID und Sammlungsbezeichnung. Bitte prüfen: {duplicateNames}",
   openGeographySearchButtonLabel: "In Open Street Maps suchen",
   organism: "Organismus",
   organismManagedAttributes: "Organismus Zusatzfelder",

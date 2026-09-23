@@ -19,8 +19,10 @@ import { BULK_ADD_FILES_KEY, BulkAddFileInfo } from "../object-store/upload";
 import {
   FaArrowLeft,
   FaFileArrowDown,
-  FaFileCircleXmark
+  FaFileCircleXmark,
+  FaFloppyDisk
 } from "react-icons/fa6";
+import { FaTimes } from "react-icons/fa";
 
 export function UploadWorkbookPage() {
   // Workbook context is used to manage the state of the workbook upload process.
@@ -171,6 +173,7 @@ export function UploadWorkbookPage() {
             style={{ width: "10rem" }}
             onClick={backToUpload}
           >
+            <FaTimes className="me-2" />
             <DinaMessage id="cancelButtonText" />
           </Button>
         </div>
@@ -195,7 +198,10 @@ export function UploadWorkbookPage() {
                 </span>
               </>
             ) : (
-              <DinaMessage id="save" />
+              <>
+                <FaFloppyDisk className="me-2" />
+                <DinaMessage id="save" />
+              </>
             )}
           </Button>
         </div>
