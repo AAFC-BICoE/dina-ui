@@ -845,18 +845,23 @@ export function WorkbookColumnMapping({
     (item) => item.value === typeFromStorage
   );
 
+  const initialValues = useMemo(
+    () => ({
+      sheet: 1,
+      type: typeFromStorage,
+      fieldMap,
+      relationshipMapping,
+      group: effectiveGroup
+    }),
+    [fieldMap, typeFromStorage, effectiveGroup]
+  );
+
   return loading || fieldMap.length === 0 ? (
     <LoadingSpinner loading={loading} />
   ) : (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
       key={`${type}-${sheet}`}
-      initialValues={{
-        sheet: 1,
-        type: typeFromStorage,
-        fieldMap,
-        relationshipMapping,
-        group: effectiveGroup
-      }}
+      initialValues={initialValues}
       innerRef={formRef}
       onSubmit={onSubmit}
       validationSchema={workbookColumnMappingFormSchema}

@@ -83,7 +83,9 @@ export async function checkServerDuplicatePrimaryIds(
 
       const path = `collection-api/material-sample?filter[materialSampleName][EQ]=${encodeURIComponent(
         entry.materialSampleName
-      )}&filter[collection.id][EQ]=${encodeURIComponent(entry.collectionUuid)}`;
+      )}&filter[collection.uuid][EQ]=${encodeURIComponent(
+        entry.collectionUuid
+      )}`;
 
       try {
         const response = await apiClient.get<unknown[]>(path, {
