@@ -131,33 +131,47 @@ describe("DateField component", () => {
     expect(wrapper.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("Partial date on invalid formats.", async () => {
+  it.each([
+    ["an incorrect month", "1998-13-19"],
+    ["an incorrect day", "1998-05-43"],
+    ["an incorrect year format", "98"],
+    ["a non-supported format", "September 2019"]
+  ])("Partial date on invalid formats: %s.", async (_, input) => {
     const wrapper = getPartialDateWrapper();
     const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
 
-    // Incorrect month
-    await clearAndType(textbox, "1998-13-19");
+    await clearAndType(textbox, input);
     await userEvent.keyboard("{Escape}");
     fireEvent.blur(textbox);
     expect(wrapper.queryByRole("status")).toBeInTheDocument();
+  });
 
-    // Incorrect day
-    await clearAndType(textbox, "1998-05-43");
-    await userEvent.keyboard("{Escape}");
-    fireEvent.blur(textbox);
-    expect(wrapper.queryByRole("status")).toBeInTheDocument();
+  it("Selects a year from the calendar's year dropdown.", async () => {
+    const wrapper = getWrapper();
+    const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
 
-    // Incorrect year format
-    await clearAndType(textbox, "98");
-    await userEvent.keyboard("{Escape}");
-    fireEvent.blur(textbox);
-    expect(wrapper.queryByRole("status")).toBeInTheDocument();
+    await userEvent.click(textbox);
+    await userEvent.click(
+      document.querySelector(".react-datepicker__year-read-view") as HTMLElement
+    );
+    await userEvent.click(await wrapper.findByRole("button", { name: "2017" }));
+    await userEvent.click(
+      wrapper.getByRole("gridcell", { name: /february 15th, 2017/i })
+    );
 
-    // Non-supported format
-    await clearAndType(textbox, "September 2019");
-    await userEvent.keyboard("{Escape}");
-    fireEvent.blur(textbox);
-    expect(wrapper.queryByRole("status")).toBeInTheDocument();
+    await waitFor(() => expect(textbox.value).toEqual("2017-02-15"));
+    expect(wrapper.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("Shows an error when tabbing away from an invalid date while the calendar is open.", async () => {
+    const wrapper = getWrapper();
+    const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
+
+    await clearAndType(textbox, "2021");
+    expect(document.querySelector(".react-datepicker")).toBeInTheDocument();
+    await userEvent.tab();
+
+    expect(await wrapper.findByRole("status")).toBeInTheDocument();
   });
 
   it("Shows an error on invalid date formats.", async () => {
