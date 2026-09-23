@@ -45,7 +45,13 @@ import {
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
 import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
-import _ from "lodash";
+import {
+  checkServerDuplicatePrimaryIds,
+  DuplicatePrimaryId,
+  getDuplicateRowNumbers,
+  getPrimaryIdEntries,
+  getRelationshipMappingKey
+} from "../utils/workbookDuplicateUtils";
 import {
   BULK_ADD_FILES_KEY,
   BulkAddFileInfo
@@ -204,10 +210,25 @@ export function WorkbookColumnMapping({
       (item) => !skippedColumns.includes(item)
     );
 
+    const duplicatePrimaryIds = await findDuplicatePrimaryIds(
+      submittedValues.fieldMap,
+      submittedValues.appendData
+    );
+    const rowsToSkip = getDuplicateRowNumbers(duplicatePrimaryIds);
+    if (
+      rowsToSkip.length > 0 &&
+      rowsToSkip.length >=
+        getDataFromWorkbook(spreadsheetData, sheet, submittedValues.fieldMap)
+          .length
+    ) {
+      throw new Error(formatMessage("workbookAllRowsDuplicated"));
+    }
+
     const showSkipWarning = skippedColumns.length > 0;
     const showMappingWarning = unmappedRelationships.length > 0;
+    const showDuplicateWarning = rowsToSkip.length > 0;
 
-    if (showMappingWarning || showSkipWarning) {
+    if (showMappingWarning || showSkipWarning || showDuplicateWarning) {
       await openModal(
         <AreYouSureModal
           actionMessage={formatMessage("proceedWithWarning")}
@@ -215,12 +236,17 @@ export function WorkbookColumnMapping({
             <WorkbookWarningDialog
               skippedColumns={skippedColumns}
               unmappedRelationshipsError={unmappedRelationships}
+              duplicatePrimaryIds={duplicatePrimaryIds}
             />
           }
           onYesButtonClicked={() => {
-            importWorkbook(submittedValues);
+            importWorkbook(submittedValues, rowsToSkip);
           }}
-          yesButtonText={formatMessage("workbookImportAnywayButton")}
+          yesButtonText={formatMessage(
+            showDuplicateWarning
+              ? "workbookSkipDuplicatesButton"
+              : "workbookImportAnywayButton"
+          )}
           noButtonText={formatMessage("cancelButtonText")}
         />
       );
@@ -229,12 +255,42 @@ export function WorkbookColumnMapping({
     }
   }
 
-  async function importWorkbook(submittedValues: any) {
+  async function findDuplicatePrimaryIds(
+    fieldMaps: FieldMapType[],
+    appendData: boolean | undefined
+  ): Promise<DuplicatePrimaryId[]> {
+    if (type !== "material-sample") {
+      return [];
+    }
+
+    const collectionColumn = fieldMaps.find(
+      (item) => !item.skipped && item.targetField === "collection.name"
+    );
+    const entries = getPrimaryIdEntries(
+      getDataFromWorkbook(spreadsheetData, sheet, fieldMaps, true),
+      collectionColumn?.columnHeader,
+      relationshipMapping as RelationshipMapping
+    );
+
+    // Append data requires the material samples to already exist.
+    return appendData
+      ? entries
+      : await checkServerDuplicatePrimaryIds(apiClient, entries);
+  }
+
+  async function importWorkbook(
+    submittedValues: any,
+    rowsToSkip: number[] = []
+  ) {
     const workbookData = getDataFromWorkbook(
       spreadsheetData,
       sheet,
-      submittedValues.fieldMap
-    );
+      submittedValues.fieldMap,
+      true
+    )
+      .filter((row) => !rowsToSkip.includes(row.rowNumber))
+      .map(({ rowNumber: _rowNumber, ...row }) => row);
+
     const { baseApiPath } = getFieldRelationshipConfig();
     const resources = convertWorkbook(workbookData, submittedValues.group);
     if (resources?.length > 0) {
@@ -389,14 +445,6 @@ export function WorkbookColumnMapping({
     return field + " - " + error;
   }
 
-  interface UniqueSampleNameCollectionPairs {
-    materialSampleName: string;
-    collectionName: string;
-    collectionUuid: string;
-    localDuplicate: boolean;
-    serverDuplicate: boolean;
-  }
-
   function validateBulkUploadFiles(
     workbookData: { [field: string]: any }[]
   ): string[] {
@@ -482,9 +530,6 @@ export function WorkbookColumnMapping({
 
       return errors;
     } else {
-      const uniqueSampleCollections: UniqueSampleNameCollectionPairs[] =
-        generateUniqueSampleNamePairs();
-
       // get all mapped parent material sample names
       const parentValueMapping =
         Object.values(workbookColumnMap ?? {}).find(
@@ -498,12 +543,8 @@ export function WorkbookColumnMapping({
         for (const fieldPath of Object.keys(row)) {
           switch (fieldPath) {
             case "rowNumber":
-              continue;
             case "materialSampleName":
-              await validateServerDuplicateMaterialSampleNames(
-                uniqueSampleCollections
-              );
-              break;
+              continue;
             case "parentMaterialSample.materialSampleName":
               // If there is a parent material-sample name, but the name is not found
               validateMissingParentMaterialSamples(
@@ -532,40 +573,6 @@ export function WorkbookColumnMapping({
         );
       }
 
-      const onSheetDuplicates: string[] = uniqueSampleCollections
-        .filter((pair) => pair.localDuplicate)
-        .map(
-          (pair) => pair.materialSampleName + " (" + pair.collectionName + ")"
-        );
-      if (onSheetDuplicates.length > 0) {
-        errors.push(
-          new ValidationError(
-            formatMessage("onSheetDuplicateMaterialSampleNames", {
-              duplicateNames: onSheetDuplicates.join(", ")
-            }),
-            "materialSampleName",
-            "sheet"
-          )
-        );
-      }
-
-      const onServerDuplicates: string[] = uniqueSampleCollections
-        .filter((pair) => pair.serverDuplicate)
-        .map(
-          (pair) => pair.materialSampleName + " (" + pair.collectionName + ")"
-        );
-      if (onServerDuplicates.length > 0) {
-        errors.push(
-          new ValidationError(
-            formatMessage("duplicateMaterialSampleNames", {
-              duplicateNames: onServerDuplicates.join(", ")
-            }),
-            "materialSampleName",
-            "sheet"
-          )
-        );
-      }
-
       return errors;
     }
   }
@@ -583,113 +590,6 @@ export function WorkbookColumnMapping({
     ) {
       missingParentMaterialSampleNames.push(row[fieldPath]);
     }
-  }
-
-  function generateUniqueSampleNamePairs(): UniqueSampleNameCollectionPairs[] {
-    const uniqueSampleCollections: UniqueSampleNameCollectionPairs[] = [];
-
-    const materialSampleNameHeader = "materialSampleName";
-    const collectionNameHeader = "collection.name";
-
-    // Check if required spreadsheet headers exist for this validation.
-    const materialSampleColumn = fieldMap.find(
-      (item) => item.targetField === materialSampleNameHeader
-    );
-    const collectionNameColumn = fieldMap.find(
-      (item) => item.targetField === collectionNameHeader
-    );
-
-    // If either column is not found, return empty arrays since we cannot check for duplicates.
-    if (!materialSampleColumn || !collectionNameColumn) {
-      return [];
-    }
-
-    // Retrieve the workbook data.
-    const workbookData = getDataFromWorkbook(spreadsheetData, sheet, fieldMap);
-
-    // Map the unique sample name and collection pairs.
-    for (const row of workbookData) {
-      const materialSampleName = row[materialSampleNameHeader];
-      const collectionName = row[collectionNameHeader];
-      const existingPair = uniqueSampleCollections.find(
-        (pair) =>
-          pair.materialSampleName === materialSampleName &&
-          pair.collectionName === collectionName
-      );
-      if (existingPair) {
-        existingPair.localDuplicate = true;
-      } else {
-        const collectionRelationshipHeader =
-          collectionNameColumn.columnHeader.replace(" ", "_");
-        const collectionUuid = _.get(relationshipMapping, [
-          collectionRelationshipHeader,
-          collectionName,
-          "id"
-        ]);
-        if (collectionUuid) {
-          uniqueSampleCollections.push({
-            materialSampleName,
-            collectionName,
-            collectionUuid,
-            localDuplicate: false,
-            serverDuplicate: false
-          });
-        }
-      }
-    }
-
-    return uniqueSampleCollections;
-  }
-
-  async function validateServerDuplicateMaterialSampleNames(
-    uniqueSampleCollections: UniqueSampleNameCollectionPairs[]
-  ) {
-    // If duplicates exist on the sheet, we don't need to check the server.
-    if (uniqueSampleCollections.some((pair) => pair.localDuplicate)) {
-      return;
-    }
-
-    const checkPromises = uniqueSampleCollections.map(async (pair) => {
-      // Generate the path for the current pair
-      const path = `collection-api/resource-name-identifier?filter[type][EQ]=material-sample&filter[group][EQ]=${encodeURIComponent(
-        group ?? ""
-      )}&filter[name][EQ]=${encodeURIComponent(pair.materialSampleName)}`;
-
-      try {
-        const response = await apiClient.get(path, {
-          page: { limit: 1 } // We only need to know if at least one exists
-        });
-
-        if (response && response.data && (response.data as any).length > 0) {
-          // Expensive request is required since resource-name-identifier does not include the collection name.
-          const expensivePath = `collection-api/material-sample?filter[materialSampleName][EQ]=${encodeURIComponent(
-            pair.materialSampleName
-          )}&filter[collection.id][EQ]=${encodeURIComponent(
-            pair.collectionUuid
-          )}&filter[group][EQ]=${encodeURIComponent(group ?? "")}`;
-
-          const expensiveRequest = await apiClient.get(expensivePath, {
-            page: { limit: 1 } // We only need to know if at least one exists
-          });
-          if (
-            expensiveRequest &&
-            expensiveRequest.data &&
-            (expensiveRequest.data as any).length > 0
-          ) {
-            // Found duplicate on the server level.
-            pair.serverDuplicate = true;
-          }
-        }
-      } catch (error) {
-        console.error(
-          `Error checking server duplicate for ${pair.materialSampleName}/${pair.collectionName} at path ${path}:`,
-          error
-        );
-      }
-    });
-
-    // Wait for all the API calls and updates to complete
-    await Promise.all(checkPromises);
   }
 
   function validateDataFormat(
@@ -884,8 +784,8 @@ export function WorkbookColumnMapping({
     relatedRecord: string | string[],
     targetType: string
   ) {
-    const columnHeaderFormatted = columnHeader.replaceAll(".", "_");
-    const fieldValueFormatted = fieldValue.replaceAll(".", "_");
+    const columnHeaderFormatted = getRelationshipMappingKey(columnHeader);
+    const fieldValueFormatted = getRelationshipMappingKey(fieldValue);
     if (relationshipMapping) {
       // Check if the dropdown option selected is undefined (was cleared)
       if (!relatedRecord) {
