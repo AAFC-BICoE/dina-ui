@@ -33,14 +33,11 @@ export function RelationshipFieldMapping({
   const { columnUniqueValues, relationshipMapping, workbookColumnMap, sheet } =
     useWorkbookContext();
 
-  const { setValues, values } = useFormikContext();
+  const { setFieldValue, values } = useFormikContext();
 
   // When the relationship mapping changes, it should update the formik values.
   useEffect(() => {
-    setValues((formikValues, _validated) => ({
-      ...formikValues,
-      relationshipMapping
-    }));
+    setFieldValue("relationshipMapping", relationshipMapping);
   }, [relationshipMapping]);
 
   // Do not display skipped records on the relationship mapping section, this array contains the path and if it's skipped.
