@@ -1,5 +1,5 @@
 import { FilterParam } from "kitsu";
-import { ScopeOption } from "../resource-select/ResourceScopes";
+import { ScopeOption, ScopeValues } from "../resource-select/ResourceScopes";
 
 // Define the supported filter operations
 export type FilterOperation =
@@ -170,11 +170,11 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
    * dropdown menu, based on the choices, it will automatically apply those filters.
    *
    * @param scopes The full list of scope definitions (as passed to ResourceSelect).
-   * @param activeScopes A map of scopeId -> the currently selected optionId.
+   * @param activeScopes A map of scopeId -> the selected optionId (toggle) or checked state (checkbox).
    */
   public applyScopes(
     scopes: ScopeOption[] | undefined,
-    activeScopes: Record<string, string> | undefined
+    activeScopes: ScopeValues | undefined
   ): this {
     if (!scopes?.length || !activeScopes) {
       return this;
@@ -187,6 +187,8 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
           (opt) => opt.id === activeOptionId
         );
         activeOption?.applyFilter(this);
+      } else if (scope.type === "checkbox" && activeScopes[scope.id] === true) {
+        scope.applyFilter?.(this);
       }
     });
 

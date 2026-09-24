@@ -720,8 +720,11 @@ describe("Material Sample Edit Page", () => {
     await userEvent.type(combo, "parent");
 
     // Select the mocked parent option.
+    // The search text is bolded within the label, so match on the whole option's text.
     const option = await within(parentField as any).findByText(
-      /parent-sample-name/i
+      (_content, element) =>
+        !!element?.classList.contains("react-select__option") &&
+        /parent-sample-name/i.test(element.textContent ?? "")
     );
     await userEvent.click(option);
 

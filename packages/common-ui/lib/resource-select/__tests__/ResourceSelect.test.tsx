@@ -1,4 +1,4 @@
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { ResourceSelect, ResourceSelectProps, ScopeOption } from "../..";
 import { mountWithAppContext } from "common-ui";
 import { AsyncOption } from "../ResourceSelect";
@@ -723,6 +723,105 @@ describe("ResourceSelect component", () => {
       await waitFor(() => {
         expect(mockGet).lastCalledWith("todo-api/todo", {
           filter: { name: "todo 2", status: { EQ: "active" } },
+          page: { limit: 6 },
+          sort: "-createdOn"
+        });
+      });
+    });
+  });
+
+  describe("Checkbox scope and showSelectedOptions", () => {
+    const HIDE_SELECTED: ScopeOption = {
+      id: "hideSelected",
+      type: "checkbox",
+      label: "Hide selected",
+      filterOption: (_resource, { isSelected }) => !isSelected
+    };
+
+    const SELECTED_TODO: PersistedResource<Todo> = {
+      id: "2",
+      type: "todo",
+      name: "todo 2"
+    };
+
+    it("Displays the selected options grayed out, then hides them when checked", async () => {
+      const wrapper = mountWithContext(
+        <ResourceSelect<Todo>
+          {...DEFAULT_SELECT_PROPS}
+          isMulti={true}
+          value={[SELECTED_TODO]}
+          scopes={[HIDE_SELECTED]}
+          showSelectedOptions={true}
+          omitNullOption={true}
+        />
+      );
+
+      await userEvent.click(wrapper.getByRole("combobox"));
+
+      // The selected option is still displayed, but disabled and tagged as added:
+      await waitFor(() => {
+        expect(
+          wrapper.getAllByRole("option").map((o) => o.textContent)
+        ).toEqual(["todo 1", "todo 2Added", "todo 3"]);
+      });
+      const [todo1, todo2] = wrapper.getAllByRole("option");
+      expect(todo2).toHaveAttribute("aria-disabled", "true");
+      expect(
+        todo2.querySelector(".resource-select-added-tag")
+      ).toHaveTextContent("Added");
+      expect(todo1).toHaveAttribute("aria-disabled", "false");
+      expect(todo1.querySelector(".resource-select-added-tag")).toBeNull();
+
+      // Checking the scope hides the selected option without a new API request:
+      const requestCount = mockGet.mock.calls.length;
+      // Clicking the label text toggles the checkbox (and keeps the menu open):
+      await userEvent.click(wrapper.getByText("Hide selected"));
+      expect(
+        wrapper.getByRole("checkbox", { name: "Hide selected" })
+      ).toBeChecked();
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThan(0);
+
+      await waitFor(() => {
+        expect(
+          wrapper.getAllByRole("option").map((o) => o.textContent)
+        ).toEqual(["todo 1", "todo 3"]);
+      });
+      expect(mockGet).toHaveBeenCalledTimes(requestCount);
+    });
+
+    it("Applies the checkbox scope's API filter only while checked", async () => {
+      const wrapper = mountWithContext(
+        <ResourceSelect<Todo>
+          {...DEFAULT_SELECT_PROPS}
+          scopes={[
+            {
+              id: "activeOnly",
+              type: "checkbox",
+              label: "Active only",
+              applyFilter: (builder) => builder.where("status", "EQ", "active")
+            }
+          ]}
+        />
+      );
+
+      await waitFor(() => {
+        expect(mockGet).lastCalledWith("todo-api/todo", {
+          page: { limit: 6 },
+          sort: "-createdOn"
+        });
+      });
+
+      await userEvent.click(wrapper.getByRole("combobox"));
+      // Clicking the label text toggles the checkbox (and keeps the menu open):
+      await userEvent.click(wrapper.getByText("Active only"));
+      expect(
+        wrapper.getByRole("checkbox", { name: "Active only" })
+      ).toBeChecked();
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThan(0);
+
+      await waitFor(() => {
+        expect(mockGet).lastCalledWith("todo-api/todo", {
+          filter: { status: { EQ: "active" } },
           page: { limit: 6 },
           sort: "-createdOn"
         });

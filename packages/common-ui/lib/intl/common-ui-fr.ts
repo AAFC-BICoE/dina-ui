@@ -150,6 +150,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     thumbnailImage: "Vignette",
     to: "À",
     true: "Vrai",
+    selectedOptionAdded: "Ajouté",
     typeHereToSearch: "Tapez ici pour effectuer une recherche.",
     typeToSearchOrChooseFromNewest:
       "Saisir la recherche ou choisir parmi les plus récents",
