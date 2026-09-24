@@ -4,17 +4,18 @@ import {
   CheckBoxField,
   DinaForm,
   DinaFormOnSubmit,
+  FormikButton,
   LoadingSpinner,
   NumberSpinnerField,
   SelectField,
-  SubmitButton,
   TextField,
   useApiClient
 } from "common-ui";
-import { Field, FormikContextType, useFormikContext } from "formik";
+import { Field, FormikProps, useFormikContext } from "formik";
 import { InputResource } from "kitsu";
 import _ from "lodash";
-import { useState } from "react";
+import { ReactNode, useRef, useState } from "react";
+import { FaArrowRight } from "react-icons/fa6";
 import SpreadSheetColumn from "spreadsheet-column";
 import * as yup from "yup";
 import {
@@ -32,6 +33,26 @@ export interface MaterialSampleGenerationFormProps {
   onGenerate: (samples: MaterialSampleGenerationFormSubmission) => void;
   initialValues?: GeneratorFormValues;
   initialMode?: GenerationMode;
+
+  /**
+   * Customize where the button bar and the rest of the form's content are placed on the page
+   * (e.g. to render the button bar above a page's <main> element, outside of its padding).
+   * Defaults to rendering the button bar directly below the rest of the content.
+   */
+  renderLayout?: (buttonBar: ReactNode, content: ReactNode) => ReactNode;
+}
+
+/** Reports the current numberToCreate value up so the button bar can be rendered outside the form. */
+function NumberToCreateWatcher({
+  onChange
+}: {
+  onChange: (numberToCreate: number | undefined) => void;
+}) {
+  const { values } = useFormikContext<GeneratorFormValues>();
+  useEffect(() => {
+    onChange(values.numberToCreate);
+  }, [values.numberToCreate]);
+  return null;
 }
 
 export interface MaterialSampleGenerationFormSubmission {
@@ -43,8 +64,16 @@ export interface MaterialSampleGenerationFormSubmission {
 export function MaterialSampleGenerationForm({
   onGenerate,
   initialValues,
-  initialMode
+  initialMode,
+  renderLayout
 }: MaterialSampleGenerationFormProps) {
+  // The button bar can be rendered outside of the form (so it can be positioned directly under
+  // the nav bar), so a ref is needed to trigger the form's submission from there:
+  const formRef = useRef<FormikProps<Partial<GeneratorFormValues>>>(null);
+  const [numberToCreate, setNumberToCreate] = useState<number | undefined>(
+    initialValues?.numberToCreate
+  );
+
   const [generationMode, setGenerationMode] = useState<GenerationMode>(
     initialMode || "SERIES"
   );
@@ -122,8 +151,31 @@ export function MaterialSampleGenerationForm({
     collectionQuery?.lastUsedCollection?.code ??
     collectionQuery?.lastUsedCollection?.name;
 
-  return (
+  const buttonBar = (
+    <DinaForm initialValues={{}}>
+      <ButtonBar>
+        <div className="col-md-6">
+          <BackToListButton entityLink="/collection/material-sample">
+            <DinaMessage id="cancelButtonText" />
+          </BackToListButton>
+        </div>
+        <div className="col-md-6 d-flex">
+          <FormikButton
+            className="btn btn-primary ms-auto"
+            buttonProps={() => ({ disabled: !numberToCreate })}
+            onClick={() => formRef.current?.submitForm()}
+          >
+            <DinaMessage id="next" />
+            <FaArrowRight className="ms-2" />
+          </FormikButton>
+        </div>
+      </ButtonBar>
+    </DinaForm>
+  );
+
+  const content = (
     <DinaForm<Partial<GeneratorFormValues>>
+      innerRef={formRef}
       initialValues={
         initialValues || {
           numberToCreate: 1,
@@ -141,6 +193,7 @@ export function MaterialSampleGenerationForm({
       validationSchema={generatorFormSchema}
       onSubmit={onSubmit}
     >
+      <NumberToCreateWatcher onChange={setNumberToCreate} />
       <div className="row">
         <GroupSelectField
           name="group"
@@ -198,22 +251,16 @@ export function MaterialSampleGenerationForm({
       {!useNextSequence && (
         <PreviewAndCustomizeFields generationMode={generationMode} />
       )}
-      <ButtonBar centered={false}>
-        <BackToListButton
-          className="ms-auto"
-          entityLink="/collection/material-sample"
-        >
-          <DinaMessage id="cancelButtonText" />
-        </BackToListButton>
-        <SubmitButton
-          buttonProps={(form: FormikContextType<GeneratorFormValues>) => ({
-            disabled: !form.values.numberToCreate
-          })}
-        >
-          <DinaMessage id="next" />
-        </SubmitButton>
-      </ButtonBar>
     </DinaForm>
+  );
+
+  return renderLayout ? (
+    renderLayout(buttonBar, content)
+  ) : (
+    <>
+      {content}
+      {buttonBar}
+    </>
   );
 }
 
