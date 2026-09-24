@@ -13,6 +13,10 @@ import {
   SEQDB_MODULE_TYPE_LABELS,
   SEQDB_MODULE_TYPES
 } from "../../types/seqdb-api/resources/SeqDBModuleType";
+import {
+  AGENT_MODULE_TYPE_LABELS,
+  AGENT_MODULE_TYPES
+} from "../../types/agent-api/resources/AgentModuleType";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 
 export const COLLECTION_OTHER_IDENTIFIERS_ID =
@@ -27,10 +31,13 @@ export const OBJECT_STORE_MANAGED_ATTRIBUTE_ID =
 export const SEQDB_MANAGED_ATTRIBUTE_ID =
   "fe62b8b4-875d-43b4-91a8-94f85b3aae42";
 
+export const AGENT_IDENTIFIERS_ID = "bff566b9-4044-4e0c-a9cd-0ab22c6f0e5b";
+
 export type ControlledVocabularyApi =
   | "collection"
   | "objectstore"
-  | "sequencing";
+  | "sequencing"
+  | "agent";
 
 export interface ControlledVocabularyApiConfig {
   apiPath: string;
@@ -86,6 +93,16 @@ export const CONTROLLED_VOCABULARY_APIS: Record<
     listRoute: "/controlled-vocabulary/list?tab=2",
     componentTypes: SEQDB_MODULE_TYPES,
     componentTypeLabels: SEQDB_MODULE_TYPE_LABELS as Record<string, string>
+  },
+  agent: {
+    apiPath: "agent-api",
+    apiBaseUrl: "/agent-api",
+    entityLink: "/agent/controlled-vocabulary-item",
+    editRoute: "/agent/controlled-vocabulary-item/edit",
+    viewRoute: "/agent/controlled-vocabulary-item/view",
+    listRoute: "/controlled-vocabulary/list?tab=3",
+    componentTypes: AGENT_MODULE_TYPES,
+    componentTypeLabels: AGENT_MODULE_TYPE_LABELS as Record<string, string>
   }
 };
 

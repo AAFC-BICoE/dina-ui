@@ -111,42 +111,9 @@ export function CollectingEventFormLayout({
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
-  function onSuggestionSelected(_, formik) {
-    /* To bring the effect as if the field's value is changed to reflect the placeholder change */
-    if (formik.values.dwcVerbatimLatitude === null) {
-      formik.setFieldValue("dwcVerbatimLatitude", "");
-    } else {
-      formik.setFieldValue("dwcVerbatimLatitude", null);
-    }
-    if (formik.values.dwcVerbatimLongitude === null) {
-      formik.setFieldValue("dwcVerbatimLongitude", "");
-    } else {
-      formik.setFieldValue("dwcVerbatimLongitude", null);
-    }
-    if (formik.values.dwcVerbatimCoordinates === null) {
-      formik.setFieldValue("dwcVerbatimCoordinates", "");
-    } else {
-      formik.setFieldValue("dwcVerbatimCoordinates", null);
-    }
-  }
-
-  const onChangeExternal = (form, name, value) => {
+  const onChangeExternal = (_form, name, value) => {
     if (name === "dwcVerbatimCoordinateSystem") {
       setDefaultVerbatimCoordSys?.(value);
-      /*When user enter other values instead of selecting from existing config,
-      correctly setting the placeHolder for verbatim coordinates */
-      if (
-        value !== CoordinateSystemEnum.DECIMAL_DEGREE &&
-        value !== CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES &&
-        value !== CoordinateSystemEnum.DEGREE_MINUTES_SECONDS &&
-        value !== CoordinateSystemEnum.UTM
-      ) {
-        if (form.values.dwcVerbatimCoordinates === null) {
-          form.setFieldValue("dwcVerbatimCoordinates", "");
-        } else {
-          form.setFieldValue("dwcVerbatimCoordinates", null);
-        }
-      }
     } else if (name === "dwcVerbatimSRS") {
       setDefaultVerbatimSRS?.(value);
     }
@@ -388,7 +355,6 @@ export function CollectingEventFormLayout({
                   )?.title
               }}
               blankSearchBackend={"json-api"}
-              onSuggestionSelected={onSuggestionSelected}
               onChangeExternal={onChangeExternal}
             />
             <Field name="dwcVerbatimCoordinateSystem">

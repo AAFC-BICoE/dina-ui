@@ -106,6 +106,10 @@ const CV_MODULES: Array<ControlledVocabularyApiConfig & { titleKey: string }> =
     {
       titleKey: "seqdbTitle",
       ...CONTROLLED_VOCABULARY_APIS.sequencing
+    },
+    {
+      titleKey: "agentsSectionTitle",
+      ...CONTROLLED_VOCABULARY_APIS.agent
     }
   ];
 
@@ -146,9 +150,12 @@ export default function ControlledVocabularyListPage() {
   const router = useRouter();
 
   // Tab state
-  const [currentTab, setCurrentTab] = useState<number>(() =>
-    router.query.tab === "1" ? 1 : router.query.tab === "2" ? 2 : 0
-  );
+  const [currentTab, setCurrentTab] = useState<number>(() => {
+    const tab = Number(router.query.tab);
+    return Number.isInteger(tab) && tab > 0 && tab < CV_MODULES.length
+      ? tab
+      : 0;
+  });
 
   // Sidebar data for each module. Hooks are called unconditionally in a fixed order.
   // Add a new entry for new modules.
@@ -167,11 +174,17 @@ export default function ControlledVocabularyListPage() {
     limit: 1000,
     params: SHARED_CV_PARAMS
   });
+  const agentSidebarData = useControlledVocabularySidebarData({
+    apiBaseUrl: CV_MODULES[3].apiBaseUrl,
+    limit: 1000,
+    params: SHARED_CV_PARAMS
+  });
 
   const moduleSidebarData = [
     collectionSidebarData,
     objectStoreSidebarData,
-    seqDBSidebarData
+    seqDBSidebarData,
+    agentSidebarData
   ];
 
   const activeModule = CV_MODULES[currentTab];

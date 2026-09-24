@@ -299,15 +299,7 @@ function ButtonBarContent({
     <>
       <div className="col-md-6 col-sm-12 mt-2">{backButton}</div>
       <div className="col-md-6 col-sm-12 d-flex">
-        <button
-          type="button"
-          className="btn btn-primary ms-auto"
-          style={{ width: "8rem" }}
-          onClick={submitForm}
-        >
-          <FaFloppyDisk className="me-2" />
-          <DinaMessage id="submitBtnText" />
-        </button>
+        <div className="ms-auto"></div>
         {id && (
           <DeleteButton
             id={id}
@@ -317,6 +309,15 @@ function ButtonBarContent({
             messageBody={<DinaMessage id="managedAttributeDeleteWarning" />}
           />
         )}
+        <button
+          type="button"
+          className="btn btn-primary ms-2"
+          style={{ width: "8rem" }}
+          onClick={submitForm}
+        >
+          <FaFloppyDisk className="me-2" />
+          <DinaMessage id="submitBtnText" />
+        </button>
       </div>
     </>
   );
@@ -359,6 +360,7 @@ export function ControlledVocabularyItemFormLayout({
             className="col-md-6"
             name="group"
             enableStoredDefaultGroup={true}
+            requiredField={true}
           />
         )}
       </div>
@@ -378,6 +380,7 @@ export function ControlledVocabularyItemFormLayout({
           model={`${apiPath}/controlled-vocabulary`}
           optionLabel={(cv) => cv.name}
           omitNullOption={true}
+          requiredField={true}
         />
         <SelectField
           className="col-md-6"
@@ -385,10 +388,16 @@ export function ControlledVocabularyItemFormLayout({
           options={ATTRIBUTE_COMPONENT_OPTIONS}
           label={formatMessage("field_managedAttributeComponent")}
           disabled={isEditMode}
+          requiredField={true}
         />
       </div>
       <div className="row">
-        <TextField className="col-md-6" name="name" disabled={isEditMode} />
+        <TextField
+          className="col-md-6"
+          name="name"
+          disabled={isEditMode}
+          requiredField={true}
+        />
         <TextField className="col-md-6" name="key" disabled={true} />
       </div>
       <div className="row">
@@ -400,6 +409,7 @@ export function ControlledVocabularyItemFormLayout({
             setVocabularyElementType(selectValue)
           }
           disabled={isEditMode}
+          requiredField={true}
         />
         {(vocabularyElementType === "DECIMAL" ||
           vocabularyElementType === "INTEGER") && (
@@ -448,6 +458,7 @@ export function ControlledVocabularyItemFormLayout({
             className="col-md-6"
             name="createdOn"
             label={formatMessage("field_createdOn")}
+            showTime={true}
           />
           <TextField
             className="col-md-6"

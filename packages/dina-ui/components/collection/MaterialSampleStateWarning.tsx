@@ -2,7 +2,8 @@ import {
   useDinaFormContext,
   FieldWrapper,
   Tooltip,
-  DinaFormSection
+  DinaFormSection,
+  EmptyFieldValue
 } from "common-ui";
 import { FaExclamationCircle } from "react-icons/fa";
 import { useFormikContext } from "formik";
@@ -37,8 +38,7 @@ export function MaterialSampleStateWarning() {
 
 export function MaterialSampleStateReadOnlyRender({ removeLabel }) {
   function renderAsReadOnly(value, formik) {
-    // Do not render anything if the state has empty value
-    if (!value) return <></>;
+    if (!value) return <EmptyFieldValue />;
 
     const metaDate = formik.values.stateChangedOn;
     const metaRemarks = formik.values.stateChangeRemarks;

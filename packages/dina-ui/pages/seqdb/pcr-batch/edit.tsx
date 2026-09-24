@@ -353,12 +353,13 @@ function PcrBatchFormFields({
   return (
     <div>
       <div className="row">
-        <TextField className="col-md-6" name="name" />
+        <TextField className="col-md-6" name="name" requiredField={true} />
         {!readOnly && (
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
             className="col-md-6"
+            requiredField={true}
           />
         )}
         <CheckBoxField
@@ -481,7 +482,7 @@ function PcrBatchFormFields({
       )}
       {readOnly && (
         <div className="row">
-          <DateField className="col-md-6" name="createdOn" />
+          <DateField className="col-md-6" name="createdOn" showTime={true} />
           <TextField className="col-md-6" name="createdBy" />
         </div>
       )}

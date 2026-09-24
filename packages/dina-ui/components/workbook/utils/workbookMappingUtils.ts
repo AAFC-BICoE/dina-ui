@@ -667,6 +667,8 @@ function matchWithoutPrefix(
 ): boolean {
   return (
     option.value.toLowerCase() === normalizedHeader.toLowerCase() ||
+    _toPlainString(option.value.replaceAll(".", "")) ===
+      _toPlainString(normalizedHeader) ||
     isValidOptionLabel(option, allOptions, normalizedHeader)
   );
 }

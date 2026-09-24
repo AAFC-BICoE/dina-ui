@@ -1,13 +1,40 @@
 import { AddPersonButton, PersonForm } from "../PersonForm";
-import { clearAndType, mountWithAppContext } from "common-ui";
+import {
+  clearAndType,
+  DoOperationsError,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { Person } from "../../../types/objectstore-api";
 import { waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 const mockSave = jest.fn();
 
+const TEST_IDENTIFIER_VOCABULARY_ITEMS = [
+  {
+    id: "cv-item-1",
+    type: "controlled-vocabulary-item",
+    name: "Wikidata",
+    key: "wikidata",
+    multilingualTitle: { titles: [{ lang: "en", title: "Wikidata ID" }] }
+  },
+  {
+    id: "cv-item-2",
+    type: "controlled-vocabulary-item",
+    name: "ORCID",
+    key: "orcid",
+    multilingualTitle: { titles: [{ lang: "en", title: "ORCID iD" }] }
+  }
+];
+
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async () => {
+const mockGet = jest.fn(async (path) => {
+  if (String(path).startsWith("agent-api/controlled-vocabulary-item")) {
+    return { data: TEST_IDENTIFIER_VOCABULARY_ITEMS };
+  }
+
   // Return empty array for the dropdowns:
   return { data: [] };
 });
@@ -362,6 +389,207 @@ describe("PersonForm", () => {
           })
         }
       ]);
+    });
+  });
+
+  it("Shows a friendly error and lets the user override a duplicate person name", async () => {
+    const duplicateMockSave = jest.fn(async (saves: any[]) => {
+      return saves.map((save) => {
+        if (
+          save.type === "person" &&
+          save.resource.familyNames === "Duplicate" &&
+          !save.resource.allowDuplicateName
+        ) {
+          throw new DoOperationsError(
+            "",
+            {
+              familyNames:
+                "Unprocessable Entity: Duplicate person detected. Existing resource ID: fd9af912-7a8d-4980-b34e-24919e3f48ab"
+            },
+            undefined,
+            { familyNames: "duplicate_resource" }
+          );
+        }
+        return {
+          ...save.resource,
+          id: save.resource.id ?? "22222222-2222-2222-2222-222222222222"
+        };
+      });
+    });
+
+    const mockOnSubmitSuccess = jest.fn();
+
+    const newPersonInput: Person = { type: "person" };
+
+    const wrapper = mountWithAppContext(
+      <PersonForm
+        person={newPersonInput as any}
+        onSubmitSuccess={mockOnSubmitSuccess}
+      />,
+      {
+        apiContext: {
+          apiClient: { get: mockGet } as any,
+          save: duplicateMockSave
+        }
+      }
+    );
+
+    // Fill in the required displayName plus the given/family names that will collide:
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "Jane Doe"
+    );
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /given names/i }),
+      "Jane"
+    );
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /family names/i }),
+      "Duplicate"
+    );
+
+    // Attempt to save; the friendly duplicate error should be displayed, showing
+    // only the given/family names (not the display name):
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitForLoadingToDisappear();
+
+    await waitFor(() =>
+      expect(wrapper.container.querySelector(".alert")).toHaveTextContent(
+        'A person with the name "Jane Duplicate" already exists, would you like to continue?'
+      )
+    );
+
+    // Links to the existing person's view page, parsed from the API error's detail text:
+    expect(
+      wrapper.getByRole("link", { name: /view existing person/i })
+    ).toHaveAttribute(
+      "href",
+      "/person/view?id=fd9af912-7a8d-4980-b34e-24919e3f48ab"
+    );
+
+    // Both given names and family names are highlighted, even though the API only
+    // pointed at familyNames, since the duplicate check is based on both together:
+    expect(wrapper.getByRole("textbox", { name: /given names/i })).toHaveClass(
+      "is-invalid"
+    );
+    expect(wrapper.getByRole("textbox", { name: /family names/i })).toHaveClass(
+      "is-invalid"
+    );
+
+    // Saving again while the error is unresolved should not succeed:
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(mockOnSubmitSuccess).toHaveBeenCalledTimes(0));
+
+    // Click the "Allow Duplicate" button:
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /allow duplicate/i })
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /given names/i })
+      ).not.toHaveClass("is-invalid")
+    );
+    expect(
+      wrapper.getByRole("textbox", { name: /family names/i })
+    ).not.toHaveClass("is-invalid");
+
+    // Submit again, this time it should succeed with allowDuplicateName sent
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => expect(mockOnSubmitSuccess).toHaveBeenCalledTimes(1));
+    expect(duplicateMockSave).lastCalledWith(
+      [
+        {
+          resource: expect.objectContaining({
+            type: "person",
+            givenNames: "Jane",
+            familyNames: "Duplicate",
+            allowDuplicateName: true
+          }),
+          type: "person"
+        }
+      ],
+      expect.anything()
+    );
+  });
+
+  it("Lists the agent identifier types from the controlled vocabulary", async () => {
+    const wrapper = mountWithAppContext(
+      <PersonForm person={{ type: "person" } as any} />,
+      { apiContext: { apiClient: { get: mockGet } as any, save: mockSave } }
+    );
+
+    await userEvent.click(
+      await wrapper.findByRole("button", { name: /add identifier/i })
+    );
+
+    await waitFor(() =>
+      expect(mockGet).toHaveBeenCalledWith(
+        expect.stringContaining("agent-api/controlled-vocabulary-item"),
+        expect.anything()
+      )
+    );
+
+    await userEvent.click(
+      await wrapper.findByRole("combobox", { name: /identifier type/i })
+    );
+
+    await wrapper.findByRole("option", { name: "Wikidata ID" });
+    wrapper.getByRole("option", { name: "ORCID iD" });
+  });
+
+  it("Submits the selected identifier type key as the namespace", async () => {
+    mockSave.mockResolvedValueOnce([
+      {
+        id: "new-identifier-id-1",
+        type: "identifier",
+        namespace: "orcid",
+        value: "0000-0001"
+      }
+    ]);
+
+    const wrapper = mountWithAppContext(
+      <PersonForm person={{ type: "person" } as any} />,
+      { apiContext: { apiClient: { get: mockGet } as any, save: mockSave } }
+    );
+
+    await userEvent.click(
+      await wrapper.findByRole("button", { name: /add identifier/i })
+    );
+
+    await userEvent.click(
+      await wrapper.findByRole("combobox", { name: /identifier type/i })
+    );
+    await userEvent.click(
+      await wrapper.findByRole("option", { name: "ORCID iD" })
+    );
+
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /^identifier$/i }),
+      "0000-0001"
+    );
+
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /display name/i }),
+      "Identified Person"
+    );
+
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(mockSave).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            resource: {
+              namespace: "orcid",
+              value: "0000-0001"
+            },
+            type: "identifier"
+          }
+        ],
+        expect.anything()
+      );
     });
   });
 });
