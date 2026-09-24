@@ -781,6 +781,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   groupName: "Name",
   groupSearchPlaceholder: "Search by code, path or label",
   groupsIBelongTo: "My Groups",
+  hideSelectedOptions: "Hide selected",
   groupsIDoNotBelongTo: "Other Groups",
   hostOrganismLegend: "Host Organism",
   http403ForbiddenError: "Access is denied",
@@ -830,6 +831,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeDeleteWarning:
     "Deleting this Managed Attribute could impact existing untracked resources like exports or scripts. Are you sure you want to proceed?",
   managedAttributeValueLabel: "Value",
+  managedAttributeNoMatches: "No matching Managed Attributes found",
+  managedAttributeSearchToAdd: "Search for a Managed Attribute to add...",
   managedAttributes: "Managed Attributes",
   managedAttributesViews: "Form Templates",
   "material-sample": "Material Sample",

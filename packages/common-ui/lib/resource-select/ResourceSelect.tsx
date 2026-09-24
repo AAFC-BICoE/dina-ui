@@ -5,19 +5,25 @@ import {
   PersistedResource
 } from "kitsu";
 import _ from "lodash";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useEffect, useRef, useState } from "react";
+import { FaCheck } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import { ActionMeta, StylesConfig } from "react-select";
 import { useDebounce } from "use-debounce";
 import {
+  getInitialScopeValues,
   getNestedValue,
+  passesScopeOptionFilters,
+  SCOPE_HEADER_HEIGHT_VAR,
   ScopedMenuList,
   ScopeOption,
+  ScopeValues,
   SelectOption,
   SimpleSearchFilterBuilder,
   useAccount
 } from "../..";
 import { JsonApiQuerySpec, useQuery } from "../api-client/useQuery";
+import { HighlightedText } from "./HighlightedText";
 import { useBulkGet } from "./useBulkGet";
 import { SortableSelect } from "common-ui";
 
@@ -86,7 +92,13 @@ export interface ResourceSelectBaseProps<TData extends KitsuResource> {
   /**
    * Programmically set what the default scope values should be.
    */
-  defaultScopes?: Record<string, string>;
+  defaultScopes?: ScopeValues;
+
+  /**
+   * Display the already selected options in the menu, grayed out and disabled, instead of hiding
+   * them. Pair with HIDE_SELECTED_SCOPE to let the user hide them.
+   */
+  showSelectedOptions?: boolean;
 
   /**
    * Define an attribute on the entity to group options by in the dropdown list.
@@ -127,8 +139,8 @@ export interface ResourceSelectInnerProps<TData extends KitsuResource>
   inputValue: string;
   setInputValue: (value: string) => void;
   searchValue?: string;
-  activeScopes?: Record<string, string>;
-  onScopeChange?: (scopeId: string, optionId: string) => void;
+  activeScopes?: ScopeValues;
+  onScopeChange?: (scopeId: string, scopeValue: string | boolean) => void;
 }
 
 type ResourceSelectValue<TData extends KitsuResource> =
@@ -177,20 +189,8 @@ export function ResourceSelect<TData extends KitsuResource>(
   const [searchValue] = useDebounce(inputValue, 250);
 
   // Initialize active states for all scopes
-  const [activeScopes, setActiveScopes] = useState<Record<string, string>>(
-    () => {
-      const initialState = { ...defaultScopes };
-      scopes?.forEach((scope) => {
-        if (
-          scope.type === "toggle" &&
-          !initialState[scope.id] &&
-          scope.options.length > 0
-        ) {
-          initialState[scope.id] = scope.options[0].id; // Default to first toggle option
-        }
-      });
-      return initialState;
-    }
+  const [activeScopes, setActiveScopes] = useState<ScopeValues>(() =>
+    getInitialScopeValues(scopes, defaultScopes)
   );
 
   // Omit blank/null filters:
@@ -230,8 +230,8 @@ export function ResourceSelect<TData extends KitsuResource>(
     response,
     searchValue,
     activeScopes,
-    onScopeChange: (scopeId, optionId) => {
-      setActiveScopes((prev) => ({ ...prev, [scopeId]: optionId }));
+    onScopeChange: (scopeId, scopeValue) => {
+      setActiveScopes((prev) => ({ ...prev, [scopeId]: scopeValue }));
     }
   });
 }
@@ -264,20 +264,8 @@ export function ResourceSelectCustomQuery<TData extends KitsuResource>(
   const [searchValue] = useDebounce(inputValue, 250);
 
   // Initialize active states for all scopes
-  const [activeScopes, setActiveScopes] = useState<Record<string, string>>(
-    () => {
-      const initialState = { ...defaultScopes };
-      scopes?.forEach((scope) => {
-        if (
-          scope.type === "toggle" &&
-          !initialState[scope.id] &&
-          scope.options.length > 0
-        ) {
-          initialState[scope.id] = scope.options[0].id; // Default to first toggle option
-        }
-      });
-      return initialState;
-    }
+  const [activeScopes, setActiveScopes] = useState<ScopeValues>(() =>
+    getInitialScopeValues(scopes, defaultScopes)
   );
 
   // Omit blank/null filters:
@@ -318,8 +306,8 @@ export function ResourceSelectCustomQuery<TData extends KitsuResource>(
     response,
     searchValue,
     activeScopes,
-    onScopeChange: (scopeId, optionId) => {
-      setActiveScopes((prev) => ({ ...prev, [scopeId]: optionId }));
+    onScopeChange: (scopeId, scopeValue) => {
+      setActiveScopes((prev) => ({ ...prev, [scopeId]: scopeValue }));
     }
   });
 }
@@ -357,12 +345,21 @@ export function ResourceSelectInner<TData extends KitsuResource>({
   filterList,
   scopes,
   activeScopes,
-  onScopeChange
+  onScopeChange,
+  showSelectedOptions
 }: ResourceSelectInnerProps<TData>) {
   const { formatMessage } = useIntl();
   const { isAdmin, groupNames } = useAccount();
 
   const isLoading = queryIsLoading || inputValue !== searchValue || loadingProp;
+
+  // Keep showing the last loaded options while re-fetching (e.g. after a scope change or selection)
+  // so the menu doesn't collapse to a loading message and re-open.
+  const lastResponse = useRef(response);
+  if (response) {
+    lastResponse.current = response;
+  }
+  const displayedResponse = response ?? lastResponse.current;
 
   useEffect(() => {
     // Only call when data is actually loaded (not when loading)
@@ -373,7 +370,7 @@ export function ResourceSelectInner<TData extends KitsuResource>({
 
   // Build the list of options from the returned resources.
   const resourceOptions =
-    response?.data
+    displayedResponse?.data
       .map((resource) => ({
         label: optionLabel(resource),
         resource,
@@ -444,14 +441,15 @@ export function ResourceSelectInner<TData extends KitsuResource>({
     options: asyncOptions
   };
 
-  // Show no options while loading: (react-select will show the "Loading..." text.)
-  const options = isLoading
-    ? []
-    : _.compact([
-        mainOptions,
-        ...(groupBy ? groupedResourceOptions : []),
-        actionOptions
-      ]);
+  // Show no options during the initial load: (react-select will show the "Loading..." text.)
+  const options =
+    isLoading && !displayedResponse
+      ? []
+      : _.compact([
+          mainOptions,
+          ...(groupBy ? groupedResourceOptions : []),
+          actionOptions
+        ]);
 
   async function onChange(
     newSelectedRaw,
@@ -526,6 +524,10 @@ export function ResourceSelectInner<TData extends KitsuResource>({
   });
   const selectValue = isMulti ? selectedAsArray : selectedAsArray[0] ?? null;
 
+  const selectedIds = valueAsArray.map((it) => String(it.id));
+  const isResourceSelected = (resource?: { id?: string | null }) =>
+    !!resource?.id && selectedIds.includes(String(resource.id));
+
   // Disable dropdown if the selected option is the only option available
   if (cannotBeChanged && !isMulti) {
     isDisabled =
@@ -546,19 +548,38 @@ export function ResourceSelectInner<TData extends KitsuResource>({
       })
     }),
     menu: (base) => ({ ...base, zIndex: 9001 }),
-    // Make the menu's height fit the resource options and the action options:
-    menuList: (base) => ({ ...base, maxHeight: "400px" }),
+    // No top padding, so the sticky scope bar and group headings sit flush with the top.
+    menuList: (base) => ({ ...base, paddingTop: 0 }),
+    // Keep group headings visible while scrolling, just below the scope header:
+    groupHeading: (base, hProps) => ({
+      ...(styles?.groupHeading?.(base, hProps) ?? base),
+      position: "sticky",
+      top: `var(${SCOPE_HEADER_HEIGHT_VAR}, 0px)`,
+      zIndex: 1,
+      backgroundColor: "#ffffff",
+      borderBottom: "1px solid #e2e8f0",
+      marginBottom: 0,
+      paddingTop: "4px",
+      paddingBottom: "4px"
+    }),
     group: (base, gProps) => ({
       ...base,
       // Make Action options bold:
       ...(gProps.label === actionOptions?.label ? { fontWeight: "bold" } : {})
     }),
     // Grouped options (relationships) should be indented.
-    option: (baseStyle, { data }) => {
+    option: (baseStyle, { data, isDisabled }) => {
       if (data?.resource) {
         return {
           ...baseStyle,
-          paddingLeft: "25px"
+          paddingLeft: "25px",
+          // Gray out the already selected options (see showSelectedOptions):
+          ...(showSelectedOptions &&
+            isDisabled && {
+              backgroundColor: "transparent",
+              color: "#9ca3af",
+              cursor: "not-allowed"
+            })
         };
       }
 
@@ -582,9 +603,53 @@ export function ResourceSelectInner<TData extends KitsuResource>({
       styles={customStyle}
       classNamePrefix="react-select"
       value={selectValue}
-      // The filtering is already done at the API level:
-      filterOption={({ data }) => filterList?.((data as any)?.resource) ?? true}
+      // Search filtering is done at the API level, only the list and scope filters are applied here:
+      filterOption={({ data }) => {
+        const resource = (data as any)?.resource;
+        return (
+          (filterList?.(resource) ?? true) &&
+          passesScopeOptionFilters(scopes, activeScopes, resource, {
+            isSelected: isResourceSelected(resource)
+          })
+        );
+      }}
+      {...(showSelectedOptions && {
+        hideSelectedOptions: false,
+        isOptionDisabled: (option: any) => isResourceSelected(option.resource)
+      })}
       isDisabled={isDisabled}
+      // Make the menu's height fit the resource options and the action options. Set as a prop
+      // (not a style) so react-select can still shrink or flip the menu to fit the viewport.
+      maxMenuHeight={400}
+      // Highlight the search text within the menu options:
+      formatOptionLabel={(option: any, { context }) => {
+        if (context !== "menu") {
+          return option.label;
+        }
+        const label =
+          typeof option.label === "string" ? (
+            <HighlightedText text={option.label} search={inputValue} />
+          ) : (
+            option.label
+          );
+
+        // Tag the already selected options (see showSelectedOptions):
+        if (showSelectedOptions && isResourceSelected(option.resource)) {
+          return (
+            <div className="d-flex align-items-center justify-content-between gap-2">
+              <span>{label}</span>
+              <span
+                className="resource-select-added-tag d-flex align-items-center gap-1 text-nowrap"
+                style={{ color: "#16a34a", fontSize: "12px" }}
+              >
+                <FaCheck />
+                {formatMessage({ id: "selectedOptionAdded" })}
+              </span>
+            </div>
+          );
+        }
+        return label;
+      }}
       {...selectProps}
       components={{
         MenuList: ScopedMenuList,
