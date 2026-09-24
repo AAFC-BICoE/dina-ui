@@ -564,6 +564,8 @@ export function ResourceSelectInner<TData extends KitsuResource>({
     }),
     group: (base, gProps) => ({
       ...base,
+      // No space above the sticky group headings:
+      paddingTop: 0,
       // Make Action options bold:
       ...(gProps.label === actionOptions?.label ? { fontWeight: "bold" } : {})
     }),

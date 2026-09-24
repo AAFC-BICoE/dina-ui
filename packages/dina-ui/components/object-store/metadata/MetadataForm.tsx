@@ -204,7 +204,6 @@ export function MetadataForm({
         }}
         disableClearButton={true}
       />
-      {buttonBar}
     </DinaForm>
   );
 }
