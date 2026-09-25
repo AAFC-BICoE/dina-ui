@@ -121,8 +121,141 @@ input[id^="react-select"] {
 
 .fieldset-h2-adjustment {
   font-size: 1.7rem !important;
-  margin-top: 15px !important;
-  margin-bottom: 10px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+fieldset.card.border {
+  position: relative;
+  border-radius: 0.5rem !important;
+  margin-top: 30px !important;
+  padding-top: 1.75rem !important;
+}
+
+fieldset.card.border > .legend-wrapper {
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  transform: translateY(calc(-50% + 3px));
+  margin: 0;
+  padding: 0 0.5rem;
+  background: linear-gradient(
+    to bottom,
+    var(--bs-body-bg, #fff) calc(50% - 3px),
+    var(--bs-body-bg, #fff) calc(50% - 3px)
+  );
+  z-index: 1;
+}
+
+fieldset.card.border:has(> .legend-wrapper > .row) {
+  padding-top: 0.5rem !important;
+}
+
+fieldset.card.border > .legend-wrapper:has(> .row) {
+  position: static;
+  transform: none;
+  padding: 0;
+  margin-bottom: 0.5rem;
+  background-color: transparent;
+}
+
+.material-sample-nav {
+  max-height: calc(100vh - 70px - 1rem);
+  overflow-y: auto;
+}
+
+.material-sample-nav .card {
+  border: none;
+  background-color: transparent;
+}
+
+.material-sample-nav label {
+  color: #8a8a8a;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.material-sample-nav label strong {
+  font-weight: 700;
+}
+
+.material-sample-nav .list-group-item {
+  height: 2.5rem !important;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border: none;
+  border-radius: 6px;
+}
+
+.material-sample-nav .list-group-item .mt-2 {
+  margin-top: 0 !important;
+}
+
+.material-sample-nav .list-group-item div.flex-grow-1 {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.material-sample-nav .list-group-item a.flex-grow-1 {
+  color: inherit;
+}
+
+.material-sample-nav .list-group-item.active {
+  background-color: #335075;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.material-sample-nav .sub-nav-list {
+  max-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  transition: max-height 0.3s ease;
+}
+
+.material-sample-nav .list-group-item.active + .sub-nav-list {
+  max-height: 30rem;
+}
+
+.material-sample-nav .sub-nav-list li {
+  padding: 0;
+}
+
+.material-sample-nav .sub-nav-list a {
+  display: block;
+  margin-left: 1.25rem;
+  padding: 0.2rem 0 0.2rem 0.6rem;
+  border-left: 2px solid #dee2e6;
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.material-sample-nav .sub-nav-list a.active {
+  color: #335075;
+  font-weight: 600;
+  border-left-width: 3px;
+  border-left-color: #335075;
+}
+
+.nav-hover-highlight {
+  outline: 3px solid #335075;
+  outline-offset: 4px;
+  border-radius: 0.5rem;
+  transition: outline-color 0.2s;
+}
+
+fieldset.card.border,
+#georeferencing,
+#geographicPlace,
+#collectingEventFieldExtensions,
+#collectingEventManagedAttributes,
+#collectingEventAttachments {
+  scroll-margin-top: 100px;
 }
 
 .modal-header {

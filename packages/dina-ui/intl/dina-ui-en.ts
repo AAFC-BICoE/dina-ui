@@ -224,6 +224,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEvents: "Collecting Events",
   collectingEventAttachments: "Collecting Event Attachments",
   collectingEventDetails: "Collecting Event Details",
+  collectingEventGeoreferencing: "Georeferencing",
+  collectingEventGeographicPlace: "Geographic Place",
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
