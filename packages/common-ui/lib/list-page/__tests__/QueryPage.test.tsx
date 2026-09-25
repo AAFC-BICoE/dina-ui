@@ -29,7 +29,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths) => {
 // Mock Next.js router
 const mockReload = jest.fn();
 const mockPush = jest.fn();
-const mockRouter = {
+const mockRouter: any = {
   push: mockPush,
   reload: mockReload,
   pathname: "/collection/material-sample/list",
@@ -162,6 +162,70 @@ describe("QueryPage test", () => {
     await waitFor(() => {
       expect(mockReload).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it("Query URL with a managed attribute performs the search once the managed attribute is loaded", async () => {
+    const managedAttribute = {
+      id: "8504783b-cf16-4702-b2fe-88c2db2ee475",
+      type: "controlled-vocabulary-item",
+      name: "Field Number",
+      key: "field_number",
+      group: "other-group",
+      vocabularyElementType: "STRING",
+      acceptedValues: null
+    };
+    mockGet.mockImplementation(async (path, params) => {
+      if (
+        path === "collection-api/controlled-vocabulary-item" &&
+        params?.filter?.uuid?.EQ === managedAttribute.id
+      ) {
+        return { data: [managedAttribute] };
+      }
+      return mockResponses[path] ?? { data: [] };
+    });
+    mockRouter.query = {
+      queryTree: JSON.stringify({
+        c: "a",
+        p: [
+          {
+            f: "data.attributes.managedAttributes",
+            o: "exactMatch",
+            v: "F-043134",
+            t: "managedAttribute",
+            d: managedAttribute.id
+          }
+        ]
+      })
+    };
+
+    try {
+      mountWithAppContext(
+        <DinaForm initialValues={{}}>
+          <MaterialSampleListPage />
+        </DinaForm>,
+        testCtx
+      );
+
+      // Without any user interaction, a search including the managed attribute should be made.
+      await waitFor(() => {
+        const searchesWithManagedAttribute = mockPost.mock.calls.filter(
+          ([path, query]) =>
+            path === "search-api/search-ws/search" &&
+            JSON.stringify(query).includes(
+              "data.attributes.managedAttributes.field_number"
+            )
+        );
+        expect(searchesWithManagedAttribute.length).toBeGreaterThan(0);
+        expect(JSON.stringify(searchesWithManagedAttribute[0][1])).toContain(
+          "F-043134"
+        );
+      });
+    } finally {
+      mockRouter.query = {};
+      mockGet.mockImplementation(
+        async (path) => mockResponses[path] ?? { data: [] }
+      );
+    }
   });
 
   describe("QueryPage Tab Functionality", () => {
