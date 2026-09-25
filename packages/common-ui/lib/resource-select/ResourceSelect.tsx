@@ -21,6 +21,27 @@ import { JsonApiQuerySpec, useQuery } from "../api-client/useQuery";
 import { useBulkGet } from "./useBulkGet";
 import { SortableSelect } from "common-ui";
 
+/**
+ * Determine the active option for each scope, using the defaultScopes if provided, otherwise the
+ * first toggle option.
+ */
+function getDefaultActiveScopes(
+  scopes?: ScopeOption[],
+  defaultScopes?: Record<string, string>
+): Record<string, string> {
+  const initialState = { ...defaultScopes };
+  scopes?.forEach((scope) => {
+    if (
+      scope.type === "toggle" &&
+      !initialState[scope.id] &&
+      scope.options.length > 0
+    ) {
+      initialState[scope.id] = scope.options[0].id; // Default to first toggle option
+    }
+  });
+  return initialState;
+}
+
 /** ResourceSelect component props. */
 export interface ResourceSelectBaseProps<TData extends KitsuResource> {
   /** Sets the input's value so the value can be controlled externally. */
@@ -176,22 +197,15 @@ export function ResourceSelect<TData extends KitsuResource>(
   /** The debounced input value passed to the fetcher. */
   const [searchValue] = useDebounce(inputValue, 250);
 
-  // Initialize active states for all scopes
-  const [activeScopes, setActiveScopes] = useState<Record<string, string>>(
-    () => {
-      const initialState = { ...defaultScopes };
-      scopes?.forEach((scope) => {
-        if (
-          scope.type === "toggle" &&
-          !initialState[scope.id] &&
-          scope.options.length > 0
-        ) {
-          initialState[scope.id] = scope.options[0].id; // Default to first toggle option
-        }
-      });
-      return initialState;
-    }
+  // Scope options chosen by the user. Any scope not chosen falls back to its default option, this
+  // also covers scopes provided after the first render.
+  const [selectedScopes, setSelectedScopes] = useState<Record<string, string>>(
+    {}
   );
+  const activeScopes = {
+    ...getDefaultActiveScopes(scopes, defaultScopes),
+    ...selectedScopes
+  };
 
   // Omit blank/null filters:
   const filterParam = _.omitBy(
@@ -231,7 +245,7 @@ export function ResourceSelect<TData extends KitsuResource>(
     searchValue,
     activeScopes,
     onScopeChange: (scopeId, optionId) => {
-      setActiveScopes((prev) => ({ ...prev, [scopeId]: optionId }));
+      setSelectedScopes((prev) => ({ ...prev, [scopeId]: optionId }));
     }
   });
 }
@@ -263,22 +277,15 @@ export function ResourceSelectCustomQuery<TData extends KitsuResource>(
   /** The debounced input value passed to the fetcher. */
   const [searchValue] = useDebounce(inputValue, 250);
 
-  // Initialize active states for all scopes
-  const [activeScopes, setActiveScopes] = useState<Record<string, string>>(
-    () => {
-      const initialState = { ...defaultScopes };
-      scopes?.forEach((scope) => {
-        if (
-          scope.type === "toggle" &&
-          !initialState[scope.id] &&
-          scope.options.length > 0
-        ) {
-          initialState[scope.id] = scope.options[0].id; // Default to first toggle option
-        }
-      });
-      return initialState;
-    }
+  // Scope options chosen by the user. Any scope not chosen falls back to its default option, this
+  // also covers scopes provided after the first render.
+  const [selectedScopes, setSelectedScopes] = useState<Record<string, string>>(
+    {}
   );
+  const activeScopes = {
+    ...getDefaultActiveScopes(scopes, defaultScopes),
+    ...selectedScopes
+  };
 
   // Omit blank/null filters:
   const filterParam = _.omitBy(filter(searchValue), (val) =>
@@ -319,7 +326,7 @@ export function ResourceSelectCustomQuery<TData extends KitsuResource>(
     searchValue,
     activeScopes,
     onScopeChange: (scopeId, optionId) => {
-      setActiveScopes((prev) => ({ ...prev, [scopeId]: optionId }));
+      setSelectedScopes((prev) => ({ ...prev, [scopeId]: optionId }));
     }
   });
 }

@@ -28,6 +28,7 @@ import { PersistedResource } from "kitsu";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
+import { useQueryBuilderContext } from "../QueryBuilder";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 interface QueryBuilderManagedAttributeSearchProps {
@@ -111,6 +112,10 @@ export default function QueryRowManagedAttributeSearch({
 
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
+  // Used to perform the search once a preloaded managed attribute (query URL) has been loaded in.
+  const { performSubmit } = useQueryBuilderContext(false) || {};
+  const [submitAfterPreload, setSubmitAfterPreload] = useState<boolean>(false);
+
   useEffect(() => {
     // Once the menu is open, preload id should be reset since the user wants to choose
     // a different option.
@@ -136,6 +141,24 @@ export default function QueryRowManagedAttributeSearch({
       setManagedAttributeState(JSON.parse(value));
     }
   }, [managedAttributeConfig, value]);
+
+  // The search performed when loading the query URL could not include this managed attribute
+  // since it was not loaded yet. Once the Query Builder has the loaded managed attribute, search
+  // again.
+  useEffect(() => {
+    if (!submitAfterPreload || !value) {
+      return;
+    }
+    const queryBuilderState: ManagedAttributeSearchStates = JSON.parse(value);
+    if (
+      queryBuilderState.selectedManagedAttribute &&
+      queryBuilderState.selectedType &&
+      !queryBuilderState.preloadId
+    ) {
+      setSubmitAfterPreload(false);
+      performSubmit?.();
+    }
+  }, [submitAfterPreload, value, performSubmit]);
 
   const managedAttributeSelected =
     managedAttributeState.selectedManagedAttribute;
@@ -402,7 +425,12 @@ export default function QueryRowManagedAttributeSearch({
         }
         model={managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""}
         groupBy="group"
-        scopes={[GROUP_SCOPE(groupNames ?? [], formatMessage)]}
+        // The preloaded managed attribute could be from any group, so no scopes are applied.
+        scopes={
+          managedAttributeState.preloadId
+            ? []
+            : [GROUP_SCOPE(groupNames ?? [], formatMessage)]
+        }
         optionLabel={(attribute) => {
           // Attempt to display the multilingual title if it exists, otherwise fallback to name, key, or id.
           if ((attribute as any)?.multilingualTitle?.titles?.length) {
@@ -428,13 +456,22 @@ export default function QueryRowManagedAttributeSearch({
         })}
         pageSize={15}
         onDataLoaded={(data) => {
-          if (managedAttributeState.preloadId) {
-            if (managedAttributeState.preloadId && data?.length === 1) {
-              setManagedAttributeState({
-                ...managedAttributeState,
-                selectedManagedAttribute: data[0]
-              });
-            }
+          if (managedAttributeState.preloadId && data?.length === 1) {
+            const fieldPath =
+              (managedAttributeConfig?.path ?? "") + "." + (data[0].key ?? "");
+
+            // Clear the preloadId once loaded, otherwise this would keep re-applying the
+            // selection on every render.
+            setManagedAttributeState({
+              ...managedAttributeState,
+              selectedManagedAttribute: data[0],
+              selectedManagedAttributeConfig: fieldValueToIndexSettings(
+                fieldPath,
+                indexMap ?? []
+              ),
+              preloadId: undefined
+            });
+            setSubmitAfterPreload(!isInColumnSelector);
           }
         }}
         onChange={(newValue) => {

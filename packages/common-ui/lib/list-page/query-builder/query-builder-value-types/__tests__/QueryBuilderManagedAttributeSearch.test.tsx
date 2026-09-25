@@ -1,4 +1,38 @@
-import { transformManagedAttributeToDSL } from "../QueryBuilderManagedAttributeSearch";
+import { mountWithAppContext } from "common-ui";
+import { waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import QueryRowManagedAttributeSearch, {
+  transformManagedAttributeToDSL
+} from "../QueryBuilderManagedAttributeSearch";
+
+// Mock out the debounce function to avoid waiting during tests.
+jest.mock("use-debounce", () => ({
+  useDebounce: (fn) => [fn, { isPending: () => false }]
+}));
+
+/** Managed attribute in a group the test user is not a member of. */
+const MANAGED_ATTRIBUTE_OTHER_GROUP = {
+  id: "8504783b-cf16-4702-b2fe-88c2db2ee475",
+  type: "controlled-vocabulary-item",
+  name: "Field Number",
+  key: "field_number",
+  group: "dao",
+  vocabularyElementType: "STRING",
+  acceptedValues: null
+};
+
+const mockGet = jest.fn<any, any>(async (_path, { filter }) => {
+  // Only return the managed attribute when searching by UUID without the group filter.
+  if (
+    filter?.uuid?.EQ === MANAGED_ATTRIBUTE_OTHER_GROUP.id &&
+    filter?.group === undefined
+  ) {
+    return { data: [MANAGED_ATTRIBUTE_OTHER_GROUP] };
+  }
+  return { data: [] };
+});
+
+const apiContext = { apiClient: { get: mockGet } } as any;
 
 interface TestValueStructure {
   type: string;
@@ -288,5 +322,74 @@ describe("QueryBuilderManagedAttributeSearch", () => {
         });
       }
     );
+  });
+
+  describe("Query URL preloading", () => {
+    beforeEach(() => jest.clearAllMocks());
+
+    it("Preloads the managed attribute by UUID, even if it's outside of the user's groups", async () => {
+      const setValue = jest.fn();
+
+      mountWithAppContext(
+        <QueryRowManagedAttributeSearch
+          value={JSON.stringify({
+            searchValue: "F-043134",
+            selectedOperator: "exactMatch",
+            selectedType: "",
+            preloadId: MANAGED_ATTRIBUTE_OTHER_GROUP.id
+          })}
+          setValue={setValue}
+          isInColumnSelector={false}
+          managedAttributeConfig={
+            {
+              label: "managedAttributes",
+              value: "data.attributes.managedAttributes",
+              path: "data.attributes.managedAttributes",
+              type: "managedAttribute",
+              dynamicField: {
+                type: "managedAttribute",
+                label: "managedAttributes",
+                path: "data.attributes.managedAttributes",
+                apiEndpoint: "objectstore-api/controlled-vocabulary-item",
+                component: "ENTITY"
+              }
+            } as any
+          }
+        />,
+        { apiContext }
+      );
+
+      await waitFor(() => {
+        const latestValue = JSON.parse(setValue.mock.lastCall[0]);
+        expect(latestValue).toEqual(
+          expect.objectContaining({
+            searchValue: "F-043134",
+            selectedOperator: "exactMatch",
+            selectedType: "STRING",
+            selectedManagedAttribute: MANAGED_ATTRIBUTE_OTHER_GROUP
+          })
+        );
+        expect(latestValue.preloadId).toBeUndefined();
+      });
+
+      // The preload request should not contain the group scope filter.
+      expect(mockGet).toHaveBeenCalledWith(
+        "objectstore-api/controlled-vocabulary-item",
+        expect.objectContaining({
+          filter: { uuid: { EQ: MANAGED_ATTRIBUTE_OTHER_GROUP.id } }
+        })
+      );
+
+      // Once preloaded, the group scope should be applied again for the dropdown options.
+      expect(mockGet).toHaveBeenLastCalledWith(
+        "objectstore-api/controlled-vocabulary-item",
+        expect.objectContaining({
+          filter: { group: { IN: "aafc,cnc" } }
+        })
+      );
+
+      // Should not be stuck in a render loop re-applying the preloaded attribute.
+      expect(setValue.mock.calls.length).toBeLessThan(10);
+    });
   });
 });
