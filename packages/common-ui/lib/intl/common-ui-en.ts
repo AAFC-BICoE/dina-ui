@@ -180,6 +180,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   thumbnailImage: "Thumbnail Image",
   to: "To",
   true: "True",
+  selectedOptionAdded: "Added",
   typeHereToSearch: "Type here to search.",
   typeToSearchOrChooseFromNewest: "Type to search or choose from newest",
   uiAppVersion: "UI Application Version: {version}",
