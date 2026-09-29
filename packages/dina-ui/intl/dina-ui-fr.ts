@@ -199,6 +199,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Glisser et déposer l'attribut à sa nouvelle position.",
   duplicate: "Dupliquer",
   duplicateFilesFound: "fichiers en double trouvés",
+  duplicatePersonFound:
+    'Une personne portant le nom "{name}" existe déjà, voulez-vous continuer?',
+  duplicatePersonViewLink: "Voir la personne existante",
   duplicatePrimaryIdFound: "Copie du document d'identité principal trouvée ",
   editAssemblageTitle: "Modifier un assemblage",
   editCataloguedObjectTitle: "Modifier un objet catalogué",
@@ -553,6 +556,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   groupName: "Nom",
   groupSearchPlaceholder: "Rechercher par code, chemin ou étiquette",
   groupsIBelongTo: "Mes groupes",
+  hideSelectedOptions: "Masquer les sélectionnés",
   groupsIDoNotBelongTo: "Autres groupes",
   hostOrganismLegend: "Organisme hôte",
   http403ForbiddenError: "Accès refusé",
@@ -591,6 +595,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   managedAttributeDeleteWarning:
     "La suppression de cet attribut géré pourrait avoir un impact sur des ressources non suivies existantes comme les exportations ou les scripts. Voulez-vous vraiment continuer ?",
   managedAttributeValueLabel: "Valeur",
+  managedAttributeNoMatches: "Aucun attribut géré correspondant trouvé",
+  managedAttributeSearchToAdd: "Rechercher un attribut géré à ajouter...",
   managedAttributes: "Attributs gérés",
   managedAttributesViews: "Modèles de formulaires",
   "material-sample": "Échantillon de matériau",

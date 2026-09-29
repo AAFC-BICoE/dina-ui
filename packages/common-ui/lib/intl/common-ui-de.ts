@@ -178,6 +178,7 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   thumbnailImage: "Vorschaubild",
   to: "Nach",
   true: "Richtig",
+  selectedOptionAdded: "Hinzugefügt",
   typeHereToSearch: "Für die Suche bitte hier eintragen.",
   typeToSearchOrChooseFromNewest:
     "Wählen Sie aus den neusten Einträgen oder geben Sie hier ihren Suchbegriff ein.",

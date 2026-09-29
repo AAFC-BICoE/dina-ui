@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import { DinaForm, DinaFormSubmitParams } from "../formik-connected/DinaForm";
 import { FormikButton } from "../formik-connected/FormikButton";
 import { OnFormikSubmit } from "../formik-connected/safeSubmit";
@@ -27,6 +27,12 @@ export interface AreYouSureModalProps {
    */
   noButtonText?: ReactNode;
 }
+
+const BUTTON_STYLE: CSSProperties = {
+  minWidth: "10rem",
+  width: "auto",
+  whiteSpace: "nowrap"
+};
 
 export function AreYouSureModal({
   actionMessage,
@@ -67,13 +73,17 @@ export function AreYouSureModal({
             <FormikButton
               className="btn btn-dark no-button"
               onClick={closeModal}
-              buttonProps={() => ({ style: { width: "10rem" } })}
+              buttonProps={() => ({ style: BUTTON_STYLE })}
             >
               <FaTimes className="me-2" />
               {noButtonText ?? <CommonMessage id="no" />}
             </FormikButton>
 
-            <SubmitButton className="yes-button" showSaveIcon={false}>
+            <SubmitButton
+              className="yes-button"
+              showSaveIcon={false}
+              buttonProps={() => ({ style: BUTTON_STYLE })}
+            >
               <FaCheck className="me-2" />
               {yesButtonText ?? <CommonMessage id="yes" />}
             </SubmitButton>

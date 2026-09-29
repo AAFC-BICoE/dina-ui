@@ -7,6 +7,7 @@ import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
 import _ from "lodash";
 import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 describe("QueryBuilderDateSearch", () => {
   describe("QueryBuilderDateSearch Component", () => {
@@ -51,6 +52,31 @@ describe("QueryBuilderDateSearch", () => {
         "Expect date field not to be displayed since the match type is not equals"
       );
     });
+
+    it.each(["equals", "between"])(
+      "Disables browser autocomplete on the %s date inputs.",
+      async (matchType) => {
+        const { getAllByRole } = mountWithAppContext(
+          <DinaForm initialValues={{}}>
+            <QueryBuilderContextProvider
+              value={{ performSubmit: _.noop, groups: [] }}
+            >
+              <QueryBuilderDateSearch
+                matchType={matchType}
+                value=""
+                setValue={jest.fn}
+              />
+            </QueryBuilderContextProvider>
+          </DinaForm>
+        );
+
+        const textboxes = getAllByRole("textbox");
+        expect(textboxes).toHaveLength(matchType === "between" ? 2 : 1);
+        textboxes.forEach((textbox) =>
+          expect(textbox).toHaveAttribute("autocomplete", "off")
+        );
+      }
+    );
 
     it("Should call performSubmit on enter key press in textfield", async () => {
       const mockPerformSubmit = jest.fn();

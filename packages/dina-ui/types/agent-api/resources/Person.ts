@@ -14,6 +14,12 @@ export interface PersonAttributes {
   createdOn?: string;
   webpage?: URL;
   remarks?: string;
+
+  /**
+   * Transient property used to allow duplicate names for a person.
+   * This is not persisted in the database and is only used for validation purposes.
+   */
+  allowDuplicateName?: boolean;
 }
 
 export interface PersonRelationships {

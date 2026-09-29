@@ -13,11 +13,7 @@ process.browser = true;
  */
 const consoleError = console.error;
 jest.spyOn(console, "error").mockImplementation((...args) => {
-  if (
-    !String(args?.[0])?.includes?.(
-      "was not wrapped in act"
-    )
-  ) {
+  if (!String(args?.[0])?.includes?.("was not wrapped in act")) {
     consoleError(...args);
   }
 });
@@ -33,6 +29,15 @@ Object.defineProperty(Element.prototype, "scrollIntoView", {
   writable: true,
   configurable: true
 });
+
+// Used by react-datepicker's time list
+if (!global.ResizeObserver) {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
 
 jest.setTimeout(50000);
 

@@ -41,6 +41,7 @@ export function FilterRowDatePicker({
       <>
         <div className="list-inline-item" style={{ width: "14rem" }}>
           <DatePicker
+            autoComplete="off"
             className="d-inline-block form-control"
             wrapperClassName="w-100"
             selected={new Date(low)}
@@ -51,6 +52,7 @@ export function FilterRowDatePicker({
         </div>
         <div className="list-inline-item" style={{ width: "14rem" }}>
           <DatePicker
+            autoComplete="off"
             className="d-inline-block form-control"
             wrapperClassName="w-100"
             selected={new Date(high)}
@@ -73,6 +75,7 @@ export function FilterRowDatePicker({
       <>
         <div className="list-inline-item" style={{ width: "16rem" }}>
           <DatePicker
+            autoComplete="off"
             className="d-inline-block form-control"
             wrapperClassName="w-100"
             selected={selected}

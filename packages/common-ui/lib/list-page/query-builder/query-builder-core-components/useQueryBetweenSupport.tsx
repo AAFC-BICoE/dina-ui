@@ -159,6 +159,7 @@ export function useQueryBetweenSupport({
       </InputGroup.Text>
       {type === "date" ? (
         <DatePicker
+          autoComplete="off"
           name="low"
           value={betweenStates.low}
           onChange={(dateValue: Date, event) => {
@@ -172,7 +173,9 @@ export function useQueryBetweenSupport({
           }}
           onChangeRaw={(event) => {
             if (event?.type === "change") {
-              let newText = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
+              let newText = (
+                event.target as HTMLTextAreaElement | HTMLInputElement
+              ).value;
               const dashOccurrences = newText.split("-").length - 1;
               if (newText.length === 8 && dashOccurrences === 0) {
                 newText =
@@ -200,7 +203,12 @@ export function useQueryBetweenSupport({
           name="low"
           className="form-control"
           value={betweenStates.low}
-          onChange={(event) => handleBetweenChange((event.target as HTMLTextAreaElement | HTMLInputElement).value, "low")}
+          onChange={(event) =>
+            handleBetweenChange(
+              (event.target as HTMLTextAreaElement | HTMLInputElement).value,
+              "low"
+            )
+          }
           onKeyDown={onKeyDown}
         />
       )}
@@ -211,6 +219,7 @@ export function useQueryBetweenSupport({
       </InputGroup.Text>
       {type === "date" ? (
         <DatePicker
+          autoComplete="off"
           name="high"
           value={betweenStates.high}
           onChange={(dateValue: Date, event) => {
@@ -224,7 +233,9 @@ export function useQueryBetweenSupport({
           }}
           onChangeRaw={(event) => {
             if (event?.type === "change") {
-              let newText = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
+              let newText = (
+                event.target as HTMLTextAreaElement | HTMLInputElement
+              ).value;
               const dashOccurrences = newText.split("-").length - 1;
               if (newText.length === 8 && dashOccurrences === 0) {
                 newText =
@@ -252,7 +263,12 @@ export function useQueryBetweenSupport({
           name="high"
           className="form-control"
           value={betweenStates.high}
-          onChange={(event) => handleBetweenChange((event.target as HTMLTextAreaElement | HTMLInputElement).value, "high")}
+          onChange={(event) =>
+            handleBetweenChange(
+              (event.target as HTMLTextAreaElement | HTMLInputElement).value,
+              "high"
+            )
+          }
           onKeyDown={onKeyDown}
         />
       )}

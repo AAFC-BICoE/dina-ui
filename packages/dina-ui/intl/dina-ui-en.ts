@@ -362,6 +362,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dragDropMouseInstructions: "Drag and drop the attribute to its new position.",
   duplicate: "Duplicate",
   duplicateFilesFound: "duplicate files found",
+  duplicatePersonFound:
+    'A person with the name "{name}" already exists, would you like to continue?',
+  duplicatePersonViewLink: "View existing person",
   duplicatePrimaryIdFound: "Duplicate Primary ID Found",
   editAssemblageTitle: "Edit Assemblage",
   editCataloguedObjectTitle: "Edit Catalogued Object",
@@ -780,6 +783,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   groupName: "Name",
   groupSearchPlaceholder: "Search by code, path or label",
   groupsIBelongTo: "My Groups",
+  hideSelectedOptions: "Hide selected",
   groupsIDoNotBelongTo: "Other Groups",
   hostOrganismLegend: "Host Organism",
   http403ForbiddenError: "Access is denied",
@@ -829,6 +833,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeDeleteWarning:
     "Deleting this Managed Attribute could impact existing untracked resources like exports or scripts. Are you sure you want to proceed?",
   managedAttributeValueLabel: "Value",
+  managedAttributeNoMatches: "No matching Managed Attributes found",
+  managedAttributeSearchToAdd: "Search for a Managed Attribute to add...",
   managedAttributes: "Managed Attributes",
   managedAttributesViews: "Form Templates",
   "material-sample": "Material Sample",
@@ -1329,10 +1335,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookSkippedField: "Please select a field or skip importing it",
   missingParentMaterialSampleNames:
     "Missing parent material sample names: {missingNames}",
-  onSheetDuplicateMaterialSampleNames:
-    "Some entries in your spreadsheet have the same Primary ID and Collection Name. Please review the following duplicates: {duplicateNames}",
-  duplicateMaterialSampleNames:
-    "These entries already exist in the system with the same Primary ID and Collection Name: {duplicateNames}",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be a {dataType}",
   workBookInvalidEnumFormat: "must be one of the accepted values:",
@@ -1396,6 +1398,16 @@ export const DINAUI_MESSAGES_ENGLISH = {
   skippedColumnsTitle: "Skipped Columns",
   skippedColumnsDescription:
     "The workbook contains columns that will be skipped during import. These columns might contain important data.",
+  duplicatePrimaryIdsTitle: "Duplicate Primary IDs",
+  duplicatePrimaryIdsRowsSkipped:
+    "{count, plural, one {# row} other {# rows}} will be skipped if you proceed.",
+  duplicatePrimaryIdsOnSheetDescription:
+    "The following Primary IDs appear more than once in the spreadsheet. All rows using these Primary IDs will be skipped.",
+  duplicatePrimaryIdsOnServerDescription:
+    "The following Primary IDs already exist in the same collection. These rows will be skipped.",
+  workbookSkipDuplicatesButton: "Skip duplicates and import",
+  workbookAllRowsDuplicated:
+    "Every row in the spreadsheet has a duplicate Primary ID. There is nothing left to import.",
   unmappedRelationshipsTitle: "Unmapped Relationships",
   unmappedRelationshipsDescription:
     "The import identified relationships in the workbook that could not be automatically mapped. This might lead to incomplete data transfer.",

@@ -1,5 +1,6 @@
 import {
   DinaForm,
+  DinaFormOnSubmit,
   SubmitButton,
   TextField,
   useModal,
@@ -16,6 +17,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { useDuplicatePersonNameDetection } from "./useDuplicatePersonNameDetection";
 import * as yup from "yup";
 
 interface PersonFormProps {
@@ -86,6 +88,14 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     onSuccess: onSubmitSuccess
   });
 
+  const { withDuplicatePersonCheck, DuplicatePersonAlert } =
+    useDuplicatePersonNameDetection();
+
+  const onSubmit: DinaFormOnSubmit<Partial<Person>> = (submission) =>
+    withDuplicatePersonCheck(async () => {
+      await personSubmitHandler(submission);
+    });
+
   const buttonBar = (
     <ButtonBar className="mb-3">
       <div className="col-md-6 col-sm-12 mt-2">
@@ -104,9 +114,10 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   return (
     <DinaForm
       initialValues={initialValues}
-      onSubmit={personSubmitHandler}
+      onSubmit={onSubmit}
       validationSchema={personFormValidationSchema}
     >
+      <DuplicatePersonAlert />
       {buttonBar}
       <div style={{ width: "30rem" }}>
         <TextField name="displayName" requiredField={true} />

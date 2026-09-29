@@ -138,10 +138,10 @@ export function DateField(props: DateFieldProps) {
           }
         }
 
-        function onBlur(event: FocusEvent<HTMLInputElement>) {
-          const newText = (
-            event.target as HTMLTextAreaElement | HTMLInputElement
-          ).value;
+        function onBlur() {
+          // Read from Formik (kept in sync by onChangeRaw) because react-datepicker
+          // resets the input text when the calendar closes in showTime mode.
+          const newText = stringValue;
 
           // Run the existing validation first.
           const error = validate?.(newText);
@@ -209,8 +209,15 @@ export function DateField(props: DateFieldProps) {
               "gap-2",
               invalid && "is-invalid"
             )}
+            onBlur={(event) => {
+              // react-datepicker skips its own onBlur while the calendar is open.
+              if (event.target instanceof HTMLInputElement) {
+                onBlur();
+              }
+            }}
           >
             <DatePicker
+              autoComplete="off"
               className={classnames("form-control", invalid && "is-invalid")}
               wrapperClassName="w-100"
               isClearable={!isDisabled && !bulkTab}
@@ -222,10 +229,6 @@ export function DateField(props: DateFieldProps) {
               showYearDropdown={true}
               todayButton="Today"
               disabled={isDisabled}
-              onBlur={(event) =>
-                event &&
-                onBlur(event as unknown as FocusEvent<HTMLInputElement>)
-              }
               onFocus={(event) => (event.target as HTMLInputElement).select()}
               selected={selectedDate}
               {...(datePickerProps as any)}
