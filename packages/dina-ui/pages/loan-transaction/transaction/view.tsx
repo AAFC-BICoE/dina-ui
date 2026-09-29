@@ -15,7 +15,7 @@ export default function TransactionDetailsPage() {
       customQueryHookOptions={{ showPermissions: true }}
       entityLink="/loan-transaction/transaction"
       type="transaction"
-      apiBaseUrl="/loan-transaction-api"
+      apiBaseUrl="/collection-api"
       nameField="transactionNumber"
       showRevisionsLink={true}
     />

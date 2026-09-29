@@ -69,12 +69,12 @@ function testExistingTransactionWithMaterialSamples(): PersistedResource<Transac
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
-    case "loan-transaction-api/transaction/test-transaction-id":
+    case "collection-api/transaction/test-transaction-id":
       return { data: testExistingTransaction() };
-    case "loan-transaction-api/transaction/test-transaction-broken-material-id":
+    case "collection-api/transaction/test-transaction-broken-material-id":
       return { data: testExistingTransactionWithMaterialSamples() };
     case "user-api/group":
-    case "loan-transaction-api/transaction":
+    case "collection-api/transaction":
     case "loan-transaction-api/managed-attribute":
     case "loan-transaction/transaction":
     case "objectstore-api/metadata":
@@ -415,7 +415,7 @@ describe("Transaction Form", () => {
             type: "transaction"
           }
         ],
-        { apiBaseUrl: "/loan-transaction-api" }
+        { apiBaseUrl: "/collection-api" }
       ]
     ]);
     expect(mockOnSaved.mock.calls).toEqual([
@@ -473,7 +473,7 @@ describe("Transaction Form", () => {
             type: "transaction"
           }
         ],
-        { apiBaseUrl: "/loan-transaction-api" }
+        { apiBaseUrl: "/collection-api" }
       ]
     ]);
   });
@@ -528,7 +528,7 @@ describe("Transaction Form", () => {
             type: "transaction"
           }
         ],
-        { apiBaseUrl: "/loan-transaction-api" }
+        { apiBaseUrl: "/collection-api" }
       ]
     ]);
   });
@@ -595,7 +595,7 @@ describe("Transaction Form", () => {
             type: "transaction"
           }
         ],
-        { apiBaseUrl: "/loan-transaction-api" }
+        { apiBaseUrl: "/collection-api" }
       ]
     ]);
   });
