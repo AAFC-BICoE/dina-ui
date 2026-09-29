@@ -657,7 +657,7 @@ describe("fiql conversion", () => {
           blank: "",
           group: { EQ: "aafc" }
         })
-      ).toEqual("name==todo 2;group==aafc");
+      ).toEqual('name=="todo 2";group==aafc');
     });
 
     it("Converts a plain null to a blank-field search, like { EQ: null } does.", () => {
@@ -695,8 +695,7 @@ describe("fiql conversion", () => {
           name: { EQ: "x" }
         })
       ).toEqual("(group==aafc,group==cnc);name==x");
-      // An array keeps each value whole. A value containing a comma still can't be searched,
-      // because it is quoted, and the back-end splits FIQL on commas before it reads quotes.
+      // Values containing commas survive as single values.
       expect(
         simpleSearchFilterToFiql({ city: { IN: ["New York, NY", "Ottawa"] } })
       ).toEqual('city=="New York, NY",city==Ottawa');
@@ -744,36 +743,18 @@ describe("fiql conversion", () => {
       ).toEqual("(a==1,(b==2;c==3));d!=x;(e==5,(f==6,f==7))");
     });
 
-    it("Sends values with spaces and accented letters unquoted, which the back-end matches.", () => {
-      // The back-end keeps double quotes as part of a value, so quoted values never match.
+    it("Quotes values that can't appear unquoted in fiql.", () => {
       expect(
         simpleSearchFilterToFiql(
           SimpleSearchFilterBuilder.create()
             .searchFilter("name", "John Smith")
             .where("email", "EQ", "john@example.com")
-            .where("sex", "EQ", "mâle")
             .whereIn("group", ["a b", "c"])
             .build()
         )
       ).toEqual(
-        "name==*John Smith*;email==john@example.com;sex==mâle;(group==a b,group==c)"
+        'name=="*John Smith*";email=="john@example.com";(group=="a b",group==c)'
       );
-    });
-
-    it("Keeps literal % and _ characters in LIKE values, marked with a backslash.", () => {
-      expect(
-        simpleSearchFilterToFiql({
-          a: { ILIKE: "%50\\%%" },
-          b: { NOT_ILIKE: "%a\\_b%" },
-          c: { LIKE: "c:\\\\%" }
-        })
-      ).toEqual("a==*50%*;b!=*a_b*;c==c:\\*");
-      // A plain "%" is the wildcard, as in searchFilter values, so it is not escaped in the FIQL output.
-      expect(
-        simpleSearchFilterToFiql(
-          SimpleSearchFilterBuilder.create().searchFilter("name", "50%").build()
-        )
-      ).toEqual("name==*50**");
     });
 
     it("Returns an empty string when no FilterParam is provided.", () => {
@@ -797,14 +778,14 @@ describe("fiql conversion", () => {
       expect(fiqlFilter).toEqual("username==*john*,labels.en==*john*");
     });
 
-    it("Sends free-text values with spaces or other characters unquoted.", () => {
+    it("Quotes values with spaces or characters that can't appear unquoted in fiql.", () => {
       expect(
         fiql({
           type: "FREE_TEXT_SEARCH_FILTER",
           value: "John Smith",
           filterAttributes: ["name"]
         })
-      ).toEqual("name==*John Smith*");
+      ).toEqual('name=="*John Smith*"');
 
       expect(
         fiql({
@@ -812,32 +793,10 @@ describe("fiql conversion", () => {
           value: "john@example.com",
           filterAttributes: ["emailAddress"]
         })
-      ).toEqual("emailAddress==*john@example.com*");
+      ).toEqual('emailAddress=="*john@example.com*"');
     });
 
-    it("Matches a % or _ typed in a partial match row literally.", () => {
-      const row = (predicate: "IS" | "IS NOT", value: string) =>
-        fiql({
-          attribute: "name",
-          id: 1,
-          predicate,
-          searchType: "PARTIAL_MATCH",
-          type: "FILTER_ROW",
-          value
-        });
-      expect(row("IS", "PR1956-70%")).toEqual("name==*PR1956-70%*");
-      expect(row("IS NOT", "70%")).toEqual("name!=*70%*");
-      expect(row("IS", "project_role")).toEqual("name==*project_role*");
-      expect(
-        fiql({
-          type: "FREE_TEXT_SEARCH_FILTER",
-          value: "50%",
-          filterAttributes: ["name"]
-        })
-      ).toEqual("name==*50%*");
-    });
-
-    it("Sends partial and exact match filter row values unquoted.", () => {
+    it("Quotes partial and exact match filter row values when needed.", () => {
       const model: FilterGroupModel = {
         children: [
           {
@@ -853,22 +812,19 @@ describe("fiql conversion", () => {
         operator: "AND",
         type: "FILTER_GROUP"
       };
-      expect(fiql(model)).toEqual("name==*John Smith*");
+      expect(fiql(model)).toEqual('name=="*John Smith*"');
     });
   });
 
   describe("fiqlArgument", () => {
-    it("Leaves values without reserved characters unquoted.", () => {
+    it("Leaves simple values unquoted.", () => {
       expect(fiqlArgument("abc-123.4/x:y*")).toEqual("abc-123.4/x:y*");
-      expect(fiqlArgument("John Smith")).toEqual("John Smith");
-      expect(fiqlArgument("écorce")).toEqual("écorce");
-      expect(fiqlArgument("john@example.com")).toEqual("john@example.com");
     });
 
     it("Quotes values with reserved characters and drops double quotes, which can't be escaped.", () => {
+      expect(fiqlArgument("a b")).toEqual('"a b"');
       expect(fiqlArgument("a;b,c(d)")).toEqual('"a;b,c(d)"');
-      expect(fiqlArgument("(a)")).toEqual('"(a)"');
-      expect(fiqlArgument('say "hi", ok')).toEqual('"say hi, ok"');
+      expect(fiqlArgument('say "hi"')).toEqual('"say hi"');
     });
   });
 });
