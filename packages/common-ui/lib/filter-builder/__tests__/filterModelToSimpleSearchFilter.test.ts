@@ -83,6 +83,37 @@ describe("filterModelToSimpleSearchFilter", () => {
     ).toEqual({ name: { NOT_ILIKE: "%abc%" } });
   });
 
+  it("escapes a % or _ typed in a partial match, so it is not a wildcard", () => {
+    const row = (
+      predicate: "IS" | "IS NOT",
+      searchType: "PARTIAL_MATCH" | "EXACT_MATCH",
+      value: string
+    ) =>
+      filterModelToSimpleSearchFilter({
+        type: "FILTER_ROW",
+        id: 1,
+        attribute: "name",
+        predicate,
+        searchType,
+        value
+      });
+    expect(row("IS", "PARTIAL_MATCH", "70%")).toEqual({
+      name: { ILIKE: "%70\\%%" }
+    });
+    expect(row("IS NOT", "PARTIAL_MATCH", "a_b\\c")).toEqual({
+      name: { NOT_ILIKE: "%a\\_b\\\\c%" }
+    });
+    // Exact matches have no wildcards
+    expect(row("IS", "EXACT_MATCH", "70%")).toEqual({ name: { EQ: "70%" } });
+    expect(
+      filterModelToSimpleSearchFilter({
+        type: "FREE_TEXT_SEARCH_FILTER",
+        value: "50%",
+        filterAttributes: ["name"]
+      })
+    ).toEqual({ name: { ILIKE: "%50\\%%" } });
+  });
+
   it("converts blank field filters to null comparisons", () => {
     expect(
       filterModelToSimpleSearchFilter({
@@ -130,6 +161,34 @@ describe("filterModelToSimpleSearchFilter", () => {
       managedBy: { NEQ: "person-1" },
       $and: [{ managedBy: { NEQ: "person-2" } }]
     });
+  });
+
+  it("adds no condition for a dropdown row without a selected resource", () => {
+    const attribute = {
+      name: "managedBy",
+      type: "DROPDOWN" as const,
+      resourcePath: "agent-api/person"
+    };
+    const row = (predicate: "IS" | "IN", value: any) =>
+      filterModelToSimpleSearchFilter({
+        type: "FILTER_ROW",
+        id: 1,
+        attribute,
+        predicate,
+        searchType: "EXACT_MATCH",
+        value
+      });
+    // Nothing selected, or text typed before switching to the dropdown attribute
+    for (const value of [null, undefined, "typed text", {}]) {
+      expect(row("IS", value)).toEqual({});
+    }
+    expect(row("IN", [{}, undefined])).toEqual({});
+    // The "<none>" option has a null id and searches for a blank field
+    expect(row("IS", { id: null })).toEqual({ managedBy: { EQ: null } });
+    expect(row("IN", [{ id: "person-1" }, { id: null }, {}])).toEqual({
+      $or: [{ managedBy: { IN: "person-1" } }, { managedBy: { EQ: null } }]
+    });
+    expect(row("IN", [{ id: null }])).toEqual({ managedBy: { EQ: null } });
   });
 
   it("converts range lists to between conditions and plain values to equalities", () => {
