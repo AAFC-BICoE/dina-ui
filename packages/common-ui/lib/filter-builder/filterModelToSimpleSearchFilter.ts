@@ -89,17 +89,11 @@ function rowToFilter(row: FilterRowModel): SimpleSearchFilter {
   }
 
   if (predicate === "IN" || predicate === "NOT IN") {
-    // Dropdown values without a selected resource are skipped.
-    const values = (Array.isArray(value) ? value : [value])
-      .map((val) => valueToString(attributeConfig, val))
-      .filter((val): val is string | null => val !== undefined);
+    const values = (Array.isArray(value) ? value : [value]).map((val) =>
+      valueToString(attributeConfig, val)
+    );
     if (predicate === "IN") {
-      // A null value (a dropdown's "<none>" option) searches for a blank field.
-      const listed = values.filter((val): val is string => val !== null);
-      return combine("OR", [
-        listed.length ? { [selector]: { IN: listed.join(",") } } : {},
-        values.includes(null) ? { [selector]: { EQ: null } } : {}
-      ]);
+      return { [selector]: { IN: values.join(",") } };
     }
     // NOT IN requires no matching values.
     return combine(
@@ -162,20 +156,12 @@ function rowToFilter(row: FilterRowModel): SimpleSearchFilter {
     }
   }
 
-  const matchValue = valueToString(attributeConfig, value);
-  if (matchValue === undefined) {
-    // A dropdown row with no resource selected adds no condition.
-    return {};
-  }
-  return matchFilter(selector, searchType, predicate !== "IS NOT", matchValue);
-}
-
-/**
- * Escapes the LIKE wildcards in a typed value, so a "%" or "_" the user types is matched as is
- * rather than as a wildcard.
- */
-function escapeLikeValue(value: string): string {
-  return value.replace(/[\\%_]/g, (character) => `\\${character}`);
+  return matchFilter(
+    selector,
+    searchType,
+    predicate !== "IS NOT",
+    valueToString(attributeConfig, value)
+  );
 }
 
 /** A single exact, partial, positive or negated value match condition. */
@@ -187,11 +173,7 @@ function matchFilter(
 ): SimpleSearchFilter {
   if (searchType === "PARTIAL_MATCH") {
     return {
-      [selector]: {
-        [positive ? "ILIKE" : "NOT_ILIKE"]: `%${escapeLikeValue(
-          String(value)
-        )}%`
-      }
+      [selector]: { [positive ? "ILIKE" : "NOT_ILIKE"]: `%${value}%` }
     };
   }
   return { [selector]: { [positive ? "EQ" : "NEQ"]: value } };
@@ -209,26 +191,19 @@ function freeTextSearchToFilter(
     filterAttributes.map((attribute) => {
       const selector =
         typeof attribute === "string" ? attribute : attribute.name;
-      return { [selector]: { ILIKE: `%${escapeLikeValue(value)}%` } };
+      return { [selector]: { ILIKE: `%${value}%` } };
     })
   );
 }
 
-/**
- * Search on IDs for dropdown resource values. Returns undefined for a dropdown with no resource
- * selected, and null for its "<none>" option, which searches for a blank field.
- */
+/** Search on IDs for dropdown resource values. */
 function valueToString(
   attributeConfig: FilterAttributeConfig,
   value: any
-): string | null | undefined {
-  if (attributeConfig.type === "DROPDOWN") {
-    // Nothing selected, or a value typed for another attribute before switching to this one:
-    if (value === null || typeof value !== "object") {
-      return undefined;
-    }
-    const id = (value as KitsuResource).id;
-    return id === undefined ? undefined : id === null ? null : String(id);
+): string | null {
+  if (attributeConfig.type === "DROPDOWN" && typeof value === "object") {
+    const id = (value as KitsuResource)?.id;
+    return id === null || id === undefined ? null : String(id);
   }
   return value === null || value === undefined ? null : String(value);
 }
