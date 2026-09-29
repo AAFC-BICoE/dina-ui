@@ -396,13 +396,13 @@ describe("Material sample bulk edit tab", () => {
     await waitFor(() => {
       expect(
         wrapper.getByRole("combobox", {
-          name: /add new/i
+          name: /search for a managed attribute to add/i
         })
       ).toBeInTheDocument();
     });
 
     const managedAttributesVisible = wrapper.getByRole("combobox", {
-      name: /add new/i
+      name: /search for a managed attribute to add/i
     });
 
     // Select the "B" managed attribute to display.

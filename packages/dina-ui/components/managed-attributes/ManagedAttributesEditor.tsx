@@ -3,6 +3,7 @@ import {
   FieldSetProps,
   FieldSpy,
   GROUP_SCOPE,
+  HIDE_SELECTED_SCOPE,
   ResourceSelect,
   SimpleSearchFilterBuilder,
   useAccount,
@@ -162,6 +163,23 @@ function ManagedAttributesEditorInner({
               />
             ) : (
               <div>
+                <div
+                  className={`row ${visibleAttributes.length ? "mb-3" : ""}`}
+                >
+                  <label
+                    className={`visible-attribute-menu col-sm-${attributeSelectorWidth}`}
+                  >
+                    <ManagedAttributeMultiSelect
+                      managedAttributeApiPath={managedAttributeApiPath}
+                      managedAttributeComponent={managedAttributeComponent}
+                      onChange={setVisibleAttributeKeys}
+                      visibleAttributes={visibleAttributes}
+                      loading={loading}
+                      isControlledVocabulary={isControlledVocabulary}
+                      controlledVocabularyId={controlledVocabularyId}
+                    />
+                  </label>
+                </div>
                 <div className="row">
                   {visibleAttributes.map((attribute) => (
                     <ManagedAttributeFieldWithLabel
@@ -177,21 +195,6 @@ function ManagedAttributesEditorInner({
                       disableClearButton={disableClearButton}
                     />
                   ))}
-                </div>
-                <div className="row">
-                  <label
-                    className={`visible-attribute-menu col-sm-${attributeSelectorWidth}`}
-                  >
-                    <ManagedAttributeMultiSelect
-                      managedAttributeApiPath={managedAttributeApiPath}
-                      managedAttributeComponent={managedAttributeComponent}
-                      onChange={setVisibleAttributeKeys}
-                      visibleAttributes={visibleAttributes}
-                      loading={loading}
-                      isControlledVocabulary={isControlledVocabulary}
-                      controlledVocabularyId={controlledVocabularyId}
-                    />
-                  </label>
                 </div>
               </div>
             )}
@@ -263,16 +266,11 @@ export function DynamicResourceSelect<
 
   const {
     onChange,
-    onDataLoaded,
     value,
     filter: filterProp,
     optionLabel: optionLabelProp,
     ...rest
   } = props;
-
-  const [fetchedRecords, setFetchedRecords] = useState<
-    PersistedResource<TData>[]
-  >([]);
 
   // Stable onInputChange (no dependency on changing object literals)
   const selectPropsRef = useRef(rest.selectProps);
@@ -290,45 +288,6 @@ export function DynamicResourceSelect<
   const handleChange = (newValue: any, actionMeta: any) => {
     onChange?.(newValue, actionMeta);
   };
-
-  const handleDataLoaded = useCallback(
-    (data?: PersistedResource<TData>[]) => {
-      if (data?.length) {
-        // Clear previous records and use only the new search results
-        // This ensures fresh results for each search
-        setFetchedRecords(data);
-      }
-      onDataLoaded?.(data);
-    },
-    [onDataLoaded]
-  );
-
-  // ---- filtering, memoized ----
-  const selectedIds = useMemo(
-    () => _.castArray(value ?? []).map((v) => v?.id),
-    [value]
-  );
-
-  const unselectedRecords = useMemo(
-    () =>
-      fetchedRecords.filter(
-        (item) => item?.id && !selectedIds.includes(item.id)
-      ),
-    [fetchedRecords, selectedIds]
-  );
-
-  // Limit to 6 records AFTER filtering out selected items
-  // This ensures up to 6 available options are always shown
-  const limitedRecords = useMemo(
-    () => unselectedRecords.slice(0, 6),
-    [unselectedRecords]
-  );
-
-  const filterList = useCallback(
-    (item?: PersistedResource<TData>) =>
-      !!item?.id && limitedRecords.some((r) => r.id === item.id),
-    [limitedRecords]
-  );
 
   // Ensure ResourceSelect receives a non-optional filter function:
   const effectiveFilter: (input: string) => any =
@@ -348,12 +307,10 @@ export function DynamicResourceSelect<
     <ResourceSelect
       {...rest}
       onChange={handleChange}
-      onDataLoaded={handleDataLoaded}
-      pageSize={20} // Fetch more records to account for filtering
+      pageSize={1000} // Load all attributes so every group can be browsed
       // normalize null -> undefined (ResourceSelect doesn't accept null)
       value={value ?? undefined}
       filter={effectiveFilter}
-      filterList={filterList}
       optionLabel={effectiveOptionLabel}
       selectProps={{
         ...rest.selectProps,
@@ -361,7 +318,13 @@ export function DynamicResourceSelect<
         onInputChange: handleInputChange
       }}
       groupBy="group"
-      scopes={[GROUP_SCOPE(groupNames ?? [], formatMessage)]}
+      scopes={[
+        GROUP_SCOPE(groupNames ?? [], formatMessage),
+        HIDE_SELECTED_SCOPE(formatMessage)
+      ]}
+      defaultScopes={{ groupFilter: "allGroups" }}
+      // Selected attributes are grayed out, unless hidden with the "Hide selected" scope:
+      showSelectedOptions={true}
     />
   );
 }
@@ -386,7 +349,7 @@ export function ManagedAttributeMultiSelect({
   isControlledVocabulary: boolean;
   controlledVocabularyId?: string;
 }) {
-  const { locale } = useDinaIntl();
+  const { locale, formatMessage } = useDinaIntl();
 
   // Memoize the filter function
   const filter = useCallback(
@@ -453,10 +416,15 @@ export function ManagedAttributeMultiSelect({
       isSearchable: true,
       controlShouldRenderValue: false,
       isClearable: false,
-      placeholder: "Add new",
-      noOptionsMessage: () => "No matching attributes found"
+      placeholder: formatMessage("managedAttributeSearchToAdd"),
+      // Open upwards when there isn't enough room below (e.g. at the bottom of the page):
+      menuPlacement: "auto",
+      minMenuHeight: 300,
+      // Keep the menu open so multiple attributes can be added in a row:
+      closeMenuOnSelect: false,
+      noOptionsMessage: () => formatMessage("managedAttributeNoMatches")
     }),
-    []
+    [formatMessage]
   );
 
   return (
