@@ -117,7 +117,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         },
         {
           term: {
-            "data.relationships.materialSamples.data.type": "material-sample"
+            // temporarly hardcoded to external-material-sample until it's switched back to material-sample in the transaction index
+            "data.relationships.materialSamples.data.type":
+              "external-material-sample"
           }
         }
       ]

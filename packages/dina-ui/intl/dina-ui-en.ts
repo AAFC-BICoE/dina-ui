@@ -485,7 +485,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Analysis Type",
   field_determinationRemarks: "Determination Remarks",
   field_displayName: "Display Name",
-  field_dwcCatalogNumber: "Catalogue Number",
   field_dwcCoordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
   field_dwcCoordinateUncertaintyInMeters_tooltip:
     "The horizontal distance in meters from the given decimalLatitude and decimalLongitude describing the smallest circle containing the whole of the Location",

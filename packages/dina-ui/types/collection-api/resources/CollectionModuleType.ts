@@ -7,7 +7,8 @@ export const COLLECTION_MODULE_TYPES = [
   "PREPARATION",
   "SITE",
   "COLLECTION",
-  "PROJECT"
+  "PROJECT",
+  "TRANSACTION"
 ] as const;
 export type CollectionModuleType = (typeof COLLECTION_MODULE_TYPES)[number];
 export const COLLECTION_MODULE_TYPE_LABELS: Record<
@@ -22,5 +23,6 @@ export const COLLECTION_MODULE_TYPE_LABELS: Record<
   PREPARATION: "preparation",
   SITE: "site",
   COLLECTION: "collection",
-  PROJECT: "project"
+  PROJECT: "project",
+  TRANSACTION: "loanTransaction"
 };

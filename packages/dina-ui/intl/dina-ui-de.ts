@@ -415,7 +415,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_displayName: "Anzeigename",
   field_downloadExport: "Export herunterladen",
   field_dueDate: "Fälligkeitsdatum",
-  field_dwcCatalogNumber: "Katalognummer",
   field_dwcCoordinateUncertaintyInMeters: "Coordinatenabweichung in Metern",
   field_dwcCoordinateUncertaintyInMeters_tooltip:
     "Der horizontale Abstand in Metern zwischen der angegebenen decimalLatitude und der decimal Longitude, die den kleinsten Kreis beschreibt, der den gesamten Standort enthält",

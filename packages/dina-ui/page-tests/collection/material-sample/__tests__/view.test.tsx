@@ -209,7 +209,7 @@ const TEST_TRANSACTION: PersistedResource<Transaction> = {
   materialSamples: [
     {
       id: "1",
-      type: "material-sample"
+      type: "external-material-sample"
     }
   ]
 };
@@ -269,7 +269,8 @@ const mockPost = jest.fn<any, any>(async (path, payload) => {
         const mustClauses = payload.query.bool.must;
         const isTransactionQuery = mustClauses.some(
           (clause) =>
-            clause.term?.["data.relationships.materialSamples.data.type"]
+            clause.term?.["data.relationships.materialSamples.data.type"] ===
+            "external-material-sample"
         );
 
         if (isTransactionQuery) {
@@ -538,6 +539,12 @@ describe("Material Sample View Page", () => {
               (clause) =>
                 clause.term?.["data.relationships.materialSamples.data.id"] ===
                 "1"
+            ) &&
+            payload.query.bool.must.some(
+              (clause) =>
+                clause.term?.[
+                  "data.relationships.materialSamples.data.type"
+                ] === "external-material-sample"
             )
           );
         });
