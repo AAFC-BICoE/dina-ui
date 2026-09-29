@@ -8,7 +8,7 @@ import {
   mountWithAppContext,
   waitForLoadingToDisappear
 } from "common-ui";
-import { Transaction } from "../../../../types/loan-transaction-api";
+import { Transaction } from "../../../../types/collection-api";
 import { act, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";

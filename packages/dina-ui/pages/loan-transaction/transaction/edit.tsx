@@ -27,7 +27,11 @@ import _ from "lodash";
 import { useRouter } from "next/router";
 import { AgentRolesField } from "../../../components/collection/AgentRolesField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  AgentRole,
+  MaterialSample,
+  Transaction
+} from "../../../types/collection-api";
 import {
   AttachmentsField,
   Footer,
@@ -39,7 +43,6 @@ import { useMaterialSampleRelationshipColumns } from "../../../components/collec
 import { ManagedAttributesEditor } from "../../../components/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
 import { Person } from "../../../types/objectstore-api";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 

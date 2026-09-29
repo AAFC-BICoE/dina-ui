@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { TableColumn } from "common-ui/lib/list-page/types";
 import Link from "next/link";
-import { Transaction } from "packages/dina-ui/types/loan-transaction-api";
+import { Transaction } from "packages/dina-ui/types/collection-api";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 

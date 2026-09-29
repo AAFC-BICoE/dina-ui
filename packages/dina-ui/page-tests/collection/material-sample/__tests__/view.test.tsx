@@ -7,7 +7,8 @@ import {
   FormTemplate,
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
-  MaterialSample
+  MaterialSample,
+  Transaction
 } from "../../../../types/collection-api";
 import "@testing-library/jest-dom";
 import { waitFor, within } from "@testing-library/react";
@@ -16,7 +17,6 @@ import { useRouter } from "next/router";
 import { GenericMolecularAnalysis } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { TEST_QUALITY_CONTROL_TYPES } from "../../../seqdb/molecular-analysis-run/__mocks__/MolecularAnalysisRunViewMocks";
-import { Transaction } from "../../../../types/loan-transaction-api";
 
 jest.mock("next/router", () => ({
   useRouter: jest.fn(),

@@ -1,6 +1,6 @@
 import { KeyValueTable } from "common-ui";
 import Link from "next/link";
-import { Transaction } from "../../../types/loan-transaction-api";
+import { Transaction } from "../../../types/collection-api";
 import { Person } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
