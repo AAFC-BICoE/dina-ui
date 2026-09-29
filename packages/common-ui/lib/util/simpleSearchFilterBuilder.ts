@@ -60,7 +60,11 @@ export interface SimpleSearchFilter {
 
 export type SimpleSearchFilterOperator = "AND" | "OR";
 
-/** True for an `IN` whose list is empty, in either the array or the comma-separated form. */
+/**
+ * True for an `IN` whose list is empty, in either the array or the comma-separated form.
+ * No condition is added for one: FIQL rejects `field==`, and most modules ignore an empty
+ * simple-filter IN anyway. Guard the call site if an empty list should hide every record.
+ */
 export function isEmptyInList(op: string, value: unknown): boolean {
   return (
     op === "IN" &&
@@ -91,10 +95,22 @@ export function isEmptySimpleSearchFilter(
     if (value === null || typeof value !== "object") {
       return value === "";
     }
+    // A field holding a list (legacy shape) is a condition unless the list is empty.
+    if (Array.isArray(value)) {
+      return value.length === 0;
+    }
     return Object.entries(value).every(
       ([op, opValue]) => opValue === undefined || isEmptyInList(op, opValue)
     );
   });
+}
+
+/** True for two identical plain values, or two lists with the same values in the same order. */
+function isSamePlainValue(a: unknown, b: unknown): boolean {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length && a.every((item, index) => item === b[index]);
+  }
+  return a === b;
 }
 
 /**
@@ -153,15 +169,22 @@ export function mergeSimpleSearchFilters(
 
     const existing = result[key];
 
-    // Plain values are kept as is. Blank values are not conditions. Null values
-    // are conditions that search for blank fields.
-    if (value === null || typeof value !== "object") {
-      if (value === "") {
+    // Plain values and lists (legacy shapes) are kept as they are. 
+    // Blank values and empty lists are not conditions. 
+    // Null values are conditions that search for blank fields.
+    if (value === null || typeof value !== "object" || Array.isArray(value)) {
+      if (value === "" || (Array.isArray(value) && value.length === 0)) {
         continue;
       }
       if (existing === undefined) {
-        setField(key, value);
-      } else if (existing !== value) {
+        // Lists are copied so that mutating the result can't reach back into the caller's filter
+        setField(
+          key,
+          Array.isArray(value)
+            ? [...(value as SimpleSearchFilterValue[])]
+            : value
+        );
+      } else if (!isSamePlainValue(existing, value)) {
         appendAnd({ [key]: value });
       }
       continue;
@@ -172,7 +195,11 @@ export function mergeSimpleSearchFilters(
       setField(key, { ...condition });
       continue;
     }
-    if (existing === null || typeof existing !== "object") {
+    if (
+      existing === null ||
+      typeof existing !== "object" ||
+      Array.isArray(existing)
+    ) {
       appendAnd({ [key]: condition });
       continue;
     }
@@ -273,21 +300,13 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
       | SimpleSearchFilterValue[];
 
     if (op === "IN" && Array.isArray(value)) {
-      // Empty lists add no conditions to prevent matching only blank values.
+      // An empty list adds no condition (see isEmptyInList).
       if (value.length === 0) {
         return this;
       }
 
-      // IN values are comma-separated. Lists containing commas are converted to an OR of equalities
-      // so each value is escaped individually.
-      if (
-        value.some((item) => typeof item === "string" && item.includes(","))
-      ) {
-        return this.or((builder) => {
-          value.forEach((item) => builder.where(field, "EQ", item));
-        });
-      }
-
+      // IN values are comma-separated. The back-end splits them on commas 
+      // in both FIQL and simple filters, so a value containing a comma can't be matched on its own.
       conditionValue = value.join(",");
     }
 
