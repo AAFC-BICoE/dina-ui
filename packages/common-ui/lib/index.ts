@@ -70,6 +70,7 @@ export * from "./resource-select/useBulkGet";
 export * from "./resource-select/TooltipSelectOption";
 export * from "./table/BooleanCell";
 export * from "./table/DateCell";
+export * from "./switch/SmallSwitch";
 export * from "./table/multilingual-cells";
 export * from "./table/StringArrayCell";
 export * from "./text-field-with-coord-buttons/TextFieldWithCoordButtons";

@@ -208,6 +208,14 @@ fieldset.card.border > .legend-wrapper:has(> .row) {
   z-index: 2;
 }
 
+.material-sample-nav .list-group-item.active .react-switch-bg {
+  background: #fff !important;
+}
+
+.material-sample-nav .list-group-item.active .react-switch-handle {
+  background: #335075 !important;
+}
+
 .material-sample-nav .sub-nav-list {
   max-height: 0;
   overflow: hidden;
@@ -229,7 +237,7 @@ fieldset.card.border > .legend-wrapper:has(> .row) {
   margin-left: 1.25rem;
   padding: 0.2rem 0 0.2rem 0.6rem;
   border-left: 2px solid #dee2e6;
-  color: inherit;
+  color: #555e67;
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.3s, border-color 0.3s;
@@ -242,13 +250,6 @@ fieldset.card.border > .legend-wrapper:has(> .row) {
   border-left-color: #335075;
 }
 
-.nav-hover-highlight {
-  outline: 3px solid #335075;
-  outline-offset: 4px;
-  border-radius: 0.5rem;
-  transition: outline-color 0.2s;
-}
-
 fieldset.card.border,
 #georeferencing,
 #geographicPlace,
@@ -256,6 +257,25 @@ fieldset.card.border,
 #collectingEventManagedAttributes,
 #collectingEventAttachments {
   scroll-margin-top: 100px;
+  outline: 3px solid transparent;
+  outline-offset: 4px;
+  border-radius: 0.5rem;
+  transition: outline-color 0.25s ease;
+}
+
+.nav-hover-highlight {
+  outline: 3px solid #335075 !important;
+  outline-offset: 4px;
+  border-radius: 0.5rem;
+}
+
+#geoReferencingLegend .react-tabs__tab-panel > .card-body:not([style]) {
+  padding: 0;
+}
+
+#geographicPlace div:has(> label[for="manualGeographyInput"]) {
+  margin-top: -0.75rem;
+  margin-bottom: 0.25rem !important;
 }
 
 .modal-header {

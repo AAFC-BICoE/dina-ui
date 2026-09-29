@@ -1,6 +1,5 @@
-import { FieldSpy, useBulkEditTabContext } from "common-ui";
+import { SmallSwitch, FieldSpy, useBulkEditTabContext } from "common-ui";
 import { Association } from "packages/dina-ui/types/collection-api/resources/Association";
-import Switch from "react-switch";
 
 /** The associations switch adds an initial association if there isn't one already. */
 export function AssociationsSwitch(props) {
@@ -9,7 +8,7 @@ export function AssociationsSwitch(props) {
   return (
     <FieldSpy<Association[]> fieldName="associations">
       {(associations, { form: { setFieldValue } }) => (
-        <Switch
+        <SmallSwitch
           {...props}
           onChange={(newVal) => {
             props.onChange?.(newVal);

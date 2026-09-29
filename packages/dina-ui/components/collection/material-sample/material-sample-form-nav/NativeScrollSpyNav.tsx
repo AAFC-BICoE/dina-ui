@@ -5,8 +5,68 @@ export interface NativeScrollSpyNavProps {
   /** Sub-section anchors, tracked and highlighted independently from scrollTargetIds. */
   subScrollTargetIds?: string[];
   activeNavClass?: string;
-  offset?: number;
   scrollDuration?: string;
+}
+
+/**
+ * Only watches the band of the viewport that starts at the targets' scroll-margin-top, so
+ * the active item matches where click-to-scroll lands and ignores what the page header covers.
+ */
+function getObserverOptions(targetIds: string[]): IntersectionObserverInit {
+  const firstTarget = targetIds
+    .map((id) => document.getElementById(id))
+    .find((element) => !!element);
+  const topOffset = firstTarget
+    ? parseFloat(getComputedStyle(firstTarget).scrollMarginTop) || 0
+    : 0;
+  const bandHeight = window.innerHeight * 0.2;
+  const bottomOffset = Math.max(0, window.innerHeight - topOffset - bandHeight);
+
+  return {
+    rootMargin: `-${topOffset}px 0px -${bottomOffset}px 0px`,
+    threshold: 0
+  };
+}
+
+/** Scrolls the nav's own scroll container (not the page) so the active items stay visible. */
+function scrollNavToActiveItems(activeNavClass: string) {
+  const activeItem = document.querySelector<HTMLElement>(
+    `.list-group-item.${activeNavClass}`
+  );
+  const container = activeItem?.closest<HTMLElement>(".material-sample-nav");
+  if (!activeItem || !container) {
+    return;
+  }
+
+  const activeSubLinks = Array.from(
+    activeItem.nextElementSibling?.matches(".sub-nav-list")
+      ? activeItem.nextElementSibling.querySelectorAll<HTMLElement>(
+          `a.${activeNavClass}`
+        )
+      : []
+  );
+
+  // The active item is sticky at the top while its sub-links scroll beneath it.
+  const topInset = activeSubLinks.length ? activeItem.offsetHeight : 0;
+  const rects = (activeSubLinks.length ? activeSubLinks : [activeItem]).map(
+    (element) => element.getBoundingClientRect()
+  );
+  const rangeTop = Math.min(...rects.map((rect) => rect.top));
+  const rangeBottom = Math.max(...rects.map((rect) => rect.bottom));
+
+  const containerRect = container.getBoundingClientRect();
+  const visibleTop = containerRect.top + topInset;
+
+  let delta = 0;
+  if (rangeTop < visibleTop) {
+    delta = rangeTop - visibleTop;
+  } else if (rangeBottom > containerRect.bottom) {
+    delta = Math.min(rangeBottom - containerRect.bottom, rangeTop - visibleTop);
+  }
+
+  if (delta !== 0) {
+    container.scrollBy({ top: delta, behavior: "smooth" });
+  }
 }
 
 /**
@@ -16,13 +76,13 @@ export function NativeScrollSpyNav({
   scrollTargetIds = [],
   subScrollTargetIds = [],
   activeNavClass = "active",
-  offset = 0,
   children
 }: PropsWithChildren<NativeScrollSpyNavProps>) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [activeSubId, setActiveSubId] = useState<string | null>(null);
+  const [activeSubIds, setActiveSubIds] = useState<string[]>([]);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const subObserverRef = useRef<IntersectionObserver | null>(null);
+  const visibleSubIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     // Clean up previous observer
@@ -31,10 +91,7 @@ export function NativeScrollSpyNav({
     }
 
     // Create intersection observer
-    const observerOptions: IntersectionObserverInit = {
-      rootMargin: `${offset}px 0px -80% 0px`,
-      threshold: 0
-    };
+    const observerOptions = getObserverOptions(scrollTargetIds);
 
     observerRef.current = new IntersectionObserver((entries) => {
       // Find the first intersecting entry
@@ -59,7 +116,7 @@ export function NativeScrollSpyNav({
         observerRef.current.disconnect();
       }
     };
-  }, [scrollTargetIds, offset]);
+  }, [scrollTargetIds]);
 
   useEffect(() => {
     // Clean up previous observer
@@ -67,16 +124,22 @@ export function NativeScrollSpyNav({
       subObserverRef.current.disconnect();
     }
 
-    const observerOptions: IntersectionObserverInit = {
-      rootMargin: `${offset}px 0px -80% 0px`,
-      threshold: 0
-    };
+    const observerOptions = getObserverOptions(subScrollTargetIds);
 
+    visibleSubIdsRef.current = new Set();
+
+    // Several sub-sections can be in view at once (e.g. side-by-side cards), so track them all.
     subObserverRef.current = new IntersectionObserver((entries) => {
-      const intersectingEntry = entries.find((entry) => entry.isIntersecting);
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          visibleSubIdsRef.current.add(entry.target.id);
+        } else {
+          visibleSubIdsRef.current.delete(entry.target.id);
+        }
+      });
 
-      if (intersectingEntry) {
-        setActiveSubId(intersectingEntry.target.id);
+      if (visibleSubIdsRef.current.size > 0) {
+        setActiveSubIds([...visibleSubIdsRef.current]);
       }
     }, observerOptions);
 
@@ -92,7 +155,7 @@ export function NativeScrollSpyNav({
         subObserverRef.current.disconnect();
       }
     };
-  }, [subScrollTargetIds, offset]);
+  }, [subScrollTargetIds]);
 
   useEffect(() => {
     // Update active class on top-level nav items only.
@@ -116,7 +179,7 @@ export function NativeScrollSpyNav({
   useEffect(() => {
     // Update active class on sub-nav links only, independently from the
     // top-level nav item's active state above.
-    if (!activeSubId) return;
+    if (activeSubIds.length === 0) return;
 
     document
       .querySelectorAll(`.sub-nav-list a.${activeNavClass}`)
@@ -124,13 +187,21 @@ export function NativeScrollSpyNav({
         el.classList.remove(activeNavClass);
       });
 
-    const activeSubLink = document.querySelector(
-      `.sub-nav-list a[href="#${activeSubId}"]`
+    activeSubIds.forEach((subId) => {
+      document
+        .querySelector(`.sub-nav-list a[href="#${subId}"]`)
+        ?.classList.add(activeNavClass);
+    });
+  }, [activeSubIds, activeNavClass]);
+
+  useEffect(() => {
+    // Wait for the sub-list expand/collapse transition so the positions being measured are final.
+    const timeout = window.setTimeout(
+      () => scrollNavToActiveItems(activeNavClass),
+      350
     );
-    if (activeSubLink) {
-      activeSubLink.classList.add(activeNavClass);
-    }
-  }, [activeSubId, activeNavClass]);
+    return () => window.clearTimeout(timeout);
+  }, [activeId, activeSubIds, activeNavClass]);
 
   return <>{children}</>;
 }

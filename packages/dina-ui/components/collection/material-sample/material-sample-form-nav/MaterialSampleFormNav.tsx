@@ -9,6 +9,7 @@ import { CSS } from "@dnd-kit/utilities";
 import classNames from "classnames";
 import {
   AreYouSureModal,
+  SmallSwitch,
   Tooltip,
   useDinaFormContext,
   useModal
@@ -21,7 +22,7 @@ import {
   useState
 } from "react";
 import { FaGripLines } from "react-icons/fa";
-import Switch, { ReactSwitchProps } from "react-switch";
+import { ReactSwitchProps } from "react-switch";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../../types/collection-api";
 import { useMaterialSampleSave } from "../useMaterialSample";
@@ -184,8 +185,7 @@ export function MaterialSampleFormNav({
                   subScrollTargetIds: Object.values(SECTION_SUB_LINKS).flatMap(
                     (links) => links?.map((link) => link.id) ?? []
                   ),
-                  activeNavClass: "active",
-                  offset: -20
+                  activeNavClass: "active"
                 }
               : {})}
           >
@@ -257,7 +257,7 @@ const DataComponentNavItem = ({
   const { isTemplate } = useDinaFormContext();
 
   const Tag = section.disabled ? "div" : "a";
-  const SwitchComponent = section.customSwitch ?? Switch;
+  const SwitchComponent = section.customSwitch ?? SmallSwitch;
 
   function toggle(newVal: boolean) {
     if (!newVal && !disableRemovePrompt) {
