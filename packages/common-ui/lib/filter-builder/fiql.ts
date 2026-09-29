@@ -14,19 +14,24 @@ import {
 } from "./filterModelToSimpleSearchFilter";
 
 /**
- * Characters a FIQL argument can contain without quotes. This is the intersection of what the RSQL
- * and back-end query-string grammars accept unquoted. Other characters require double quotes.
+ * Characters that end a FIQL argument: "," and ";" join conditions and "(" ")" group them.
+ * The back-end rejects an unquoted argument containing one of them.
  */
-const UNQUOTED_FIQL_ARGUMENT = /^[A-Za-z0-9_\-.%/:*]*$/;
+const FIQL_RESERVED_CHARACTERS = /[(),;]/;
 
 /**
- * Quotes a FIQL argument containing characters that require quotes.
- * Double quotes cannot be escaped in the back-end query-string grammar and are dropped.
+ * Returns a value as a FIQL argument.
+ *
+ * Values are sent unquoted, the back-end accepts spaces and accented letters. 
+ * But it keeps double quotes as part of the value, so a quoted argument never matches anything. 
+ * Values containing reserved characters are quoted only to avoid a syntax error and cannot match 
+ * (the back-end also splits "," and ";" before it reads quotes, so those are rejected either way).
+ * Double quotes cannot be escaped and are dropped from quoted values.
  */
 export function fiqlArgument(value: string): string {
-  return UNQUOTED_FIQL_ARGUMENT.test(value)
-    ? value
-    : `"${value.replace(/"/g, "")}"`;
+  return FIQL_RESERVED_CHARACTERS.test(value)
+    ? `"${value.replace(/"/g, "")}"`
+    : value;
 }
 
 /**
@@ -169,11 +174,18 @@ function argument(
   return typeof value === "string" ? fiqlArgument(value) : String(value);
 }
 
-/** LIKE and ILIKE values use "%" as the wildcard whereas FIQL uses "*". */
+/**
+ * LIKE and ILIKE values use "%" as the wildcard, and "\%", "\_" and "\\" for literal characters.
+ * FIQL uses "*" as the wildcard, and the back-end escapes "%" and "_" itself, so literal characters
+ * are sent as they are.
+ */
 function wildcardArgument(
   value: SimpleSearchFilterValue | SimpleSearchFilterValue[]
 ): string {
-  return typeof value === "string"
-    ? fiqlArgument(value.replace(/%/g, "*"))
-    : argument(value);
+  if (typeof value !== "string") {
+    return argument(value);
+  }
+  return fiqlArgument(
+    value.replace(/\\([\\%_])|%/g, (_match, literal) => literal ?? "*")
+  );
 }
