@@ -89,8 +89,9 @@ export default function TransactionListPage() {
               {
                 type: "managedAttribute",
                 label: "managedAttributes",
+                component: "TRANSACTION",
                 path: "data.attributes.managedAttributes",
-                apiEndpoint: "loan-transaction-api/managed-attribute"
+                apiEndpoint: "collection-api/controlled-vocabulary-item"
               }
             ],
             relationshipFields: []

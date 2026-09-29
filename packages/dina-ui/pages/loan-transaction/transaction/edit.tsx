@@ -509,7 +509,8 @@ export function TransactionFormLayout({
       <ShipmentDetailsFieldSet fieldName="shipment" />
       <ManagedAttributesEditor
         valuesPath="managedAttributes"
-        managedAttributeApiPath="loan-transaction-api/managed-attribute"
+        managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+        managedAttributeComponent="TRANSACTION"
         fieldSetProps={{
           legend: <DinaMessage id="managedAttributes" />
         }}

@@ -75,7 +75,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return { data: testExistingTransactionWithMaterialSamples() };
     case "user-api/group":
     case "collection-api/transaction":
-    case "loan-transaction-api/managed-attribute":
+    case "collection-api/controlled-vocabulary-item":
     case "loan-transaction/transaction":
     case "objectstore-api/metadata":
       return { data: [] };
