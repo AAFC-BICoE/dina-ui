@@ -1,5 +1,5 @@
 import { FilterParam } from "kitsu";
-import { ScopeOption } from "../resource-select/ResourceScopes";
+import { ScopeOption, ScopeValues } from "../resource-select/ResourceScopes";
 
 /**
  * Supported filter operations matching the back-end "simple filter" operator names.
@@ -412,15 +412,15 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
 
   /**
    * Applies the active `applyFilter` for each scope.
-   * Scopes without an active option are skipped.
+   * Toggle scopes without an active option and unchecked checkbox scopes are skipped.
    * Used by ResourceSelect to apply filters based on dropdown choices.
    *
-   * @param scopes The scope definitions.
-   * @param activeScopes Map of scopeId to the selected optionId.
+   * @param scopes The full list of scope definitions (as passed to ResourceSelect).
+   * @param activeScopes A map of scopeId -> the selected optionId (toggle) or checked state (checkbox).
    */
   public applyScopes(
     scopes: ScopeOption[] | undefined,
-    activeScopes: Record<string, string> | undefined
+    activeScopes: ScopeValues | undefined
   ): this {
     if (!scopes?.length || !activeScopes) {
       return this;
@@ -433,6 +433,8 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
           (opt) => opt.id === activeOptionId
         );
         activeOption?.applyFilter(this);
+      } else if (scope.type === "checkbox" && activeScopes[scope.id] === true) {
+        scope.applyFilter?.(this);
       }
     });
 
