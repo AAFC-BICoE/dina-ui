@@ -491,7 +491,10 @@ export function MaterialSampleForm({
       >
         <div className="flex-grow-1 container-fluid">
           {!reduceRendering && (
-            <>
+            <div
+              className="material-sample-general-info rounded border p-3 mb-4"
+              style={{ backgroundColor: "#f8f9fa" }}
+            >
               {!isTemplate && materialSample?.materialSampleName && (
                 <MaterialSampleBreadCrumb
                   disableLastLink={true}
@@ -530,7 +533,7 @@ export function MaterialSampleForm({
                   />
                 </div>
               </div>
-            </>
+            </div>
           )}
           {/* The toggleable / re-arrangeable form sections: */}
           <div className="data-components">
