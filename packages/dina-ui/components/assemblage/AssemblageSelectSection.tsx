@@ -13,22 +13,28 @@ import Link from "next/link";
 export interface AssemblageSelectSectionProps {
   resourcePath?: string;
   classNames?: string;
+  horizontal?: boolean | [number, number] | "flex" | number;
 }
 
 export function AssemblageSelectSection({
   resourcePath,
-  classNames
+  classNames,
+  horizontal = "flex"
 }: AssemblageSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
-    <AssemblageSelectField resourcePath={resourcePath} />
+    <AssemblageSelectField
+      resourcePath={resourcePath}
+      horizontal={horizontal}
+    />
   ) : (
     <div className={`${classNames} row`}>
-      <DinaFormSection horizontal="flex">
+      <DinaFormSection horizontal={horizontal}>
         <div className="d-flex flex-row gap-1">
           <AssemblageSelectField
             resourcePath={resourcePath}
             className="flex-grow-1 mb-2"
+            horizontal={horizontal}
           />
         </div>
       </DinaFormSection>
@@ -39,15 +45,17 @@ export function AssemblageSelectSection({
 export interface AssemblageSelectFieldProps {
   resourcePath?: string;
   className?: string;
+  horizontal?: boolean | [number, number] | "flex" | number;
 }
 
 export function AssemblageSelectField({
   resourcePath,
-  className
+  className,
+  horizontal = "flex"
 }: AssemblageSelectFieldProps) {
   const { readOnly } = useDinaFormContext();
   return (
-    <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
+    <DinaFormSection horizontal={horizontal} readOnly={readOnly}>
       <ResourceSelectField<Assemblage>
         name="assemblages"
         isMulti={true}

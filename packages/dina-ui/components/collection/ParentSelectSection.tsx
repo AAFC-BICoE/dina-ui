@@ -85,6 +85,7 @@ export interface ParentSelectSectionProps {
   resourcePath?: string;
   classNames?: string;
   enableCollectingEvent?: boolean;
+  horizontal?: boolean | [number, number] | "flex" | number;
 }
 
 /**
@@ -97,17 +98,19 @@ export interface ParentSelectSectionProps {
  */
 export function ParentSelectSection({
   classNames,
-  enableCollectingEvent
+  enableCollectingEvent,
+  horizontal = "flex"
 }: ParentSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
 
   return readOnly ? undefined : (
     <div className={`${classNames} row`}>
-      <DinaFormSection horizontal="flex">
+      <DinaFormSection horizontal={horizontal}>
         <div className="d-flex flex-row gap-1">
           <ParentSelectField
             enableCollectingEvent={enableCollectingEvent}
             className="flex-grow-1 mb-2"
+            horizontal={horizontal}
           />
         </div>
       </DinaFormSection>
@@ -119,12 +122,14 @@ interface ParentSelectFieldProps {
   resourcePath?: string;
   className?: string;
   enableCollectingEvent?: boolean;
+  horizontal?: boolean | [number, number] | "flex" | number;
 }
 
 function ParentSelectField({
   resourcePath = "collection-api/material-sample",
   enableCollectingEvent,
-  className
+  className,
+  horizontal = "flex"
 }: ParentSelectFieldProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const currentHierarchyItemId = initialValues?.hierarchy?.find(
@@ -144,7 +149,7 @@ function ParentSelectField({
     : undefined; // if not in bulk edit context, use the current hierarchy item id if available, otherwise undefined
 
   return (
-    <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
+    <DinaFormSection horizontal={horizontal} readOnly={readOnly}>
       <ResourceSelectFieldCustomQuery<MaterialSample>
         name="parentMaterialSample"
         useCustomQuery={useSearchWsCustomQuery}

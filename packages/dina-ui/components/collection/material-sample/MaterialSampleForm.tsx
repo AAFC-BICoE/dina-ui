@@ -515,21 +515,32 @@ export function MaterialSampleForm({
                 </div>
               )}
               <div className="row">
-                <div className="col-md-8">
-                  <CollectionSelectSection resourcePath="collection-api/collection" />
-                  <ProjectSelectSection resourcePath="collection-api/project" />
+                <div className="col-md-12">
+                  <CollectionSelectSection
+                    resourcePath="collection-api/collection"
+                    horizontal={16}
+                  />
+                  <ProjectSelectSection
+                    resourcePath="collection-api/project"
+                    horizontal={16}
+                  />
                   <ParentSelectSection
                     enableCollectingEvent={
                       dataComponentState.enableCollectingEvent
                     }
                   />
-                  <AssemblageSelectSection resourcePath="collection-api/assemblage" />
+                  <AssemblageSelectSection
+                    resourcePath="collection-api/assemblage"
+                    horizontal={16}
+                  />
                   <NotPubliclyReleasableSection
                     defaultToNotReleasable={defaultToNotReleasable}
+                    horizontal={16}
                   />
                   <TagsAndRestrictionsSection
                     resourcePath="collection-api/material-sample"
                     indexName="dina_material_sample_index"
+                    horizontal={16}
                   />
                 </div>
               </div>

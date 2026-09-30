@@ -14,22 +14,25 @@ import Link from "next/link";
 export interface CollectionSelectSectionProps {
   resourcePath?: string;
   classNames?: string;
+  horizontal?: boolean | [number, number] | "flex" | number;
 }
 
 export function CollectionSelectSection({
   resourcePath,
-  classNames
+  classNames,
+  horizontal = "flex"
 }: CollectionSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
     <CollectionSelectField resourcePath={resourcePath} />
   ) : (
     <div className={`${classNames} row`}>
-      <DinaFormSection horizontal="flex">
+      <DinaFormSection horizontal={horizontal}>
         <div className="d-flex flex-row gap-1">
           <CollectionSelectField
             resourcePath={resourcePath}
             className="flex-grow-1 mb-2"
+            horizontal={horizontal}
           />
         </div>
       </DinaFormSection>
@@ -44,13 +47,14 @@ export interface CollectionSelectFieldProps {
 
 export function CollectionSelectField({
   resourcePath,
-  className
+  className,
+  horizontal = "flex"
 }: CollectionSelectFieldProps) {
   const { readOnly } = useDinaFormContext();
   const { isAdmin, groupNames } = useAccount();
 
   return (
-    <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
+    <DinaFormSection horizontal={horizontal} readOnly={readOnly}>
       <ResourceSelectField<Collection>
         key={String(isAdmin)}
         name="collection"
