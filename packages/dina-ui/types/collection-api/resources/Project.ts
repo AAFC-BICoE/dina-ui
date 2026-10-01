@@ -1,7 +1,7 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { MultilingualDescription } from "../../common";
-import { AgentRole } from "../../loan-transaction-api";
+import { AgentRole } from "./Transaction";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface ProjectAttributes {

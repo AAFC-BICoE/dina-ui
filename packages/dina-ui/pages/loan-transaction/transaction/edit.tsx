@@ -27,7 +27,11 @@ import _ from "lodash";
 import { useRouter } from "next/router";
 import { AgentRolesField } from "../../../components/collection/AgentRolesField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  AgentRole,
+  MaterialSample,
+  Transaction
+} from "../../../types/collection-api";
 import {
   AttachmentsField,
   Footer,
@@ -39,7 +43,6 @@ import { useMaterialSampleRelationshipColumns } from "../../../components/collec
 import { ManagedAttributesEditor } from "../../../components/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
 import { Person } from "../../../types/objectstore-api";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 
@@ -58,7 +61,7 @@ export function useTransactionQuery(
   const { showPermissions } = options || {};
   return useQuery<Transaction>(
     {
-      path: `loan-transaction-api/transaction/${id}`,
+      path: `collection-api/transaction/${id}`,
       include: "attachment,materialSamples",
       ...(showPermissions && { header: { "include-dina-permission": "true" } })
     },
@@ -219,7 +222,7 @@ export function TransactionForm({
           type: "transaction"
         }
       ],
-      { apiBaseUrl: "/loan-transaction-api" }
+      { apiBaseUrl: "/collection-api" }
     );
     await onSaved(savedTransaction);
   };
@@ -414,7 +417,7 @@ export function TransactionFormLayout({
               name="transactionType"
               jsonApiBackend={{
                 query: (search, ctx) => ({
-                  path: "loan-transaction-api/transaction",
+                  path: "collection-api/transaction",
                   filter: SimpleSearchFilterBuilder.create<Transaction>()
                     .whereProvided("group", "EQ", ctx.values.group)
                     .searchFilter("transactionType", search)
@@ -435,7 +438,7 @@ export function TransactionFormLayout({
             name="status"
             jsonApiBackend={{
               query: (search, ctx) => ({
-                path: "loan-transaction-api/transaction",
+                path: "collection-api/transaction",
                 filter: SimpleSearchFilterBuilder.create<Transaction>()
                   .whereProvided("group", "EQ", ctx.values.group)
                   .searchFilter("status", search)
@@ -450,7 +453,7 @@ export function TransactionFormLayout({
             name="purpose"
             jsonApiBackend={{
               query: (search, ctx) => ({
-                path: "loan-transaction-api/transaction",
+                path: "collection-api/transaction",
                 filter: SimpleSearchFilterBuilder.create<Transaction>()
                   .whereProvided("group", "EQ", ctx.values.group)
                   .searchFilter("purpose", search)
@@ -502,14 +505,15 @@ export function TransactionFormLayout({
       <AgentRolesField
         fieldName="agentRoles"
         readOnly={readOnly}
-        resourcePath="loan-transaction-api/transaction"
+        resourcePath="collection-api/transaction"
         title={<DinaMessage id="agentRole" />}
         indexName="dina_loan_transaction_index"
       />
       <ShipmentDetailsFieldSet fieldName="shipment" />
       <ManagedAttributesEditor
         valuesPath="managedAttributes"
-        managedAttributeApiPath="loan-transaction-api/managed-attribute"
+        managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+        managedAttributeComponent="TRANSACTION"
         fieldSetProps={{
           legend: <DinaMessage id="managedAttributes" />
         }}

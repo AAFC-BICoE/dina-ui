@@ -297,7 +297,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   "field_determination.verbatimScientificName": "Nom scientifique verbatim",
   field_determinationRemarks: "Détermination - remarques",
   field_displayName: "Visualiser le nom",
-  field_dwcCatalogNumber: "Numéro de catalogue",
   field_dwcCoordinateUncertaintyInMeters:
     "Coordonner les incertitudes dans les mesures en mètres",
   field_dwcCoordinateUncertaintyInMeters_tooltip:

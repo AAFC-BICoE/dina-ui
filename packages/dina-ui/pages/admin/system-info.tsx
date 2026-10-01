@@ -39,10 +39,6 @@ const SYSTEM_INFO_API_CONFIG: ApiConfigInfo[] = [
     apiEndpoint: "agent-api"
   },
   {
-    moduleName: "Loan Transaction API",
-    apiEndpoint: "loan-transaction-api"
-  },
-  {
     moduleName: "Export API",
     apiEndpoint: "dina-export-api"
   },
