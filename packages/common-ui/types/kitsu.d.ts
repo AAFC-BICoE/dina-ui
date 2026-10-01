@@ -3,6 +3,7 @@
 import { AxiosInstance } from "axios";
 import { JsonValue, SetRequired } from "type-fest";
 import { ResponseType } from "axios";
+import { SimpleSearchFilter } from "../lib/util/simpleSearchFilterBuilder";
 
 declare module "kitsu" {
   // export default Kitsu;
@@ -27,18 +28,26 @@ declare module "kitsu" {
     public post(...args: any[]): Promise<any>;
   }
 
-  /** Params for the Kitsu JSONAPI client's constructor */
+  /** Kitsu JSONAPI client constructor parameters. */
   export interface KitsuConstructorParams {
     baseURL: string;
     headers?: any;
     pluralize?: boolean;
     camelCaseTypes?: boolean;
     resourceCase?: "kebab" | "snake" | "none";
+    /**
+     * Serializes GET parameters to a query string. String values select built-in
+     * serializers and function values provide custom serialization.
+     */
+    query?:
+      | "traditional"
+      | "modern"
+      | ((params: Record<string, any>) => string);
   }
 
   /** Parameters for GET requests. */
   export interface GetParams {
-    /** Fields to include in the response data. */
+    /** Fields to include in response data. */
     fields?: FieldsParam;
 
     /** Resource filter */
@@ -47,37 +56,28 @@ declare module "kitsu" {
     /** FIQL filter */
     fiql?: string;
 
-    /**
-     * Sort order + attribute.
-     * Examples:
-     *  - name
-     *  - -description
-     */
+    /** Sort order and attribute, e.g. "name" or "-description". */
     sort?: string;
 
     /** Included resources. */
     include?: string;
 
     /**
-     * Certain fields are optional since they are computational expensive and not always needed.
-     * They can be defined per resource type.
-     *
-     * e.g.: { "material-sample": "hierarchy,targetDetermination" }
+     * Computationally expensive fields can be requested per resource type
+     * e.g. { "material-sample": "hierarchy,targetDetermination" }
      */
     optfields?: FieldsParam;
 
-    /** Vendor-specific parameter for paginating listed data. */
+    /** Parameter for paginating listed data. */
     page?: any;
 
-    /** Custom headers for the request */
+    /** Custom request headers. */
     header?: {};
 
-    /** Response type that the request should be formatted as. "arraybuffer" | "blob" | "document" | "json" | "text" | "stream" */
+    /** Expected response type such as "json" or "text". */
     responseType?: ResponseType;
 
-    /** Specifies the number of milliseconds before the request times out.
-     * If the request takes longer than `timeout`, the request will be aborted.
-     */
+    /** Milliseconds before the request aborts from timeout. */
     timeout?: number;
   }
 
@@ -86,10 +86,13 @@ declare module "kitsu" {
     [key: string]: string;
   }
 
-  /** Parameter for filtering listed data. */
-  export type FilterParam = string | Record<string, JsonValue>;
+  /** Filter parameter built with SimpleSearchFilterBuilder. */
+  export type FilterParam =
+    | string
+    | SimpleSearchFilter
+    | Record<string, JsonValue>;
 
-  /** The response from a Kitsu GET request. */
+  /** Kitsu GET request response. */
   export interface KitsuResponse<
     TData extends KitsuResponseData,
     TMeta = undefined
@@ -100,7 +103,7 @@ declare module "kitsu" {
     meta: TMeta;
   }
 
-  /** The Kitsu response data can either be one resource or an array of resources. */
+  /** Response data containing a single resource or an array of resources. */
   export type KitsuResponseData = KitsuResource | KitsuResource[];
 
   /** JSONAPI resource base attributes. */
@@ -121,10 +124,7 @@ declare module "kitsu" {
         type?: string;
       };
 
-  /**
-   * Makes the 'id' field required on a resource type and all of its relationships.
-   * Used when assuming that data from the back-end always has the ID set.
-   */
+  /** Requires the ID field on a resource and its relationships. */
   export type PersistedResource<TData extends KitsuResource = KitsuResource> = {
     [P in keyof TData]: TData[P] extends KitsuResource
       ? PersistedResource<TData[P]>
@@ -134,10 +134,8 @@ declare module "kitsu" {
   } & Required<KitsuResource>;
 
   /**
-   * Used when creating or updating a resource.
-   * Makes the 'id' field optional on the main resource.
-   * Makes the 'id' field required on linked resources.
-   * 'type' must be defined.
+   * Requires the ID field on linked resources but makes it optional
+   * on the main resource. Requires the type field.
    */
   export type InputResource<TData extends KitsuResource> = SetRequired<
     {

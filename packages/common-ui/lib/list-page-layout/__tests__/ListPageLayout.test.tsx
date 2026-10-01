@@ -1,6 +1,10 @@
 import { waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { clearAndType, mountWithAppContext, SimpleSearchFilterBuilder } from "common-ui";
+import {
+  clearAndType,
+  mountWithAppContext,
+  SimpleSearchFilterBuilder
+} from "common-ui";
 import { ListPageLayout } from "../ListPageLayout";
 import "@testing-library/jest-dom";
 
@@ -28,7 +32,7 @@ describe("ListPageLayout component", () => {
       { apiContext: mockApiCtx }
     );
 
-    // Wait for the default search to finish.
+    // Wait for default search to finish.
     await waitFor(() => {
       expect(
         wrapper.getByRole("textbox", { name: /filter value/i })
@@ -40,9 +44,11 @@ describe("ListPageLayout component", () => {
       wrapper.getByRole("textbox", { name: /filter value/i }),
       "101F"
     );
-    await userEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /filter list/i })
+    );
 
-    // There should be an FIQL filter.
+    // Requires an FIQL filter.
     await waitFor(() => {
       expect(mockGet).lastCalledWith(
         expect.anything(),
@@ -57,7 +63,7 @@ describe("ListPageLayout component", () => {
       wrapper.getByRole("button", { name: /reset filters/i })
     );
 
-    // There should be no FIQL filter. Ensure it contains no fiql property.
+    // Verify no FIQL filter property exists.
     await waitFor(() => {
       expect(mockGet).lastCalledWith(
         expect.anything(),
@@ -81,15 +87,15 @@ describe("ListPageLayout component", () => {
       { apiContext: mockApiCtx }
     );
 
-    // Wait for the default search to finish.
+    // Wait for default search to finish.
     await waitFor(() => {
       expect(wrapper.getByText("Type")).toBeInTheDocument();
     });
 
-    // Click the type header to trigger the sort.
+    // Click type header to trigger sort.
     await userEvent.click(wrapper.getByText("Type"));
 
-    // There should be an FIQL filter.
+    // Requires an FIQL filter.
     await waitFor(() => {
       expect(mockGet).lastCalledWith("pcrPrimer", {
         page: { limit: 25, offset: 0 },
@@ -120,7 +126,7 @@ describe("ListPageLayout component", () => {
       { apiContext: mockApiCtx }
     );
 
-    // Ensure the additional filters are included in the request:
+    // Ensure additional filters are in request.
     await waitFor(() => {
       expect(mockGet).lastCalledWith("pcrPrimer", {
         fiql: "attr1==a;attr2==b",
@@ -147,7 +153,7 @@ describe("ListPageLayout component", () => {
       { apiContext: mockApiCtx }
     );
 
-    // Ensure the additional filters are included in the request:
+    // Ensure additional filters are in request.
     await waitFor(() => {
       expect(mockGet).lastCalledWith("pcrPrimer", {
         fiql: "group==testGroup",
@@ -170,7 +176,7 @@ describe("ListPageLayout component", () => {
       { apiContext: mockApiCtx }
     );
 
-    // Wait for the default search to finish.
+    // Wait for default search to finish.
     await waitFor(() => {
       expect(
         wrapper.getByRole("textbox", { name: /filter value/i })
@@ -182,9 +188,11 @@ describe("ListPageLayout component", () => {
       wrapper.getByRole("textbox", { name: /filter value/i }),
       "101F"
     );
-    await userEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /filter list/i })
+    );
 
-    // There should be a fiql filter.
+    // Requires an FIQL filter.
     await waitFor(() => {
       expect(mockGet).lastCalledWith(
         expect.anything(),
@@ -193,20 +201,26 @@ describe("ListPageLayout component", () => {
         })
       );
 
-      // check that only fiql is used.
+      // Verify only FIQL is used.
       const [, args] = mockGet.mock.lastCall;
       expect(args).not.toHaveProperty("filter");
     });
   });
 
-  it("Combines additionalFiqlFilters with other FIQL filters.", async () => {
+  it("Combines the filter form's filters with additionalFilters containing OR groups.", async () => {
     const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"
-        additionalFiqlFilters="status==active"
-        additionalFilters={SimpleSearchFilterBuilder.create()
-          .where("group", "EQ", "testGroup")
-          .build()}
+        additionalFilters={(filterForm) =>
+          SimpleSearchFilterBuilder.create()
+            .whereProvided("group", "EQ", filterForm.group)
+            .or((b) =>
+              b
+                .where("createdBy", "EQ", "me")
+                .where("restrictToCreatedBy", "EQ", false)
+            )
+            .build()
+        }
         filterAttributes={["name"]}
         queryTableProps={{
           columns: ["name", "type"],
@@ -216,7 +230,7 @@ describe("ListPageLayout component", () => {
       { apiContext: mockApiCtx }
     );
 
-    // Wait for the default search to finish.
+    // Wait for default search to finish.
     await waitFor(() => {
       expect(
         wrapper.getByRole("textbox", { name: /filter value/i })
@@ -228,14 +242,16 @@ describe("ListPageLayout component", () => {
       wrapper.getByRole("textbox", { name: /filter value/i }),
       "101F"
     );
-    await userEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /filter list/i })
+    );
 
-    // All filters should be combined with semicolons (AND operator).
+    // All filters are AND-ed with parenthesized OR groups.
     await waitFor(() => {
       expect(mockGet).lastCalledWith(
         expect.anything(),
         expect.objectContaining({
-          fiql: "(name==*101F*);(group==testGroup);(status==active)"
+          fiql: "name==*101F*;(createdBy==me,restrictToCreatedBy==false)"
         })
       );
     });

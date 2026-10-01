@@ -7,7 +7,7 @@ import {
   booleanCell,
   dateCell,
   FieldHeader,
-  fiql
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import { FormTemplate } from "../../../types/collection-api";
@@ -90,45 +90,22 @@ export default function MaterialSampleFormTemplateListPage() {
       }
     >
       <ListPageLayout<FormTemplate>
-        additionalFiqlFilters={(filterForm) =>
-          fiql({
-            type: "FILTER_GROUP",
-            operator: "AND",
-            id: 1,
-            children: [
-              {
-                type: "FILTER_ROW",
-                id: 2,
-                attribute: "group",
-                predicate: filterForm.group ? "IS" : "IN",
-                searchType: "EXACT_MATCH",
-                value: filterForm.group || groupNames
-              },
-              {
-                type: "FILTER_GROUP",
-                operator: "OR",
-                id: 3,
-                children: [
-                  {
-                    type: "FILTER_ROW",
-                    id: 4,
-                    attribute: "createdBy",
-                    predicate: "IS",
-                    searchType: "EXACT_MATCH",
-                    value: username ?? ""
-                  },
-                  {
-                    type: "FILTER_ROW",
-                    id: 5,
-                    attribute: "restrictToCreatedBy",
-                    predicate: "IS",
-                    searchType: "EXACT_MATCH",
-                    value: "false"
-                  }
-                ]
-              }
-            ]
-          })
+        additionalFilters={(filterForm) =>
+          SimpleSearchFilterBuilder.create<FormTemplate>()
+            // Restrict to selected group or user's groups. Users without groups have no restrictions.
+            // The API only returns readable items.
+            .when(
+              !!filterForm.group,
+              (b) => b.where("group", "EQ", filterForm.group),
+              (b) => b.whereIn("group", groupNames)
+            )
+            // Templates created by the user or open to everyone:
+            .or((b) =>
+              b
+                .whereProvided("createdBy", "EQ", username)
+                .where("restrictToCreatedBy", "EQ", false)
+            )
+            .build()
         }
         filterAttributes={FILTER_ATTRIBUTES}
         id="material-sample-form-template-list"

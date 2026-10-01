@@ -1,33 +1,27 @@
-import { FilterParam, KitsuResource } from "kitsu";
-import moment from "moment";
-import { FilterAttributeConfig } from "./FilterBuilder";
-import { FilterGroupModel } from "./FilterGroup";
-import { FilterRowModel } from "./FilterRow";
-import { DateRange } from "./FilterRowDatePicker";
-import { FreeTextSearchFilterModel } from "../filter-free-text-search/FilterFreeTextSearchField";
-
-interface FiqlOperand {
-  arguments: string | string[];
-  comparison: string;
-  selector: string;
-}
-
-interface FiqlOperandGroup {
-  operands: (FiqlOperand | FiqlOperandGroup)[];
-  operator: string;
-}
+import { FilterParam } from "kitsu";
+import {
+  AND_KEY,
+  FilterOperation,
+  OR_KEY,
+  SimpleSearchFilter,
+  SimpleSearchFilterCondition,
+  SimpleSearchFilterValue,
+  isEmptyInList
+} from "../util/simpleSearchFilterBuilder";
+import {
+  FilterModel,
+  filterModelToSimpleSearchFilter
+} from "./filterModelToSimpleSearchFilter";
 
 /**
- * Characters a fiql argument can contain without quotes, the intersection of what the RSQL
- * grammar and the back-end's query-string grammar accept unquoted. Anything else (spaces,
- * "@" in an email address, "+", quotes, etc.) requires the argument to be double-quoted.
+ * Characters a FIQL argument can contain without quotes. This is the intersection of what the RSQL
+ * and back-end query-string grammars accept unquoted. Other characters require double quotes.
  */
 const UNQUOTED_FIQL_ARGUMENT = /^[A-Za-z0-9_\-.%/:*]*$/;
 
 /**
- * Quotes a fiql argument when it contains characters that can't appear unquoted, e.g. a free-text
- * search for "John Smith" or "john@example.com". Double quotes can't be escaped in the back-end's
- * query-string grammar, so they are dropped from the value.
+ * Quotes a FIQL argument containing characters that require quotes.
+ * Double quotes cannot be escaped in the back-end query-string grammar and are dropped.
  */
 export function fiqlArgument(value: string): string {
   return UNQUOTED_FIQL_ARGUMENT.test(value)
@@ -35,316 +29,151 @@ export function fiqlArgument(value: string): string {
     : `"${value.replace(/"/g, "")}"`;
 }
 
+/**
+ * Converts a {@link SimpleSearchFilter} to a FIQL expression:
+ *
+ *   { name: { ILIKE: "%a%" }, $or: [{ group: { EQ: "b" } }, { group: { EQ: "c" } }] }
+ *   => name==*a*;(group==b,group==c)
+ *
+ * This is the only place FIQL should be produced.
+ */
 export function simpleSearchFilterToFiql(
-  filter: FilterParam | undefined
+  filter: FilterParam | SimpleSearchFilter | null | undefined
 ): string {
-  const fiqlClauses: string[] = [];
-
-  // Loop over each field in the filter object (e.g., 'name', 'description', 'age').
-  for (const [fieldName, operators] of Object.entries(filter || {})) {
-    if (!operators) continue;
-
-    for (const [operator, value] of Object.entries(operators)) {
-      const fiqlOperator =
-        operator.toUpperCase() === "EQ" || operator.toUpperCase() === "ILIKE"
-          ? "" // Empty string since the operator is implicit in FIQL for equality
-          : operator.toLowerCase();
-
-      let fiqlValue = value === null ? "null" : value;
-
-      // Replace "%" with "*" for ILIKE operations (FIQL partial matching)
-      if (operator.toUpperCase() === "ILIKE" && typeof fiqlValue === "string") {
-        fiqlValue = fiqlValue.replace(/%/g, "*");
-      }
-
-      fiqlClauses.push(`${fieldName}=${fiqlOperator}=${fiqlValue}`);
-    }
-  }
-
-  return fiqlClauses.join(";");
-}
-
-/** Converts a FilterGroupModel to a FIQL expression. */
-export function fiql(
-  filter: FilterGroupModel | FilterRowModel | FreeTextSearchFilterModel | null
-): string {
-  if (!filter) {
+  if (!filter || typeof filter !== "object") {
     return "";
   }
-  switch (filter.type) {
-    case "FILTER_GROUP":
-      return transformToFIQL(toGroup(filter));
-    case "FILTER_ROW":
-      return transformToFIQL(toPredicate(filter));
-    case "FREE_TEXT_SEARCH_FILTER": {
-      return transformToFIQL(toFreeTextSearch(filter));
+  const terms = filterToTerms(filter as SimpleSearchFilter);
+  return terms.length ? joinTerms(terms, ";").text : "";
+}
+
+/** Converts a filter builder or free-text search model to a FIQL expression. */
+export function fiql(filter: FilterModel | null | undefined): string {
+  return simpleSearchFilterToFiql(filterModelToSimpleSearchFilter(filter));
+}
+
+interface FiqlTerm {
+  text: string;
+  /** True if the term joins several conditions and needs parentheses next to siblings. */
+  compound: boolean;
+}
+
+/** Returns the AND-ed terms of a filter. */
+function filterToTerms(filter: SimpleSearchFilter): FiqlTerm[] {
+  const terms: FiqlTerm[] = [];
+
+  for (const [key, value] of Object.entries(filter)) {
+    if (value === undefined) {
+      continue;
+    }
+
+    if (key === OR_KEY) {
+      const members = (value as SimpleSearchFilter[])
+        .map((member) => filterToTerms(member))
+        // Members without conditions widen the group and render as empty "()" which the parser rejects.
+        .filter((memberTerms) => memberTerms.length)
+        .map((memberTerms) => joinTerms(memberTerms, ";"));
+      if (members.length) {
+        terms.push(joinTerms(members, ","));
+      }
+      continue;
+    }
+
+    if (key === AND_KEY) {
+      // The parent is already an AND so member terms are added directly.
+      for (const member of value as SimpleSearchFilter[]) {
+        terms.push(...filterToTerms(member));
+      }
+      continue;
+    }
+
+    // Plain values are equalities and blank ones are ignored. A null value searches for a blank field.
+    if (value === null || typeof value !== "object") {
+      if (value !== "") {
+        terms.push(conditionToFiql(key, "EQ", value));
+      }
+      continue;
+    }
+
+    for (const [op, opValue] of Object.entries(
+      value as SimpleSearchFilterCondition
+    ) as [
+      FilterOperation,
+      SimpleSearchFilterValue | SimpleSearchFilterValue[] | undefined
+    ][]) {
+      // Empty IN lists have nothing to compare against. Emitting them produces invalid syntax.
+      if (opValue !== undefined && !isEmptyInList(op, opValue)) {
+        terms.push(conditionToFiql(key, op, opValue));
+      }
+    }
+  }
+
+  return terms;
+}
+
+function joinTerms(terms: FiqlTerm[], separator: ";" | ","): FiqlTerm {
+  if (terms.length === 1) {
+    return terms[0];
+  }
+  return {
+    text: terms
+      .map((term) => (term.compound ? `(${term.text})` : term.text))
+      .join(separator),
+    compound: true
+  };
+}
+
+function conditionToFiql(
+  field: string,
+  op: FilterOperation,
+  value: SimpleSearchFilterValue | SimpleSearchFilterValue[]
+): FiqlTerm {
+  switch (op) {
+    case "EQ":
+      return { text: `${field}==${argument(value)}`, compound: false };
+    case "NEQ":
+      return { text: `${field}!=${argument(value)}`, compound: false };
+    case "LIKE":
+    case "ILIKE":
+      return { text: `${field}==${wildcardArgument(value)}`, compound: false };
+    case "NOT_ILIKE":
+      return { text: `${field}!=${wildcardArgument(value)}`, compound: false };
+    case "GT":
+      return { text: `${field}=gt=${String(value)}`, compound: false };
+    case "GOE":
+      return { text: `${field}=ge=${String(value)}`, compound: false };
+    case "LT":
+      return { text: `${field}=lt=${String(value)}`, compound: false };
+    case "LOE":
+      return { text: `${field}=le=${String(value)}`, compound: false };
+    case "IN": {
+      // FIQL has no "in" operator so IN becomes an OR of equalities. Values are arrays or comma lists.
+      const values = Array.isArray(value) ? value : String(value).split(",");
+      return joinTerms(
+        values.map((val) => ({
+          text: `${field}==${argument(val)}`,
+          compound: false
+        })),
+        ","
+      );
     }
   }
 }
 
-/** Converts FIQL operand structure to FIQL string format */
-function transformToFIQL(operand: FiqlOperand | FiqlOperandGroup): string {
-  if ("selector" in operand) {
-    // Single operand
-    const args = Array.isArray(operand.arguments)
-      ? operand.arguments.join(",")
-      : operand.arguments;
-    return `${operand.selector}${operand.comparison}${args}`;
-  } else {
-    // Group of operands
-    const operandStrings = operand.operands.map((op) => {
-      const transformed = transformToFIQL(op);
-      // Only wrap in parentheses if it contains operators and we're not at the root level
-      if (
-        (transformed.includes(";") || transformed.includes(",")) &&
-        operand.operands.length > 1
-      ) {
-        return `(${transformed})`;
-      }
-      return transformed;
-    });
-
-    const separator = operand.operator === "AND" ? ";" : ",";
-    return operandStrings.join(separator);
+function argument(
+  value: SimpleSearchFilterValue | SimpleSearchFilterValue[]
+): string {
+  if (value === null) {
+    return "null";
   }
+  return typeof value === "string" ? fiqlArgument(value) : String(value);
 }
 
-/** Converts a FilterGroupModel to a FIQL expression. */
-function toGroup(
-  filterGroup: FilterGroupModel
-): FiqlOperandGroup | FiqlOperand {
-  const { children, operator } = filterGroup;
-
-  return {
-    operands: children
-      // Exclude filter rows using PARTIAL_MATCH or EXACT_MATCH with no value.
-      .filter(
-        (child) =>
-          !(
-            child.type === "FILTER_ROW" &&
-            (child.searchType === "PARTIAL_MATCH" ||
-              child.searchType === "EXACT_MATCH") &&
-            !child.value
-          )
-      )
-      // Exclude filter groups with no children:
-      .filter(
-        (child) => !(child.type === "FILTER_GROUP" && !child.children.length)
-      )
-      .map((child) => {
-        switch (child.type) {
-          case "FILTER_GROUP":
-            return toGroup(child);
-          case "FILTER_ROW":
-            return toPredicate(child);
-        }
-      }),
-    operator
-  };
-}
-
-/** Converts a FilterRowModel to a FIQL expression. */
-function toPredicate(
-  filterRow: FilterRowModel
-): FiqlOperandGroup | FiqlOperand {
-  const { attribute, predicate, searchType, value } = filterRow;
-
-  const attributeConfig: FilterAttributeConfig =
-    typeof attribute === "string"
-      ? { name: attribute, type: "STRING" }
-      : attribute;
-
-  const selector = typeof attribute === "string" ? attribute : attribute.name;
-
-  if (searchType === "BLANK_FIELD") {
-    const comparison = predicate === "IS" ? "==" : "!=";
-    const operator = predicate === "IS" ? "OR" : "AND";
-    return {
-      operands: [
-        {
-          arguments: "null",
-          comparison,
-          selector
-        }
-      ],
-      operator
-    };
-  }
-
-  // Handle IN predicate
-  if (predicate === "IN" || predicate === "NOT IN") {
-    const values = Array.isArray(value) ? value : [value];
-    const comparison = predicate === "IN" ? "==" : "!=";
-    const operator = predicate === "IN" ? "OR" : "AND";
-
-    const operands = values.map((val) => {
-      let searchValue = val;
-
-      // Handle dropdown/resource types
-      if (
-        attributeConfig.type === "DROPDOWN" &&
-        typeof val === "object" &&
-        (val as KitsuResource)?.id
-      ) {
-        searchValue = String((val as KitsuResource).id);
-      } else if (typeof val === "string") {
-        searchValue = val;
-      } else if (typeof val === "number") {
-        searchValue = String(val);
-      }
-
-      return {
-        arguments: searchValue,
-        comparison,
-        selector
-      };
-    });
-
-    return {
-      operands,
-      operator
-    };
-  }
-
-  // Allow list/range filters.
-  if (typeof value === "string" && attributeConfig?.allowRange) {
-    const commaSplit = value.split(",");
-    const ranges = attributeConfig?.allowRange
-      ? commaSplit.filter((e) => e.includes("-"))
-      : commaSplit;
-
-    const rangeOperands = attributeConfig.allowRange
-      ? ranges.map((range) => {
-          const [low, high] = range
-            .split("-")
-            .sort((a, b) => Number(a) - Number(b));
-
-          const positive = predicate === "IS";
-
-          return betweenOperand({ low, high, positive, selector });
-        })
-      : [];
-
-    return {
-      operands: [...rangeOperands],
-      operator: predicate === "IS NOT" ? "AND" : "OR"
-    };
-  }
-
-  let searchValue;
-  let compare;
-
-  // Handle date searches:
-  if (attributeConfig.type === "DATE") {
-    const dates =
-      predicate === "BETWEEN"
-        ? [(value as DateRange).low, (value as DateRange).high]
-        : [value as string, value as string];
-    // Sort the dates in case the user gives them in the wrong order:
-    const [low, high] = dates.sort((a, b) => Date.parse(a) - Date.parse(b));
-
-    const beginningOfRange = new Date(low);
-    beginningOfRange.setHours(0, 0, 0, 0); // Beginning of the day.
-    const beginningOfRangeString = moment(beginningOfRange).format();
-
-    const endOfRange = new Date(high);
-    endOfRange.setHours(23, 59, 59, 999); // End of the day.
-    const endOfRangeString = moment(endOfRange).format();
-
-    if (predicate === "FROM") {
-      compare = "=ge=";
-      // GreaterThan searches should match from the beginning of the chosen day:
-      searchValue = beginningOfRangeString;
-    } else if (predicate === "UNTIL") {
-      compare = "=le=";
-      // LessThan searches should match from the end of the chosen day:
-      searchValue = endOfRangeString;
-    } else if (
-      predicate === "IS" ||
-      predicate === "IS NOT" ||
-      predicate === "BETWEEN"
-    ) {
-      return betweenOperand({
-        low: beginningOfRangeString,
-        high: endOfRangeString,
-        positive: predicate !== "IS NOT",
-        selector
-      });
-    }
-  }
-
-  if (
-    attributeConfig.type === "DROPDOWN" ||
-    attributeConfig.type === "STRING"
-  ) {
-    searchValue =
-      attributeConfig.type === "DROPDOWN"
-        ? String((value as KitsuResource).id)
-        : (value as string);
-
-    if (searchType === "PARTIAL_MATCH") {
-      searchValue = `*${searchValue}*`;
-      compare = predicate === "IS NOT" ? "!=" : "==";
-    } else if (searchType === "EXACT_MATCH") {
-      compare = predicate === "IS NOT" ? "!=" : "==";
-    }
-    searchValue = fiqlArgument(searchValue);
-  }
-
-  return {
-    arguments: searchValue,
-    comparison: compare,
-    selector
-  };
-}
-
-function toFreeTextSearch(
-  filterRow: FreeTextSearchFilterModel
-): FiqlOperandGroup {
-  const { filterAttributes, value } = filterRow;
-
-  const operands = filterAttributes.map((attribute) => {
-    const selector = typeof attribute === "string" ? attribute : attribute.name;
-    const operand: FiqlOperand = {
-      arguments: fiqlArgument(`*${value}*`),
-      comparison: "==",
-      selector
-    };
-    return operand;
-  });
-  return {
-    operands,
-    operator: "OR"
-  };
-}
-
-interface BetweenOperandParams {
-  selector: string;
-  low: string | string[];
-  high: string | string[];
-  positive: boolean;
-}
-
-/** Creates a "between"-type operand given low and high values. */
-function betweenOperand({
-  low,
-  high,
-  positive,
-  selector
-}: BetweenOperandParams): FiqlOperandGroup {
-  return {
-    operands: [
-      {
-        arguments: low,
-        comparison: positive ? "=ge=" : "=lt=",
-        selector
-      },
-      {
-        arguments: high,
-        comparison: positive ? "=le=" : "=gt=",
-        selector
-      }
-    ],
-    operator: positive ? "AND" : "OR"
-  };
+/** LIKE and ILIKE values use "%" as the wildcard whereas FIQL uses "*". */
+function wildcardArgument(
+  value: SimpleSearchFilterValue | SimpleSearchFilterValue[]
+): string {
+  return typeof value === "string"
+    ? fiqlArgument(value.replace(/%/g, "*"))
+    : argument(value);
 }

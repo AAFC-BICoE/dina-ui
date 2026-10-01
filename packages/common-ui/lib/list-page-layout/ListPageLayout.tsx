@@ -1,11 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FormikProps } from "formik";
-import {
-  FilterParam,
-  KitsuResource,
-  KitsuResponse,
-  PersistedResource
-} from "kitsu";
+import { KitsuResource, KitsuResponse, PersistedResource } from "kitsu";
 import { ComponentType, ReactNode } from "react";
 import {
   CheckBoxFieldProps,
@@ -17,7 +12,12 @@ import {
   QueryTableProps,
   useGroupedCheckBoxes
 } from "..";
-import { fiql, simpleSearchFilterToFiql } from "../filter-builder/fiql";
+import { simpleSearchFilterToFiql } from "../filter-builder/fiql";
+import { filterModelToSimpleSearchFilter } from "../filter-builder/filterModelToSimpleSearchFilter";
+import {
+  SimpleSearchFilter,
+  SimpleSearchFilterBuilder
+} from "../util/simpleSearchFilterBuilder";
 import {
   BulkDeleteButton,
   BulkDeleteButtonProps,
@@ -33,8 +33,13 @@ export enum ListLayoutFilterType {
 }
 
 export interface ListPageLayoutProps<TData extends KitsuResource> {
-  additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
-  additionalFiqlFilters?: string | ((filterForm: any) => string);
+  /**
+   * Filters combined with the filter form filters using AND. Build them with SimpleSearchFilterBuilder
+   * like `.whereProvided("group", "EQ", filterForm.group)`. Raw FIQL strings are ignored.
+   */
+  additionalFilters?:
+    | SimpleSearchFilter
+    | ((filterForm: any) => SimpleSearchFilter);
   defaultSort?: ColumnSort[];
   filterType?: ListLayoutFilterType;
   enableInMemoryFilter?: boolean;
@@ -54,21 +59,21 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
   filterPlaceholder?: string;
 
   /**
-   * Re-filters the list as the user types in the free-text search (FREE_TEXT filter type only).
-   * Intended for in-memory filtered lists, where re-filtering is cheap.
+   * Re-filters the list as the user types in FREE_TEXT searches.
+   * Useful for in-memory lists where filtering is cheap.
    */
   liveSearch?: boolean;
 
   id: string;
   queryTableProps:
-  | QueryTableProps<TData>
-  | ((context: ListPageLayoutContext<TData>) => QueryTableProps<TData>);
+    | QueryTableProps<TData>
+    | ((context: ListPageLayoutContext<TData>) => QueryTableProps<TData>);
   wrapTable?: (children: ReactNode) => ReactNode;
 
-  /** Adds the bulk edit button and the row checkboxes. */
+  /** Adds the bulk edit button and row checkboxes. */
   bulkEditPath?: string;
 
-  /** Adds the bulk delete button and the row checkboxes. */
+  /** Adds the bulk delete button and row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
 }
 
@@ -77,12 +82,11 @@ interface ListPageLayoutContext<TData extends KitsuResource> {
 }
 
 /**
- * Generic layout component for list pages. Renders a QueryTable with a filter builder.
- * The filter form state is hydrated from localstorage, and is saved in localstorage on form submit.
+ * Generic layout component for list pages rendering a QueryTable with a filter builder.
+ * Filter form state is synced with localstorage.
  */
 export function ListPageLayout<TData extends KitsuResource>({
   additionalFilters: additionalFiltersProp,
-  additionalFiqlFilters: additionalFiqlFiltersProp,
   defaultSort: defaultSortProp,
   filterType = ListLayoutFilterType.FILTER_BUILDER,
   enableInMemoryFilter = false,
@@ -102,12 +106,10 @@ export function ListPageLayout<TData extends KitsuResource>({
   const tableSortKey = `${id}_tableSort`;
   const filterformKey = `${id}_filterForm`;
 
-  // Use a localStorage hook to get the filter form state,
-  // and re-render when the watched localStorage key is changed.
+  // Get the filter form state from localstorage and re-render when it changes.
   const [filterForm, setFilterForm] = useLocalStorage<any>(filterformKey, {});
 
-  // Default sort and page-size from the QueryTable. These are only used on the initial
-  // QueryTable render, and are saved in localStorage when the table's sort or page-size is changed.
+  // Initial sort and page-size which are saved in localstorage upon change.
   const [storedDefaultSort, setStoredDefaultSort] =
     useLocalStorage<SortingState>(tableSortKey);
   const defaultSort = storedDefaultSort ??
@@ -116,13 +118,13 @@ export function ListPageLayout<TData extends KitsuResource>({
   const [defaultPageSize, setDefaultPageSize] =
     useLocalStorage<number>(tablePageSizeKey);
 
-  let filterParam: FilterParam | undefined;
+  let fiqlFilter: string | undefined;
   let inMemoryFilter:
     | ((
-      value: PersistedResource<TData>,
-      index?: number,
-      array?: PersistedResource<TData>[]
-    ) => boolean)
+        value: PersistedResource<TData>,
+        index?: number,
+        array?: PersistedResource<TData>[]
+      ) => boolean)
     | undefined;
 
   if (enableInMemoryFilter) {
@@ -134,11 +136,13 @@ export function ListPageLayout<TData extends KitsuResource>({
       return filterFn(filterForm, value, index, array);
     };
   } else {
-    let filterBuilderFiql = "";
+    let filterBuilderFilter = {};
     try {
-      filterBuilderFiql = fiql(filterForm.filterBuilderModel);
+      filterBuilderFilter = filterModelToSimpleSearchFilter(
+        filterForm.filterBuilderModel
+      );
     } catch (error) {
-      // If there is an error, ignore the filter form instead of crashing the page.
+      // Ignore filter form errors instead of crashing the page.
       console.error(error);
       setImmediate(() => setFilterForm({}));
     }
@@ -148,32 +152,13 @@ export function ListPageLayout<TData extends KitsuResource>({
         ? additionalFiltersProp(filterForm)
         : additionalFiltersProp;
 
-    // If the caller returns a string, use it directly (it is already FIQL).
-    // Otherwise, convert the simple-filter object to FIQL.
-    const additionalFiltersFiql =
-      typeof additionalFilters === "string"
-        ? (additionalFilters as string)
-        : simpleSearchFilterToFiql(additionalFilters);
+    // Combine filter form filters with additional filters using AND.
+    const filter = SimpleSearchFilterBuilder.create()
+      .add(filterBuilderFilter)
+      .add(additionalFilters)
+      .build();
 
-    const additionalFiqlFilters =
-      typeof additionalFiqlFiltersProp === "function"
-        ? additionalFiqlFiltersProp(filterForm)
-        : additionalFiqlFiltersProp;
-
-    // Combine all FIQL filters
-    const fiqlParts = [
-      filterBuilderFiql,
-      additionalFiltersFiql,
-      additionalFiqlFilters
-    ].filter(Boolean);
-
-    if (fiqlParts.length > 1) {
-      // Only wrap in parentheses when combining multiple filters
-      filterParam = fiqlParts.map((part) => `(${part})`).join(";");
-    } else if (fiqlParts.length === 1) {
-      // Don't wrap when there's only one filter
-      filterParam = fiqlParts[0];
-    }
+    fiqlFilter = simpleSearchFilterToFiql(filter) || undefined;
   }
 
   const {
@@ -194,16 +179,16 @@ export function ListPageLayout<TData extends KitsuResource>({
   const columns: ColumnDefinition<TData>[] = [
     ...(showRowCheckboxes
       ? [
-        {
-          cell: ({ row: { original: resource } }) => (
-            <CheckBoxField key={resource.id} resource={resource} />
-          ),
-          header: () => CheckBoxHeader,
-          enableSorting: false,
-          size: 200,
-          id: "checkbox_column"
-        }
-      ]
+          {
+            cell: ({ row: { original: resource } }) => (
+              <CheckBoxField key={resource.id} resource={resource} />
+            ),
+            header: () => CheckBoxHeader,
+            enableSorting: false,
+            size: 200,
+            id: "checkbox_column"
+          }
+        ]
       : []),
     ...resolvedQueryTableProps.columns
   ];
@@ -219,7 +204,7 @@ export function ListPageLayout<TData extends KitsuResource>({
       filterFn={inMemoryFilter}
       defaultPageSize={defaultPageSize ?? undefined}
       defaultSort={defaultSort ?? undefined}
-      fiql={filterParam as string}
+      fiql={fiqlFilter}
       onPageSizeChange={(newSize) => setDefaultPageSize(newSize)}
       onSortedChange={(newSort) => setStoredDefaultSort(newSort)}
       topRightCorner={
