@@ -207,6 +207,10 @@ form:has(> .bulk-button-bar) {
   gap: var(--space-3, 16px);
 }
 
+#collectingEventFieldExtensions fieldset.card.border {
+  margin-top: 70px !important;
+}
+
 .identifiers-row-input .mb-2 {
   margin-bottom: 0 !important;
 }
