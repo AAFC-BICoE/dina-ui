@@ -1775,11 +1775,12 @@ export function useMaterialSampleSave({
               materialSampleUsageCount={materialSampleUsageCount}
               alertMessage="collectingEventEditErrorMessage"
               collectingEventUUID={initialValues?.id}
-              displayCollectingEventDetailsLink={true}
+              displayCollectingEventDetailsLink={false}
               override={disableNestedFormEdits}
             />
           )}
           <CollectingEventFormLayout
+            compactReadOnly={makeCollectingEventReadOnly}
             defaultToNotReleasable={true}
             visibleManagedAttributeKeys={
               visibleManagedAttributeKeys?.collectingEvent

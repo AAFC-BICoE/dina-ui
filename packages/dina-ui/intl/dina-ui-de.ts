@@ -160,9 +160,9 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Dieses Sammlungsevent ist derzeit mit {count} Materialproben verknüpft. Stellen Sie sicher",
   collectingEventEditAlertTitle: "Sammlungsevent aktualisieren?",
   collectingEventEditErrorMessage:
-    "Dieses Sammlungsevent ist derzeit mit {count} Materialproben verknüpft. Bearbeitung ist nur auf der Detailseite des Sammlungsevents möglich.",
+    "Geteiltes Sammlungsevent — mit {count} Materialproben verknüpft. Bearbeitung über die Detailseite.",
   collectingEventEditErrorMessageSingle:
-    "Dieses Sammlungsevent ist derzeit mit einer Materialprobe verknüpft. Bearbeitung ist nur auf der Detailseite des Sammlungsevents möglich.",
+    "Verknüpftes Sammlungsevent — mit 1 Materialprobe verknüpft. Bearbeitung über die Detailseite.",
   collectingEventFieldExtensions: "Sammlungsevent-Felderweiterungen",
   collectingEventGoToDetails: "Zur Detailseite des Sammlungsevents",
   collectingEventListTitle: "Sammlungsevent",
@@ -170,12 +170,13 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectingEventPartOfExpedition: "Sammlungsevent Teil von Expedition",
   collectingEventPermissionAlert: "Sie haben keine Berechtigung",
   collectingEventViewMaterialSamplesAttached:
-    "Verknüpfte Materialproben anzeigen",
+    "{count} verknüpfte Materialproben anzeigen",
   collectingEvents: "Sammlungsevents",
   collectingLocationLegend: "Sammlungsort",
   collecting_event_tag_info:
     "Tag-Vorschläge basieren derzeit auf den Sammelereignis-Tags",
   collection: "Sammlung",
+  collecting: "Sammlungsdetails",
   collectionListTitle: "Sammlungen",
   collectionManagedAttributeListTitle: "Zusatzfeld des Sammlungsmoduls",
   collectionMethod: "Sammelmethode",

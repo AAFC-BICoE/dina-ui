@@ -10,15 +10,17 @@ import { TextField, TextFieldProps } from "./TextField";
 import TextareaAutosize from "react-textarea-autosize";
 
 export function StringArrayField(
-  props: Omit<TextFieldProps, "customInput" | "multiLines">
+  props: Omit<TextFieldProps, "customInput" | "multiLines"> & {
+    minRows?: number;
+  }
 ) {
+  const { minRows = 4, ...textFieldProps } = props;
   const { horizontal, readOnly } = useDinaFormContext();
   const [{ value }] = useField<string[] | undefined>(props.name);
   const isEmptyValue = readOnly && (!value || value.length === 0);
-
   return (
     <TextField
-      {...props}
+      {...textFieldProps}
       // Add the "One per line" and tooltip to the field label:
       label={
         <div className={`${horizontal ? "" : "d-flex"} align-items-center`}>
@@ -42,14 +44,19 @@ export function StringArrayField(
           </div>
         </div>
       }
-      customInput={(inputProps) => <StringArrayFieldInternal {...inputProps} />}
+      customInput={(inputProps) => (
+        <StringArrayFieldInternal {...inputProps} minRows={minRows} />
+      )}
     />
   );
 }
 
-function StringArrayFieldInternal(
-  inputProps: Omit<InputHTMLAttributes<any>, "style">
-) {
+function StringArrayFieldInternal({
+  minRows,
+  ...inputProps
+}: Omit<InputHTMLAttributes<any>, "style"> & {
+  minRows: number;
+}) {
   const [textValue, setTextValue] = useState("");
 
   // When the outer form state changes, set the inner text state:
@@ -72,7 +79,7 @@ function StringArrayFieldInternal(
 
   return (
     <TextareaAutosize
-      minRows={4}
+      minRows={minRows}
       {...inputProps}
       onChange={(event) =>
         onChange((event.target as HTMLTextAreaElement | HTMLInputElement).value)
