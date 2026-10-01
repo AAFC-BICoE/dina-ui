@@ -7,6 +7,8 @@ export function SmallSwitch(props: ReactSwitchProps) {
       height={18}
       width={34}
       handleDiameter={14}
+      onColor="#335075"
+      offColor="#d5dae0"
       checkedIcon={false}
       uncheckedIcon={false}
       {...props}

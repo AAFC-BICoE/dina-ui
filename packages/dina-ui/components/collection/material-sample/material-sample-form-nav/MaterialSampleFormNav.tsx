@@ -22,9 +22,39 @@ import {
   useState
 } from "react";
 import { FaGripLines } from "react-icons/fa";
+import {
+  FaBoxArchive,
+  FaBug,
+  FaCalendarDays,
+  FaCircleInfo,
+  FaFingerprint,
+  FaFlask,
+  FaLink,
+  FaLocationDot,
+  FaLock,
+  FaPaperclip,
+  FaPuzzlePiece,
+  FaQuoteRight,
+  FaSliders
+} from "react-icons/fa6";
+import { IconType } from "react-icons";
 import { ReactSwitchProps } from "react-switch";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
-import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../../types/collection-api";
+import {
+  ASSOCIATIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
+  COLLECTING_EVENT_COMPONENT_NAME,
+  FIELD_EXTENSIONS_COMPONENT_NAME,
+  IDENTIFIER_COMPONENT_NAME,
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
+  MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
+  ORGANISMS_COMPONENT_NAME,
+  PREPARATIONS_COMPONENT_NAME,
+  RESTRICTION_COMPONENT_NAME,
+  SCHEDULED_ACTIONS_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
+} from "../../../../types/collection-api";
 import { useMaterialSampleSave } from "../useMaterialSample";
 import { useMaterialSampleSectionOrder } from "./useMaterialSampleSectionOrder";
 import { NativeScrollSpyNav } from "./NativeScrollSpyNav";
@@ -86,8 +116,50 @@ interface SubNavLink {
   msg: React.JSX.Element;
 }
 
+const SECTION_ICONS: Partial<Record<string, IconType>> = {
+  [IDENTIFIER_COMPONENT_NAME]: FaFingerprint,
+  [MATERIAL_SAMPLE_INFO_COMPONENT_NAME]: FaCircleInfo,
+  [COLLECTING_EVENT_COMPONENT_NAME]: FaLocationDot,
+  [PREPARATIONS_COMPONENT_NAME]: FaFlask,
+  [ORGANISMS_COMPONENT_NAME]: FaBug,
+  [ASSOCIATIONS_COMPONENT_NAME]: FaLink,
+  [STORAGE_COMPONENT_NAME]: FaBoxArchive,
+  [RESTRICTION_COMPONENT_NAME]: FaLock,
+  [SCHEDULED_ACTIONS_COMPONENT_NAME]: FaCalendarDays,
+  [CITATIONS_COMPONENT_NAME]: FaQuoteRight,
+  [FIELD_EXTENSIONS_COMPONENT_NAME]: FaPuzzlePiece,
+  [MANAGED_ATTRIBUTES_COMPONENT_NAME]: FaSliders,
+  [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: FaPaperclip
+};
+
 /** Sub-links shown under a top-level nav item while it's the active scroll target. */
 const SECTION_SUB_LINKS: Partial<Record<string, SubNavLink[]>> = {
+  [ORGANISMS_COMPONENT_NAME]: [
+    {
+      id: "organism-managed-attributes",
+      msg: <DinaMessage id="organismManagedAttributes" />
+    },
+    {
+      id: "organism-verbatim-determination",
+      msg: <DinaMessage id="verbatimDeterminationLegend" />
+    },
+    { id: "organism-type-specimen", msg: <DinaMessage id="typeSpecimen" /> },
+    { id: "organism-determination", msg: <DinaMessage id="determination" /> },
+    {
+      id: "organism-determination-managed-attributes",
+      msg: <DinaMessage id="determinationManagedAttributes" />
+    }
+  ],
+  [ASSOCIATIONS_COMPONENT_NAME]: [
+    {
+      id: "associations-host-organism",
+      msg: <DinaMessage id="hostOrganismLegend" />
+    },
+    {
+      id: "associations-tabs",
+      msg: <DinaMessage id="materialSampleAssociationLegend" />
+    }
+  ],
   [COLLECTING_EVENT_COMPONENT_NAME]: [
     { id: "identifiers", msg: <DinaMessage id="identifiers" /> },
     {
@@ -174,7 +246,7 @@ export function MaterialSampleFormNav({
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
         <div className="sticky-md-top material-sample-nav">
-          <style>{`.material-sample-nav .active a { color: inherit !important; } .material-sample-nav { top: 70px; }`}</style>
+          <style>{`.material-sample-nav .active a { color: inherit !important; } .material-sample-nav { top: 72px; }`}</style>
           <ScrollSpyNav
             {...(renderNav
               ? {
@@ -287,9 +359,10 @@ const DataComponentNavItem = ({
   }
 
   const subLinks = SECTION_SUB_LINKS[section.id];
+  const SectionIcon = SECTION_ICONS[section.id];
 
   return (
-    <>
+    <div className="nav-item-group">
       <div
         ref={setNodeRef}
         {...attributes}
@@ -308,6 +381,7 @@ const DataComponentNavItem = ({
           onMouseEnter={() => setFormSectionHovered(section.id, true)}
           onMouseLeave={() => setFormSectionHovered(section.id, false)}
         >
+          {SectionIcon && <SectionIcon className="nav-item-icon" />}
           {section.msg}
         </Tag>
         {section.setEnabled &&
@@ -347,7 +421,7 @@ const DataComponentNavItem = ({
           ))}
         </ul>
       )}
-    </>
+    </div>
   );
 };
 
