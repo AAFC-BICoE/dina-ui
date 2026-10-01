@@ -380,12 +380,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
         })
       );
 
-      // Once preloaded, the group scope should be applied again for the dropdown options.
+      // Once preloaded, the dropdown options are loaded normally again. 
+      // The group scope defaults to "All Groups", so no group filter is applied.
       expect(mockGet).toHaveBeenLastCalledWith(
         "objectstore-api/controlled-vocabulary-item",
-        expect.objectContaining({
-          filter: { group: { IN: "aafc,cnc" } }
-        })
+        expect.not.objectContaining({ filter: expect.anything() })
       );
 
       // Should not be stuck in a render loop re-applying the preloaded attribute.
