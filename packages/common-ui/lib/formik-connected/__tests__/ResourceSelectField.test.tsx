@@ -114,8 +114,17 @@ describe("ResourceSelectField component", () => {
       })
     );
 
-    // Assume options are loaded; simulate option selection.
-    const option = screen.getByText("Mat's Group");
+    // Assume options are loaded; the search text is bolded within the option label.
+    const option = screen.getByText(
+      (_content, element) =>
+        !!element?.classList.contains("react-select__option") &&
+        element.textContent === "Mat's Group"
+    );
+    expect(
+      option.querySelector(".resource-select-highlight")
+    ).toHaveTextContent("Mat");
+
+    // Simulate option selection.
     await userEvent.click(option);
 
     // Verify the selected group is displayed.

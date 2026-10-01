@@ -1,8 +1,11 @@
 import {
   ColumnDefinition,
   FilterForm,
+  filterModelToSimpleSearchFilter,
   FormikButton,
   QueryTable,
+  SimpleSearchFilterBuilder,
+  simpleSearchFilterToFiql,
   stringArrayCell
 } from "common-ui";
 import { FormikContextType } from "formik";
@@ -12,7 +15,6 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api";
 import { Person } from "../../../types/objectstore-api";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
-import { fiql } from "../../../../common-ui/lib/filter-builder/fiql";
 
 export interface CollectingEventFilterFormValues {
   createdBy?: string;
@@ -84,23 +86,12 @@ export function CollectingEventLinker({
   const [filterParam, setFilterParam] = useState<string>();
 
   function onFilterSubmit(values) {
-    const fiqlFilters: string[] = [];
+    const filter = SimpleSearchFilterBuilder.create<CollectingEvent>()
+      .whereProvided("group", "EQ", values?.group)
+      .add(filterModelToSimpleSearchFilter(values?.filterBuilderModel))
+      .build();
 
-    if (values && values.group) {
-      fiqlFilters.push(`group==${values.group}`);
-    }
-
-    const filterBuilderFiql = fiql(values.filterBuilderModel);
-    if (filterBuilderFiql) {
-      fiqlFilters.push(filterBuilderFiql);
-    }
-
-    if (fiqlFilters.length === 0) {
-      setFilterParam(undefined);
-      return;
-    }
-
-    setFilterParam(fiqlFilters.join(";"));
+    setFilterParam(simpleSearchFilterToFiql(filter) || undefined);
   }
 
   return (

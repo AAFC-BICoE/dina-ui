@@ -47,6 +47,8 @@ include::useQuery_hook_function.adoc[]
 
 include::write_operations.adoc[]
 
+include::search_filters.adoc[]
+
 :leveloffset: 1
 
 = Creating Tests
