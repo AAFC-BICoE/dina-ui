@@ -43,16 +43,18 @@ function RowButton({
   onClick,
   disabled,
   children,
-  label
+  label,
+  variant = "outline-secondary"
 }: {
   onClick: () => void;
   disabled?: boolean;
   children: React.JSX.Element;
   label: string;
+  variant?: "primary" | "outline-secondary";
 }) {
   return (
     <Button
-      variant="outline-secondary"
+      variant={variant}
       className="identifiers-row-button"
       onClick={onClick}
       disabled={disabled}
@@ -134,9 +136,17 @@ export function OtherIdentifiersSection({
       <>
         {otherCatalogNumbersVisible && (
           <div className="other-catalogue-numbers-section">
-            <strong className="d-block mb-2">
-              <DinaMessage id={"field_dwcOtherCatalogNumbers"} />
-            </strong>
+            <div className="d-flex align-items-center gap-2 mb-2">
+              {isTemplate && (
+                <CheckBoxWithoutWrapper
+                  name={`templateCheckboxes['${templateCheckboxPrefix}.identifiers-section.dwcOtherCatalogNumbers']`}
+                  className="templateCheckBox"
+                />
+              )}
+              <strong>
+                <DinaMessage id={"field_dwcOtherCatalogNumbers"} />
+              </strong>
+            </div>
             {bulkEditCatalogNumbersOverride ? (
               <FieldArray name="dwcOtherCatalogNumbers">
                 {({ form, push, remove }) => {
@@ -170,7 +180,7 @@ export function OtherIdentifiersSection({
                         {otherCatalogNumbers.map((_, index) => (
                           <div className="d-flex gap-2" key={index}>
                             <div
-                              className="flex-grow-1"
+                              className="flex-grow-1 identifiers-row-input"
                               data-testid={
                                 "dwcOtherCatalogNumbers[" + index + "]"
                               }
@@ -180,6 +190,7 @@ export function OtherIdentifiersSection({
                                 hideLabel={true}
                                 disableTemplateCheckbox={true}
                                 removeBottomMargin={true}
+                                disabled={isTemplate}
                               />
                             </div>
                             {otherCatalogNumbers.length > 1 && (
@@ -197,6 +208,7 @@ export function OtherIdentifiersSection({
                                 label={formatMessage("addAnother", {
                                   typeName: otherCatalogNumberLabel
                                 })}
+                                variant="primary"
                                 disabled={disableAddButton}
                                 onClick={() => push("")}
                               >
@@ -242,9 +254,17 @@ export function OtherIdentifiersSection({
         )}
         {otherIdentifiersVisible && (
           <div className="identifier-section">
-            <strong className="d-block mb-2">
-              <DinaMessage id="otherIdentifiers" />
-            </strong>
+            <div className="d-flex align-items-center gap-2 mb-2">
+              {isTemplate && (
+                <CheckBoxWithoutWrapper
+                  name={`templateCheckboxes['${templateCheckboxPrefix}.identifiers-section.identifiers']`}
+                  className="templateCheckBox"
+                />
+              )}
+              <strong>
+                <DinaMessage id="otherIdentifiers" />
+              </strong>
+            </div>
             {bulkEditOtherIdentifiersOverride ? (
               <FieldArray name="identifiers">
                 {({ form, push, remove }) => {
@@ -288,12 +308,14 @@ export function OtherIdentifiersSection({
                             name: `identifiers[${index}].${valueFieldName}`,
                             hideLabel: true,
                             disableTemplateCheckbox: true,
-                            removeBottomMargin: true
+                            removeBottomMargin: true,
+                            disabled: isTemplate
                           };
 
                           return (
                             <div className="d-flex gap-2" key={index}>
                               <div
+                                className="identifiers-row-input"
                                 style={{ flex: 1, minWidth: 0 }}
                                 data-testid={"identifiers[" + index + "].type"}
                               >
@@ -302,11 +324,13 @@ export function OtherIdentifiersSection({
                                   options={vocabOptions}
                                   filterValues={selectedTypes}
                                   disableTemplateCheckbox={true}
+                                  disabled={isTemplate}
                                   hideLabel={true}
                                   removeBottomMargin={true}
                                 />
                               </div>
                               <div
+                                className="identifiers-row-input"
                                 style={{ flex: 2, minWidth: 0 }}
                                 data-testid={`identifiers[${index}].${valueFieldName}`}
                               >
@@ -347,6 +371,7 @@ export function OtherIdentifiersSection({
                                   label={formatMessage("addAnother", {
                                     typeName: otherIdentifierLabel
                                   })}
+                                  variant="primary"
                                   disabled={disableAddButton}
                                   onClick={() => push({})}
                                 >

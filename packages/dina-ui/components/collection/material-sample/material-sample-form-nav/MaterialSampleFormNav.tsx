@@ -94,7 +94,6 @@ const ScrollSpyNav = renderNav ? NativeScrollSpyNav : "div";
 
 const FORM_SECTION_HOVER_CLASS = "nav-hover-highlight";
 
-/** Highlights (or un-highlights) the form section a nav item points to. */
 function setFormSectionHovered(targetId: string, hovered: boolean) {
   document
     .getElementById(targetId)

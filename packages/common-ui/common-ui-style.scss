@@ -184,19 +184,40 @@ form:has(> .bulk-button-bar) {
   gap: var(--space-3, 16px);
 }
 
+.identifiers-grid .tags .react-select__menu {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.identifiers-grid .tags .react-select__option {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.identifiers-grid .tags .react-select__placeholder {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .identifiers-panel-stack {
   display: flex;
   flex-direction: column;
   gap: var(--space-3, 16px);
 }
 
+.identifiers-row-input .mb-2 {
+  margin-bottom: 0 !important;
+}
+
 .identifiers-row-button {
   flex: none;
+  align-self: stretch;
   display: flex;
   align-items: center;
   justify-content: center;
   width: var(--control-height, 38px);
-  min-height: var(--control-height, 38px);
   padding: 0;
 }
 

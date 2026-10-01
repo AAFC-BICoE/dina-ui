@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 
 export interface NativeScrollSpyNavProps {
@@ -8,24 +9,20 @@ export interface NativeScrollSpyNavProps {
   scrollDuration?: string;
 }
 
-/**
- * Only watches the band of the viewport that starts at the targets' scroll-margin-top, so
- * the active item matches where click-to-scroll lands and ignores what the page header covers.
- */
-function getObserverOptions(targetIds: string[]): IntersectionObserverInit {
+function getTopOffset(targetIds: string[]): number {
   const firstTarget = targetIds
     .map((id) => document.getElementById(id))
     .find((element) => !!element);
-  const topOffset = firstTarget
+  return firstTarget
     ? parseFloat(getComputedStyle(firstTarget).scrollMarginTop) || 0
     : 0;
-  const bandHeight = window.innerHeight * 0.2;
-  const bottomOffset = Math.max(0, window.innerHeight - topOffset - bandHeight);
+}
 
-  return {
-    rootMargin: `-${topOffset}px 0px -${bottomOffset}px 0px`,
-    threshold: 0
-  };
+function isScrolledToPageBottom(): boolean {
+  return (
+    window.innerHeight + window.scrollY >=
+    document.documentElement.scrollHeight - 2
+  );
 }
 
 /** Scrolls the nav's own scroll container (not the page) so the active items stay visible. */
@@ -70,7 +67,8 @@ function scrollNavToActiveItems(activeNavClass: string) {
 }
 
 /**
- * Native implementation of scroll-spy navigation using Intersection Observer API.
+ * Scroll-spy navigation. Works out the active items from the targets' positions on every scroll
+ * (rather than reacting to elements crossing a line), so it behaves the same scrolling up or down.
  */
 export function NativeScrollSpyNav({
   scrollTargetIds = [],
@@ -80,82 +78,116 @@ export function NativeScrollSpyNav({
 }: PropsWithChildren<NativeScrollSpyNavProps>) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeSubIds, setActiveSubIds] = useState<string[]>([]);
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const subObserverRef = useRef<IntersectionObserver | null>(null);
-  const visibleSubIdsRef = useRef<Set<string>>(new Set());
+  /** The section the user clicked in the nav, kept active when the page can't scroll it into place. */
+  const pinnedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Clean up previous observer
-    if (observerRef.current) {
-      observerRef.current.disconnect();
+    function pinClickedSection(event: MouseEvent) {
+      const link = (
+        event.target as HTMLElement | null
+      )?.closest<HTMLAnchorElement>(".material-sample-nav a[href^='#']");
+      const clickedId = link?.getAttribute("href")?.slice(1);
+      if (clickedId && scrollTargetIds.includes(clickedId)) {
+        pinnedIdRef.current = clickedId;
+        setActiveId(clickedId);
+      } else if (clickedId) {
+        pinnedIdRef.current = null;
+      }
+    }
+    function unpin() {
+      pinnedIdRef.current = null;
     }
 
-    // Create intersection observer
-    const observerOptions = getObserverOptions(scrollTargetIds);
-
-    observerRef.current = new IntersectionObserver((entries) => {
-      // Find the first intersecting entry
-      const intersectingEntry = entries.find((entry) => entry.isIntersecting);
-
-      if (intersectingEntry) {
-        setActiveId(intersectingEntry.target.id);
-      }
-    }, observerOptions);
-
-    // Observe all target elements
-    scrollTargetIds.forEach((id) => {
-      const element = document.getElementById(id);
-      if (element && observerRef.current) {
-        observerRef.current.observe(element);
-      }
-    });
-
-    // Cleanup on unmount
+    document.addEventListener("click", pinClickedSection);
+    window.addEventListener("wheel", unpin, { passive: true });
+    window.addEventListener("touchmove", unpin, { passive: true });
+    window.addEventListener("keydown", unpin);
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      document.removeEventListener("click", pinClickedSection);
+      window.removeEventListener("wheel", unpin);
+      window.removeEventListener("touchmove", unpin);
+      window.removeEventListener("keydown", unpin);
     };
   }, [scrollTargetIds]);
 
   useEffect(() => {
-    // Clean up previous observer
-    if (subObserverRef.current) {
-      subObserverRef.current.disconnect();
-    }
+    let frame = 0;
 
-    const observerOptions = getObserverOptions(subScrollTargetIds);
+    function update() {
+      frame = 0;
 
-    visibleSubIdsRef.current = new Set();
+      // Starts where click-to-scroll lands (below the page header) and spans 20% of the viewport.
+      const bandTop = getTopOffset(scrollTargetIds);
+      const bandBottom = bandTop + window.innerHeight * 0.2;
 
-    // Several sub-sections can be in view at once (e.g. side-by-side cards), so track them all.
-    subObserverRef.current = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          visibleSubIdsRef.current.add(entry.target.id);
-        } else {
-          visibleSubIdsRef.current.delete(entry.target.id);
-        }
+      const targets = scrollTargetIds
+        .map((id) => document.getElementById(id))
+        .filter((element): element is HTMLElement => !!element)
+        .map((element) => ({
+          id: element.id,
+          top: element.getBoundingClientRect().top
+        }));
+
+      // The active section is the last one whose top has scrolled into or past the band.
+      let nextActiveId = _.maxBy(
+        targets.filter((target) => target.top <= bandBottom),
+        (target) => target.top
+      )?.id;
+
+      // Sub-sections: everything overlapping the band, since several can be in view at once.
+      let nextSubIds = subScrollTargetIds.filter((id) => {
+        const rect = document.getElementById(id)?.getBoundingClientRect();
+        return !!rect && rect.bottom > bandTop && rect.top < bandBottom;
       });
 
-      if (visibleSubIdsRef.current.size > 0) {
-        setActiveSubIds([...visibleSubIdsRef.current]);
-      }
-    }, observerOptions);
+      // The page can't scroll far enough for the last targets to reach the band,
+      // so at the bottom, use whatever is showing there instead.
+      if (isScrolledToPageBottom()) {
+        const pinnedTop = targets.find(
+          (target) => target.id === pinnedIdRef.current
+        )?.top;
+        const lastTarget = _.maxBy(
+          targets.filter((target) => target.top < window.innerHeight),
+          (target) => target.top
+        );
+        nextActiveId =
+          pinnedTop !== undefined && pinnedTop < window.innerHeight
+            ? pinnedIdRef.current ?? undefined
+            : lastTarget?.id;
 
-    subScrollTargetIds.forEach((id) => {
-      const element = document.getElementById(id);
-      if (element && subObserverRef.current) {
-        subObserverRef.current.observe(element);
+        nextSubIds = subScrollTargetIds.filter((id) => {
+          const rect = document.getElementById(id)?.getBoundingClientRect();
+          return (
+            !!rect && rect.bottom > bandTop && rect.top < window.innerHeight
+          );
+        });
       }
-    });
 
+      if (nextActiveId) {
+        setActiveId(nextActiveId);
+      }
+      if (nextSubIds.length > 0) {
+        setActiveSubIds((previous) =>
+          previous.join() === nextSubIds.join() ? previous : nextSubIds
+        );
+      }
+    }
+
+    function scheduleUpdate() {
+      if (!frame) {
+        frame = window.requestAnimationFrame(update);
+      }
+    }
+
+    update();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
     return () => {
-      if (subObserverRef.current) {
-        subObserverRef.current.disconnect();
-      }
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
     };
-  }, [subScrollTargetIds]);
+  }, [scrollTargetIds, subScrollTargetIds]);
 
   useEffect(() => {
     // Update active class on top-level nav items only.

@@ -11,7 +11,8 @@ import { useEffect, useState } from "react";
 import Select, {
   ActionMeta,
   Props as SelectProps,
-  GroupBase
+  GroupBase,
+  StylesConfig
 } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 
@@ -53,9 +54,9 @@ export function SortableSelect<
 
   // react-select's default menu z-index (1) can get visually covered by
   // any nearby positioned element on the page, so raise it here by default.
-  const mergedStyles = {
+  const mergedStyles: StylesConfig<Option, IsMulti, Group> = {
     ...styles,
-    menu: (base: any, state: any) => ({
+    menu: (base, state) => ({
       ...base,
       zIndex: 1050,
       ...(styles?.menu?.(base, state) ?? {})

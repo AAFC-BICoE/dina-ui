@@ -42,7 +42,7 @@ export function MaterialSampleIdentifiersGrid({
   defaultToNotReleasable
 }: MaterialSampleIdentifiersGridProps) {
   const [{ value: collection }] = useField("collection");
-  const { readOnly, initialValues } = useDinaFormContext();
+  const { readOnly, initialValues, isTemplate } = useDinaFormContext();
   const [primaryIdDisabled, setPrimaryIdDisabled] = useState(false);
 
   return (
@@ -106,18 +106,20 @@ export function MaterialSampleIdentifiersGrid({
         sectionName="general-section"
       >
         <div className="identifiers-panel-stack">
-          <GroupSelectField
-            disableTemplateCheckbox={true}
-            name="group"
-            enableStoredDefaultGroup={enableStoredDefaultGroup}
-            hideWithOnlyOneGroup={false}
-            removeBottomMargin={true}
-            label={
-              <span>
-                <FaUsers className="me-1" /> <DinaMessage id="group" />
-              </span>
-            }
-          />
+          {!isTemplate && (
+            <GroupSelectField
+              disableTemplateCheckbox={true}
+              name="group"
+              enableStoredDefaultGroup={enableStoredDefaultGroup}
+              hideWithOnlyOneGroup={false}
+              removeBottomMargin={true}
+              label={
+                <span>
+                  <FaUsers className="me-1" /> <DinaMessage id="group" />
+                </span>
+              }
+            />
+          )}
           <CollectionSelectField
             resourcePath="collection-api/collection"
             horizontal={false}
