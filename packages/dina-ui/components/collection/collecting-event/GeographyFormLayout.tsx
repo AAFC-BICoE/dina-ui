@@ -13,12 +13,12 @@ import {
   FormikButton,
   NominatumApiSearchResult,
   PlaceSectionsSelectionField,
+  SmallSwitch,
   TextField,
   useDinaFormContext
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { useState } from "react";
-import Switch from "react-switch";
 import { GeographySearchBox } from "./GeographySearchBox";
 
 export interface GeographyFormLayoutProps {
@@ -423,7 +423,7 @@ export function GeographyFormLayout({
                   <label className="me-2" htmlFor="manualGeographyInput">
                     <DinaMessage id="manual" />
                   </label>
-                  <Switch
+                  <SmallSwitch
                     id="manualGeographyInput"
                     checked={manualMode}
                     onChange={(checked) => setManualMode(checked)}
