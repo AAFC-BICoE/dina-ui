@@ -17,7 +17,6 @@ import {
   AttachmentsField,
   BulkEditTabWarning,
   CollectingEventLinker,
-  GroupSelectField,
   ManagedAttributesEditor,
   MaterialSampleFormNav,
   ProjectSelectSection,
@@ -53,6 +52,7 @@ import { AllowAttachmentsConfig } from "../../object-store";
 import { AssociationsField } from "../AssociationsField";
 import { TabbedResourceLinker } from "../TabbedResourceLinker";
 import { MaterialSampleBreadCrumb } from "./MaterialSampleBreadCrumb";
+import { MaterialSampleIdentifiersGrid } from "./MaterialSampleIdentifiersGrid";
 import { MaterialSampleIdentifiersSection } from "./MaterialSampleIdentifiersSection";
 import { MaterialSampleInfoSection } from "./MaterialSampleInfoSection";
 import { PreparationField } from "./PreparationField";
@@ -253,13 +253,23 @@ export function MaterialSampleForm({
         />
       ),
     [IDENTIFIER_COMPONENT_NAME]: (id) =>
-      !reduceRendering && (
+      !reduceRendering &&
+      (isTemplate ? (
         <MaterialSampleIdentifiersSection
           id={id}
           disableSampleNameField={disableSampleNameField}
           hideUseSequence={hideUseSequence}
         />
-      ),
+      ) : (
+        <MaterialSampleIdentifiersGrid
+          id={id}
+          disableSampleNameField={disableSampleNameField}
+          hideUseSequence={hideUseSequence}
+          enableStoredDefaultGroup={enableStoredDefaultGroup}
+          enableCollectingEvent={dataComponentState.enableCollectingEvent}
+          defaultToNotReleasable={defaultToNotReleasable}
+        />
+      )),
     [MATERIAL_SAMPLE_INFO_COMPONENT_NAME]: (id) =>
       !reduceRendering && <MaterialSampleInfoSection id={id} />,
     [COLLECTING_EVENT_COMPONENT_NAME]: (id) =>
@@ -497,39 +507,30 @@ export function MaterialSampleForm({
                   disableLastLink={true}
                   materialSample={materialSample as any}
                   enableStoredDefaultGroup={enableStoredDefaultGroup}
-                  enableGroupSelectField={true}
+                  enableGroupSelectField={false}
                 />
               )}
-              {!isTemplate && !materialSample?.materialSampleName && (
+              {isTemplate && (
                 <div className="row">
-                  <div className="col-md-6">
-                    <GroupSelectField
-                      disableTemplateCheckbox={true}
-                      name="group"
-                      enableStoredDefaultGroup={enableStoredDefaultGroup}
+                  <div className="col-md-8">
+                    <CollectionSelectSection resourcePath="collection-api/collection" />
+                    <ProjectSelectSection resourcePath="collection-api/project" />
+                    <ParentSelectSection
+                      enableCollectingEvent={
+                        dataComponentState.enableCollectingEvent
+                      }
+                    />
+                    <AssemblageSelectSection resourcePath="collection-api/assemblage" />
+                    <NotPubliclyReleasableSection
+                      defaultToNotReleasable={defaultToNotReleasable}
+                    />
+                    <TagsAndRestrictionsSection
+                      resourcePath="collection-api/material-sample"
+                      indexName="dina_material_sample_index"
                     />
                   </div>
                 </div>
               )}
-              <div className="row">
-                <div className="col-md-8">
-                  <CollectionSelectSection resourcePath="collection-api/collection" />
-                  <ProjectSelectSection resourcePath="collection-api/project" />
-                  <ParentSelectSection
-                    enableCollectingEvent={
-                      dataComponentState.enableCollectingEvent
-                    }
-                  />
-                  <AssemblageSelectSection resourcePath="collection-api/assemblage" />
-                  <NotPubliclyReleasableSection
-                    defaultToNotReleasable={defaultToNotReleasable}
-                  />
-                  <TagsAndRestrictionsSection
-                    resourcePath="collection-api/material-sample"
-                    indexName="dina_material_sample_index"
-                  />
-                </div>
-              </div>
             </>
           )}
           {/* The toggleable / re-arrangeable form sections: */}

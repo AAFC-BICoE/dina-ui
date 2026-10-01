@@ -163,6 +163,63 @@ form:has(> .bulk-button-bar) {
   display: contents;
 }
 
+.identifiers-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  column-gap: var(--space-3, 16px);
+  row-gap: 32px;
+  align-items: stretch;
+  margin-top: 30px;
+}
+
+.identifiers-grid > fieldset.card.border {
+  height: 100%;
+  box-sizing: border-box;
+  margin: 0 !important;
+}
+
+.identifiers-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3, 16px);
+}
+
+.identifiers-panel-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 16px);
+}
+
+.identifiers-row-button {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height, 38px);
+  min-height: var(--control-height, 38px);
+  padding: 0;
+}
+
+.identifiers-grid .useNextSequence-field {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.identifiers-grid .useNextSequence-field .flex-grow-1 {
+  flex-grow: 0 !important;
+}
+
+.identifiers-grid .useNextSequence-field strong {
+  font-weight: 400;
+}
+
+@media (max-width: 900px) {
+  .identifiers-grid,
+  .identifiers-panel-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .material-sample-nav-column {
   width: 260px;
   flex: none;
@@ -288,6 +345,7 @@ form:has(> .bulk-button-bar) {
 }
 
 fieldset.card.border,
+#identifiers-component,
 #georeferencing,
 #geographicPlace,
 #collectingEventFieldExtensions,

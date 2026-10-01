@@ -12,7 +12,8 @@ import {
   useModal
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { Button } from "react-bootstrap";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { getFormTemplateCheckboxes } from "../form-template/formTemplateUtils";
 import { useState } from "react";
@@ -31,6 +32,36 @@ export interface OtherIdentifiersSectionProps {
   valueFieldName?: string;
   /** Hide the dwcOtherCatalogNumbers section. */
   hideOtherCatalogNumbers?: boolean;
+  /**
+   * Renders the catalog numbers and identifiers as two bare cells (no FieldSet) to be placed
+   * in a parent grid. Only applies to editable forms.
+   */
+  compact?: boolean;
+}
+
+function RowButton({
+  onClick,
+  disabled,
+  children,
+  label
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  children: React.JSX.Element;
+  label: string;
+}) {
+  return (
+    <Button
+      variant="outline-secondary"
+      className="identifiers-row-button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      data-testid="add row button"
+    >
+      {children}
+    </Button>
+  );
 }
 
 export function OtherIdentifiersSection({
@@ -39,13 +70,15 @@ export function OtherIdentifiersSection({
   resourceLabelKey,
   templateCheckboxPrefix = "identifiers-component",
   valueFieldName = "value",
-  hideOtherCatalogNumbers = false
+  hideOtherCatalogNumbers = false,
+  compact = false
 }: OtherIdentifiersSectionProps) {
   const { readOnly, isTemplate, formTemplate, isBulkEditAllTab } =
     useDinaFormContext();
   const { values } = useFormikContext();
   const { getFieldLabel } = useFieldLabels();
   const { openModal } = useModal();
+  const { formatMessage } = useDinaIntl();
 
   const { vocabOptions, controlledVocabularies } =
     useControlledVocabularyOptions({
@@ -95,6 +128,272 @@ export function OtherIdentifiersSection({
   const otherCatalogNumberLabel = getFieldLabel({
     name: "dwcOtherCatalogNumbers"
   }).fieldLabel.replace(/s$/, "");
+
+  if (compact && !readOnly) {
+    return (
+      <>
+        {otherCatalogNumbersVisible && (
+          <div className="other-catalogue-numbers-section">
+            <strong className="d-block mb-2">
+              <DinaMessage id={"field_dwcOtherCatalogNumbers"} />
+            </strong>
+            {bulkEditCatalogNumbersOverride ? (
+              <FieldArray name="dwcOtherCatalogNumbers">
+                {({ form, push, remove }) => {
+                  const otherCatalogNumbers =
+                    form?.values?.dwcOtherCatalogNumbers ?? [];
+
+                  // If empty, just display one.
+                  if (otherCatalogNumbers.length === 0) {
+                    push("");
+                  }
+
+                  const disableAddButton =
+                    otherCatalogNumbers.some(
+                      (obj) => Object.keys(obj).length === 0
+                    ) || !!otherCatalogNumbers.find((obj) => obj.value === "");
+
+                  return (
+                    <>
+                      {isBulkEditAllTab && (
+                        <div className="alert alert-warning">
+                          <DinaMessage
+                            id="bulkEditResourceSetWarningMulti"
+                            values={{
+                              targetType: resourceTypeLabel,
+                              fieldName: otherCatalogNumberLabel
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div className="d-flex flex-column gap-2">
+                        {otherCatalogNumbers.map((_, index) => (
+                          <div className="d-flex gap-2" key={index}>
+                            <div
+                              className="flex-grow-1"
+                              data-testid={
+                                "dwcOtherCatalogNumbers[" + index + "]"
+                              }
+                            >
+                              <TextField
+                                name={"dwcOtherCatalogNumbers[" + index + "]"}
+                                hideLabel={true}
+                                disableTemplateCheckbox={true}
+                                removeBottomMargin={true}
+                              />
+                            </div>
+                            {otherCatalogNumbers.length > 1 && (
+                              <RowButton
+                                label={formatMessage("removeThisElement", {
+                                  typeName: otherCatalogNumberLabel
+                                })}
+                                onClick={() => remove(index)}
+                              >
+                                <FaMinus />
+                              </RowButton>
+                            )}
+                            {index === otherCatalogNumbers.length - 1 && (
+                              <RowButton
+                                label={formatMessage("addAnother", {
+                                  typeName: otherCatalogNumberLabel
+                                })}
+                                disabled={disableAddButton}
+                                onClick={() => push("")}
+                              >
+                                <FaPlus />
+                              </RowButton>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  );
+                }}
+              </FieldArray>
+            ) : (
+              <button
+                className="btn btn-primary override-all-button-catalog-numbers"
+                onClick={() =>
+                  openModal(
+                    <AreYouSureModal
+                      actionMessage={
+                        <DinaMessage
+                          id="overrideAllConfirmationTitle"
+                          values={{ fieldName: otherCatalogNumberLabel }}
+                        />
+                      }
+                      messageBody={
+                        <DinaMessage
+                          id="overrideAllConfirmation"
+                          values={{ fieldName: otherCatalogNumberLabel }}
+                        />
+                      }
+                      onYesButtonClicked={() =>
+                        setBulkEditCatalogNumbersOverride(true)
+                      }
+                    />
+                  )
+                }
+              >
+                <DinaMessage id="overrideAll" />
+              </button>
+            )}
+          </div>
+        )}
+        {otherIdentifiersVisible && (
+          <div className="identifier-section">
+            <strong className="d-block mb-2">
+              <DinaMessage id="otherIdentifiers" />
+            </strong>
+            {bulkEditOtherIdentifiersOverride ? (
+              <FieldArray name="identifiers">
+                {({ form, push, remove }) => {
+                  const identifiers = form?.values?.identifiers ?? [];
+                  const selectedTypes =
+                    identifiers?.map?.((obj) => obj.type) ?? [];
+
+                  // If empty, just display one.
+                  if (identifiers?.length === 0) {
+                    push({});
+                  }
+
+                  const disableAddButton =
+                    selectedTypes.length === vocabOptions.length ||
+                    (identifiers?.some?.(
+                      (obj) => Object.keys(obj).length === 0
+                    ) ??
+                      false);
+
+                  return (
+                    <>
+                      {isBulkEditAllTab && (
+                        <div className="alert alert-warning">
+                          <DinaMessage
+                            id="bulkEditResourceSetWarningMulti"
+                            values={{
+                              targetType: resourceTypeLabel,
+                              fieldName: otherIdentifierLabel
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div className="d-flex flex-column gap-2">
+                        {identifiers?.map?.((identifier, index) => {
+                          // Retrieve the controlled vocabulary based on the ID selected. By default, string is used.
+                          const identifierType =
+                            controlledVocabularies?.find?.(
+                              (vocab) => vocab?.id === identifier?.type
+                            )?.vocabularyElementType ?? "STRING";
+                          const commonProps = {
+                            name: `identifiers[${index}].${valueFieldName}`,
+                            hideLabel: true,
+                            disableTemplateCheckbox: true,
+                            removeBottomMargin: true
+                          };
+
+                          return (
+                            <div className="d-flex gap-2" key={index}>
+                              <div
+                                style={{ flex: 1, minWidth: 0 }}
+                                data-testid={"identifiers[" + index + "].type"}
+                              >
+                                <SelectField
+                                  name={"identifiers[" + index + "].type"}
+                                  options={vocabOptions}
+                                  filterValues={selectedTypes}
+                                  disableTemplateCheckbox={true}
+                                  hideLabel={true}
+                                  removeBottomMargin={true}
+                                />
+                              </div>
+                              <div
+                                style={{ flex: 2, minWidth: 0 }}
+                                data-testid={`identifiers[${index}].${valueFieldName}`}
+                              >
+                                {identifierType === "STRING" && (
+                                  <TextField {...commonProps} />
+                                )}
+                                {identifierType === "DATE" && (
+                                  <DateField {...commonProps} />
+                                )}
+                                {identifierType === "INTEGER" && (
+                                  <NumberField
+                                    {...commonProps}
+                                    isInteger={true}
+                                  />
+                                )}
+                                {identifierType === "DECIMAL" && (
+                                  <NumberField
+                                    {...commonProps}
+                                    isInteger={false}
+                                  />
+                                )}
+                                {identifierType === "BOOL" && (
+                                  <StringToggleField {...commonProps} />
+                                )}
+                              </div>
+                              {identifiers.length > 1 && (
+                                <RowButton
+                                  label={formatMessage("removeThisElement", {
+                                    typeName: otherIdentifierLabel
+                                  })}
+                                  onClick={() => remove(index)}
+                                >
+                                  <FaMinus />
+                                </RowButton>
+                              )}
+                              {index === identifiers.length - 1 && (
+                                <RowButton
+                                  label={formatMessage("addAnother", {
+                                    typeName: otherIdentifierLabel
+                                  })}
+                                  disabled={disableAddButton}
+                                  onClick={() => push({})}
+                                >
+                                  <FaPlus />
+                                </RowButton>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  );
+                }}
+              </FieldArray>
+            ) : (
+              <button
+                className="btn btn-primary override-all-button-identifiers"
+                onClick={() =>
+                  openModal(
+                    <AreYouSureModal
+                      actionMessage={
+                        <DinaMessage
+                          id="overrideAllConfirmationTitle"
+                          values={{ fieldName: otherIdentifierLabel }}
+                        />
+                      }
+                      messageBody={
+                        <DinaMessage
+                          id="overrideAllConfirmation"
+                          values={{ fieldName: otherIdentifierLabel }}
+                        />
+                      }
+                      onYesButtonClicked={() =>
+                        setBulkEditOtherIdentifiersOverride(true)
+                      }
+                    />
+                  )
+                }
+              >
+                <DinaMessage id="overrideAll" />
+              </button>
+            )}
+          </div>
+        )}
+      </>
+    );
+  }
 
   return (
     <FieldSet

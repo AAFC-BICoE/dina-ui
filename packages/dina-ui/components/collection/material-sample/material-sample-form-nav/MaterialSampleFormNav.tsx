@@ -134,6 +134,18 @@ const SECTION_ICONS: Partial<Record<string, IconType>> = {
 
 /** Sub-links shown under a top-level nav item while it's the active scroll target. */
 const SECTION_SUB_LINKS: Partial<Record<string, SubNavLink[]>> = {
+  [IDENTIFIER_COMPONENT_NAME]: [
+    { id: "identifiers-main", msg: <DinaMessage id="identifiers" /> },
+    { id: "identifiers-ownership", msg: <DinaMessage id="ownership" /> },
+    {
+      id: "identifiers-relationships",
+      msg: <DinaMessage id="relationshipsAndTags" />
+    },
+    {
+      id: "identifiers-releasable",
+      msg: <DinaMessage id="publiclyReleasable" />
+    }
+  ],
   [ORGANISMS_COMPONENT_NAME]: [
     {
       id: "organism-managed-attributes",
@@ -359,6 +371,20 @@ const DataComponentNavItem = ({
   }
 
   const subLinks = SECTION_SUB_LINKS[section.id];
+
+  // Cards can be missing (e.g. hidden by a form template), so only link to the ones rendered.
+  const [renderedSubLinkIds, setRenderedSubLinkIds] = useState<string[]>([]);
+  useEffect(() => {
+    const ids = (subLinks ?? [])
+      .filter((subLink) => document.getElementById(subLink.id))
+      .map((subLink) => subLink.id);
+    setRenderedSubLinkIds((previous) =>
+      previous.join() === ids.join() ? previous : ids
+    );
+  });
+  const visibleSubLinks = subLinks?.filter((subLink) =>
+    renderedSubLinkIds.includes(subLink.id)
+  );
   const SectionIcon = SECTION_ICONS[section.id];
 
   return (
@@ -406,9 +432,9 @@ const DataComponentNavItem = ({
             />
           ))}
       </div>
-      {subLinks && !section.disabled && (
+      {visibleSubLinks && !section.disabled && (
         <ul className="sub-nav-list list-unstyled">
-          {subLinks.map((subLink) => (
+          {visibleSubLinks.map((subLink) => (
             <li key={subLink.id}>
               <a
                 href={`#${subLink.id}`}

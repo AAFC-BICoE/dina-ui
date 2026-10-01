@@ -1,5 +1,6 @@
 import {
   DinaFormSection,
+  DinaFormSectionProps,
   ResourceSelectField,
   SimpleSearchFilterBuilder,
   Tooltip,
@@ -39,15 +40,17 @@ export function AssemblageSelectSection({
 export interface AssemblageSelectFieldProps {
   resourcePath?: string;
   className?: string;
+  horizontal?: DinaFormSectionProps["horizontal"];
 }
 
 export function AssemblageSelectField({
   resourcePath,
-  className
+  className,
+  horizontal = "flex"
 }: AssemblageSelectFieldProps) {
   const { readOnly } = useDinaFormContext();
   return (
-    <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
+    <DinaFormSection horizontal={horizontal} readOnly={readOnly}>
       <ResourceSelectField<Assemblage>
         name="assemblages"
         isMulti={true}
