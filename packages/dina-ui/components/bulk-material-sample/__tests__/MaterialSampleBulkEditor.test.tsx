@@ -804,12 +804,14 @@ describe("MaterialSampleBulkEditor", () => {
     );
     await waitFor(() =>
       expect(
-        wrapper.getAllByRole("button", { name: /override all/i })[1]
+        wrapper.container.querySelector(".override-all-button-catalog-numbers")
       ).toBeInTheDocument()
     );
 
     await userEvent.click(
-      wrapper.getAllByRole("button", { name: /override all/i })[1]
+      wrapper.container.querySelector(
+        ".override-all-button-catalog-numbers"
+      ) as HTMLElement
     );
     await waitFor(() =>
       expect(wrapper.getByRole("button", { name: /yes/i })).toBeInTheDocument()

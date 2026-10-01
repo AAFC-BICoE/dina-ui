@@ -213,10 +213,14 @@ export function DataEntry({
     | undefined {
     return (legendElement) => {
       return (
-        <div className="d-flex align-items-center justify-content-between">
+        <div className="d-flex align-items-center justify-content-between gap-3">
           {legendElement}
           {!readOnly && (
-            <Button onClick={() => addBlock()} className="add-datablock">
+            <Button
+              size="sm"
+              onClick={() => addBlock()}
+              className="add-datablock mb-2"
+            >
               <DinaMessage id="addCustomPlaceName" />
             </Button>
           )}

@@ -1,5 +1,6 @@
 import {
   DinaFormSection,
+  DinaFormSectionProps,
   Tooltip,
   ResourceSelectFieldCustomQuery,
   ResourceSelectFieldCustomQueryProps,
@@ -9,7 +10,7 @@ import {
 } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { FaDna } from "react-icons/fa";
+import { FaSitemap } from "react-icons/fa";
 
 /**
  * Generates query-generating function to search by material sample name or id and exclude descendants.
@@ -115,16 +116,18 @@ export function ParentSelectSection({
   );
 }
 
-interface ParentSelectFieldProps {
+export interface ParentSelectFieldProps {
   resourcePath?: string;
   className?: string;
   enableCollectingEvent?: boolean;
+  horizontal?: DinaFormSectionProps["horizontal"];
 }
 
-function ParentSelectField({
+export function ParentSelectField({
   resourcePath = "collection-api/material-sample",
   enableCollectingEvent,
-  className
+  className,
+  horizontal = "flex"
 }: ParentSelectFieldProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const currentHierarchyItemId = initialValues?.hierarchy?.find(
@@ -144,7 +147,7 @@ function ParentSelectField({
     : undefined; // if not in bulk edit context, use the current hierarchy item id if available, otherwise undefined
 
   return (
-    <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
+    <DinaFormSection horizontal={horizontal} readOnly={readOnly}>
       <ResourceSelectFieldCustomQuery<MaterialSample>
         name="parentMaterialSample"
         useCustomQuery={useSearchWsCustomQuery}
@@ -161,7 +164,7 @@ function ParentSelectField({
         isDisabled={enableCollectingEvent}
         label={
           <span>
-            <FaDna className="me-2" />
+            <FaSitemap className="me-2" />
             <DinaMessage id="parentMaterialSample" />
             {enableCollectingEvent && (
               <Tooltip id="parentMaterialSampleDisabledTooltip" />

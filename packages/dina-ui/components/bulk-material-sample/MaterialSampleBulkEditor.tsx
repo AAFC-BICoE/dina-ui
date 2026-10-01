@@ -159,7 +159,7 @@ export function MaterialSampleBulkEditor({
 
   const buttonBar = (
     <DinaForm initialValues={{}}>
-      <ButtonBar className="mb-3">
+      <ButtonBar className="mb-3 bulk-button-bar">
         {onPreviousClick && (
           <div className="col-md-4">
             <FormikButton

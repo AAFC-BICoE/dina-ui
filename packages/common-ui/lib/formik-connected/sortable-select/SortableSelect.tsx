@@ -11,7 +11,8 @@ import { useEffect, useState } from "react";
 import Select, {
   ActionMeta,
   Props as SelectProps,
-  GroupBase
+  GroupBase,
+  StylesConfig
 } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 
@@ -44,11 +45,23 @@ export function SortableSelect<
   value,
   onChange: onChangeProp,
   isCreatable = false,
+  styles,
   ...props
 }: SortableSelectProps<Option, IsMulti, Group>) {
   const [selectedValues, setSelectedValues] = useState(
     !value ? [] : _.castArray(value)
   );
+
+  // react-select's default menu z-index (1) can get visually covered by
+  // any nearby positioned element on the page, so raise it here by default.
+  const mergedStyles: StylesConfig<Option, IsMulti, Group> = {
+    ...styles,
+    menu: (base, state) => ({
+      ...base,
+      zIndex: 1050,
+      ...(styles?.menu?.(base, state) ?? {})
+    })
+  };
 
   // Sync internal state with external value changes
   useEffect(() => {
@@ -115,6 +128,7 @@ export function SortableSelect<
             value={selectedValues}
             onChange={handleOnChange}
             {...props}
+            styles={mergedStyles}
             components={{
               MultiValue: MultiValue,
               ...props.components
@@ -130,6 +144,7 @@ export function SortableSelect<
         value={selectedValues.length > 0 ? selectedValues[0] : null}
         onChange={handleOnChange}
         {...props}
+        styles={mergedStyles}
       />
     );
   }

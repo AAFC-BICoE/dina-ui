@@ -17,17 +17,12 @@ import {
   AttachmentsField,
   BulkEditTabWarning,
   CollectingEventLinker,
-  GroupSelectField,
   ManagedAttributesEditor,
   MaterialSampleFormNav,
-  ProjectSelectSection,
   StorageLinkerField,
-  TagsAndRestrictionsSection,
   useCollectingEventQuery,
-  AssemblageSelectSection,
   OrganismsField,
-  useCopyToNextSample,
-  NotPubliclyReleasableSection
+  useCopyToNextSample
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
@@ -53,7 +48,7 @@ import { AllowAttachmentsConfig } from "../../object-store";
 import { AssociationsField } from "../AssociationsField";
 import { TabbedResourceLinker } from "../TabbedResourceLinker";
 import { MaterialSampleBreadCrumb } from "./MaterialSampleBreadCrumb";
-import { MaterialSampleIdentifiersSection } from "./MaterialSampleIdentifiersSection";
+import { MaterialSampleIdentifiersGrid } from "./MaterialSampleIdentifiersGrid";
 import { MaterialSampleInfoSection } from "./MaterialSampleInfoSection";
 import { PreparationField } from "./PreparationField";
 import { ScheduledActionsField } from "./ScheduledActionsField";
@@ -61,10 +56,8 @@ import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
 import { CitationsField } from "../citations/CitationsField";
-import { CollectionSelectSection } from "../CollectionSelectSection";
 import { ShowParentAttributesField } from "./ShowParentAttributesField";
 import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
-import { ParentSelectSection } from "../ParentSelectSection";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface VisibleManagedAttributesConfig {
@@ -254,10 +247,13 @@ export function MaterialSampleForm({
       ),
     [IDENTIFIER_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
-        <MaterialSampleIdentifiersSection
+        <MaterialSampleIdentifiersGrid
           id={id}
           disableSampleNameField={disableSampleNameField}
           hideUseSequence={hideUseSequence}
+          enableStoredDefaultGroup={enableStoredDefaultGroup}
+          enableCollectingEvent={dataComponentState.enableCollectingEvent}
+          defaultToNotReleasable={defaultToNotReleasable}
         />
       ),
     [MATERIAL_SAMPLE_INFO_COMPONENT_NAME]: (id) =>
@@ -470,7 +466,7 @@ export function MaterialSampleForm({
 
   const formLayout = (
     <div className="d-md-flex">
-      <div style={{ minWidth: "20rem", maxWidth: "20rem" }}>
+      <div className="material-sample-nav-column">
         {(!isOffScreen || !reduceRendering) && (
           <MaterialSampleFormNav
             dataComponentState={dataComponentState}
@@ -497,39 +493,9 @@ export function MaterialSampleForm({
                   disableLastLink={true}
                   materialSample={materialSample as any}
                   enableStoredDefaultGroup={enableStoredDefaultGroup}
-                  enableGroupSelectField={true}
+                  enableGroupSelectField={false}
                 />
               )}
-              {!isTemplate && !materialSample?.materialSampleName && (
-                <div className="row">
-                  <div className="col-md-6">
-                    <GroupSelectField
-                      disableTemplateCheckbox={true}
-                      name="group"
-                      enableStoredDefaultGroup={enableStoredDefaultGroup}
-                    />
-                  </div>
-                </div>
-              )}
-              <div className="row">
-                <div className="col-md-8">
-                  <CollectionSelectSection resourcePath="collection-api/collection" />
-                  <ProjectSelectSection resourcePath="collection-api/project" />
-                  <ParentSelectSection
-                    enableCollectingEvent={
-                      dataComponentState.enableCollectingEvent
-                    }
-                  />
-                  <AssemblageSelectSection resourcePath="collection-api/assemblage" />
-                  <NotPubliclyReleasableSection
-                    defaultToNotReleasable={defaultToNotReleasable}
-                  />
-                  <TagsAndRestrictionsSection
-                    resourcePath="collection-api/material-sample"
-                    indexName="dina_material_sample_index"
-                  />
-                </div>
-              </div>
             </>
           )}
           {/* The toggleable / re-arrangeable form sections: */}

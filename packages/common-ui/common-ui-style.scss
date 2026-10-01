@@ -121,8 +121,281 @@ input[id^="react-select"] {
 
 .fieldset-h2-adjustment {
   font-size: 1.7rem !important;
-  margin-top: 15px !important;
-  margin-bottom: 10px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+fieldset.card.border {
+  position: relative;
+  border-radius: 0.5rem !important;
+  margin-top: 30px !important;
+  padding-top: 1.75rem !important;
+}
+
+fieldset.card.border > .legend-wrapper {
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  transform: translateY(calc(-50% + 3px));
+  margin: 0;
+  padding: 0 0.5rem;
+  background: linear-gradient(
+    to bottom,
+    var(--bs-body-bg, #fff) calc(50% - 3px),
+    var(--bs-body-bg, #fff) calc(50% - 3px)
+  );
+  z-index: 1;
+}
+
+fieldset.card.border:has(> .legend-wrapper > .row) {
+  padding-top: 0.5rem !important;
+}
+
+fieldset.card.border > .legend-wrapper:has(> .row) {
+  position: static;
+  transform: none;
+  padding: 0;
+  margin-bottom: 0.5rem;
+  background-color: transparent;
+}
+
+form:has(> .bulk-button-bar) {
+  display: contents;
+}
+
+.identifiers-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  column-gap: var(--space-3, 16px);
+  row-gap: 32px;
+  align-items: stretch;
+  margin-top: 30px;
+}
+
+.identifiers-grid > fieldset.card.border {
+  height: 100%;
+  box-sizing: border-box;
+  margin: 0 !important;
+}
+
+.identifiers-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3, 16px);
+}
+
+.identifiers-grid .tags .react-select__menu {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.identifiers-grid .tags .react-select__option {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.identifiers-grid .tags .react-select__placeholder {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identifiers-panel-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 16px);
+}
+
+#collectingEventFieldExtensions fieldset.card.border {
+  margin-top: 70px !important;
+}
+
+.identifiers-row-input .mb-2 {
+  margin-bottom: 0 !important;
+}
+
+.identifiers-row-button {
+  flex: none;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height, 38px);
+  padding: 0;
+}
+
+.identifiers-grid .useNextSequence-field {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.identifiers-grid .useNextSequence-field .flex-grow-1 {
+  flex-grow: 0 !important;
+}
+
+.identifiers-grid .useNextSequence-field strong {
+  font-weight: 400;
+}
+
+@media (max-width: 900px) {
+  .identifiers-grid,
+  .identifiers-panel-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.material-sample-nav-column {
+  width: 260px;
+  flex: none;
+  margin-right: 8px;
+}
+
+.material-sample-nav {
+  max-height: calc(100vh - 88px);
+  overflow-y: auto;
+  padding: 8px;
+  background: var(--surface-buttonbar, #f3f3f3);
+  border: var(--border-width, 1px) solid var(--border-subtle, #dee2e6);
+  border-radius: var(--radius, 0.5rem);
+  box-shadow: var(--shadow-sm, 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075));
+}
+
+.material-sample-nav .card {
+  border: none;
+  background-color: transparent;
+}
+
+.material-sample-nav .card-body {
+  padding: 0;
+}
+
+.material-sample-nav label {
+  color: #8a8a8a;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  padding: 6px 12px 10px;
+  margin: 0 -8px 6px !important;
+  border-bottom: var(--border-width, 1px) solid var(--border-subtle, #dee2e6);
+}
+
+.material-sample-nav label strong {
+  font-weight: 700;
+}
+
+.material-sample-nav .list-group-item {
+  background-color: transparent;
+  height: 2.5rem !important;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border: none;
+  border-radius: 6px;
+}
+
+.material-sample-nav .list-group-item .mt-2 {
+  margin-top: 0 !important;
+}
+
+.material-sample-nav .list-group-item div.flex-grow-1 {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.material-sample-nav .list-group-item a.flex-grow-1 {
+  color: inherit;
+}
+
+.material-sample-nav .list-group-item.active {
+  background-color: #335075;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1031 !important;
+}
+
+.material-sample-nav .nav-item-icon {
+  margin-right: 0.6rem;
+  vertical-align: -0.125em;
+  color: #335075;
+}
+
+.material-sample-nav .list-group-item div.flex-grow-1 .nav-item-icon {
+  color: inherit;
+}
+
+.material-sample-nav .list-group-item.active .nav-item-icon {
+  color: #fff;
+}
+
+.material-sample-nav .list-group-item.active .react-switch-bg {
+  background: #fff !important;
+}
+
+.material-sample-nav .list-group-item.active .react-switch-handle {
+  background: #335075 !important;
+}
+
+.material-sample-nav .sub-nav-list {
+  max-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  transition: max-height 0.3s ease;
+}
+
+.material-sample-nav .list-group-item.active + .sub-nav-list {
+  max-height: 30rem;
+}
+
+.material-sample-nav .sub-nav-list li {
+  padding: 0;
+}
+
+.material-sample-nav .sub-nav-list a {
+  display: block;
+  margin-left: 1.25rem;
+  padding: 0.2rem 0 0.2rem 0.6rem;
+  border-left: 2px solid #dee2e6;
+  color: #555e67;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.material-sample-nav .sub-nav-list a.active {
+  color: #335075;
+  font-weight: 600;
+  border-left-width: 3px;
+  border-left-color: #335075;
+}
+
+fieldset.card.border,
+#identifiers-component,
+#georeferencing,
+#geographicPlace,
+#collectingEventFieldExtensions,
+#collectingEventManagedAttributes,
+#collectingEventAttachments {
+  scroll-margin-top: 100px;
+  outline: 3px solid transparent;
+  outline-offset: 4px;
+  border-radius: 0.5rem;
+  transition: outline-color 0.25s ease;
+}
+
+.nav-hover-highlight {
+  outline: 3px solid #335075 !important;
+  outline-offset: 4px;
+  border-radius: 0.5rem;
+}
+
+#geoReferencingLegend .react-tabs__tab-panel > .card-body:not([style]) {
+  padding: 0;
+}
+
+#geographicPlace div:has(> label[for="manualGeographyInput"]) {
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem !important;
 }
 
 .modal-header {

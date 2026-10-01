@@ -1,11 +1,13 @@
 import {
   DinaFormSection,
+  DinaFormSectionProps,
   ResourceSelectField,
   useDinaFormContext,
   useAccount,
   Tooltip,
   SimpleSearchFilterBuilder
 } from "common-ui";
+import { ReactNode } from "react";
 import { FaInbox } from "react-icons/fa";
 import { Collection } from "../../types/collection-api/resources/Collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -40,17 +42,21 @@ export function CollectionSelectSection({
 export interface CollectionSelectFieldProps {
   resourcePath?: string;
   className?: string;
+  horizontal?: DinaFormSectionProps["horizontal"];
+  icon?: ReactNode;
 }
 
 export function CollectionSelectField({
   resourcePath,
-  className
+  className,
+  horizontal = "flex",
+  icon = <FaInbox className="me-1" />
 }: CollectionSelectFieldProps) {
   const { readOnly } = useDinaFormContext();
   const { isAdmin, groupNames } = useAccount();
 
   return (
-    <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
+    <DinaFormSection horizontal={horizontal} readOnly={readOnly}>
       <ResourceSelectField<Collection>
         key={String(isAdmin)}
         name="collection"
@@ -73,7 +79,7 @@ export function CollectionSelectField({
         disableTemplateCheckbox={true}
         label={
           <span>
-            <FaInbox className="me-1" /> <DinaMessage id="collection" />
+            {icon} <DinaMessage id="collection" />
           </span>
         }
         readOnlyRender={(value, _) => (

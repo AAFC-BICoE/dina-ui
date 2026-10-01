@@ -1,10 +1,12 @@
 import {
   DinaFormSection,
+  DinaFormSectionProps,
   ResourceSelectField,
   SimpleSearchFilterBuilder,
   Tooltip,
   useDinaFormContext
 } from "common-ui";
+import { ReactNode } from "react";
 import { IoIosListBox } from "react-icons/io";
 import { Project } from "../../types/collection-api/resources/Project";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -39,15 +41,19 @@ export function ProjectSelectSection({
 export interface ProjectSelectFieldProps {
   resourcePath?: string;
   className?: string;
+  horizontal?: DinaFormSectionProps["horizontal"];
+  icon?: ReactNode;
 }
 
 export function ProjectsSelectField({
   resourcePath,
-  className
+  className,
+  horizontal = "flex",
+  icon = <IoIosListBox className="me-1" />
 }: ProjectSelectFieldProps) {
   const { readOnly } = useDinaFormContext();
   return (
-    <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
+    <DinaFormSection horizontal={horizontal} readOnly={readOnly}>
       <ResourceSelectField<Project>
         name="projects"
         isMulti={true}
@@ -65,7 +71,7 @@ export function ProjectsSelectField({
         removeBottomMargin={true}
         label={
           <span>
-            <IoIosListBox className="me-1" /> <DinaMessage id="projects" />
+            {icon} <DinaMessage id="projects" />
           </span>
         }
         readOnlyRender={(value, _) =>

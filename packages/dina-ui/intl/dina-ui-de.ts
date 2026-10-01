@@ -227,7 +227,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   croppedImg: "Zugeschnittenes Bild",
   customPlaceName: "Benutzerdefinierter Ortsname",
   customPlaceNamePlaceholder: "Eigenen Ortsnamen eingeben …",
-  dataComponents: "Datenelement",
+  dataComponents: "Abschnitte",
   dataEntryLabel: "Dateneingabe",
   dataExportError: "Beim Exportieren der Daten ist ein Fehler aufgetreten.",
   dataExports: "Datenexporte",

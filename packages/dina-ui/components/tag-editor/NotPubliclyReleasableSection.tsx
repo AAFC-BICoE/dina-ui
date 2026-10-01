@@ -10,9 +10,12 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface NotPubliclyReleasableSectionProps {
   defaultToNotReleasable?: boolean;
+  /** Render the reason as a single-line input instead of a text area. */
+  singleLineReason?: boolean;
 }
 export function NotPubliclyReleasableSection({
-  defaultToNotReleasable
+  defaultToNotReleasable,
+  singleLineReason
 }: NotPubliclyReleasableSectionProps = {}) {
   const isInBulkEditTab = !!useBulkEditTabContext();
   const formik = useFormikContext<any>();
@@ -75,7 +78,7 @@ export function NotPubliclyReleasableSection({
             <TextField
               name="notPubliclyReleasableReason"
               className="flex-grow-1 notPubliclyReleasableReason"
-              multiLines={true}
+              multiLines={!singleLineReason}
             />
           )}
       </DinaFormSection>
