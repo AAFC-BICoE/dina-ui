@@ -188,10 +188,13 @@ export function ResourceSelect<TData extends KitsuResource>(
   /** The debounced input value passed to the fetcher. */
   const [searchValue] = useDebounce(inputValue, 250);
 
-  // Initialize active states for all scopes
-  const [activeScopes, setActiveScopes] = useState<ScopeValues>(() =>
-    getInitialScopeValues(scopes, defaultScopes)
-  );
+  // Scope values chosen by the user. Any scope not chosen falls back to its default value, this
+  // also covers scopes provided after the first render.
+  const [selectedScopes, setSelectedScopes] = useState<ScopeValues>({});
+  const activeScopes = {
+    ...getInitialScopeValues(scopes, defaultScopes),
+    ...selectedScopes
+  };
 
   // Omit blank/null filters:
   const filterParam = _.omitBy(
@@ -231,7 +234,7 @@ export function ResourceSelect<TData extends KitsuResource>(
     searchValue,
     activeScopes,
     onScopeChange: (scopeId, scopeValue) => {
-      setActiveScopes((prev) => ({ ...prev, [scopeId]: scopeValue }));
+      setSelectedScopes((prev) => ({ ...prev, [scopeId]: scopeValue }));
     }
   });
 }
@@ -263,10 +266,13 @@ export function ResourceSelectCustomQuery<TData extends KitsuResource>(
   /** The debounced input value passed to the fetcher. */
   const [searchValue] = useDebounce(inputValue, 250);
 
-  // Initialize active states for all scopes
-  const [activeScopes, setActiveScopes] = useState<ScopeValues>(() =>
-    getInitialScopeValues(scopes, defaultScopes)
-  );
+  // Scope values chosen by the user. Any scope not chosen falls back to its default value, this
+  // also covers scopes provided after the first render.
+  const [selectedScopes, setSelectedScopes] = useState<ScopeValues>({});
+  const activeScopes = {
+    ...getInitialScopeValues(scopes, defaultScopes),
+    ...selectedScopes
+  };
 
   // Omit blank/null filters:
   const filterParam = _.omitBy(filter(searchValue), (val) =>
@@ -307,7 +313,7 @@ export function ResourceSelectCustomQuery<TData extends KitsuResource>(
     searchValue,
     activeScopes,
     onScopeChange: (scopeId, scopeValue) => {
-      setActiveScopes((prev) => ({ ...prev, [scopeId]: scopeValue }));
+      setSelectedScopes((prev) => ({ ...prev, [scopeId]: scopeValue }));
     }
   });
 }
