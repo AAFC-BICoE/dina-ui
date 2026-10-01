@@ -29,6 +29,15 @@ export function MaterialSampleBreadCrumb({
   const parentPath = [...(materialSample.hierarchy?.slice(1) ?? [])];
 
   const displayName = materialSample.materialSampleName ?? materialSample.id;
+  const organismCount = materialSample.organism?.filter(Boolean).length ?? 0;
+
+  const determinationCount =
+    materialSample.organism?.reduce(
+      (total, organism) => total + (organism?.determination?.length ?? 0),
+      0
+    ) ?? 0;
+
+  const collectionName = materialSample.collection?.name;
   const customStyle = {
     option: (base) => {
       return {
@@ -46,7 +55,11 @@ export function MaterialSampleBreadCrumb({
   return (
     <>
       {/* Current Material Sample Name */}
-      <h1 id="wb-cont" className="d-flex justify-content-between">
+      <h2
+        id="wb-cont"
+        className="d-flex justify-content-between align-items-end mb-0"
+        style={{ fontSize: "1.4rem" }}
+      >
         <strong>
           {!disableLastLink ? (
             <Link
@@ -82,7 +95,30 @@ export function MaterialSampleBreadCrumb({
               <NotPubliclyReleasableWarning />
             </div>
           ))}
-      </h1>
+      </h2>
+      <div className="d-flex align-items-center gap-3 text-muted mt-1 mb-0">
+        {collectionName && (
+          <span
+            className="text-uppercase fw-semibold"
+            style={{ letterSpacing: "0.08em" }}
+          >
+            {collectionName}
+          </span>
+        )}
+
+        {collectionName && <span className="text-secondary">|</span>}
+
+        <span className="fst-italic">
+          {organismCount} {organismCount === 1 ? "organism" : "organisms"}
+        </span>
+
+        <span className="text-secondary">|</span>
+
+        <span className="fst-italic">
+          {determinationCount}{" "}
+          {determinationCount === 1 ? "determination" : "determinations"}
+        </span>
+      </div>
       {/* Material Sample Parents */}
       {parentPath.length !== 0 && (
         <BreadcrumbBanner

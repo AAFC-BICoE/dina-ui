@@ -7,6 +7,7 @@ import {
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { FaGlobe } from "react-icons/fa";
 
 export interface NotPubliclyReleasableSectionProps {
   defaultToNotReleasable?: boolean;
@@ -41,7 +42,13 @@ export function NotPubliclyReleasableSection({
             visibleElement={
               <SelectField<boolean | null>
                 name="publiclyReleasable"
-                label={<DinaMessage id="publiclyReleasable" />}
+                removeBottomMargin={true}
+                label={
+                  <span>
+                    <FaGlobe className="me-2" />
+                    <DinaMessage id="publiclyReleasable" />
+                  </span>
+                }
                 options={[
                   // null values are ignored when bulk editing
                   { label: formatMessage("keepCurrentValues"), value: null },
@@ -62,7 +69,13 @@ export function NotPubliclyReleasableSection({
           <SelectField<boolean>
             className="notPubliclyReleasable"
             name="publiclyReleasable"
-            label={<DinaMessage id="publiclyReleasable" />}
+            label={
+              <span>
+                <FaGlobe className="me-2" />
+                <DinaMessage id="publiclyReleasable" />
+              </span>
+            }
+            removeBottomMargin={true}
             options={[
               { label: formatMessage("publiclyReleasableOption"), value: true },
               {

@@ -1,0 +1,85 @@
+.dataComponents
+  > fieldset
+  > :global(.legend-wrapper)
+  > legend
+  > :global(.fieldset-h2-adjustment) {
+  font-size: 0.95rem !important;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #274c77;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.dataComponents > fieldset > :global(.legend-wrapper) {
+  background-color: #eaf1f8;
+  margin: -0.5rem -1.5rem 1rem;
+  padding: 0.55rem 1.5rem 0.45rem;
+  border-bottom: 1px solid #ccd8e5;
+}
+
+.dataComponents > fieldset fieldset {
+  background-color: #fafafa !important;
+}
+
+.dataComponents > fieldset fieldset :global(.fieldset-h2-adjustment) {
+  font-size: 1.1rem !important;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.formCanvas {
+  background-color: #f5f6f7;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.dataComponents > fieldset {
+  background-color: #fff;
+}
+
+.overviewHeader {
+  background-color: #eaf1f8;
+  margin: -1rem -1rem 1rem;
+  padding: 0.45rem 1rem;
+  border-bottom: 1px solid #ccd8e5;
+}
+
+.overviewHeader > h2 {
+  margin-top: 5px;
+}
+
+/* Top-level sections whose FieldSet is nested inside another component. */
+.topLevelEmbeddedSection > fieldset,
+.topLevelEmbeddedSection > div > fieldset {
+  background-color: #fff;
+}
+
+.topLevelEmbeddedSection > fieldset > :global(.legend-wrapper),
+.topLevelEmbeddedSection > div > fieldset > :global(.legend-wrapper) {
+  background-color: #eaf1f8;
+  margin: -0.5rem -1.5rem 1rem;
+  padding: 0.55rem 1.5rem 0.45rem;
+  border-bottom: 1px solid #ccd8e5;
+}
+
+.topLevelEmbeddedSection
+  > fieldset
+  > :global(.legend-wrapper)
+  > legend
+  > :global(.fieldset-h2-adjustment),
+.topLevelEmbeddedSection
+  :global(.legend-wrapper)
+  :global(.fieldset-h2-adjustment) {
+  font-size: 0.95rem !important;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #274c77;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
