@@ -431,6 +431,7 @@ export default function QueryRowManagedAttributeSearch({
             ? []
             : [GROUP_SCOPE(groupNames ?? [], formatMessage)]
         }
+        defaultScopes={{ groupFilter: "allGroups" }}
         optionLabel={(attribute) => {
           // Attempt to display the multilingual title if it exists, otherwise fallback to name, key, or id.
           if ((attribute as any)?.multilingualTitle?.titles?.length) {
@@ -454,7 +455,7 @@ export default function QueryRowManagedAttributeSearch({
         placeholder={formatMessage({
           id: "queryBuilder_managedAttribute_placeholder"
         })}
-        pageSize={15}
+        pageSize={1000}
         onDataLoaded={(data) => {
           if (managedAttributeState.preloadId && data?.length === 1) {
             const fieldPath =
