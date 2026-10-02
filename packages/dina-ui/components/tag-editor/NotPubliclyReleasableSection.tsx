@@ -86,7 +86,7 @@ export function NotPubliclyReleasableSection({
           />
         )}
       </DinaFormSection>
-      <DinaFormSection horizontal={false}>
+      <DinaFormSection horizontal={horizontal}>
         {formik.values.publiclyReleasable !== undefined &&
           !formik.values.publiclyReleasable && (
             <TextField

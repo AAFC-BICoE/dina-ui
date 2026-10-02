@@ -8,6 +8,7 @@ export interface DataEntryFieldProps {
   width?: string;
   isTemplate?: boolean;
   id?: string;
+  className?: string;
   blockAddable?: boolean;
   unitsAddable?: boolean;
   typesAddable?: boolean;
@@ -27,6 +28,7 @@ export function DataEntryField({
   width,
   isTemplate,
   id,
+  className,
   blockAddable = false,
   unitsAddable = false,
   typesAddable = false,
@@ -45,6 +47,7 @@ export function DataEntryField({
       name={name}
       readOnly={readOnly}
       id={id}
+      className={className}
       blockAddable={blockAddable}
       unitsAddable={unitsAddable}
       typesAddable={typesAddable}

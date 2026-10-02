@@ -19,8 +19,12 @@
   border-bottom: 1px solid #ccd8e5;
 }
 
-.dataComponents > fieldset fieldset {
+.dataComponents > fieldset fieldset:not(:global(.collecting-event-clean)) {
   background-color: #fafafa !important;
+}
+
+.dataComponents > fieldset :global(.collecting-event-layout) fieldset {
+  background-color: #fff !important;
 }
 
 .dataComponents > fieldset fieldset :global(.fieldset-h2-adjustment) {

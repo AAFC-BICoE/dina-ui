@@ -221,7 +221,7 @@ export function GeoReferenceAssertionRow({
           />
         </CompactFieldRow>
 
-        <CompactFieldRow label="Coordinate Uncertainty In Meters">
+        <CompactFieldRow label="Coordinate Uncertainty (meters)">
           <NumberField
             name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
             tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_coordinate_uncertainty_in_meters"

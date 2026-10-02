@@ -25,6 +25,7 @@ export interface GeographyFormLayoutProps {
   geoAssertionTabIdx: number;
   geoSearchValue: string;
   setGeoSearchValue: (value: string) => void;
+  className?: string;
 }
 
 const MAX_SRC_ADMIN_LEVELS = 10;
@@ -90,7 +91,8 @@ function ManualStateProvinceCountryFields({ readOnly }: { readOnly: boolean }) {
 export function GeographyFormLayout({
   geoAssertionTabIdx,
   geoSearchValue,
-  setGeoSearchValue
+  setGeoSearchValue,
+  className
 }: GeographyFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -311,7 +313,7 @@ export function GeographyFormLayout({
     <FieldSet
       fieldName="geographicPlaceNameSourceDetail"
       legend={<DinaMessage id="toponymyLegend" />}
-      className="non-strip"
+      className={`non-strip ${className ?? ""}`}
       componentName={COLLECTING_EVENT_COMPONENT_NAME}
       sectionName="current-geographic-place"
     >

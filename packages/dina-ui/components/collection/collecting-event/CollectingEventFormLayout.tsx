@@ -56,6 +56,7 @@ import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-build
 import { GeographyFormLayout } from "./GeographyFormLayout";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { CollectingEventSummary } from "./CollectingEventSummary";
+import styles from "./CollectingEventFormLayout.module.css";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -134,7 +135,7 @@ export function CollectingEventFormLayout({
   }) {
     return (
       <div
-        className="d-flex align-items-center mb-2"
+        className="d-flex align-items-center mb-1"
         style={{ maxWidth: "760px" }}
       >
         <div className="fw-semibold flex-shrink-0" style={{ width: "230px" }}>
@@ -177,7 +178,8 @@ export function CollectingEventFormLayout({
       managedAttributeComponent="COLLECTING_EVENT"
       controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
       fieldSetProps={{
-        legend: <DinaMessage id="collectingEventManagedAttributes" />,
+        legend: "Managed Attributes",
+        className: `non-strip collecting-event-clean ${styles.cleanSection}`,
         componentName: COLLECTING_EVENT_COMPONENT_NAME,
         sectionName: "collecting-event-managed-attributes-section"
       }}
@@ -188,7 +190,7 @@ export function CollectingEventFormLayout({
   );
 
   return (
-    <div ref={layoutWrapperRef}>
+    <div ref={layoutWrapperRef} className="collecting-event-layout">
       <DinaFormSection
         componentName={COLLECTING_EVENT_COMPONENT_NAME}
         sectionName="general-section"
@@ -206,20 +208,26 @@ export function CollectingEventFormLayout({
               collectingEventUUID={initialValues.id}
             />
 
-            <NotPubliclyReleasableSection
-              defaultToNotReleasable={defaultToNotReleasable}
-            />
-            <Tooltip
-              id="collecting_event_tag_info"
-              disableSpanMargin={true}
-              visibleElement={
-                <TagsAndRestrictionsSection
-                  resourcePath="collection-api/collecting-event"
-                  indexName="dina_material_sample_index"
-                  tagIncludedType="collecting-event"
-                />
-              }
-            />
+            <div className={styles.sectionHeading}>Access &amp; Tags</div>
+
+            <div className={styles.accessFields}>
+              <NotPubliclyReleasableSection
+                defaultToNotReleasable={defaultToNotReleasable}
+                horizontal={14.375}
+              />
+              <Tooltip
+                id="collecting_event_tag_info"
+                disableSpanMargin={true}
+                visibleElement={
+                  <TagsAndRestrictionsSection
+                    resourcePath="collection-api/collecting-event"
+                    indexName="dina_material_sample_index"
+                    tagIncludedType="collecting-event"
+                    horizontal={14.375}
+                  />
+                }
+              />
+            </div>
           </>
         )}
       </DinaFormSection>
@@ -228,7 +236,7 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="identifiers" />}
             id="identifiers"
-            className="non-strip"
+            className={`non-strip collecting-event-clean ${styles.cleanSection}`}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="identifiers-section"
           >
@@ -272,7 +280,7 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="collecting" />}
             id="collecting"
-            className="non-strip"
+            className={`non-strip collecting-event-clean ${styles.cleanSection}`}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
           >
             <DinaFormSection
@@ -396,7 +404,7 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="verbatimLabelLegend" />}
             id="verbatimLabelLegend"
-            className="non-strip h-100"
+            className={`non-strip h-100 ${styles.cleanSection}`}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="verbatim-label-section"
           >
@@ -611,7 +619,7 @@ export function CollectingEventFormLayout({
         <div className="col-md-12">
           <FieldSet
             legend={<DinaMessage id="collectingEventDetails" />}
-            className="non-strip h-100"
+            className={`non-strip h-100 ${styles.cleanSection}`}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-additional-details-section"
           >
@@ -726,10 +734,12 @@ export function CollectingEventFormLayout({
           {!readOnly ? (
             <GeoReferenceAssertionField
               onChangeTabIndex={setGeoAssertionTabIdx}
+              className={`collecting-event-clean ${styles.cleanSection}`}
             />
-          ) : !hideGeoreferences ? ( // if read-only, check for hideGeoreferences
+          ) : !hideGeoreferences ? (
             <GeoReferenceAssertionField
               onChangeTabIndex={setGeoAssertionTabIdx}
+              className={`collecting-event-clean ${styles.cleanSection}`}
             />
           ) : null}
         </div>
@@ -741,6 +751,7 @@ export function CollectingEventFormLayout({
                   geoAssertionTabIdx={geoAssertionTabIdx}
                   geoSearchValue={geoSearchValue}
                   setGeoSearchValue={setGeoSearchValue}
+                  className={`collecting-event-clean ${styles.cleanSection}`}
                 />
               </div>
             </div>
@@ -760,48 +771,48 @@ export function CollectingEventFormLayout({
         </div>
       </div>
       <div className="row mb-3">
-        <div className="col-md-6">
+        <div className="col-md-12">
           <FieldSet
-            legend={<DinaMessage id="collectingEventPartOfExpedition" />}
-            className="non-strip h-100"
+            legend="Expedition & Site"
+            className={`non-strip collecting-event-clean ${styles.cleanSection}`}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-details"
           >
-            <ResourceSelectField<Expedition>
-              name="expedition"
-              filter={(searchValue: string) =>
-                SimpleSearchFilterBuilder.create<CollectionMethod>()
-                  .searchFilter("name", searchValue)
-                  .build()
-              }
-              model="collection-api/expedition"
-              optionLabel={(expedition) => expedition.name}
-              omitNullOption={false}
-              readOnlyLink="/collection/expedition/view?id="
-            />
-          </FieldSet>
-        </div>
-        <div className="col-md-6">
-          <FieldSet
-            legend={<DinaMessage id="collectingEventSite" />}
-            className="non-strip h-100"
-            componentName={COLLECTING_EVENT_COMPONENT_NAME}
-            sectionName="collecting-event-details"
-          >
-            <ResourceSelectField<Site>
-              name="site"
-              filter={(searchValue: string) =>
-                SimpleSearchFilterBuilder.create<CollectionMethod>()
-                  .searchFilter("name", searchValue)
-                  .build()
-              }
-              model="collection-api/site"
-              optionLabel={(site) =>
-                site.name + (site.code ? ` (${site.code})` : "")
-              }
-              omitNullOption={false}
-              readOnlyLink="/collection/site/view?id="
-            />
+            <CompactFieldRow label="Expedition">
+              <ResourceSelectField<Expedition>
+                name="expedition"
+                filter={(searchValue: string) =>
+                  SimpleSearchFilterBuilder.create<CollectionMethod>()
+                    .searchFilter("name", searchValue)
+                    .build()
+                }
+                model="collection-api/expedition"
+                optionLabel={(expedition) => expedition.name}
+                omitNullOption={false}
+                readOnlyLink="/collection/expedition/view?id="
+                removeLabel={true}
+                removeBottomMargin={true}
+              />
+            </CompactFieldRow>
+
+            <CompactFieldRow label="Site">
+              <ResourceSelectField<Site>
+                name="site"
+                filter={(searchValue: string) =>
+                  SimpleSearchFilterBuilder.create<CollectionMethod>()
+                    .searchFilter("name", searchValue)
+                    .build()
+                }
+                model="collection-api/site"
+                optionLabel={(site) =>
+                  site.name + (site.code ? ` (${site.code})` : "")
+                }
+                omitNullOption={false}
+                readOnlyLink="/collection/site/view?id="
+                removeLabel={true}
+                removeBottomMargin={true}
+              />
+            </CompactFieldRow>
           </FieldSet>
         </div>
       </div>
@@ -821,6 +832,7 @@ export function CollectingEventFormLayout({
             }}
             width={"100%"}
             disableClearButton={true}
+            className={`non-strip collecting-event-clean ${styles.cleanSection}`}
           />
         </DinaFormSection>
       </div>
@@ -830,7 +842,7 @@ export function CollectingEventFormLayout({
         ) : JSON.stringify(initialValues?.managedAttributes) !== "{}" ? ( // if read-only, check for managed attributes
           <FieldSet
             legend={<DinaMessage id="collectingEventManagedAttributes" />}
-            className="non-strip"
+            className="non-strip collecting-event-clean-section"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-managed-attributes-section"
           >
