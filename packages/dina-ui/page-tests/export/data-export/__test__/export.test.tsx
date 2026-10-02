@@ -181,7 +181,7 @@ describe("ExportPage Component", () => {
         // Verify 5 total records have been found.
         await waitFor(() => {
           expect(
-            wrapper.getByText(/total matched records: 5/i)
+            wrapper.getByRole("button", { name: "Export 5 Records" })
           ).toBeInTheDocument();
         });
 
@@ -192,10 +192,12 @@ describe("ExportPage Component", () => {
           "Material Sample Demo"
         );
 
-        // Wait for the option to appear, then click it
-        const option = await wrapper.findByText("Material Sample Demo");
-        await userEvent.click(option);
         await waitForLoadingToDisappear();
+
+        // The template is shown in the dropdown and in the summary.
+        await waitFor(() => {
+          expect(wrapper.getAllByText("Material Sample Demo")).toHaveLength(2);
+        });
 
         // Ensure the following columns are loaded in:
         expect(wrapper.getByText("Primary ID")).toBeInTheDocument();
@@ -219,7 +221,9 @@ describe("ExportPage Component", () => {
         expect(wrapper.getByText("Tab")).toBeInTheDocument();
 
         // Submit the export to ensure the network request is setup properly.
-        await userEvent.click(wrapper.getByRole("button", { name: "Export" }));
+        await userEvent.click(
+          wrapper.getByRole("button", { name: "Export 5 Records" })
+        );
         expect(mockSave.mock.calls).toEqual([
           [
             [
@@ -470,7 +474,9 @@ describe("ExportPage Component", () => {
       );
 
       // Submit export
-      const submitButton = wrapper.getByRole("button", { name: "Export" });
+      const submitButton = wrapper.getByRole("button", {
+        name: "Export 5 Records"
+      });
       await userEvent.click(submitButton);
 
       // Verify payload has updated name
@@ -506,11 +512,22 @@ describe("ExportPage Component", () => {
       const wrapper = mountWithAppContext(<ExportPage />, testCtx);
       await waitForLoadingToDisappear();
 
+      // The summary describes the default CSV output with no template.
+      expect(
+        wrapper.getByText("CSV file, comma separated")
+      ).toBeInTheDocument();
+      expect(wrapper.getByText("None")).toBeInTheDocument();
+
       // Find the separator dropdown using the container approach
       await selectDropdownOption(wrapper, /separator/i, "Tab");
 
+      // The summary updates as soon as the separator changes.
+      expect(wrapper.getByText("TSV file, tab separated")).toBeInTheDocument();
+
       // Submit export
-      const submitButton = wrapper.getByRole("button", { name: "Export" });
+      const submitButton = wrapper.getByRole("button", {
+        name: "Export 5 Records"
+      });
       await userEvent.click(submitButton);
 
       // Verify payload has TAB as the columnSeparator
@@ -548,7 +565,9 @@ describe("ExportPage Component", () => {
       const wrapper = mountWithAppContext(<ExportPage />, testCtx);
       await waitForLoadingToDisappear();
 
-      const exportButton = wrapper.getByRole("button", { name: "Export" });
+      const exportButton = wrapper.getByRole("button", {
+        name: "Export 5 Records"
+      });
       expect(exportButton).not.toBeDisabled();
 
       // Submit export
@@ -560,7 +579,9 @@ describe("ExportPage Component", () => {
 
       // The export button should be disabled after submission
       await waitFor(() => {
-        expect(wrapper.getByRole("button", { name: "Export" })).toBeDisabled();
+        expect(
+          wrapper.getByRole("button", { name: "Export 5 Records" })
+        ).toBeDisabled();
       });
     });
 
@@ -587,7 +608,9 @@ describe("ExportPage Component", () => {
       await userEvent.type(alias1Input, "new-alias-1");
 
       // Submit export and verify the updated alias is sent in the payload
-      await userEvent.click(wrapper.getByRole("button", { name: "Export" }));
+      await userEvent.click(
+        wrapper.getByRole("button", { name: "Export 5 Records" })
+      );
 
       await waitFor(() => {
         expect(mockSave).toHaveBeenCalledWith(
@@ -631,7 +654,7 @@ describe("ExportPage Component", () => {
       await waitForLoadingToDisappear();
 
       // Switch into "Object" mode.
-      await userEvent.click(wrapper.getByText(/objects/i));
+      await userEvent.click(wrapper.getByRole("radio", { name: /^objects/i }));
       await waitForLoadingToDisappear();
 
       // Change the name:
@@ -641,7 +664,9 @@ describe("ExportPage Component", () => {
       );
 
       // Submit the export.
-      await userEvent.click(wrapper.getByRole("button", { name: /export/i }));
+      await userEvent.click(
+        wrapper.getByRole("button", { name: "Export 2 Objects" })
+      );
 
       // Expect the correct network request.
       expect(mockSave).toHaveBeenCalledWith(
@@ -687,7 +712,7 @@ describe("ExportPage Component", () => {
       await waitForLoadingToDisappear();
 
       // Switch into "Object" mode.
-      await userEvent.click(wrapper.getByText(/objects/i));
+      await userEvent.click(wrapper.getByRole("radio", { name: /^objects/i }));
       await waitForLoadingToDisappear();
 
       // The "File Name Alias Field" section should be visible
@@ -700,7 +725,9 @@ describe("ExportPage Component", () => {
       await userEvent.click(await wrapper.findByText(/original filename/i));
 
       // Submit the export
-      await userEvent.click(wrapper.getByRole("button", { name: /export/i }));
+      await userEvent.click(
+        wrapper.getByRole("button", { name: "Export 2 Objects" })
+      );
 
       // The save call should include filenameAliases
       await waitFor(() => {
@@ -743,7 +770,7 @@ describe("ExportPage Component", () => {
       await waitForLoadingToDisappear();
 
       // Switch into "Object" mode.
-      await userEvent.click(wrapper.getByText(/objects/i));
+      await userEvent.click(wrapper.getByRole("radio", { name: /^objects/i }));
       await waitForLoadingToDisappear();
 
       // Wait for the JPEG eligibility check (bulkGet) to complete
@@ -753,12 +780,14 @@ describe("ExportPage Component", () => {
 
       // The resize Select should now be enabled (all objects are JPEG).
       // Select resize to 50%
-      const resizeSelect = wrapper.getAllByRole("combobox")[1];
+      const resizeSelect = wrapper.getAllByRole("combobox")[2];
       await userEvent.click(resizeSelect);
       await userEvent.click(await wrapper.findByText(/^50%/));
 
       // Submit the export
-      await userEvent.click(wrapper.getByRole("button", { name: /export/i }));
+      await userEvent.click(
+        wrapper.getByRole("button", { name: "Export 2 Objects" })
+      );
 
       // The save call should include the IMG_RESIZE exportFunction
       await waitFor(() => {
@@ -803,7 +832,7 @@ describe("ExportPage Component", () => {
       await waitForLoadingToDisappear();
 
       // Switch into "Object" mode.
-      await userEvent.click(wrapper.getByText(/objects/i));
+      await userEvent.click(wrapper.getByRole("radio", { name: /^objects/i }));
       await waitForLoadingToDisappear();
 
       // Wait for JPEG check to complete
@@ -819,32 +848,206 @@ describe("ExportPage Component", () => {
       });
     });
 
-    it("Shows the Data/Objects export type toggle only for object-store-list", async () => {
+    it("Disables the image options and exports the original files when the objects are mixed media", async () => {
+      // Override mockBulkGet with a mix of an image and a non-image (e.g. PDF) object
+      mockBulkGet.mockImplementation(async (paths: string[]) => {
+        if (paths[0]?.includes("metadata/")) {
+          return paths.map((path: string) => {
+            const id = path.split("/").pop()?.split("?")[0];
+            return {
+              id,
+              type: "metadata",
+              fileIdentifier: `file-${id}`,
+              dcType: id === "obj-1" ? "IMAGE" : "DOCUMENT",
+              fileExtension: id === "obj-1" ? ".jpg" : ".pdf",
+              derivatives:
+                id === "obj-1"
+                  ? [
+                      {
+                        derivativeType: "LARGE_IMAGE",
+                        fileIdentifier: "large-obj-1",
+                        dcFormat: "image/jpeg"
+                      }
+                    ]
+                  : []
+            };
+          });
+        }
+        return [];
+      });
+
       const wrapper = mountWithAppContext(<ExportPage />, testCtx);
       await waitForLoadingToDisappear();
 
-      // Both the "Data" and "Objects" toggle buttons should be visible
-      expect(wrapper.getByText(/^data$/i)).toBeInTheDocument();
-      expect(wrapper.getByText(/objects/i)).toBeInTheDocument();
+      // Switch into "Object" mode.
+      await userEvent.click(wrapper.getByRole("radio", { name: /^objects/i }));
+      await waitForLoadingToDisappear();
+
+      // Both image dropdowns are disabled and explain why.
+      await waitFor(() => {
+        expect(
+          wrapper.getAllByText(/not available for mixed media/i)
+        ).toHaveLength(2);
+      });
+      expect(wrapper.getByText(/image type/i)).toBeInTheDocument();
+      expect(
+        wrapper.container.querySelectorAll(
+          'input[name="imageType"], input[name="resizePercentage"]'
+        ).length
+      ).toBe(0);
+      expect(
+        wrapper.getByText("Original files (image options unavailable)")
+      ).toBeInTheDocument();
+
+      await userEvent.click(
+        wrapper.getByRole("button", { name: "Export 2 Objects" })
+      );
+
+      // The original files are exported, not the large image derivative.
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledWith(
+          [
+            {
+              resource: {
+                fileIdentifiers: ["file-obj-1", "file-obj-2"],
+                name: undefined,
+                type: "object-export"
+              },
+              type: "object-export"
+            }
+          ],
+          { apiBaseUrl: "/objectstore-api" }
+        );
+      });
     });
 
-    it("Switching between Data and Objects tabs shows/hides the correct UI sections", async () => {
+    it("Exports the selected Image Type derivative and shows it in the summary", async () => {
+      mockBulkGet.mockImplementation(async (paths: string[]) => {
+        if (paths[0]?.includes("metadata/")) {
+          return paths.map((path: string) => {
+            const id = path.split("/").pop()?.split("?")[0];
+            return {
+              id,
+              type: "metadata",
+              fileIdentifier: `file-${id}`,
+              dcType: "IMAGE",
+              fileExtension: ".tif",
+              dcFormat: "image/tiff",
+              derivatives: [
+                {
+                  derivativeType: "LARGE_IMAGE",
+                  fileIdentifier: `large-${id}`,
+                  dcFormat: "image/jpeg"
+                },
+                {
+                  derivativeType: "THUMBNAIL_IMAGE",
+                  fileIdentifier: `thumb-${id}`,
+                  dcFormat: "image/jpeg"
+                }
+              ]
+            };
+          });
+        }
+        return [];
+      });
+
+      const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      await userEvent.click(wrapper.getByRole("radio", { name: /^objects/i }));
+      await waitForLoadingToDisappear();
+
+      // Large Image is the default.
+      await waitFor(() => {
+        expect(
+          wrapper.getByText("Large Image, 100% - Original size")
+        ).toBeInTheDocument();
+      });
+
+      // Choose the thumbnail and resize to 50%.
+      await userEvent.click(wrapper.getAllByRole("combobox")[1]);
+      await userEvent.click(await wrapper.findByText("Thumbnail"));
+      await userEvent.click(wrapper.getAllByRole("combobox")[2]);
+      await userEvent.click(await wrapper.findByText("50%"));
+
+      // The summary updates right away.
+      expect(wrapper.getByText("Thumbnail, 50%")).toBeInTheDocument();
+
+      await userEvent.click(
+        wrapper.getByRole("button", { name: "Export 2 Objects" })
+      );
+
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledWith(
+          [
+            {
+              resource: {
+                fileIdentifiers: ["thumb-obj-1", "thumb-obj-2"],
+                name: undefined,
+                type: "object-export",
+                exportFunction: {
+                  functionDef: "IMG_RESIZE",
+                  params: { factor: "0.5" }
+                }
+              },
+              type: "object-export"
+            }
+          ],
+          { apiBaseUrl: "/objectstore-api" }
+        );
+      });
+
+      // Switching to Original disables resizing because the originals are not JPEG.
+      await userEvent.click(wrapper.getAllByRole("combobox")[1]);
+      await userEvent.click(await wrapper.findByText("Original"));
+      expect(
+        wrapper.getByText("Original, 100% - Original size")
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByText(/image resizing is only available/i)
+      ).toBeInTheDocument();
+    });
+
+    it("Shows the Data/Objects export type cards only for object-store-list", async () => {
+      const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Both the "Data" and "Objects" cards should be visible, with Data selected.
+      expect(wrapper.getByRole("radio", { name: /^data/i })).toBeChecked();
+      expect(
+        wrapper.getByRole("radio", { name: /^objects/i })
+      ).not.toBeChecked();
+    });
+
+    it("Switching between Data and Objects shows/hides the correct UI sections", async () => {
       const wrapper = mountWithAppContext(<ExportPage />, testCtx);
       await waitForLoadingToDisappear();
 
       // Default is TABULAR_DATA — separator dropdown visible
       expect(wrapper.getByText(/separator/i)).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("button", { name: /save export template/i })
+      ).toBeInTheDocument();
 
-      // Switch to Objects — separator should be hidden, resize/alias controls appear
-      await userEvent.click(wrapper.getByText(/objects/i));
+      // Switch to Objects — separator should be hidden, image/alias controls appear
+      await userEvent.click(wrapper.getByRole("radio", { name: /^objects/i }));
       await waitForLoadingToDisappear();
 
       expect(wrapper.queryByText(/^separator$/i)).not.toBeInTheDocument();
+      expect(wrapper.getByText(/image processing/i)).toBeInTheDocument();
       expect(wrapper.getByText(/resize images/i)).toBeInTheDocument();
       expect(wrapper.getByText(/file name alias field/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/image type/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(wrapper.getAllByText(/large image/i).length).toBeGreaterThan(0);
+      });
+      expect(wrapper.getByText("ZIP of stored files")).toBeInTheDocument();
+      expect(
+        wrapper.queryByRole("button", { name: /save export template/i })
+      ).not.toBeInTheDocument();
 
-      // Switch back to Data — separator returns, resize/alias sections hidden
-      await userEvent.click(wrapper.getByText(/^data$/i));
+      // Switch back to Data — separator returns, image/alias sections hidden
+      await userEvent.click(wrapper.getByRole("radio", { name: /^data/i }));
       await waitForLoadingToDisappear();
 
       expect(wrapper.getByText(/separator/i)).toBeInTheDocument();
@@ -910,7 +1113,9 @@ describe("ExportPage Component", () => {
       await waitForLoadingToDisappear();
 
       // Submit without any columns selected
-      await userEvent.click(wrapper.getByRole("button", { name: "Export" }));
+      await userEvent.click(
+        wrapper.getByRole("button", { name: "Export 3 Records" })
+      );
 
       await waitFor(() => {
         expect(mockSave).toHaveBeenCalledWith(
