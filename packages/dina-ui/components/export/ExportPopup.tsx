@@ -1,4 +1,5 @@
 import { Overlay, Popover } from "react-bootstrap";
+import { Placement } from "react-bootstrap/types";
 import { IoClose } from "react-icons/io5";
 import { FaCheckCircle } from "react-icons/fa";
 import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
@@ -7,11 +8,19 @@ interface ExportPopupProps {
   target: HTMLElement | null;
   show: boolean;
   onClose: () => void;
+
+  /** Side of the target the popup opens on. Defaults to the right. */
+  placement?: Placement;
 }
 
-export function ExportPopup({ target, show, onClose }: ExportPopupProps) {
+export function ExportPopup({
+  target,
+  show,
+  onClose,
+  placement = "right"
+}: ExportPopupProps) {
   return (
-    <Overlay target={target} show={show} placement="right">
+    <Overlay target={target} show={show} placement={placement}>
       <Popover id="popover-basic">
         <Popover.Header
           as="h3"

@@ -847,3 +847,137 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   min-width: var(--cell-block-min-width, 50%);
   text-align: left;
 }
+
+/* Export page (/export/data-export/export) */
+.export-page-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 991.98px) {
+  .export-page-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.export-section-label {
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.export-type-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 575.98px) {
+  .export-type-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.export-type-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 2px;
+  padding: 1rem 1.25rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.export-type-card.selected {
+  margin: 0;
+  border: 3px solid #335075;
+}
+
+.export-type-card.disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.export-type-card:focus-within {
+  box-shadow: 0 0 0 0.25rem rgba(51, 80, 117, 0.25);
+}
+
+.export-type-card .form-check-input {
+  flex-shrink: 0;
+  margin: 0.2rem 0 0;
+  cursor: inherit;
+}
+
+.export-type-card .form-check-input:checked {
+  background-color: #335075;
+  border-color: #335075;
+}
+
+.export-type-card .form-check-input:focus {
+  box-shadow: none;
+}
+
+.export-type-card-description {
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.export-summary {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  background-color: #fff;
+}
+
+@media (min-width: 992px) {
+  .export-summary {
+    position: sticky;
+    top: 76px;
+  }
+  /* Line the summary up with the Export Type cards rather than their label. */
+  .export-summary.below-section-label {
+    margin-top: calc(0.875rem * 1.5 + 0.5rem);
+  }
+}
+
+.export-summary-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #dee2e6;
+  font-weight: 700;
+}
+
+.export-summary-list {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 1rem;
+  row-gap: 0.5rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+.export-summary-list dt {
+  font-weight: 400;
+  color: #6c757d;
+}
+
+.export-summary-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.export-summary-footer {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Disabled image option dropdowns use the Bootstrap disabled input background. */
+.export-image-processing .react-select__control--is-disabled {
+  background-color: #e9ecef;
+}
