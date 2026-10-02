@@ -90,76 +90,84 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       disabled: !id,
       onSuccess: async ({ data }) => {
-        const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
-          `seqdb-api/generic-molecular-analysis-item`,
-          {
-            include: "genericMolecularAnalysis,molecularAnalysisRunItem",
-            filter: SimpleSearchFilterBuilder.create()
-              .where("materialSample.id", "EQ", data.id)
-              .build(),
-            page: { limit: 1000 }
-          }
-        );
+        data.workflows = [];
 
-        const runItemIds = _.compact(
-          workflowItems.data.map(
-            (item: any) => item.molecularAnalysisRunItem?.id
-          )
-        );
-
-        if (runItemIds.length > 0) {
-          const runItemsWithResult = await bulkGet<MolecularAnalysisRunItem>(
-            runItemIds.map(
-              (id) => `/molecular-analysis-run-item/${id}?include=result`
-            ),
-            { apiBaseUrl: "/seqdb-api" }
-          );
-
-          // Map by id for quick lookup when merging back in
-          const runItemsById = _.keyBy(_.compact(runItemsWithResult), "id");
-
-          // Attach the loaded result onto the original workflowItems.data
-          workflowItems.data.forEach((item: any) => {
-            const runItemId = item.molecularAnalysisRunItem?.id;
-            if (runItemId && runItemsById[runItemId]) {
-              item.molecularAnalysisRunItem = runItemsById[runItemId];
+        const workflowItems = await apiClient
+          .get<GenericMolecularAnalysis[]>(
+            `seqdb-api/generic-molecular-analysis-item`,
+            {
+              include: "genericMolecularAnalysis,molecularAnalysisRunItem",
+              filter: SimpleSearchFilterBuilder.create()
+                .where("materialSample.id", "EQ", data.id)
+                .build(),
+              page: { limit: 1000 }
             }
-          });
+          )
+          .catch(() => null);
 
-          // Collect every attachment id across every result
-          const attachmentIds = _.compact(
-            _.uniq(
-              workflowItems.data.flatMap(
-                (item: any) =>
-                  item.molecularAnalysisRunItem?.result?.attachments?.map(
-                    (attachment: any) => attachment.id
-                  ) ?? []
-              )
+        if (workflowItems) {
+          const runItemIds = _.compact(
+            workflowItems.data.map(
+              (item: any) => item.molecularAnalysisRunItem?.id
             )
           );
 
-          if (attachmentIds.length > 0) {
-            const metadataAttachments = await bulkGet<Metadata>(
-              attachmentIds.map((id) => `/metadata/${id}`),
-              { apiBaseUrl: "/objectstore-api" }
+          if (runItemIds.length > 0) {
+            const runItemsWithResult = await bulkGet<MolecularAnalysisRunItem>(
+              runItemIds.map(
+                (id) => `/molecular-analysis-run-item/${id}?include=result`
+              ),
+              { apiBaseUrl: "/seqdb-api" }
             );
 
-            const metadataById = _.keyBy(_.compact(metadataAttachments), "id");
+            // Map by id for quick lookup when merging back in
+            const runItemsById = _.keyBy(_.compact(runItemsWithResult), "id");
 
-            // Replace the {id, type} attachment stubs with full metadata
+            // Attach the loaded result onto the original workflowItems.data
             workflowItems.data.forEach((item: any) => {
-              const result = item.molecularAnalysisRunItem?.result;
-              if (result?.attachments) {
-                result.attachments = result.attachments.map(
-                  (attachment: any) => metadataById[attachment.id] ?? attachment
-                );
+              const runItemId = item.molecularAnalysisRunItem?.id;
+              if (runItemId && runItemsById[runItemId]) {
+                item.molecularAnalysisRunItem = runItemsById[runItemId];
               }
             });
-          }
-        }
 
-        // Retrieve workflows linked to the material sample
-        if (workflowItems) {
+            // Collect every attachment id across every result
+            const attachmentIds = _.compact(
+              _.uniq(
+                workflowItems.data.flatMap(
+                  (item: any) =>
+                    item.molecularAnalysisRunItem?.result?.attachments?.map(
+                      (attachment: any) => attachment.id
+                    ) ?? []
+                )
+              )
+            );
+
+            if (attachmentIds.length > 0) {
+              const metadataAttachments = await bulkGet<Metadata>(
+                attachmentIds.map((id) => `/metadata/${id}`),
+                { apiBaseUrl: "/objectstore-api" }
+              );
+
+              const metadataById = _.keyBy(
+                _.compact(metadataAttachments),
+                "id"
+              );
+
+              // Replace the {id, type} attachment stubs with full metadata
+              workflowItems.data.forEach((item: any) => {
+                const result = item.molecularAnalysisRunItem?.result;
+                if (result?.attachments) {
+                  result.attachments = result.attachments.map(
+                    (attachment: any) =>
+                      metadataById[attachment.id] ?? attachment
+                  );
+                }
+              });
+            }
+          }
+
+          // Retrieve workflows linked to the material sample
           data.workflows = [...new Set(_.compact(workflowItems.data))];
         }
 
@@ -296,16 +304,18 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
         // in the semaphore isn't held through sequential round-trips.
         const [workflowItems, storageUnit, associations] = await Promise.all([
           // Workflow items linked to this material sample
-          apiClient.get<GenericMolecularAnalysis[]>(
-            `seqdb-api/generic-molecular-analysis-item`,
-            {
-              include: "genericMolecularAnalysis,materialSample",
-              filter: SimpleSearchFilterBuilder.create()
-                .where("materialSample.id", "EQ", data.id)
-                .build(),
-              page: { limit: 1000 }
-            }
-          ),
+          apiClient
+            .get<GenericMolecularAnalysis[]>(
+              `seqdb-api/generic-molecular-analysis-item`,
+              {
+                include: "genericMolecularAnalysis,materialSample",
+                filter: SimpleSearchFilterBuilder.create()
+                  .where("materialSample.id", "EQ", data.id)
+                  .build(),
+                page: { limit: 1000 }
+              }
+            )
+            .catch(() => null),
           // Storage unit (only fetched when a storageUnitUsage id exists)
           data?.storageUnitUsage?.id
             ? apiClient.get<StorageUnitUsage>(
@@ -322,6 +332,8 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
             page: { limit: 1000 }
           })
         ]);
+
+        data.workflows = [];
 
         if (workflowItems) {
           data.workflows = [
