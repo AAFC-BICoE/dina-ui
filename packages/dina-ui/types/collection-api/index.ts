@@ -30,3 +30,4 @@ export * from "./resources/GeographicThesaurus";
 export * from "./resources/Expedition";
 export * from "./resources/Site";
 export * from "./resources/ControlledVocabularyItem";
+export * from "./resources/Transaction";

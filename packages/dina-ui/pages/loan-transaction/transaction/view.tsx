@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { ViewPageLayoutWithCustomHook } from "../../../components";
-import { Transaction } from "../../../types/loan-transaction-api";
+import { Transaction } from "../../../types/collection-api";
 import { TransactionFormLayout, useTransactionQuery } from "./edit";
 
 export default function TransactionDetailsPage() {
@@ -15,7 +15,7 @@ export default function TransactionDetailsPage() {
       customQueryHookOptions={{ showPermissions: true }}
       entityLink="/loan-transaction/transaction"
       type="transaction"
-      apiBaseUrl="/loan-transaction-api"
+      apiBaseUrl="/collection-api"
       nameField="transactionNumber"
       showRevisionsLink={true}
     />

@@ -48,10 +48,6 @@ docker build -t dina-ui:dev .
 |Search service endpoint
 |`search-ws:8085`
 
-|`LOAN_TRANSACTION_API_ADDRESS`
-|Loan transaction back-end API endpoint
-|`loan-transaction-api:8080`
-
 |`REPORT_LABEL_API_ADDRESS`
 |Report and label export API endpoint
 |`dina-export-api:8080`

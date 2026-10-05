@@ -1,7 +1,6 @@
 import { InputResource } from "kitsu";
 import _ from "lodash";
-import { Dataset } from "../../../types/collection-api";
-import { AgentRole } from "../../../types/loan-transaction-api";
+import { AgentRole, Dataset } from "../../../types/collection-api";
 import { License } from "../../../types/objectstore-api";
 
 /** The Dataset shape the form works with: multilingual fields as flat dictionaries. */

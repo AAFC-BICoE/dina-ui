@@ -14,13 +14,13 @@ import {
 import { GroupSelectField, PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  AgentRole,
   DATASET_AGENT_ROLES,
   DATASET_TYPES,
   DatasetAward,
   DatasetKeywordSet,
   DatasetTaxonomicCoverage
 } from "../../../types/collection-api";
-import { AgentRole } from "../../../types/loan-transaction-api";
 import { License } from "../../../types/objectstore-api";
 import { InlineArrayField, InlineRowCtx } from "../InlineArrayField";
 

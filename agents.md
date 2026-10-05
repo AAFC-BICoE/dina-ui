@@ -4,7 +4,7 @@ This file is used for AI tools to better understand our project and development 
 
 ## What this is
 
-DINA UI is the React/Next.js front end for AAFC-DINA, a biodiversity collections management system. It is a **static-export SPA** (`output: "export"` in `next.config.js`) that is served behind a Caddy reverse proxy (`packages/dina-ui/dev.Caddyfile`) which proxies `/api/<name>-api/*` to independent back-end microservices (objectstore-api, agent-api, user-api, seqdb-api, collection-api, loan-transaction-api, search-api, dina-export-api). This repo contains no back-end code — those services live in separate repositories. Local full-stack development is done via [dina-local-deployment](https://aafc-bicoe.github.io/dina-local-deployment/#_developer_environment_setup), not standalone in this repo.
+DINA UI is the React/Next.js front end for AAFC-DINA, a biodiversity collections management system. It is a **static-export SPA** (`output: "export"` in `next.config.js`) that is served behind a Caddy reverse proxy (`packages/dina-ui/dev.Caddyfile`) which proxies `/api/<name>-api/*` to independent back-end microservices (objectstore-api, agent-api, user-api, seqdb-api, collection-api, search-api, dina-export-api). This repo contains no back-end code — those services live in separate repositories. Local full-stack development is done via [dina-local-deployment](https://aafc-bicoe.github.io/dina-local-deployment/#_developer_environment_setup), not standalone in this repo.
 
 ## Yarn workspaces
 
@@ -38,7 +38,7 @@ All server communication goes through a JSON:API client (Kitsu) exposed via Reac
 
 - **Reads**: the `useQuery<T>({ path })` hook (see `docs/useQuery_hook_function.adoc`) fetches a single resource or list; `withResponse(query, renderFn)` is the standard helper for handling loading/error/success without manual if/else branching.
 - **Writes**: the `save` function from `useApiClient()` takes an array of `{ resource, type }` operations plus `{ apiBaseUrl: "/xxx-api" }`, and submits them as a single JSON:API jsonpatch transaction (backed by crnk-operations on the back end) — all operations succeed or the whole transaction is rejected (see `docs/write_operations.adoc`).
-- Each back-end service has its own `apiBaseUrl` prefix (`/objectstore-api`, `/agent-api`, `/collection-api`, `/seqdb-api`, `/loan-transaction-api`, `/user-api`, `/dina-export-api`), matching the Caddy routes.
+- Each back-end service has its own `apiBaseUrl` prefix (`/objectstore-api`, `/agent-api`, `/collection-api`, `/seqdb-api`, `/user-api`, `/dina-export-api`), matching the Caddy routes.
 - Elasticsearch-backed list/search pages exist alongside the JSON:API pages (see `QueryPage`, `useElasticSearchQuery`, `AutoSuggestTextField`'s `elasticSearchBackend`) for index-backed querying and autosuggest.
 
 ### Page/component structure

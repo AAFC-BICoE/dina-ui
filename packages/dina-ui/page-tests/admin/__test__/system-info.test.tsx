@@ -18,7 +18,6 @@ const MODULE_NAMES = [
   "Object Store API",
   "SeqDB API",
   "Agent API",
-  "Loan Transaction API",
   "Export API",
   "Search WS API"
 ];
@@ -29,7 +28,6 @@ const API_ENDPOINTS = [
   "objectstore-api",
   "seqdb-api",
   "agent-api",
-  "loan-transaction-api",
   "dina-export-api",
   "search-api"
 ];
@@ -66,7 +64,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
       };
 
     // Offline module returning a structured error from the api
-    case "loan-transaction-api/api-info": {
+    case "dina-export-api/api-info": {
       const error: any = new Error("Request failed with status code 503");
       error.cause = {
         status: "503",
@@ -195,9 +193,9 @@ describe("System Info page", () => {
       expect(mockGet).toHaveBeenCalledWith(`${endpoint}/api-info`, {});
     }
 
-    // 6 modules online, 2 offline
+    // 5 modules online, 2 offline
     // 1 indicies online, 1 offline
-    expect(screen.getAllByText(/^online$/i)).toHaveLength(7);
+    expect(screen.getAllByText(/^online$/i)).toHaveLength(6);
     expect(screen.getAllByText(/^offline$/i)).toHaveLength(3);
 
     // The last refreshed time is displayed
@@ -251,10 +249,10 @@ describe("System Info page", () => {
       apiContext,
       accountContext: adminAccount
     });
-    await screen.findByText("Loan Transaction API");
+    await screen.findByText("Export API");
 
     // Structured API error with status code and message
-    const searchCard = getCard("Loan Transaction API");
+    const searchCard = getCard("Export API");
     expect(searchCard.getByText(/^offline$/i)).toBeInTheDocument();
     expect(searchCard.getByText(/attention required/i)).toBeInTheDocument();
     expect(searchCard.getByText(/503 Service Unavailable/)).toBeInTheDocument();
