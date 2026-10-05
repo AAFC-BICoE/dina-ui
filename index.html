@@ -477,6 +477,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_usequery_hook_function">8.1. useQuery Hook Function</a></li>
 <li><a href="#_performing_write_operations">8.2. Performing write operations</a></li>
+<li><a href="#_search_filters">8.3. Search Filters</a></li>
 </ul>
 </li>
 <li><a href="#_creating_tests">9. Creating Tests</a></li>
@@ -844,11 +845,6 @@ docker build -t dina-ui:dev .</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>SEARCH_API_ADDRESS</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Search service endpoint</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>search-ws:8085</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LOAN_TRANSACTION_API_ADDRESS</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Loan transaction back-end API endpoint</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>loan-transaction-api:8080</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>REPORT_LABEL_API_ADDRESS</code></p></td>
@@ -1933,6 +1929,139 @@ provide a button that creates a new Region with a random name and symbol:</p>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_search_filters">8.3. Search Filters</h3>
+<div class="paragraph">
+<p>List pages, dropdowns, and lookups filter back-end resources using <code>SimpleSearchFilterBuilder</code> (<code>packages/common-ui/lib/util/simpleSearchFilterBuilder.ts</code>). The builder creates a single filter object, which the back-end receives in one of two formats:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Simple filter</strong> query params (e.g. <code>filter[name][ILIKE]=%test%</code>). Used by <code>ResourceSelect</code> and most <code>useQuery</code> calls.</p>
+</li>
+<li>
+<p>A <strong>FIQL</strong> string (e.g. <code>fiql=name==<strong>test</strong>;group==aafc</code>). Used by list pages (<code>ListPageLayout</code>, <code>QueryTable</code>) and lookups requiring OR groups or null checks.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>FIQL is currently being retired. The back-end simple filter grammar supports groups as of <code>dina-base-api</code> 0.178. The UI generates all FIQL strings from a <code>SimpleSearchFilter</code> via <code>simpleSearchFilterToFiql</code>. Retiring FIQL means we will send the filter object directly instead of generating the FIQL string.</p>
+</div>
+<div class="sect3">
+<h4 id="_building_a_filter">8.3.1. Building a Filter</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">const filter = SimpleSearchFilterBuilder.create&lt;FormTemplate&gt;()
+  .whereProvided("group", "EQ", filterForm.group)   // skipped when blank
+  .searchFilter("name", searchValue)                 // name ILIKE %searchValue%
+  .whereIn("type", ["MANAGED_ATTRIBUTE", "SYSTEM"])  // comma-separated IN list
+  .where("dateUsed", "EQ", null)                     // blank field
+  .when(hideCompleted, (b) =&gt; b.where("isCompleted", "EQ", false))
+  .or((b) =&gt;                                         // any member has to match
+    b
+      .whereProvided("createdBy", "EQ", username)
+      .where("restrictToCreatedBy", "EQ", false)
+  )
+  .build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Available operators include: <code>EQ</code>, <code>NEQ</code>, <code>GT</code>, <code>GOE</code>, <code>LT</code>, <code>LOE</code>, <code>LIKE</code>, <code>ILIKE</code>, <code>IN</code>, and the UI-only <code>NOT_ILIKE</code>. The back-end simple filter cannot negate a partial match. <code>NOT_ILIKE</code> exists solely for the filter builder UI "IS NOT partial match" row and is sent as FIQL.</p>
+</div>
+<div class="paragraph">
+<p>The <code>IN</code> operator sends values as a comma-separated list with two important rules:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>An empty list adds no condition and leaves the field unrestricted. Always guard the call site if an empty list should hide results.</p>
+</li>
+<li>
+<p>Commas inside values cannot be escaped. Lists containing commas are built transparently as an OR of equalities instead.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Conditions added inside <code>.or(&#8230;&#8203;)</code> become members of the OR group. Use <code>.and(&#8230;&#8203;)</code> for members requiring multiple conditions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">.or((b) =&gt; b.where("a", "EQ", 1).and((b2) =&gt; b2.where("b", "EQ", 2).where("c", "EQ", 3)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Skipped OR group conditions do not add anything to the filter. A single condition group is added strictly as that condition. The <code>.add(filter)</code> method merges filters built elsewhere.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_the_filter_object">8.3.2. The Filter Object</h4>
+<div class="paragraph">
+<p>Calling <code>build()</code> returns a <code>SimpleSearchFilter</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">{
+  group: { EQ: "aafc" },                 // field conditions, all AND-ed
+  age: { GOE: 18, LOE: 65 },             // several operators on one field
+  $or: [                                 // members are OR-ed
+    { createdBy: { EQ: "me" } },
+    { restrictToCreatedBy: { EQ: false } }
+  ],
+  $and: [                                // extra AND-ed members: a second OR group, or the same
+    { group: { NEQ: "cnc" } }            // field + operator used twice
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Plain filters serialize perfectly to <code>filter[field][OP]=value</code>. You can pass them as the <code>filter</code> param to <code>useQuery</code>, <code>QueryTable</code>, and <code>apiClient.get</code>.</p>
+</div>
+<div class="paragraph">
+<p>Legacy operator-less shapes like <code>{ name: "abc" }</code> act as equalities. Always prefer <code>{ name: { EQ: "abc" } }</code> in new code.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_sending_the_filter">8.3.3. Sending the Filter</h4>
+<div class="paragraph">
+<p>The <code>simpleSearchFilterToFiql(filter)</code> function converts the object to FIQL: <code>group==aafc;age=ge=18;age=le=65;(createdBy==me,restrictToCreatedBy==false);group!=cnc</code>. The back-end FIQL parser lacks <code>=in=</code> support, so <code>IN</code> becomes an OR of equalities. Values with spaces or reserved characters are double-quoted.</p>
+</div>
+<div class="paragraph">
+<p>The <code>simpleSearchFilterToQueryString(filter)</code> function serializes the object to the back-end simple filter grammar including grouped syntax: <code>(filter[createdBy][EQ]=me|filter[restrictToCreatedBy][EQ]=false)&amp;filter[group][EQ]=aafc</code>.
+The API client uses this function for every <code>filter</code> param. A filter without groups serializes exactly like Kitsu did previously.</p>
+</div>
+<div class="paragraph">
+<p>The filter builder UI model combines easily with <code>additionalFilters</code> after being converted by <code>filterModelToSimpleSearchFilter</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_retiring_fiql">8.3.4. Retiring FIQL</h4>
+<div class="paragraph">
+<p>The following tasks remain for the complete removal of FIQL:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Replace <code>fiql: simpleSearchFilterToFiql(filter)</code> and <code>fiql={&#8230;&#8203;}</code> with <code>filter: filter</code> and <code>filter={&#8230;&#8203;}</code> everywhere (including <code>ListPageLayout</code>, <code>QueryTable</code>, <code>CollectingEventLinker</code>, <code>AutoSuggestTextField</code>, workbook queries, and storage-unit queries).</p>
+</li>
+<li>
+<p>Update every module filtered with groups to <code>dina-base-api</code> 0.178 or newer. Older versions do not parse the grouped syntax.</p>
+</li>
+<li>
+<p>Identify back-end equivalents for negated partial matches (<code>NOT_ILIKE</code>) and <code>null</code> comparisons. The simple filter grammar lacks both. Currently, <code>simpleSearchFilterToQueryString</code> emits these normally so the web app server-side can intercept and translate them. You must drop them from the UI if back-end equivalents are not created.</p>
+</li>
+<li>
+<p>Removing FIQL fixes unescapable commas. The Apache CXF <code>FiqlParser</code> splits FIQL on <code>,</code> and <code>;</code> before evaluating quotes or backslashes. Currently, searches like <code>Smith, John</code> fail completely. Moving away from FIQL resolves this because the simple filter URL-encodes each value independently. Until FIQL is removed, splitting the value across an OR of equalities is the only workaround.</p>
+</li>
+<li>
+<p>Avoid mixing <code>fiql=</code> and <code>filter[&#8230;&#8203;]</code> params. The back-end will use FIQL and completely ignore the simple filter.</p>
+</li>
+<li>
+<p>Remove <code>fiql</code> from <code>GetParams</code> (<code>packages/common-ui/types/kitsu.d.ts</code>), <code>useQuery</code>, <code>QueryTable</code>, and <code>fiql.ts</code>. Delete the <code>fiqlArgument</code> quoting rules as well.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2778,7 +2907,7 @@ CSVFILE=messages.csv yarn import-intl-csv</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-09-23 18:47:41 UTC
+Last updated 2026-10-05 15:52:18 UTC
 </div>
 </div>
 </body>
