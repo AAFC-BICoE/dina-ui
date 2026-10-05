@@ -33,7 +33,9 @@ import {
   convertStringArray,
   getParentFieldPath,
   isEmptyWorkbookValue,
-  isObject
+  isObject,
+  SPLIT_VALUE_FIELDS,
+  splitMultiValue
 } from "./workbookMappingUtils";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
@@ -643,10 +645,27 @@ export function useWorkbookConverter(
                   !isObject(childValue) &&
                   !Array.isArray(childValue)
                 ) {
-                  valueToLink =
-                    columnMap[fieldPath + "." + attrNameInValue]?.[
-                      childValue.trim().replaceAll(".", "_")
-                    ];
+                  const childFieldPath = fieldPath + "." + attrNameInValue;
+                  if (SPLIT_VALUE_FIELDS.has(childFieldPath)) {
+                    // Each value in the cell is mapped individually
+                    const linkedValues = _.uniqBy(
+                      splitMultiValue(childValue).flatMap(
+                        (splitValue) =>
+                          columnMap[childFieldPath]?.[
+                            splitValue.replaceAll(".", "_")
+                          ] ?? []
+                      ),
+                      (v) => (typeof v === "string" ? v : v?.id)
+                    );
+                    valueToLink = linkedValues.length
+                      ? linkedValues
+                      : undefined;
+                  } else {
+                    valueToLink =
+                      columnMap[childFieldPath]?.[
+                        childValue.trim().replaceAll(".", "_")
+                      ];
+                  }
 
                   if (valueToLink) {
                     break;
