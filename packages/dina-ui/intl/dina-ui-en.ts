@@ -1303,6 +1303,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   exportImageType_ORIGINAL: "Original",
   exportImageType_LARGE_IMAGE: "Large Image",
   exportImageType_THUMBNAIL_IMAGE: "Thumbnail",
+  exportImageType_LARGE_IMAGE_DERIVATIVE: "Large Image (Derivative)",
+  exportImageType_THUMBNAIL_IMAGE_DERIVATIVE: "Thumbnail (Derivative)",
   exportImageTypeTooltip:
     "Preferred version of each image to export: Original, Large Image or Thumbnail. When an image does not have the preferred version, its original file is exported instead. Only available when every object in the export is an image.",
   exportResizeImagesTooltip:

@@ -496,9 +496,13 @@ export default function ExportPage<TData extends KitsuResource>() {
 
   const imageTypeLabel = (type: ExportImageType) =>
     formatMessage({ id: `exportImageType_${type}` as any });
+  const imageTypeDropdownLabel = (type: ExportImageType) =>
+    type === "ORIGINAL"
+      ? imageTypeLabel(type)
+      : formatMessage({ id: `exportImageType_${type}_DERIVATIVE` as any });
   const imageTypeOptions = IMAGE_TYPES.map((type) => ({
     value: type,
-    label: imageTypeLabel(type)
+    label: imageTypeDropdownLabel(type)
   }));
   const resizeLabel =
     RESIZE_OPTIONS.find((option) => option.value === exportResizePercentage)

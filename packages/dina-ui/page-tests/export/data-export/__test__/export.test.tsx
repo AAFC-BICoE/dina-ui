@@ -966,7 +966,15 @@ describe("ExportPage Component", () => {
 
       // Choose the thumbnail and resize to 50%.
       await userEvent.click(wrapper.getAllByRole("combobox")[1]);
-      await userEvent.click(await wrapper.findByText("Thumbnail"));
+      expect(
+        wrapper.getByRole("option", { name: "Original" })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("option", { name: "Large Image (Derivative)" })
+      ).toBeInTheDocument();
+      await userEvent.click(
+        wrapper.getByRole("option", { name: "Thumbnail (Derivative)" })
+      );
       await userEvent.click(wrapper.getAllByRole("combobox")[2]);
       await userEvent.click(await wrapper.findByText("50%"));
 
