@@ -5,7 +5,6 @@ import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useWorkbookContext } from "../WorkbookProvider";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
-import { getRelationshipUniqueValues } from "../utils/workbookMappingUtils";
 
 export interface RelationshipFieldMappingProps {
   onChangeRelatedRecord: (
@@ -104,10 +103,7 @@ export function RelationshipFieldMapping({
           .map((columnName, index1) => {
             const thisColumnMap = workbookColumnMap[columnName]!;
             const fieldPath = thisColumnMap.fieldPath;
-            const counts = getRelationshipUniqueValues(
-              columnUniqueValues[sheet][columnName],
-              fieldPath
-            );
+            const counts = columnUniqueValues[sheet][columnName];
             const lastIndex = fieldPath!.lastIndexOf(".");
             const parentPath = fieldPath!.substring(0, lastIndex);
             return Object.keys(counts).map((fieldValue, index2) => (

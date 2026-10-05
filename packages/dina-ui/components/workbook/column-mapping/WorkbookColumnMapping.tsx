@@ -36,7 +36,6 @@ import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
   getDataFromWorkbook,
-  getRelationshipUniqueValues,
   isBoolean,
   isBooleanArray,
   isNumber,
@@ -171,10 +170,7 @@ export function WorkbookColumnMapping({
 
     for (const columnName of relationshipColumnNames) {
       const values = Object.keys(
-        getRelationshipUniqueValues(
-          (columnUniqueValues ?? {})[sheet]?.[columnName] || {},
-          workbookColumnMap[columnName].fieldPath
-        )
+        (columnUniqueValues ?? {})[sheet]?.[columnName] || {}
       );
 
       if (Array.isArray(relationshipMapping[columnName])) {
