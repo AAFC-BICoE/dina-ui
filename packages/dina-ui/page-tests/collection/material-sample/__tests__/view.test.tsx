@@ -214,7 +214,7 @@ const TEST_TRANSACTION: PersistedResource<Transaction> = {
   ]
 };
 
-const mockGet = jest.fn<any, any>(async (path, params) => {
+async function baseMockGet(path, params) {
   switch (path) {
     case "collection-api/material-sample/1":
       return { data: TEST_MATERIAL_SAMPLE };
@@ -258,7 +258,9 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "seqdb-api/vocabulary/qualityControlType":
       return { data: TEST_QUALITY_CONTROL_TYPES };
   }
-});
+}
+
+const mockGet = jest.fn<any, any>(baseMockGet);
 
 const mockPost = jest.fn<any, any>(async (path, payload) => {
   switch (path) {
@@ -348,6 +350,7 @@ describe("Material Sample View Page", () => {
   afterEach(() => {
     // Reset the router mock so a formTemplateId set by one test doesn't leak into the next:
     (useRouter as jest.Mock).mockReturnValue(undefined);
+    mockGet.mockImplementation(baseMockGet);
   });
 
   it("Renders the Material Sample with the linked Collecting Event", async () => {
@@ -565,5 +568,25 @@ describe("Material Sample View Page", () => {
         "/loan-transaction/transaction/view?id=transaction-123"
       );
     }
+  });
+
+  it("Renders the Material Sample even when seqdb-api is unavailable", async () => {
+    mockGet.mockImplementation(async (path, params) => {
+      if (path === "seqdb-api/generic-molecular-analysis-item") {
+        throw new Error("Service unavailable");
+      }
+
+      return baseMockGet(path, params);
+    });
+
+    const wrapper = mountWithAppContext(
+      <MaterialSampleViewPage router={{ query: { id: "1" } } as any} />,
+      testCtx
+    );
+
+    await waitFor(() => {
+      expect(wrapper.getAllByText("my-sample-name")[0]).toBeInTheDocument();
+      expect(wrapper.getByText("2019_01_01_10_10_10")).toBeInTheDocument();
+    });
   });
 });
