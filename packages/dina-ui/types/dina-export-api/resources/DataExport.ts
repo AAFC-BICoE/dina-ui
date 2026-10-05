@@ -1,9 +1,15 @@
 import { KitsuResource } from "kitsu";
+import { DatasetAttributes } from "../../collection-api/resources/Dataset";
 
 export type ExportStatus = "NEW" | "RUNNING" | "COMPLETED" | "ERROR";
-export type ExportType = "TABULAR_DATA" | "OBJECT_ARCHIVE";
+export type ExportType = "TABULAR_DATA" | "OBJECT_ARCHIVE" | "DWCA";
 export type FunctionDefinitions = "CONCAT" | "CONVERT_COORDINATES_DD";
 export type ColumnSeparator = "COMMA" | "TAB";
+
+export type DataExportDataset = Omit<
+  DatasetAttributes,
+  "type" | "createdOn" | "createdBy"
+> & { uuid: string };
 
 export interface FunctionDef {
   functionDef: FunctionDefinitions;
@@ -23,10 +29,11 @@ export interface DataExportAttributes {
   source?: string;
   query?: string;
   name?: string;
-  exportType: ExportType;
+  exportType?: ExportType;
   exportOptions?: ExportOptions;
   schema?: Record<string, EntitySchema>;
   functions?: Record<string, FunctionDef>;
+  dataset?: DataExportDataset;
 }
 
 export interface ExportOptions {
