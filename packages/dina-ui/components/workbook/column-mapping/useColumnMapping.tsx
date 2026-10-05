@@ -26,11 +26,13 @@ import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
   FieldOptionType,
   MULTI_SELECT_FIELDS,
+  SPLIT_VALUE_FIELDS,
   WorkbookColumnInfo,
   compareAlphanumeric,
   findMatchField,
   generateWorkbookFieldOptions,
   getColumnHeaders,
+  getRelationshipUniqueValues,
   validateTemplateIntegrity
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
@@ -843,7 +845,10 @@ export function useColumnMapping() {
     const values = columnUniqueValues?.[sheet][columnHeader];
 
     if (values) {
-      for (const value of Object.keys(values)) {
+      const isSplitValueField = SPLIT_VALUE_FIELDS.has(fieldPath);
+      for (const value of Object.keys(
+        getRelationshipUniqueValues(values, fieldPath)
+      )) {
         // Sanitize the key to make it valid for Formik form paths (replace dots)
         const sanitizedKey = value.replaceAll(".", "_");
 
@@ -853,7 +858,10 @@ export function useColumnMapping() {
 
         // If relationship is found, set it. If not, reset it so it's empty.
         if (found) {
-          if (MULTI_SELECT_FIELDS.has(fieldPath)) {
+          if (isSplitValueField) {
+            // Values are already split, store the full object so ResourceSelectField can display it properly
+            theRelationshipMapping[columnHeader][sanitizedKey] = found;
+          } else if (MULTI_SELECT_FIELDS.has(fieldPath)) {
             // Store full object for multi-select (array)
             theRelationshipMapping[columnHeader][sanitizedKey] = [found];
           } else {
@@ -870,7 +878,7 @@ export function useColumnMapping() {
             id: string;
             type: string;
           }[] = [];
-          if (MULTI_SELECT_FIELDS.has(fieldPath)) {
+          if (!isSplitValueField && MULTI_SELECT_FIELDS.has(fieldPath)) {
             const splitFieldValues = value
               .split(";")
               .map((item) => item.trim());
@@ -1084,6 +1092,7 @@ export function useColumnMapping() {
 
     /**
      * Renders the appropriate select field component based on field type.
+     * - Split value person fields use a single PersonSelectField per value
      * - Multi-select person fields use PersonSelectField
      * - Multi-select project fields use ProjectSelectField
      * - Other multi-select fields use SelectField with isMulti
@@ -1108,6 +1117,24 @@ export function useColumnMapping() {
           }
         }
       };
+
+      // Values are split into individual rows, so each row selects a single person
+      if (SPLIT_VALUE_FIELDS.has(fieldPath)) {
+        return (
+          <PersonSelectField
+            {...commonSelectProps}
+            onChange={(newValue) => {
+              if (!columnHeader || !fieldValue) return;
+              onChangeRelatedRecord(
+                columnHeader,
+                fieldValue,
+                (newValue as Person | undefined)?.id as string,
+                targetType
+              );
+            }}
+          />
+        );
+      }
 
       // Handle multi-select fields
       if (isMultiSelectField) {

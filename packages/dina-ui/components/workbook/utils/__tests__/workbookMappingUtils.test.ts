@@ -18,6 +18,8 @@ import {
   getColumnHeaders,
   getDataFromWorkbook,
   getGeneratorColumnFromFieldName,
+  getRelationshipUniqueValues,
+  splitMultiValue,
   findMatchField,
   WorkbookColumnInfo,
   isBoolean,
@@ -1724,6 +1726,57 @@ describe("workbookMappingUtils functions", () => {
         expect(detectEntityType(spreadsheet, 0)).toBe("material-sample");
         expect(detectEntityType(spreadsheet, 1)).toBe("metadata");
       });
+    });
+  });
+
+  describe("splitMultiValue", () => {
+    it("splits on the delimiter and trims each value", () => {
+      expect(splitMultiValue("Katiani Eli; Darell Galbraith ;OMAFRA")).toEqual([
+        "Katiani Eli",
+        "Darell Galbraith",
+        "OMAFRA"
+      ]);
+    });
+
+    it("removes empty values", () => {
+      expect(splitMultiValue("Katiani Eli;; ;OMAFRA;")).toEqual([
+        "Katiani Eli",
+        "OMAFRA"
+      ]);
+    });
+
+    it("returns a single value when there is no delimiter", () => {
+      expect(splitMultiValue(" Katiani Eli ")).toEqual(["Katiani Eli"]);
+    });
+  });
+
+  describe("getRelationshipUniqueValues", () => {
+    it("splits the values of split value fields and sums the counts", () => {
+      expect(
+        getRelationshipUniqueValues(
+          {
+            "Katiani Eli; Darell Galbraith; OMAFRA": 2,
+            "Katiani Eli": 3,
+            "OMAFRA; OMAFRA": 1
+          },
+          "collectingEvent.collectors.displayName"
+        )
+      ).toEqual({
+        "Katiani Eli": 5,
+        "Darell Galbraith": 2,
+        OMAFRA: 3
+      });
+    });
+
+    it("does not split other fields", () => {
+      const counts = { "Collection A; Collection B": 2 };
+      expect(getRelationshipUniqueValues(counts, "collection.name")).toEqual(
+        counts
+      );
+      expect(
+        getRelationshipUniqueValues(counts, "dcCreator.displayName")
+      ).toEqual(counts);
+      expect(getRelationshipUniqueValues(counts, undefined)).toEqual(counts);
     });
   });
 });
