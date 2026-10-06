@@ -962,16 +962,18 @@ export function QueryPage<TData extends KitsuResource>({
     setError(undefined);
     setPageOffset(0);
 
-    // Reset the query to empty.
+    // Clear the saved search from the URL without dropping page context such as an entity ID.
+    const routeQuery = { ...router.query };
+    delete routeQuery.queryTree;
     router.push(
       {
         pathname: router.pathname,
-        query: null
+        query: routeQuery
       },
       undefined,
       { shallow: true }
     );
-  }, []);
+  }, [router]);
 
   /**
    * On search filter submit. This will also update the pagination to go back to the first page on

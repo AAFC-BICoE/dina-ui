@@ -55,7 +55,7 @@ export default function DatasetExportPage() {
             uniqueName={`dataset-export-${exportTypeKey}-${data.id}`}
             dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
             columns={MATERIAL_SAMPLE_EXPORT_COLUMNS}
-            resultsAside={({ query, totalRecords }) => (
+            resultsAside={({ query, totalRecords, loading }) => (
               <section
                 aria-labelledby="dataset-export-form-heading"
                 className="dataset-export-aside"
@@ -65,6 +65,7 @@ export default function DatasetExportPage() {
                   definition={definition as DatasetExportDefinition}
                   query={query}
                   totalRecords={totalRecords}
+                  loading={loading}
                 />
               </section>
             )}

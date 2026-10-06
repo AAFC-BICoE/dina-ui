@@ -19,13 +19,15 @@ interface DatasetExportFormProps {
   definition: DatasetExportDefinition;
   query?: unknown;
   totalRecords: number;
+  loading?: boolean;
 }
 
 export function DatasetExportForm({
   dataset,
   definition,
   query,
-  totalRecords
+  totalRecords,
+  loading = false
 }: DatasetExportFormProps) {
   const { formatMessage } = useDinaIntl();
   const [submitted, setSubmitted] = useState(false);
@@ -78,7 +80,7 @@ export function DatasetExportForm({
         <SubmitButton
           showSaveIcon={false}
           buttonProps={() => ({
-            disabled: !query || submitted
+            disabled: !query || loading || totalRecords === 0 || submitted
           })}
         >
           <DinaMessage id="datasetExportSubmitButtonText" />
@@ -86,7 +88,15 @@ export function DatasetExportForm({
         {submitted && (
           <div className="alert alert-success mt-3" role="status">
             <DinaMessage id="datasetExportRequestSubmitted" />{" "}
-            <Link href="/export/data-export/list">
+            <Link
+              href={{
+                pathname: "/export/data-export/list",
+                query: {
+                  entityLink: "/collection/dataset",
+                  entityId: dataset.id
+                }
+              }}
+            >
               <DinaMessage id="datasetExportViewRequests" />
             </Link>
           </div>

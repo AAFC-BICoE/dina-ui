@@ -115,6 +115,22 @@ describe("DatasetExportForm", () => {
     );
   });
 
+  it("disables export when the query has no matching records", () => {
+    const wrapper = mountWithAppContext(
+      <DatasetExportForm
+        dataset={TEST_DATASET}
+        definition={DATASET_EXPORT_DEFINITIONS.DWCA}
+        query={TEST_QUERY}
+        totalRecords={0}
+      />,
+      { apiContext }
+    );
+
+    expect(
+      wrapper.getByRole("button", { name: /request export/i })
+    ).toBeDisabled();
+  });
+
   it("uses the selected export definition for request type and source", async () => {
     const wrapper = mountWithAppContext(
       <DatasetExportForm
