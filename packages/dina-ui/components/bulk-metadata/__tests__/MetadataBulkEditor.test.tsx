@@ -97,6 +97,12 @@ describe("MetadataBulkEditor", () => {
     expect(
       wrapper.getByTestId("bulk-button-bar").querySelector(".button-bar")
     ).toBeInTheDocument();
+    expect(
+      wrapper.getByTestId("bulk-button-bar").querySelector(".button-bar-sticky")
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByTestId("bulk-button-bar").querySelector("form")
+    ).not.toBeInTheDocument();
     expect(wrapper.getByTestId("bulk-editor-content")).toBeInTheDocument();
   });
 

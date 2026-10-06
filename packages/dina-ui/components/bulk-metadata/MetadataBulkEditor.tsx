@@ -152,7 +152,40 @@ export const MetadataBulkEditor = forwardRef<
       : -1;
     const isEditAll = selectedTab?.key === "EDIT_ALL";
 
-    const buttonBar = (
+    const buttonBar = renderLayout ? (
+      <ButtonBar>
+        {onPreviousClick && (
+          <div style={{ display: "inline-block", width: "50%" }}>
+            <button
+              type="button"
+              className="btn btn-outline-secondary previous-button"
+              onClick={onPreviousClick}
+            >
+              <FaArrowLeft className="me-2" />
+              <DinaMessage id="goToThePreviousStep" />
+            </button>
+          </div>
+        )}
+        <div
+          style={{
+            display: "inline-block",
+            width: "50%",
+            textAlign: "right"
+          }}
+        >
+          <button
+            type="button"
+            className="btn btn-primary bulk-save-button"
+            style={{ width: "10rem" }}
+            onClick={() => {
+              void saveAll().catch(() => undefined);
+            }}
+          >
+            <DinaMessage id="saveAll" />
+          </button>
+        </div>
+      </ButtonBar>
+    ) : (
       <DinaForm initialValues={{}}>
         {!insideModal && (
           <ButtonBar className="button-bar">
