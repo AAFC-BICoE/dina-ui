@@ -1,6 +1,6 @@
 import { KeyValueTable } from "common-ui";
 import Link from "next/link";
-import { Transaction } from "../../../types/loan-transaction-api";
+import { Transaction } from "../../../types/collection-api";
 import { Person } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
@@ -36,7 +36,8 @@ export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig<Transaction> = {
     }) => (
       <ManagedAttributesViewer
         values={value}
-        managedAttributeApiPath="loan-transaction-api/managed-attribute"
+        managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+        managedAttributeComponent="TRANSACTION"
       />
     ),
     // Computed value; don't show audits.

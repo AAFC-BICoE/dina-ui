@@ -53,7 +53,6 @@ export * from "./head";
 export * from "./identifier/IdentifierFields";
 export * from "./identifier/IdentifierRow";
 export * from "./managed-attributes/ManagedAttributeForm";
-export * from "./managed-attributes/ManagedAttributeListView";
 export * from "./object-store/attachment-list/AttachmentsField";
 export * from "./managed-attributes/ManagedAttributesEditor";
 export * from "./page-layouts/ViewPageLayout";

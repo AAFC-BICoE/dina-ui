@@ -7,7 +7,8 @@ import {
   FormTemplate,
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
-  MaterialSample
+  MaterialSample,
+  Transaction
 } from "../../../../types/collection-api";
 import "@testing-library/jest-dom";
 import { waitFor, within } from "@testing-library/react";
@@ -16,7 +17,6 @@ import { useRouter } from "next/router";
 import { GenericMolecularAnalysis } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { TEST_QUALITY_CONTROL_TYPES } from "../../../seqdb/molecular-analysis-run/__mocks__/MolecularAnalysisRunViewMocks";
-import { Transaction } from "../../../../types/loan-transaction-api";
 
 jest.mock("next/router", () => ({
   useRouter: jest.fn(),
@@ -209,7 +209,7 @@ const TEST_TRANSACTION: PersistedResource<Transaction> = {
   materialSamples: [
     {
       id: "1",
-      type: "material-sample"
+      type: "external-material-sample"
     }
   ]
 };
@@ -271,7 +271,8 @@ const mockPost = jest.fn<any, any>(async (path, payload) => {
         const mustClauses = payload.query.bool.must;
         const isTransactionQuery = mustClauses.some(
           (clause) =>
-            clause.term?.["data.relationships.materialSamples.data.type"]
+            clause.term?.["data.relationships.materialSamples.data.type"] ===
+            "external-material-sample"
         );
 
         if (isTransactionQuery) {
@@ -541,6 +542,12 @@ describe("Material Sample View Page", () => {
               (clause) =>
                 clause.term?.["data.relationships.materialSamples.data.id"] ===
                 "1"
+            ) &&
+            payload.query.bool.must.some(
+              (clause) =>
+                clause.term?.[
+                  "data.relationships.materialSamples.data.type"
+                ] === "external-material-sample"
             )
           );
         });

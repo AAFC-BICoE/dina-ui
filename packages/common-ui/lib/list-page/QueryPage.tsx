@@ -482,6 +482,13 @@ export function QueryPage<TData extends KitsuResource>({
     defaultQueryTree()
   );
 
+  // Latest query builder tree, updated as soon as the Query Builder reports a change. Allows a
+  // search to be submitted from a query builder component before this component has re-rendered.
+  const latestQueryBuilderTree = useRef<ImmutableTree>(queryBuilderTree);
+  useEffect(() => {
+    latestQueryBuilderTree.current = queryBuilderTree;
+  }, [queryBuilderTree]);
+
   // The submitted query builder tree. If this changes, a search should be performed.
   const [submittedQueryBuilderTree, setSubmittedQueryBuilderTree] =
     useState<ImmutableTree>(defaultQueryTree());
@@ -971,10 +978,11 @@ export function QueryPage<TData extends KitsuResource>({
    * a new search.
    */
   const onSubmit = () => {
+    const treeToSubmit = latestQueryBuilderTree.current;
     isActionTriggeredQuery.current = true;
-    setSubmittedQueryBuilderTree(queryBuilderTree);
+    setSubmittedQueryBuilderTree(treeToSubmit);
     setPageOffset(0);
-    setSessionStorageQueryTree(Utils.getTree(queryBuilderTree));
+    setSessionStorageQueryTree(Utils.getTree(treeToSubmit));
   };
 
   /**
@@ -1016,6 +1024,7 @@ export function QueryPage<TData extends KitsuResource>({
    * When the query builder tree has changed, store the new tree here.
    */
   const onQueryBuildTreeChange = useCallback((newTree: ImmutableTree) => {
+    latestQueryBuilderTree.current = newTree;
     setQueryBuilderTree(newTree);
   }, []);
 

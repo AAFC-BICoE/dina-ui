@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { MultilingualDescription, MultilingualTitle } from "../../common";
-import { AgentRole } from "../../loan-transaction-api";
+import { AgentRole } from "./Transaction";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 /** The roles an agent can hold on a Dataset, as defined by the back-end DTO. */
