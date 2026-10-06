@@ -118,10 +118,15 @@ describe("Derivative single record edit page.", () => {
 
   it("Lets you edit a Derivative that has an object upload value.", async () => {
     mockUseRouter.mockReturnValue({
-      query: { id: "askjdhkd-bbff-4d58-9a07-b6d6c134b208" }
+      query: { id: "askjdhkd-bbff-4d58-9a07-b6d6c134b208" },
+      push: () => undefined
     });
 
     const wrapper = mountWithAppContext(<DerivativeEditPage />, { apiContext });
+
+    expect(
+      wrapper.container.querySelector("main")?.previousElementSibling
+    ).toHaveClass("button-bar");
 
     // Check for the right initial values:
     await waitFor(() => {
@@ -165,7 +170,7 @@ describe("Derivative single record edit page.", () => {
     );
 
     // Submit form
-    fireEvent.submit(wrapper.container.querySelector("form")!);
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     // Check only the changed values
     await waitFor(() => {
       expect(mockSave).lastCalledWith(
@@ -187,7 +192,8 @@ describe("Derivative single record edit page.", () => {
 
   it("Lets you edit a Derivative that does not have an object upload value.", async () => {
     mockUseRouter.mockReturnValue({
-      query: { id: "a9d2f847-6b3c-4e91-af25-8c4d7e1b9f63" }
+      query: { id: "a9d2f847-6b3c-4e91-af25-8c4d7e1b9f63" },
+      push: () => undefined
     });
     const wrapper = mountWithAppContext(<DerivativeEditPage />, { apiContext });
 
@@ -244,7 +250,7 @@ describe("Derivative single record edit page.", () => {
     );
 
     // Submit form
-    fireEvent.submit(wrapper.container.querySelector("form")!);
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     // Check only the changed values
     await waitFor(() => {
       expect(mockSave).lastCalledWith(

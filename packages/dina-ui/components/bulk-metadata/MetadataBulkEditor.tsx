@@ -1,4 +1,9 @@
-import React, { forwardRef, useCallback, useImperativeHandle } from "react";
+import React, {
+  forwardRef,
+  ReactNode,
+  useCallback,
+  useImperativeHandle
+} from "react";
 import { Metadata } from "../../types/objectstore-api";
 import { InputResource, PersistedResource } from "kitsu";
 import {
@@ -39,6 +44,7 @@ export interface MetadataBulkEditorProps {
   disableMetadataNameField?: boolean;
   onPreviousClick?: () => void;
   insideModal?: boolean;
+  renderLayout?: (buttonBar: ReactNode, content: ReactNode) => ReactNode;
 }
 
 export interface MetadataBulkEditorHandle {
@@ -64,7 +70,13 @@ export const MetadataBulkEditor = forwardRef<
   MetadataBulkEditorProps
 >(
   (
-    { metadatas: metadatasProp, onPreviousClick, onSaved, insideModal = false },
+    {
+      metadatas: metadatasProp,
+      onPreviousClick,
+      onSaved,
+      insideModal = false,
+      renderLayout
+    },
     ref
   ) => {
     const [selectedTab, setSelectedTab] = useState<
@@ -140,40 +152,43 @@ export const MetadataBulkEditor = forwardRef<
       : -1;
     const isEditAll = selectedTab?.key === "EDIT_ALL";
 
-    return (
-      <div>
-        <DinaForm initialValues={{}}>
-          {!insideModal && (
-            <ButtonBar className="button-bar">
-              {onPreviousClick && (
-                <div style={{ display: "inline-block", width: "50%" }}>
-                  <FormikButton
-                    className="btn btn-outline-secondary previous-button"
-                    onClick={onPreviousClick}
-                  >
-                    <FaArrowLeft className="me-2" />
-                    <DinaMessage id="goToThePreviousStep" />
-                  </FormikButton>
-                </div>
-              )}
-              <div
-                style={{
-                  display: "inline-block",
-                  width: "50%",
-                  textAlign: "right"
-                }}
-              >
+    const buttonBar = (
+      <DinaForm initialValues={{}}>
+        {!insideModal && (
+          <ButtonBar className="button-bar">
+            {onPreviousClick && (
+              <div style={{ display: "inline-block", width: "50%" }}>
                 <FormikButton
-                  className="btn btn-primary bulk-save-button"
-                  onClick={saveAll}
-                  buttonProps={() => ({ style: { width: "10rem" } })}
+                  className="btn btn-outline-secondary previous-button"
+                  onClick={onPreviousClick}
                 >
-                  <DinaMessage id="saveAll" />
+                  <FaArrowLeft className="me-2" />
+                  <DinaMessage id="goToThePreviousStep" />
                 </FormikButton>
               </div>
-            </ButtonBar>
-          )}
-        </DinaForm>
+            )}
+            <div
+              style={{
+                display: "inline-block",
+                width: "50%",
+                textAlign: "right"
+              }}
+            >
+              <FormikButton
+                className="btn btn-primary bulk-save-button"
+                onClick={saveAll}
+                buttonProps={() => ({ style: { width: "10rem" } })}
+              >
+                <DinaMessage id="saveAll" />
+              </FormikButton>
+            </div>
+          </ButtonBar>
+        )}
+      </DinaForm>
+    );
+
+    const content = (
+      <>
         {selectedTab && (
           <div className="alert alert-info py-2 px-3 mb-2 bulk-edit-status-banner">
             {isEditAll ? (
@@ -219,6 +234,15 @@ export const MetadataBulkEditor = forwardRef<
             )}
           />
         )}
+      </>
+    );
+
+    return renderLayout ? (
+      renderLayout(buttonBar, content)
+    ) : (
+      <div>
+        {buttonBar}
+        {content}
       </div>
     );
   }

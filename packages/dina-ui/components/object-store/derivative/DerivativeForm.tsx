@@ -9,7 +9,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Derivative, Metadata } from "../../../types/objectstore-api";
 import { useDerivativeSave } from "../metadata/useMetadata";
 import { DCTYPE_OPTIONS } from "../../../pages/object-store/metadata/edit";
-import { ReactNode, Ref, useMemo } from "react";
+import { Ref, useMemo } from "react";
 import { InputResource } from "kitsu";
 import { FormikProps } from "formik";
 import MetadataBadges from "../metadata/MetadataBadges";
@@ -21,8 +21,6 @@ export interface MetadataFormProps {
 
   // Function to redirect to next page after saving metadata
   onSaved?: (id: string) => Promise<void>;
-
-  buttonBar?: ReactNode;
 
   /** Optionally call the hook from the parent component. */
   derivativeSaveHook?: ReturnType<typeof useDerivativeSave>;
@@ -36,7 +34,6 @@ export interface MetadataFormProps {
 export function DerivativeForm({
   derivative,
   onSaved,
-  buttonBar,
   derivativeSaveHook,
   derivativeFormRef,
   defaultToNotReleasable
@@ -90,7 +87,6 @@ export function DerivativeForm({
       }
     >
       <NotPubliclyReleasableWarning />
-      {buttonBar}
       <div className="mb-3">
         <MetadataFileView
           metadata={derivative as Derivative}
@@ -126,7 +122,6 @@ export function DerivativeForm({
           />
         </div>
       </FieldSet>
-      {buttonBar}
     </DinaForm>
   );
 }

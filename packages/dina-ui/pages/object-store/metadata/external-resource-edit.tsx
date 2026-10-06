@@ -5,9 +5,9 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   FieldSet,
+  RefSubmitButton,
   ResourceSelectField,
   SelectField,
-  SubmitButton,
   TextField,
   useAccount,
   useApiClient,
@@ -17,6 +17,7 @@ import {
   resourceDifference,
   isResourceEmpty
 } from "common-ui";
+import { FormikProps } from "formik";
 import { NextRouter, useRouter } from "next/router";
 import { Field } from "formik";
 import {
@@ -39,12 +40,14 @@ import { DCTYPE_OPTIONS, ORIENTATION_OPTIONS } from "../metadata/edit";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { InputResource } from "kitsu";
 import _ from "lodash";
+import { useRef } from "react";
 
 export default function ExternalResourceMetadataPage() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
   const id = router?.query.id?.toString();
+  const metadataFormRef = useRef<FormikProps<any>>(null);
 
   const { apiClient } = useApiClient();
 
@@ -68,10 +71,22 @@ export default function ExternalResourceMetadataPage() {
     }
   );
 
+  const buttonBar = (
+    <ButtonBar>
+      <div className="col-md-6 col-sm-12">
+        <BackToListButton entityLink="/object-store/object" />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <RefSubmitButton formRef={metadataFormRef} className="ms-auto" />
+      </div>
+    </ButtonBar>
+  );
+
   return (
     <div>
       <Head title={formatMessage("editExternalResourceTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      {buttonBar}
       <main className="container-fluid">
         {id ? (
           <div>
@@ -83,7 +98,11 @@ export default function ExternalResourceMetadataPage() {
                 {data.derivatives && (
                   <MetadataFileView metadata={data} imgHeight="15rem" />
                 )}
-                <ExternalResourceMetadataForm metadata={data} router={router} />
+                <ExternalResourceMetadataForm
+                  metadata={data}
+                  router={router}
+                  formRef={metadataFormRef}
+                />
               </div>
             ))}
           </div>
@@ -92,7 +111,10 @@ export default function ExternalResourceMetadataPage() {
             <h1 id="wb-cont">
               <DinaMessage id="addExternalResourceTitle" />
             </h1>
-            <ExternalResourceMetadataForm router={router} />
+            <ExternalResourceMetadataForm
+              router={router}
+              formRef={metadataFormRef}
+            />
           </div>
         )}
       </main>
@@ -105,11 +127,13 @@ interface ExternalResourceMetadataProps {
   /** Existing Metadata is required, no new ones are added with this form. */
   metadata?: Metadata;
   router: NextRouter;
+  formRef?: React.RefObject<FormikProps<any> | null>;
 }
 
 function ExternalResourceMetadataForm({
   router,
-  metadata
+  metadata,
+  formRef
 }: ExternalResourceMetadataProps) {
   const { locale, formatMessage } = useDinaIntl();
   const { groupNames } = useAccount();
@@ -216,21 +240,13 @@ function ExternalResourceMetadataForm({
     }
   };
 
-  const buttonBar = (
-    <ButtonBar className="mb-3">
-      <div className="col-md-6 col-sm-12">
-        <BackToListButton entityLink="/object-store/object" />
-      </div>
-      <div className="col-md-6 col-sm-12 d-flex">
-        <SubmitButton className="ms-auto" />
-      </div>
-    </ButtonBar>
-  );
-
   return (
-    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+    <DinaForm
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      innerRef={formRef}
+    >
       <NotPubliclyReleasableWarning />
-      {buttonBar}
       <NotPubliclyReleasableSection defaultToNotReleasable={true} />
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"

@@ -7,7 +7,7 @@ import {
 } from "../../../../types/objectstore-api";
 import { mountWithAppContext } from "common-ui";
 import ExternalResourceMetadataPage from "../../../../pages/object-store/metadata/external-resource-edit";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -114,6 +114,10 @@ describe("Metadata external resource edit page.", () => {
       apiContext
     });
 
+    expect(
+      wrapper.container.querySelector("main")?.previousElementSibling
+    ).toHaveClass("button-bar");
+
     // Test initial values
     await waitFor(() => {
       expect(
@@ -155,7 +159,7 @@ describe("Metadata external resource edit page.", () => {
     );
 
     // Submit form
-    fireEvent.submit(wrapper.container.querySelector("form")!);
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Test response
     await waitFor(() => {
@@ -216,7 +220,7 @@ describe("Metadata external resource edit page.", () => {
     );
 
     // Submit form
-    fireEvent.submit(wrapper.container.querySelector("form")!);
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Expect only CHANGED fields to be included in the request.
     await waitFor(() => {
@@ -264,7 +268,7 @@ describe("Metadata external resource edit page.", () => {
     });
 
     // Submit form
-    fireEvent.submit(wrapper.container.querySelector("form")!);
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     await waitFor(
       () => {
