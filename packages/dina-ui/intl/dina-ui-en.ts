@@ -1295,6 +1295,35 @@ export const DINAUI_MESSAGES_ENGLISH = {
   resizeImages: "Resize Images",
   resizeImagesJpegOnlyTooltip:
     "Image resizing is only available when all selected files are JPEG format.",
+  exportType_dataDescription: "Record fields as a spreadsheet (CSV or TSV)",
+  exportType_objectsDescription:
+    "Stored files linked to the records, packaged as a ZIP",
+  exportImageProcessing: "Image Processing",
+  exportImageType_ORIGINAL: "Original",
+  exportImageType_LARGE_IMAGE: "Large Image",
+  exportImageType_THUMBNAIL_IMAGE: "Thumbnail",
+  exportImageType_LARGE_IMAGE_DERIVATIVE: "Large Image (Derivative)",
+  exportImageType_THUMBNAIL_IMAGE_DERIVATIVE: "Thumbnail (Derivative)",
+  exportImageTypeTooltip:
+    "Preferred version of each image to export: Original, Large Image or Thumbnail. When an image does not have the preferred version, its original file is exported instead. Only available when every object in the export is an image.",
+  exportResizeImagesTooltip:
+    "Scales the width and height of every exported image to the selected percentage. 100% keeps the size of the selected Image Type. Only available when every exported file is a JPEG image.",
+  exportImageOptionsUnavailable: "Not available for mixed media",
+  exportSummary: "Summary",
+  exportSummary_records: "Records",
+  exportSummary_output: "Output",
+  exportSummary_template: "Template",
+  exportSummary_images: "Images",
+  exportSummary_outputCsv: "CSV file, comma separated",
+  exportSummary_outputTsv: "TSV file, tab separated",
+  exportSummary_outputZip: "ZIP of stored files",
+  exportSummary_templateNone: "None",
+  exportSummary_imagesValue: "{imageType}, {resize}",
+  exportSummary_imagesUnavailable: "Original files (image options unavailable)",
+  exportRecordsButton:
+    "{count, plural, one {Export # Record} other {Export # Records}}",
+  exportObjectsCountButton:
+    "{count, plural, one {Export # Object} other {Export # Objects}}",
   unit: "Unit",
   unsavedChanges: "Unsaved changes made",
   unsetAsDefault: "Unset as default",
@@ -1550,6 +1579,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Tag suggestions are currently based on collecting event tags associated with Material Samples.",
   selectFunctionToUse: "Select function to use",
   selectImageTypeToUse: "Select image type to link:",
+  exportImageTypeLabel: "Image Type",
   viewImage: "View Image",
   selectFieldToUseWithFunction: "Select a field to use with the function",
   autoSelectButtonTitle: "Auto Select",

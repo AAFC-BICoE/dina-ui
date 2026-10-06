@@ -1,4 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
+import classNames from "classnames";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { get } from "lodash";
 import Link from "next/link";
@@ -11,6 +12,7 @@ import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   DinaForm,
+  FieldSet,
   OBJECT_EXPORT_IDS_KEY,
   SaveArgs,
   SubmitButton,
@@ -45,13 +47,7 @@ import {
 } from "dina-ui/types/dina-export-api";
 import { Metadata, ObjectExport } from "dina-ui/types/objectstore-api";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import {
-  Button,
-  ButtonGroup,
-  Card,
-  Spinner,
-  ToggleButton
-} from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import { FaFileExport, FaHistory, FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
@@ -91,13 +87,92 @@ const RESIZE_OPTIONS = [
   { value: 10, label: "10%" }
 ];
 
+/** Which file of each image object is exported: the original or one of its derivatives. */
+type ExportImageType = "ORIGINAL" | "LARGE_IMAGE" | "THUMBNAIL_IMAGE";
+
+const IMAGE_TYPES: ExportImageType[] = [
+  "ORIGINAL",
+  "LARGE_IMAGE",
+  "THUMBNAIL_IMAGE"
+];
+
 const NON_EXPORTABLE_COLUMNS_MAP: { [key: string]: string[] } = {
   ["dina_material_sample_index"]: MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS,
   ["dina_object_store_index"]: OBJECT_STORE_NON_EXPORTABLE_COLUMNS
 };
 
+/**
+ * Returns the file that will be exported for an object: the requested image derivative when the
+ * object has one, otherwise the original file.
+ */
+function getExportFile(
+  metadata: PersistedResource<Metadata>,
+  imageType: ExportImageType
+): { fileIdentifier?: string; dcFormat?: string; fileExtension?: string } {
+  if (imageType !== "ORIGINAL") {
+    const derivative = metadata?.derivatives?.find(
+      (it) => it.derivativeType === imageType
+    );
+    if (derivative) {
+      return derivative;
+    }
+  }
+  return metadata;
+}
+
+function isJpegFile(file: { dcFormat?: string; fileExtension?: string }) {
+  const ext = file.fileExtension?.toLowerCase();
+  return file.dcFormat === "image/jpeg" || ext === ".jpg" || ext === ".jpeg";
+}
+
+interface ExportTypeCardProps {
+  id: string;
+  checked: boolean;
+  disabled?: boolean;
+  onSelect: () => void;
+  title: ReactNode;
+  description: ReactNode;
+}
+
+/** Card that behaves like a radio button for choosing the export type. */
+function ExportTypeCard({
+  id,
+  checked,
+  disabled,
+  onSelect,
+  title,
+  description
+}: ExportTypeCardProps) {
+  return (
+    <label
+      htmlFor={id}
+      className={classNames(
+        "export-type-card",
+        checked && "selected",
+        disabled && "disabled"
+      )}
+    >
+      <input
+        id={id}
+        type="radio"
+        name="exportType"
+        className="form-check-input"
+        checked={checked}
+        disabled={disabled}
+        onChange={onSelect}
+      />
+      <span>
+        <span className="d-block fw-bold">{title}</span>
+        <span className="d-block export-type-card-description">
+          {description}
+        </span>
+      </span>
+    </label>
+  );
+}
+
 export default function ExportPage<TData extends KitsuResource>() {
-  const { formatNumber } = useIntl();
+  const { formatNumber, formatMessage } = useIntl();
   const { bulkGet, save } = useApiClient();
   const router = useRouter();
 
@@ -122,11 +197,18 @@ export default function ExportPage<TData extends KitsuResource>() {
   // State holding the current export type. For example, Data export / Object export.
   const [exportType, setExportType] = useState<ExportType>("TABULAR_DATA");
 
-  // Only available through the object export (all objects need to be JPEG), the scale to apply to the export.
+  // Only available through the object export (all objects need to be images), which file of each
+  // image to export.
+  const [imageType, setImageType] = useState<ExportImageType>("LARGE_IMAGE");
+
+  // Only available through the object export (all exported files need to be JPEG), the scale to
+  // apply to the export.
   const [resizePercentage, setResizePercentage] = useState<number>(100);
 
-  // Tracks if all selected objects in OBJECT_ARCHIVE mode are JPEG.
-  const [allObjectsAreJpeg, setAllObjectsAreJpeg] = useState<boolean>(false);
+  // Metadata of the selected objects, loaded when switching to OBJECT_ARCHIVE export.
+  const [objectMetadatas, setObjectMetadatas] =
+    useState<PersistedResource<Metadata>[]>();
+  const [loadingObjectMetadatas, setLoadingObjectMetadatas] = useState(false);
 
   // State to determine if the export API request has been submitted.
   const [exportRequestSubmitted, setExportRequestSubmitted] = useState(false);
@@ -174,62 +256,56 @@ export default function ExportPage<TData extends KitsuResource>() {
     } as ESIndexMapping);
   }
 
-  // Check if all selected objects (or their large image derivatives) are JPEGs when switching to OBJECT_ARCHIVE export
+  async function fetchObjectMetadatas() {
+    const paths = localStorageExportObjectIds.map(
+      (id) => `metadata/${id}?include=derivatives`
+    );
+    return await bulkGet<Metadata>(paths, {
+      apiBaseUrl: "/objectstore-api"
+    });
+  }
+
+  // Load the selected objects when switching to OBJECT_ARCHIVE export, to know which image options
+  // apply to them.
   useEffect(() => {
-    async function checkJpegEligibility() {
+    async function loadObjectMetadatas() {
       if (
         exportType === "OBJECT_ARCHIVE" &&
         localStorageExportObjectIds.length > 0
       ) {
+        setLoadingObjectMetadatas(true);
         try {
-          const paths = localStorageExportObjectIds.map(
-            (id) => `metadata/${id}?include=derivatives`
+          setObjectMetadatas(
+            (await fetchObjectMetadatas()) as PersistedResource<Metadata>[]
           );
-          const metadatas: PersistedResource<Metadata>[] = await bulkGet(
-            paths,
-            {
-              apiBaseUrl: "/objectstore-api"
-            }
-          );
-
-          const isAllJpeg = metadatas.every((meta) => {
-            // Check if a LARGE_IMAGE derivative exists first
-            const derivatives = meta?.derivatives ?? [];
-            if (meta.dcType === "IMAGE" && derivatives?.length) {
-              const largeImageDerivative = derivatives.find(
-                (derivative) => derivative.derivativeType === "LARGE_IMAGE"
-              );
-
-              if (largeImageDerivative) {
-                const dcFormat = largeImageDerivative.dcFormat;
-                const ext = largeImageDerivative.fileExtension?.toLowerCase();
-
-                return (
-                  dcFormat === "image/jpeg" || ext === ".jpg" || ext === ".jpeg"
-                );
-              }
-            }
-
-            // Fallback to checking the primary metadata object
-            const dcFormat = meta.dcFormat;
-            const ext = meta.fileExtension?.toLowerCase();
-
-            return (
-              dcFormat === "image/jpeg" || ext === ".jpg" || ext === ".jpeg"
-            );
-          });
-
-          setAllObjectsAreJpeg(isAllJpeg);
         } catch {
-          setAllObjectsAreJpeg(false);
+          setObjectMetadatas(undefined);
         }
+        setLoadingObjectMetadatas(false);
       } else {
-        setAllObjectsAreJpeg(false);
+        setObjectMetadatas(undefined);
       }
     }
 
-    checkJpegEligibility();
+    loadObjectMetadatas();
   }, [exportType, localStorageExportObjectIds]);
+
+  // Image Type and Resize Images apply to every object, so they are only offered when every object
+  // is an image. Otherwise the original files are exported.
+  const imageOptionsAvailable =
+    !!objectMetadatas?.length &&
+    objectMetadatas.every((meta) => meta.dcType === "IMAGE");
+  const exportImageType: ExportImageType = imageOptionsAvailable
+    ? imageType
+    : "ORIGINAL";
+
+  // Resizing is only supported when every exported file is a JPEG.
+  const resizeAvailable =
+    imageOptionsAvailable &&
+    objectMetadatas.every((meta) =>
+      isJpegFile(getExportFile(meta, exportImageType))
+    );
+  const exportResizePercentage = resizeAvailable ? resizePercentage : 100;
 
   // The selected field from the query field selector.
   const [selectedFilenameAliasField, setSelectedFilenameAliasField] =
@@ -326,39 +402,23 @@ export default function ExportPage<TData extends KitsuResource>() {
 
   // Function to export and download Objects
   async function exportObjects(formik) {
-    {
-      setLoading(true);
+    setLoading(true);
 
-      // Clear error message.
-      setDataExportError(undefined);
+    // Clear error message.
+    setDataExportError(undefined);
 
-      const paths = localStorageExportObjectIds.map(
-        (id) => `metadata/${id}?include=derivatives`
+    try {
+      const metadatas = (objectMetadatas ??
+        (await fetchObjectMetadatas())) as PersistedResource<Metadata>[];
+
+      const exportFiles = metadatas.map((metadata) =>
+        getExportFile(metadata, exportImageType)
       );
-      const metadatas: PersistedResource<Metadata>[] = await bulkGet(paths, {
-        apiBaseUrl: "/objectstore-api"
-      });
-
-      const fileIdentifiers = metadatas.map((metadata) => {
-        // If the metadata is for an image and has derivatives, return the large image derivative fileIdentifier if present
-        const derivatives = metadata?.derivatives ?? [];
-        if (metadata.dcType === "IMAGE" && derivatives?.length) {
-          const largeImageDerivative = derivatives.find(
-            (derivative) => derivative.derivativeType === "LARGE_IMAGE"
-          );
-          if (largeImageDerivative) {
-            return largeImageDerivative.fileIdentifier;
-          }
-        }
-        // Otherwise, return the original fileIdentifier
-        return metadata.fileIdentifier;
-      });
 
       const filenameAliases = {};
 
       if (selectedFilenameAliasField) {
-        metadatas.forEach((metadata) => {
-          const derivatives = metadata?.derivatives ?? [];
+        metadatas.forEach((metadata, index) => {
           const filenameAlias: string =
             selectedFilenameAliasField.label === "managedAttributes" &&
             dynamicFieldValue
@@ -368,22 +428,10 @@ export default function ExportPage<TData extends KitsuResource>() {
                     .label
                 )
               : get(metadata, selectedFilenameAliasField.label);
-          if (derivatives?.length) {
-            // If image has derivative, use large image derivative fileIdentifier
-            const largeImageDerivative = derivatives.find((derivative) => {
-              if (derivative.derivativeType === "LARGE_IMAGE") {
-                return true;
-              }
-            });
-            if (largeImageDerivative) {
-              filenameAliases[largeImageDerivative.fileIdentifier] =
-                filenameAlias;
-            }
+          const fileIdentifier = exportFiles[index].fileIdentifier;
+          if (fileIdentifier) {
+            filenameAliases[fileIdentifier] = filenameAlias;
           }
-
-          if (metadata.fileIdentifier)
-            // Otherwise, use original fileIdentifier
-            filenameAliases[metadata.fileIdentifier] = filenameAlias;
         });
       }
 
@@ -392,15 +440,15 @@ export default function ExportPage<TData extends KitsuResource>() {
       const objectExportSaveArg = {
         resource: {
           type: "object-export",
-          fileIdentifiers,
+          fileIdentifiers: exportFiles.map((file) => file.fileIdentifier),
           name: formik?.values?.name,
           ...(hasFilenameAliases ? { filenameAliases } : {}),
-          ...(allObjectsAreJpeg && resizePercentage < 100
+          ...(exportResizePercentage < 100
             ? {
                 exportFunction: {
                   functionDef: "IMG_RESIZE",
                   params: {
-                    factor: (resizePercentage / 100).toString()
+                    factor: (exportResizePercentage / 100).toString()
                   }
                 }
               }
@@ -409,21 +457,19 @@ export default function ExportPage<TData extends KitsuResource>() {
         type: "object-export"
       };
 
-      try {
-        await save<ObjectExport>([objectExportSaveArg], {
-          apiBaseUrl: "/objectstore-api"
-        });
-      } catch (e) {
-        setDataExportError(
-          <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
-        );
-      }
-
-      // Display export request submitted message to user after submitting export request
-      setExportRequestSubmitted(true);
-
-      setLoading(false);
+      await save<ObjectExport>([objectExportSaveArg], {
+        apiBaseUrl: "/objectstore-api"
+      });
+    } catch (e) {
+      setDataExportError(
+        <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
+      );
     }
+
+    // Display export request submitted message to user after submitting export request
+    setExportRequestSubmitted(true);
+
+    setLoading(false);
   }
 
   const displayManagedAttributes =
@@ -444,33 +490,313 @@ export default function ExportPage<TData extends KitsuResource>() {
     </>
   );
 
-  const resizeControl = (
-    <div>
-      <div className="mb-2">
-        <strong>
-          <DinaMessage id="resizeImages" />
-        </strong>
-      </div>
-      <Select
-        className="mt-2 mb-3"
-        name="resizePercentage"
-        options={RESIZE_OPTIONS}
-        onChange={(selection) => {
-          if (selection) {
-            setResizePercentage(selection.value);
-          }
-        }}
-        isDisabled={loading || !allObjectsAreJpeg}
-        value={RESIZE_OPTIONS.find(
-          (option) => option.value === resizePercentage
-        )}
-      />
-    </div>
-  );
-
   const disableObjectExportButton =
     localStorageExportObjectIds.length < 1 ||
     totalRecords > MAX_OBJECT_EXPORT_TOTAL;
+
+  const imageTypeLabel = (type: ExportImageType) =>
+    formatMessage({ id: `exportImageType_${type}` as any });
+  const imageTypeDropdownLabel = (type: ExportImageType) =>
+    type === "ORIGINAL"
+      ? imageTypeLabel(type)
+      : formatMessage({ id: `exportImageType_${type}_DERIVATIVE` as any });
+  const imageTypeOptions = IMAGE_TYPES.map((type) => ({
+    value: type,
+    label: imageTypeDropdownLabel(type)
+  }));
+  const resizeLabel =
+    RESIZE_OPTIONS.find((option) => option.value === exportResizePercentage)
+      ?.label ?? `${exportResizePercentage}%`;
+
+  // While the objects are loading, keep the image options disabled without claiming mixed media.
+  const imageOptionsPlaceholder = loadingObjectMetadatas ? undefined : (
+    <DinaMessage id="exportImageOptionsUnavailable" />
+  );
+
+  const savedExportOptions: SavedExportOption[] = allSavedExports.map(
+    (option) => ({
+      value: option.name,
+      label: option.name,
+      resource: option
+    })
+  );
+
+  const settingsFields =
+    exportType === "TABULAR_DATA" ? (
+      <div className="row">
+        <div className="col-md-6">
+          <TextField name={"name"} customName="exportName" disabled={loading} />
+        </div>
+        <div className="col-md-6 mb-3">
+          <label className="d-block mb-2">
+            <strong>
+              <DinaMessage id="separator" />
+            </strong>
+          </label>
+          <Select<{ value: ColumnSeparator; label: string }>
+            name="separator"
+            options={SEPARATOR_OPTIONS}
+            onChange={(selection) => {
+              if (selection) {
+                setSelectedSeparator(selection);
+                if (selectedSavedExport) {
+                  setChangesMade(true);
+                }
+              }
+            }}
+            isLoading={loadingSavedExports}
+            isDisabled={loading}
+            value={selectedSeparator}
+          />
+        </div>
+        <div className="col-md-6 mb-3">
+          <label className="d-block mb-2">
+            <strong>
+              <DinaMessage id="savedExport_exportDropdown" />
+            </strong>
+          </label>
+          <div className="d-flex gap-2">
+            <Select<SavedExportOption>
+              className="flex-grow-1"
+              name="savedExportOption"
+              options={savedExportOptions}
+              onChange={(selection) => {
+                if (selection && selection.resource) {
+                  setSelectedSavedExport(selection.resource);
+                  const separator = SEPARATOR_OPTIONS.find(
+                    (option) =>
+                      option.value ===
+                      selection.resource?.exportOptions?.columnSeparator
+                  );
+                  if (separator) {
+                    setSelectedSeparator(separator);
+                  }
+                }
+              }}
+              isLoading={loadingSavedExports}
+              isDisabled={loading}
+              value={
+                savedExportOptions.find(
+                  (option) => option.value === selectedSavedExport?.name
+                ) ?? null
+              }
+            />
+            {selectedSavedExport && (
+              <Button
+                variant="danger"
+                onClick={deleteSavedExport}
+                disabled={loadingDelete || loading}
+                aria-label={formatMessage({ id: "deleteButtonText" })}
+              >
+                {loadingDelete ? LoadingSpinner : <FaTrash />}
+              </Button>
+            )}
+          </div>
+        </div>
+        {selectedSavedExport && (
+          <div className="col-md-6 mb-3">
+            <label className="d-block mb-2">
+              <strong>
+                <DinaMessage id="visibility" />
+              </strong>
+            </label>
+            <Select<{
+              label: React.JSX.Element;
+              value: {
+                restrictToCreatedBy: boolean;
+                publiclyReleasable: boolean;
+              };
+            }>
+              name="visibility"
+              options={VISIBILITY_OPTIONS}
+              onChange={(selected) => {
+                setRestrictToCreatedBy(selected!.value.restrictToCreatedBy);
+                setPubliclyReleaseable(selected!.value.publiclyReleasable);
+                setChangesMade(true);
+              }}
+              value={VISIBILITY_OPTIONS.find(
+                (option) =>
+                  selectedSavedExport.publiclyReleasable ===
+                    option.value.publiclyReleasable &&
+                  selectedSavedExport.restrictToCreatedBy ===
+                    option.value.restrictToCreatedBy
+              )}
+            />
+          </div>
+        )}
+        {selectedSavedExport && changesMade && (
+          <div className="col-12 mb-3">
+            <Button
+              variant="primary"
+              onClick={updateSavedExport}
+              disabled={loadingUpdate || loading}
+            >
+              {loadingUpdate ? (
+                LoadingSpinner
+              ) : (
+                <DinaMessage id="saveChanges" />
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+    ) : (
+      <div className="row">
+        <div className="col-md-6">
+          <TextField name={"name"} customName="exportName" disabled={loading} />
+        </div>
+        <div className="col-md-6 mb-3">
+          <label className="d-block mb-2">
+            <strong>
+              <DinaMessage id="fileNameAliasField" />
+            </strong>
+          </label>
+          <QueryFieldSelector
+            indexMap={indexMap as ESIndexMapping[]}
+            currentField={selectedFilenameAliasField?.value}
+            setField={(path) => {
+              if (indexMap) {
+                const columnIndex = indexMap.find(
+                  (index) => index.value === path
+                );
+                if (columnIndex) {
+                  setSelectedFilenameAliasField(columnIndex);
+                }
+              }
+            }}
+            isInColumnSelector={false}
+          />
+          {displayManagedAttributes && (
+            <div className="mt-3">
+              <QueryRowManagedAttributeSearch
+                indexMap={indexMap}
+                managedAttributeConfig={selectedFilenameAliasField}
+                isInColumnSelector={true}
+                setValue={setDynamicFieldValue}
+                value={dynamicFieldValue}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+
+  const summary = (
+    <aside
+      className={classNames(
+        "export-summary",
+        uniqueName === "object-store-list" && "below-section-label"
+      )}
+    >
+      <div className="export-summary-header">
+        <DinaMessage id="exportSummary" />
+      </div>
+      <dl className="export-summary-list">
+        <dt>
+          <DinaMessage id="exportSummary_records" />
+        </dt>
+        <dd>{formatNumber(totalRecords ?? 0)}</dd>
+        <dt>
+          <DinaMessage id="exportSummary_output" />
+        </dt>
+        <dd>
+          {exportType === "OBJECT_ARCHIVE" ? (
+            <DinaMessage id="exportSummary_outputZip" />
+          ) : selectedSeparator.value === "TAB" ? (
+            <DinaMessage id="exportSummary_outputTsv" />
+          ) : (
+            <DinaMessage id="exportSummary_outputCsv" />
+          )}
+        </dd>
+        {exportType === "TABULAR_DATA" && (
+          <>
+            <dt>
+              <DinaMessage id="exportSummary_template" />
+            </dt>
+            <dd>
+              {selectedSavedExport?.name ?? (
+                <DinaMessage id="exportSummary_templateNone" />
+              )}
+            </dd>
+          </>
+        )}
+        {exportType === "OBJECT_ARCHIVE" && (
+          <>
+            <dt>
+              <DinaMessage id="exportSummary_images" />
+            </dt>
+            <dd>
+              {loadingObjectMetadatas ? (
+                LoadingSpinner
+              ) : imageOptionsAvailable ? (
+                <DinaMessage
+                  id="exportSummary_imagesValue"
+                  values={{
+                    imageType: imageTypeLabel(exportImageType),
+                    resize: resizeLabel
+                  }}
+                />
+              ) : (
+                <DinaMessage id="exportSummary_imagesUnavailable" />
+              )}
+            </dd>
+          </>
+        )}
+      </dl>
+      <div className="export-summary-footer">
+        <div ref={submitButtonRef}>
+          <SubmitButton
+            buttonProps={(formik) => ({
+              style: { width: "100%" },
+              disabled: loading || exportRequestSubmitted,
+              onClick: () => {
+                if (exportType === "TABULAR_DATA") {
+                  exportData(formik);
+                } else {
+                  exportObjects(formik);
+                }
+              }
+            })}
+          >
+            {loading ? (
+              LoadingSpinner
+            ) : exportType === "TABULAR_DATA" ? (
+              <DinaMessage
+                id="exportRecordsButton"
+                values={{ count: totalRecords ?? 0 }}
+              />
+            ) : (
+              <DinaMessage
+                id="exportObjectsCountButton"
+                values={{ count: localStorageExportObjectIds.length }}
+              />
+            )}
+          </SubmitButton>
+          <ExportPopup
+            target={submitButtonRef.current}
+            show={exportRequestSubmitted}
+            onClose={() => setExportRequestSubmitted(false)}
+            placement="left"
+          />
+        </div>
+        {exportType === "OBJECT_ARCHIVE" && disableObjectExportButton && (
+          <div className="form-text mt-0">
+            <CommonMessage id="exportObjectsMaxLimitTooltip" />
+          </div>
+        )}
+        {exportType === "TABULAR_DATA" && (
+          <button
+            className="btn btn-outline-primary w-100"
+            type="button"
+            onClick={handleShowCreateSavedExportModal}
+            disabled={loadingSavedExports || loading}
+          >
+            <DinaMessage id="savedExport_createTitle" />
+          </button>
+        )}
+      </div>
+    </aside>
+  );
 
   return (
     <>
@@ -529,328 +855,139 @@ export default function ExportPage<TData extends KitsuResource>() {
       >
         <DinaForm initialValues={{}}>
           {dataExportError}
-
-          <CommonMessage
-            id="tableTotalCount"
-            values={{ totalCount: formatNumber(totalRecords ?? 0) }}
-          />
-          <div className="col-md-12">
-            <h4 className="mt-3">
-              <DinaMessage id="settingLabel" />
-            </h4>
-            <Card>
-              <Card.Body>
-                <div className="row">
-                  <div className="col-md-4">
-                    <TextField
-                      name={"name"}
-                      customName="exportName"
-                      disabled={loading}
-                    />
-                    {uniqueName === "object-store-list" && (
-                      <>
-                        <strong>
-                          <DinaMessage id="savedExport_exportType" />
-                        </strong>
-                        <br />
-                        <ButtonGroup className="mt-1">
-                          <ToggleButton
-                            id="export-data"
-                            value={"data"}
-                            type={"radio"}
-                            checked={exportType === "TABULAR_DATA"}
-                            onClick={() => {
-                              setExportType("TABULAR_DATA");
-                            }}
-                            variant={
-                              exportType === "TABULAR_DATA"
-                                ? "primary"
-                                : "outline-primary"
-                            }
-                            disabled={loading}
-                          >
-                            <DinaMessage id="dataLabel" />
-                          </ToggleButton>
-                          <ToggleButton
-                            id="export-object"
-                            value={"object"}
-                            type={"radio"}
-                            checked={exportType === "OBJECT_ARCHIVE"}
-                            onClick={() => {
-                              setExportType("OBJECT_ARCHIVE");
-                            }}
-                            variant={
-                              exportType === "OBJECT_ARCHIVE"
-                                ? "primary"
-                                : "outline-primary"
-                            }
-                            disabled={loading}
-                          >
-                            <DinaMessage id="objectsLabel" />
-                          </ToggleButton>
-                        </ButtonGroup>
-                      </>
-                    )}
+          <div className="export-page-grid mt-3">
+            <div>
+              {uniqueName === "object-store-list" && (
+                <div
+                  className="mb-4"
+                  role="radiogroup"
+                  aria-labelledby="export-type-label"
+                >
+                  <div id="export-type-label" className="export-section-label">
+                    <DinaMessage id="savedExport_exportType" />
                   </div>
-                  {exportType === "TABULAR_DATA" && (
-                    <>
-                      <div className="col-md-4">
+                  <div className="export-type-cards">
+                    <ExportTypeCard
+                      id="export-data"
+                      checked={exportType === "TABULAR_DATA"}
+                      disabled={loading}
+                      onSelect={() => setExportType("TABULAR_DATA")}
+                      title={<DinaMessage id="dataLabel" />}
+                      description={
+                        <DinaMessage id="exportType_dataDescription" />
+                      }
+                    />
+                    <ExportTypeCard
+                      id="export-object"
+                      checked={exportType === "OBJECT_ARCHIVE"}
+                      disabled={loading}
+                      onSelect={() => setExportType("OBJECT_ARCHIVE")}
+                      title={<DinaMessage id="objectsLabel" />}
+                      description={
+                        <DinaMessage id="exportType_objectsDescription" />
+                      }
+                    />
+                  </div>
+                </div>
+              )}
+
+              <FieldSet legend={<DinaMessage id="settingLabel" />}>
+                {settingsFields}
+              </FieldSet>
+
+              {exportType === "OBJECT_ARCHIVE" && (
+                <FieldSet
+                  className="export-image-processing"
+                  legend={<DinaMessage id="exportImageProcessing" />}
+                >
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
+                      <label className="d-flex align-items-center mb-2">
                         <strong>
-                          <DinaMessage id="separator" />
+                          <DinaMessage id="exportImageTypeLabel" />
                         </strong>
-                        <Select<{ value: ColumnSeparator; label: string }>
-                          className="mt-2 mb-3"
-                          name="separator"
-                          options={SEPARATOR_OPTIONS}
-                          onChange={(selection) => {
-                            if (selection) {
-                              setSelectedSeparator(selection);
-                              if (selectedSavedExport) {
-                                setChangesMade(true);
-                              }
-                            }
-                          }}
-                          isLoading={loadingSavedExports}
-                          isDisabled={loading}
-                          value={selectedSeparator}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <strong>
-                          <DinaMessage id="savedExport_exportDropdown" />
-                        </strong>
-                        <Select<SavedExportOption>
-                          className="mt-2 mb-3"
-                          name="savedExportOption"
-                          options={allSavedExports.map((option) => ({
-                            value: option.name,
-                            label: option.name,
-                            resource: option
-                          }))}
-                          onChange={(selection) => {
-                            if (selection && selection.resource) {
-                              setSelectedSavedExport(selection.resource);
-                              const separator = SEPARATOR_OPTIONS.find(
-                                (option) =>
-                                  option.value ===
-                                  selection.resource?.exportOptions
-                                    ?.columnSeparator
-                              );
-                              if (separator) {
-                                setSelectedSeparator(separator);
-                              }
-                            }
-                          }}
-                          isLoading={loadingSavedExports}
-                          isDisabled={loading}
-                          value={
-                            allSavedExports
-                              ?.map((option) => ({
-                                value: option.name,
-                                label: option.name,
-                                resource: option
-                              }))
-                              ?.find(
-                                (option) =>
-                                  option.value === selectedSavedExport?.name
-                              ) ?? null
+                        <Tooltip id="exportImageTypeTooltip" className="ms-2" />
+                      </label>
+                      <Select<{ value: ExportImageType; label: string }>
+                        name="imageType"
+                        options={imageTypeOptions}
+                        onChange={(selection) => {
+                          if (selection) {
+                            setImageType(selection.value);
                           }
+                        }}
+                        isLoading={loadingObjectMetadatas}
+                        isDisabled={loading || !imageOptionsAvailable}
+                        placeholder={imageOptionsPlaceholder}
+                        classNamePrefix="react-select"
+                        value={
+                          imageOptionsAvailable
+                            ? imageTypeOptions.find(
+                                (option) => option.value === imageType
+                              )
+                            : null
+                        }
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label className="d-flex align-items-center mb-2">
+                        <strong>
+                          <DinaMessage id="resizeImages" />
+                        </strong>
+                        <Tooltip
+                          id="exportResizeImagesTooltip"
+                          className="ms-2"
                         />
-                      </div>
-                      {selectedSavedExport && (
-                        <div className="d-flex">
-                          <div className="me-auto">
-                            <Button
-                              style={{ marginTop: "30px" }}
-                              variant="danger"
-                              onClick={deleteSavedExport}
-                              disabled={loadingDelete || loading}
-                            >
-                              {loadingDelete ? LoadingSpinner : <FaTrash />}
-                            </Button>
-                            {changesMade && (
-                              <Button
-                                style={{
-                                  marginTop: "30px",
-                                  marginLeft: "10px"
-                                }}
-                                variant="primary"
-                                onClick={updateSavedExport}
-                                disabled={loadingUpdate || loading}
-                              >
-                                {loadingUpdate ? (
-                                  LoadingSpinner
-                                ) : (
-                                  <DinaMessage id="saveChanges" />
-                                )}
-                              </Button>
-                            )}
-                          </div>
-                          <div
-                            className="col-md-4 p"
-                            style={{ paddingLeft: "15px" }}
-                          >
-                            <strong>
-                              <DinaMessage id="visibility" />
-                            </strong>
-                            <Select<{
-                              label: React.JSX.Element;
-                              value: {
-                                restrictToCreatedBy: boolean;
-                                publiclyReleasable: boolean;
-                              };
-                            }>
-                              className="mt-2 mb-3"
-                              name="visibility"
-                              options={VISIBILITY_OPTIONS}
-                              onChange={(selected) => {
-                                setRestrictToCreatedBy(
-                                  selected!.value.restrictToCreatedBy
-                                );
-                                setPubliclyReleaseable(
-                                  selected!.value.publiclyReleasable
-                                );
-                                setChangesMade(true);
-                              }}
-                              value={VISIBILITY_OPTIONS.find(
+                      </label>
+                      <Select
+                        name="resizePercentage"
+                        options={RESIZE_OPTIONS}
+                        onChange={(selection) => {
+                          if (selection) {
+                            setResizePercentage(selection.value);
+                          }
+                        }}
+                        isLoading={loadingObjectMetadatas}
+                        isDisabled={loading || !resizeAvailable}
+                        placeholder={imageOptionsPlaceholder}
+                        classNamePrefix="react-select"
+                        value={
+                          imageOptionsAvailable
+                            ? RESIZE_OPTIONS.find(
                                 (option) =>
-                                  selectedSavedExport.publiclyReleasable ===
-                                    option.value.publiclyReleasable &&
-                                  selectedSavedExport.restrictToCreatedBy ===
-                                    option.value.restrictToCreatedBy
-                              )}
-                            />
-                          </div>
+                                  option.value === exportResizePercentage
+                              )
+                            : null
+                        }
+                      />
+                      {imageOptionsAvailable && !resizeAvailable && (
+                        <div className="form-text">
+                          <DinaMessage id="resizeImagesJpegOnlyTooltip" />
                         </div>
                       )}
-                    </>
-                  )}
-                  {exportType === "OBJECT_ARCHIVE" && (
-                    <>
-                      <div className="col-md-4">
-                        <div className="row">
-                          <div className="col-md-12">
-                            <div className="mb-2">
-                              <strong>
-                                <DinaMessage id="fileNameAliasField" />
-                              </strong>
-                            </div>
-                            <QueryFieldSelector
-                              indexMap={indexMap as ESIndexMapping[]}
-                              currentField={selectedFilenameAliasField?.value}
-                              setField={(path) => {
-                                if (indexMap) {
-                                  const columnIndex = indexMap.find(
-                                    (index) => index.value === path
-                                  );
-                                  if (columnIndex) {
-                                    setSelectedFilenameAliasField(columnIndex);
-                                  }
-                                }
-                              }}
-                              isInColumnSelector={false}
-                            />
-                          </div>
-                          {displayManagedAttributes && (
-                            <div
-                              className="col-md-12"
-                              style={{ marginTop: "22px" }}
-                            >
-                              <QueryRowManagedAttributeSearch
-                                indexMap={indexMap}
-                                managedAttributeConfig={
-                                  selectedFilenameAliasField
-                                }
-                                isInColumnSelector={true}
-                                setValue={setDynamicFieldValue}
-                                value={dynamicFieldValue}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        {!allObjectsAreJpeg ? (
-                          <Tooltip
-                            id="resizeImagesJpegOnlyTooltip"
-                            disableSpanMargin={true}
-                            visibleElement={resizeControl}
-                          />
-                        ) : (
-                          resizeControl
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </Card.Body>
-              <Card.Footer className="d-flex">
-                <div className="me-auto" ref={submitButtonRef}>
-                  <SubmitButton
-                    buttonProps={(formik) => ({
-                      style: { width: "8rem" },
-                      disabled: loading || exportRequestSubmitted,
-                      onClick: () => {
-                        if (exportType === "TABULAR_DATA") {
-                          exportData(formik);
-                        } else {
-                          exportObjects(formik);
-                        }
-                      }
-                    })}
-                  >
-                    {loading ? (
-                      LoadingSpinner
-                    ) : (
-                      <DinaMessage id="exportButtonText" />
-                    )}
-                  </SubmitButton>
-                  <ExportPopup
-                    target={submitButtonRef.current}
-                    show={exportRequestSubmitted}
-                    onClose={() => setExportRequestSubmitted(false)}
-                  />
-                  {uniqueName === "object-store-list" &&
-                    disableObjectExportButton && (
-                      <Tooltip id="exportObjectsMaxLimitTooltip" />
-                    )}
-                </div>
-                {exportType === "TABULAR_DATA" && (
-                  <button
-                    className="btn btn-primary"
-                    type="button"
-                    onClick={handleShowCreateSavedExportModal}
-                    disabled={loadingSavedExports || loading}
-                  >
-                    <DinaMessage id="savedExport_createTitle" />
-                  </button>
-                )}
-              </Card.Footer>
-            </Card>
+                    </div>
+                  </div>
+                </FieldSet>
+              )}
 
-            {exportType === "TABULAR_DATA" && (
-              <>
-                <h4 className="mt-4">
-                  <DinaMessage id="export_columnsToExport" />
-                </h4>
-                <Card>
-                  <Card.Body>
-                    <ColumnSelectorMemo
-                      exportMode={true}
-                      displayedColumns={columnsToExport as any}
-                      setDisplayedColumns={setColumnsToExport as any}
-                      overrideDisplayedColumns={columnPathsToExport}
-                      setOverrideDisplayedColumns={setColumnPathsToExport}
-                      indexMapping={indexMap}
-                      uniqueName={uniqueName}
-                      dynamicFieldsMappingConfig={dynamicFieldMapping}
-                      disabled={loading}
-                      nonExportableColumns={nonExportableColumns}
-                    />
-                  </Card.Body>
-                </Card>
-              </>
-            )}
+              {exportType === "TABULAR_DATA" && (
+                <FieldSet legend={<DinaMessage id="export_columnsToExport" />}>
+                  <ColumnSelectorMemo
+                    exportMode={true}
+                    displayedColumns={columnsToExport as any}
+                    setDisplayedColumns={setColumnsToExport as any}
+                    overrideDisplayedColumns={columnPathsToExport}
+                    setOverrideDisplayedColumns={setColumnPathsToExport}
+                    indexMapping={indexMap}
+                    uniqueName={uniqueName}
+                    dynamicFieldsMappingConfig={dynamicFieldMapping}
+                    disabled={loading}
+                    nonExportableColumns={nonExportableColumns}
+                  />
+                </FieldSet>
+              )}
+            </div>
+            {summary}
           </div>
         </DinaForm>
       </PageLayout>
