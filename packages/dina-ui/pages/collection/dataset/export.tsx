@@ -1,10 +1,7 @@
 import {
   BackButton,
   FieldHeader,
-  ListViewTab,
   QueryPage,
-  QueryPageTabConfig,
-  QueryPageTabProps,
   useQuery,
   withResponse
 } from "common-ui";
@@ -29,16 +26,6 @@ const MATERIAL_SAMPLE_EXPORT_COLUMNS: TableColumn<MaterialSample>[] = [
   }
 ];
 
-function DatasetExportTab(props: QueryPageTabProps<MaterialSample>) {
-  return (
-    <DatasetExportForm
-      dataset={props.dataset as Dataset}
-      definition={props.definition as DatasetExportDefinition}
-      query={props.query}
-    />
-  );
-}
-
 export default function DatasetExportPage() {
   const router = useRouter();
   const datasetId = router.query.id?.toString();
@@ -61,20 +48,6 @@ export default function DatasetExportPage() {
       {withResponse(datasetQuery, ({ data }) => {
         const definition = getDatasetExportDefinition(data.datasetType);
         const exportTypeKey = definition.exportType.toLowerCase();
-        const tabs: QueryPageTabConfig<MaterialSample>[] = [
-          {
-            id: "list",
-            labelKey: "listView",
-            component: ListViewTab
-          },
-          {
-            id: `${exportTypeKey}-export`,
-            labelKey: "exportButtonText",
-            showActionButtons: false,
-            component: DatasetExportTab,
-            config: { dataset: data, definition }
-          }
-        ];
 
         return (
           <QueryPage
@@ -82,8 +55,19 @@ export default function DatasetExportPage() {
             uniqueName={`dataset-export-${exportTypeKey}-${data.id}`}
             dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
             columns={MATERIAL_SAMPLE_EXPORT_COLUMNS}
-            tabs={tabs}
-            defaultTab="list"
+            resultsAside={({ query, totalRecords }) => (
+              <section
+                aria-labelledby="dataset-export-form-heading"
+                className="dataset-export-aside"
+              >
+                <DatasetExportForm
+                  dataset={data}
+                  definition={definition as DatasetExportDefinition}
+                  query={query}
+                  totalRecords={totalRecords}
+                />
+              </section>
+            )}
           />
         );
       })}

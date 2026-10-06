@@ -18,12 +18,14 @@ interface DatasetExportFormProps {
   dataset: Dataset;
   definition: DatasetExportDefinition;
   query?: unknown;
+  totalRecords: number;
 }
 
 export function DatasetExportForm({
   dataset,
   definition,
-  query
+  query,
+  totalRecords
 }: DatasetExportFormProps) {
   const { formatMessage } = useDinaIntl();
   const [submitted, setSubmitted] = useState(false);
@@ -57,6 +59,12 @@ export function DatasetExportForm({
       <h2 id="dataset-export-form-heading">
         <DinaMessage id="datasetExportFormTitle" />
       </h2>
+      <p>
+        <DinaMessage
+          id="datasetExportMatchedRecordCount"
+          values={{ totalCount: totalRecords }}
+        />
+      </p>
       <DinaForm<DatasetExportFormValues>
         initialValues={{ name: "" }}
         onSubmit={onSubmit}

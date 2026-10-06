@@ -77,6 +77,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   datasetAgentRoles: "Agent Roles",
   datasetExportButtonText: "Export",
   datasetExportFormTitle: "Export Dataset",
+  datasetExportMatchedRecordCount: "{totalCount} records will be included.",
   datasetExportName: "Export name",
   datasetExportNameTooLong: "Export name must be 100 characters or fewer.",
   datasetExportPageTitle: "Curate Dataset Samples",
