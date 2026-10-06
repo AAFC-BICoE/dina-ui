@@ -42,7 +42,7 @@ describe("Dataset details page", () => {
     const wrapper = mountWithAppContext(<DatasetDetailsPage />, { apiContext });
 
     const exportLink = await wrapper.findByRole("link", {
-      name: /export dwca/i
+      name: /^export$/i
     });
 
     expect(exportLink).toHaveAttribute(
