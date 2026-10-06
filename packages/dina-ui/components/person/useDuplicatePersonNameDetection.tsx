@@ -2,14 +2,12 @@ import {
   DoOperationsError,
   DuplicateResourceAlert,
   ExternalLink,
-  useDuplicateResourceCheck
+  useDuplicateResourceCheck,
+  UUID_PATTERN
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { useState } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-
-const UUID_PATTERN =
-  /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
 /**
  * Hook that wraps a Person save so a duplicate-name error from the API is shown as a

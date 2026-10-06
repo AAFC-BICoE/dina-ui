@@ -308,6 +308,9 @@ export function Home() {
                       <Link href="/admin/system-info">
                         <DinaMessage id="systemInfoTitle" />
                       </Link>
+                      <Link href="/admin/reindex">
+                        <DinaMessage id="reindexDocumentsTitle" />
+                      </Link>
                     </>
                   )}
                 </Stack>

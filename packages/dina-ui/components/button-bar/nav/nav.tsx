@@ -680,12 +680,22 @@ function NavDinaManagementDropdown({ formatMessage }) {
           </Link>
           <Link
             href="/admin/system-info"
-            onKeyDown={onKeyDownLastItem}
+            onKeyDown={onKeyDown}
             passHref={true}
             legacyBehavior
           >
             <NavDropdown.Item role="menuitem">
               <DinaMessage id="systemInfoTitle" />
+            </NavDropdown.Item>
+          </Link>
+          <Link
+            href="/admin/reindex"
+            onKeyDown={onKeyDownLastItem}
+            passHref={true}
+            legacyBehavior
+          >
+            <NavDropdown.Item role="menuitem">
+              <DinaMessage id="reindexDocumentsTitle" />
             </NavDropdown.Item>
           </Link>
         </>

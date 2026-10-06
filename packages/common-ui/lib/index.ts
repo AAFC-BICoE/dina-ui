@@ -120,6 +120,7 @@ export * from "./filter-builder/filterModelToSimpleSearchFilter";
 export * from "./util/simpleSearchFilterQueryString";
 export * from "./util/bulkEditAllManagedAttributes";
 export * from "./util/bulkQueryUtils";
+export * from "./util/uuidUtils";
 export * from "./table/ReactTable";
 export * from "./table/Pagination";
 export * from "./table/RowComponents";

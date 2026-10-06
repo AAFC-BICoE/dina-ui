@@ -49,7 +49,9 @@ import {
   FaFileSignature,
   FaScissors,
   FaUserGear,
-  FaUserGroup
+  FaUserGroup,
+  FaArrowsRotate,
+  FaServer
 } from "react-icons/fa6";
 
 import { MdNature } from "react-icons/md";
@@ -406,6 +408,20 @@ function managementDefaults(isAdmin?: boolean): NavigationCard[] {
             title: "reportTemplateUpload",
             icon: FaFileArrowUp,
             href: "/export/report-template/upload",
+            category: "management"
+          },
+          {
+            id: "system-info",
+            title: "systemInfoTitle",
+            icon: FaServer,
+            href: "/admin/system-info",
+            category: "management"
+          },
+          {
+            id: "reindex-documents",
+            title: "reindexDocumentsTitle",
+            icon: FaArrowsRotate,
+            href: "/admin/reindex",
             category: "management"
           }
         ]
