@@ -836,6 +836,28 @@ export function useColumnMapping() {
     return { valueMapping, multipleValueMappings };
   }
 
+  function findPerson(value: string) {
+    return (
+      persons.find((item) => item.displayName === value) ??
+      persons.find((item) => compareAlphanumeric(item.displayName, value))
+    );
+  }
+
+  /**
+   * Returns the values to display in the relationship mapping for a column.
+   * Existing person names containing a comma (e.g. "Cardinal, Sophie") are not split.
+   */
+  function getRelationshipValues(
+    counts: { [value: string]: number },
+    fieldPath?: string
+  ) {
+    return getRelationshipUniqueValues(
+      counts,
+      fieldPath,
+      (value) => !!findPerson(value)
+    );
+  }
+
   function resolveRelationships(
     theRelationshipMapping: RelationshipMapping,
     columnHeader: string,
@@ -847,7 +869,7 @@ export function useColumnMapping() {
     if (values) {
       const isSplitValueField = SPLIT_VALUE_FIELDS.has(fieldPath);
       for (const value of Object.keys(
-        getRelationshipUniqueValues(values, fieldPath)
+        getRelationshipValues(values, fieldPath)
       )) {
         // Sanitize the key to make it valid for Formik form paths (replace dots)
         const sanitizedKey = value.replaceAll(".", "_");
@@ -949,11 +971,7 @@ export function useColumnMapping() {
         case "organism.determination.determiner.displayName":
         case "preparedBy.displayName":
         case "dcCreator.displayName":
-          found =
-            persons.find((item) => item.displayName === value) ??
-            persons.find((item) =>
-              compareAlphanumeric(item.displayName, value)
-            );
+          found = findPerson(value);
           break;
         case "attachment.name":
           found =
@@ -1230,6 +1248,7 @@ export function useColumnMapping() {
 
     resolveParentMapping,
     resolveColumnMappingAndRelationshipMapping,
-    getResourceSelectField
+    getResourceSelectField,
+    getRelationshipValues
   };
 }

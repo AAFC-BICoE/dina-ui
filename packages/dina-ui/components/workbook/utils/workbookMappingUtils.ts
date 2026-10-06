@@ -1453,8 +1453,12 @@ export const MULTI_SELECT_FIELDS = new Set([
 /** Delimiter used to supply multiple values in a single spreadsheet cell. */
 export const MULTI_VALUE_DELIMITER = ";";
 
+/** Secondary delimiter, also used in "Last, First" names. */
+export const MULTI_VALUE_SECONDARY_DELIMITER = ",";
+
 /**
- * Fields where a cell can contain multiple values separated by MULTI_VALUE_DELIMITER.
+ * Fields where a cell can contain multiple values separated by MULTI_VALUE_DELIMITER
+ * or MULTI_VALUE_SECONDARY_DELIMITER.
  * Each value is mapped individually in the relationship mapping.
  */
 export const SPLIT_VALUE_FIELDS = new Set([
@@ -1463,11 +1467,45 @@ export const SPLIT_VALUE_FIELDS = new Set([
   "organism.determination.determiner.displayName"
 ]);
 
-export function splitMultiValue(value: string): string[] {
+function splitAndTrim(value: string, delimiter: string): string[] {
   return value
-    .split(MULTI_VALUE_DELIMITER)
+    .split(delimiter)
     .map((item) => item.trim())
     .filter((item) => item !== "");
+}
+
+/**
+ * Splits a cell into individual values.
+ *
+ * Values are always split on semicolons. A comma can either separate values
+ * ("Brandon Andre, John Doe") or be part of a "Last, First" name ("Cardinal, Sophie"):
+ * 1. The value is kept as is if it is a known value.
+ * 2. The value is split if any of the parts is a known value.
+ * 3. Otherwise, two parts where the first one is a single word are treated as a "Last, First" name.
+ *
+ * @param isKnownValue Checks if a value matches an existing record.
+ */
+export function splitMultiValue(
+  value: string,
+  isKnownValue: (value: string) => boolean = () => false
+): string[] {
+  return splitAndTrim(value, MULTI_VALUE_DELIMITER).flatMap((item) => {
+    const parts = splitAndTrim(item, MULTI_VALUE_SECONDARY_DELIMITER);
+    if (parts.length < 2) {
+      return parts;
+    }
+
+    const name = parts.join(MULTI_VALUE_SECONDARY_DELIMITER + " ");
+    if (isKnownValue(name)) {
+      return [name];
+    }
+    if (parts.some(isKnownValue)) {
+      return parts;
+    }
+
+    const isLastFirstName = parts.length === 2 && !/\s/.test(parts[0]);
+    return isLastFirstName ? [name] : parts;
+  });
 }
 
 /**
@@ -1476,7 +1514,8 @@ export function splitMultiValue(value: string): string[] {
  */
 export function getRelationshipUniqueValues(
   counts: { [value: string]: number },
-  fieldPath?: string
+  fieldPath?: string,
+  isKnownValue?: (value: string) => boolean
 ): { [value: string]: number } {
   if (!fieldPath || !SPLIT_VALUE_FIELDS.has(fieldPath)) {
     return counts;
@@ -1484,7 +1523,7 @@ export function getRelationshipUniqueValues(
 
   const result: { [value: string]: number } = {};
   for (const [cellValue, count] of Object.entries(counts)) {
-    for (const value of new Set(splitMultiValue(cellValue))) {
+    for (const value of new Set(splitMultiValue(cellValue, isKnownValue))) {
       result[value] = count + (result[value] || 0);
     }
   }

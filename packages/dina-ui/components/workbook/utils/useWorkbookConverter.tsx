@@ -648,12 +648,16 @@ export function useWorkbookConverter(
                   const childFieldPath = fieldPath + "." + attrNameInValue;
                   if (SPLIT_VALUE_FIELDS.has(childFieldPath)) {
                     // Each value in the cell is mapped individually
+                    const getMappedValue = (splitValue: string) =>
+                      columnMap[childFieldPath]?.[
+                        splitValue.replaceAll(".", "_")
+                      ];
                     const linkedValues = _.uniqBy(
-                      splitMultiValue(childValue).flatMap(
-                        (splitValue) =>
-                          columnMap[childFieldPath]?.[
-                            splitValue.replaceAll(".", "_")
-                          ] ?? []
+                      splitMultiValue(
+                        childValue,
+                        (splitValue) => !!getMappedValue(splitValue)
+                      ).flatMap(
+                        (splitValue) => getMappedValue(splitValue) ?? []
                       ),
                       (v) => (typeof v === "string" ? v : v?.id)
                     );

@@ -36,7 +36,6 @@ import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
   getDataFromWorkbook,
-  getRelationshipUniqueValues,
   isBoolean,
   isBooleanArray,
   isNumber,
@@ -129,7 +128,8 @@ export function WorkbookColumnMapping({
     workbookColumnMap,
     relationshipMapping,
     resolveColumnMappingAndRelationshipMapping,
-    getResourceSelectField
+    getResourceSelectField,
+    getRelationshipValues
   } = useColumnMapping();
 
   const { allowAppendData, fieldColumnLocaleId } =
@@ -171,7 +171,7 @@ export function WorkbookColumnMapping({
 
     for (const columnName of relationshipColumnNames) {
       const values = Object.keys(
-        getRelationshipUniqueValues(
+        getRelationshipValues(
           (columnUniqueValues ?? {})[sheet]?.[columnName] || {},
           workbookColumnMap[columnName].fieldPath
         )
@@ -1058,6 +1058,7 @@ export function WorkbookColumnMapping({
               <RelationshipFieldMapping
                 onChangeRelatedRecord={onRelatedRecordChange}
                 getResourceSelectField={getResourceSelectField}
+                getRelationshipValues={getRelationshipValues}
               />
             </>
           );

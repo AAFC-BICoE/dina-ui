@@ -1748,6 +1748,58 @@ describe("workbookMappingUtils functions", () => {
     it("returns a single value when there is no delimiter", () => {
       expect(splitMultiValue(" Katiani Eli ")).toEqual(["Katiani Eli"]);
     });
+
+    it("keeps a 'Last, First' name as a single value", () => {
+      expect(splitMultiValue("Cardinal, Sophie")).toEqual(["Cardinal, Sophie"]);
+      expect(splitMultiValue("Cardinal,Sophie")).toEqual(["Cardinal, Sophie"]);
+      expect(splitMultiValue("Cardinal, Sophie Marie")).toEqual([
+        "Cardinal, Sophie Marie"
+      ]);
+      expect(splitMultiValue("Cardinal, Sophie,")).toEqual([
+        "Cardinal, Sophie"
+      ]);
+    });
+
+    it("splits comma separated full names", () => {
+      expect(splitMultiValue("Brandon Andre, John Doe")).toEqual([
+        "Brandon Andre",
+        "John Doe"
+      ]);
+      expect(splitMultiValue("Brandon Andre, , John Doe,")).toEqual([
+        "Brandon Andre",
+        "John Doe"
+      ]);
+    });
+
+    it("splits on semicolons before commas", () => {
+      expect(
+        splitMultiValue(
+          "Cardinal, Sophie; Brandon Andre, John Doe; Andre, Brandon"
+        )
+      ).toEqual([
+        "Cardinal, Sophie",
+        "Brandon Andre",
+        "John Doe",
+        "Andre, Brandon"
+      ]);
+    });
+
+    it("keeps a known value with a comma as a single value", () => {
+      const isKnownValue = (value: string) => value === "van der Berg, Anna";
+      expect(
+        splitMultiValue("van der Berg, Anna; Brandon Andre", isKnownValue)
+      ).toEqual(["van der Berg, Anna", "Brandon Andre"]);
+    });
+
+    it("splits a comma separated value when one of the parts is known", () => {
+      const isKnownValue = (value: string) => value === "John Doe";
+      expect(splitMultiValue("Smith, John Doe", isKnownValue)).toEqual([
+        "Smith",
+        "John Doe"
+      ]);
+      // Without known values it looks like a "Last, First" name
+      expect(splitMultiValue("Smith, John Doe")).toEqual(["Smith, John Doe"]);
+    });
   });
 
   describe("getRelationshipUniqueValues", () => {
@@ -1768,8 +1820,39 @@ describe("workbookMappingUtils functions", () => {
       });
     });
 
+    it("splits comma separated names and keeps 'Last, First' names", () => {
+      expect(
+        getRelationshipUniqueValues(
+          {
+            "Cardinal, Sophie": 2,
+            "Brandon Andre, John Doe": 1,
+            "Cardinal, Sophie; John Doe": 1
+          },
+          "preparedBy.displayName"
+        )
+      ).toEqual({
+        "Cardinal, Sophie": 3,
+        "Brandon Andre": 1,
+        "John Doe": 2
+      });
+    });
+
+    it("uses the known values to decide how to split", () => {
+      expect(
+        getRelationshipUniqueValues(
+          { "van der Berg, Anna": 1, "Smith, John Doe": 1 },
+          "organism.determination.determiner.displayName",
+          (value) => ["van der Berg, Anna", "John Doe"].includes(value)
+        )
+      ).toEqual({
+        "van der Berg, Anna": 1,
+        Smith: 1,
+        "John Doe": 1
+      });
+    });
+
     it("does not split other fields", () => {
-      const counts = { "Collection A; Collection B": 2 };
+      const counts = { "Collection A; Collection B, Collection C": 2 };
       expect(getRelationshipUniqueValues(counts, "collection.name")).toEqual(
         counts
       );

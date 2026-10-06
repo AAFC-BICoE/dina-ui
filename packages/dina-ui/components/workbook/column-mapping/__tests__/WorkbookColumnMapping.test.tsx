@@ -34,7 +34,13 @@ const COLLECTIONS = [
 
 const PERSONS = [
   { id: "person-a", type: "person", displayName: "Person A" },
-  { id: "person-b", type: "person", displayName: "Person B" }
+  { id: "person-b", type: "person", displayName: "Person B" },
+  { id: "person-cardinal", type: "person", displayName: "Cardinal, Sophie" },
+  {
+    id: "person-van-der-berg",
+    type: "person",
+    displayName: "van der Berg, Anna"
+  }
 ];
 
 let existingMaterialSampleNames: string[] = [];
@@ -260,6 +266,60 @@ describe("WorkbookColumnMapping", () => {
         expect(getSelectedValue(personBRow)).toEqual("Person B");
       });
       expect(getSelectedValue(unknownRow)).toBeUndefined();
+    });
+
+    it("keeps a 'Last, First' name and splits comma separated names", async () => {
+      await renderColumnMapping(
+        createCollectorsSpreadsheet("Cardinal, Sophie; Person A, Person B")
+      );
+
+      const cardinalRow = await findRelationshipRow("Cardinal, Sophie");
+      const personARow = await findRelationshipRow("Person A");
+      const personBRow = await findRelationshipRow("Person B");
+
+      expect(screen.queryByText("Cardinal", { selector: ".col-2" })).toBeNull();
+      expect(screen.queryByText("Sophie", { selector: ".col-2" })).toBeNull();
+      expect(within(cardinalRow).getByText("1")).toBeInTheDocument();
+      expect(within(personARow).getByText("2")).toBeInTheDocument();
+      expect(within(personBRow).getByText("1")).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(getSelectedValue(cardinalRow)).toEqual("Cardinal, Sophie");
+        expect(getSelectedValue(personARow)).toEqual("Person A");
+        expect(getSelectedValue(personBRow)).toEqual("Person B");
+      });
+    });
+
+    it("keeps an existing person with a comma in their name as a single row", async () => {
+      await renderColumnMapping(
+        createCollectorsSpreadsheet("van der Berg, Anna; Person B")
+      );
+
+      const vanDerBergRow = await findRelationshipRow("van der Berg, Anna");
+
+      expect(
+        screen.queryByText("van der Berg", { selector: ".col-2" })
+      ).toBeNull();
+      expect(screen.queryByText("Anna", { selector: ".col-2" })).toBeNull();
+      await waitFor(() =>
+        expect(getSelectedValue(vanDerBergRow)).toEqual("van der Berg, Anna")
+      );
+    });
+
+    it("does not warn when every comma separated agent is mapped", async () => {
+      await renderColumnMapping(
+        createCollectorsSpreadsheet("Cardinal, Sophie; Person A, Person B")
+      );
+      await waitFor(async () =>
+        expect(
+          getSelectedValue(await findRelationshipRow("Cardinal, Sophie"))
+        ).toEqual("Cardinal, Sophie")
+      );
+
+      await submitForm();
+
+      await waitForSavedResources();
+      expect(screen.queryByText("Unmapped Relationships")).toBeNull();
     });
 
     it("warns when an agent in the cell is not mapped", async () => {
