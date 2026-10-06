@@ -2,20 +2,15 @@
 
 .cvGrid {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 340px 1fr;
   gap: 1rem;
   align-items: start;
 }
 
+/* Holds the Managed Attributes and Filter by Type sections */
 .cvSidebar {
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 0.75rem;
-  background: #fff;
-  width: 280px;
-  max-width: 280px;
-  position: sticky;
-  top: 70px;
+  width: 340px;
+  max-width: 340px;
 }
 
 /* Main (table container) */
@@ -62,10 +57,7 @@
     grid-template-columns: 1fr;
   }
   .cvSidebar {
-    max-height: unset;
-    border-right: 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
+    width: 100%;
+    max-width: none;
   }
 }

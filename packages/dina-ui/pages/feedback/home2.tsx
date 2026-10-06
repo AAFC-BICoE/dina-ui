@@ -318,10 +318,10 @@ const CONTROLLED_VOCAB_DEFAULTS: NavigationCard[] = [
     category: "controlled-vocabulary"
   },
   {
-    id: "managed-attributes",
-    title: "managedAttributes",
+    id: "controlled-vocabulary",
+    title: "controlledVocabularyTitle",
     icon: FaListCheck,
-    href: "/managed-attribute/list",
+    href: "/controlled-vocabulary/list",
     category: "controlled-vocabulary"
   },
   {
