@@ -373,6 +373,13 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * Default active tab (if tabs are provided)
    */
   defaultTab?: string;
+
+  /** Render a side panel beside the results and outside the results form. */
+  resultsAside?: (props: {
+    query?: any;
+    totalRecords: number;
+    loading: boolean;
+  }) => React.ReactNode;
 }
 
 /**
@@ -421,7 +428,8 @@ export function QueryPage<TData extends KitsuResource>({
   onDeselect,
   enableColumnSelector = true,
   tabs,
-  defaultTab
+  defaultTab,
+  resultsAside
 }: QueryPageProps<TData>) {
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
@@ -954,16 +962,18 @@ export function QueryPage<TData extends KitsuResource>({
     setError(undefined);
     setPageOffset(0);
 
-    // Reset the query to empty.
+    // Clear the saved search from the URL without dropping page context such as an entity ID.
+    const routeQuery = { ...router.query };
+    delete routeQuery.queryTree;
     router.push(
       {
         pathname: router.pathname,
-        query: null
+        query: routeQuery
       },
       undefined,
       { shallow: true }
     );
-  }, []);
+  }, [router]);
 
   /**
    * On search filter submit. This will also update the pagination to go back to the first page on
@@ -1267,104 +1277,167 @@ export function QueryPage<TData extends KitsuResource>({
         </>
       )}
 
-      <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
-        {/* Group Selection */}
-        {!viewMode ? (
-          <DinaFormSection horizontal={"flex"}>
-            <div className="row">
-              <GroupSelectFieldMemoized
-                isMulti={true}
-                name="group"
-                className="col-md-4 mt-3"
-                onChange={onGroupChange}
-                groups={groups}
-              />
-              {/* Bulk edit buttons - Only shown when not in selection mode. */}
-              {!selectionMode && showActionButtons && (
-                <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
-                  {enableColumnSelector && (
-                    <ColumnSelectorMemo
-                      uniqueName={uniqueName}
-                      exportMode={false}
-                      indexMapping={indexMap}
-                      dynamicFieldsMappingConfig={dynamicFieldMapping}
-                      displayedColumns={displayedColumns as any}
-                      setDisplayedColumns={onDisplayedColumnsChange as any}
-                      defaultColumns={columns as any}
-                      setColumnSelectorLoading={setColumnSelectorLoading}
-                      excludedRelationshipTypes={excludedRelationshipTypes}
-                      mandatoryDisplayedColumns={mandatoryDisplayedColumns}
-                      nonExportableColumns={nonExportableColumns}
-                    />
-                  )}
-                  {bulkEditPath && (
-                    <BulkEditButton
-                      pathname={bulkEditPath}
-                      singleEditPathName={singleEditPath}
-                    />
-                  )}
-                  {bulkDeleteButtonProps && (
-                    <BulkDeleteButton {...bulkDeleteButtonProps} />
-                  )}
-                  {dataExportProps && (
-                    <DataExportButton
-                      pathname={dataExportProps.dataExportPath}
-                      entityLink={dataExportProps.entityLink}
-                      totalRecords={totalRecords}
-                      query={elasticSearchQuery}
-                      uniqueName={uniqueName}
-                      columns={columns}
-                      dynamicFieldMapping={dynamicFieldMapping}
-                      indexName={indexName}
-                    />
-                  )}
-                  {bulkSplitPath && (
-                    <BulkSplitButton pathname={bulkSplitPath} />
-                  )}
-                  {attachSelectedButtonsProps && (
-                    <AttachSelectedButton {...attachSelectedButtonsProps} />
-                  )}
-                </div>
-              )}
-            </div>
-          </DinaFormSection>
-        ) : (
-          <DinaFormSection horizontal={"flex"}>
-            <div className="row">
-              {/* Bulk edit buttons - Only shown when not in selection mode. */}
-              {!selectionMode && showActionButtons && (
-                <div className="col-md-12 mt-3 d-flex gap-2 justify-content-end align-items-start">
-                  {enableColumnSelector && (
-                    <ColumnSelectorMemo
-                      uniqueName={uniqueName}
-                      exportMode={false}
-                      indexMapping={indexMap}
-                      displayedColumns={displayedColumns as any}
-                      setDisplayedColumns={onDisplayedColumnsChange as any}
-                      defaultColumns={columns as any}
-                      setColumnSelectorLoading={setColumnSelectorLoading}
-                      dynamicFieldsMappingConfig={dynamicFieldMapping}
-                      excludedRelationshipTypes={excludedRelationshipTypes}
-                      mandatoryDisplayedColumns={mandatoryDisplayedColumns}
-                      nonExportableColumns={nonExportableColumns}
-                    />
+      <div className={resultsAside ? "query-page-results-layout" : undefined}>
+        <div className={resultsAside ? "query-page-results-main" : undefined}>
+          <DinaForm
+            key={formKey}
+            initialValues={defaultGroups}
+            onSubmit={onSubmit}
+          >
+            {/* Group Selection */}
+            {!viewMode ? (
+              <DinaFormSection horizontal={"flex"}>
+                <div className="row">
+                  <GroupSelectFieldMemoized
+                    isMulti={true}
+                    name="group"
+                    className="col-md-4 mt-3"
+                    onChange={onGroupChange}
+                    groups={groups}
+                  />
+                  {/* Bulk edit buttons - Only shown when not in selection mode. */}
+                  {!selectionMode && showActionButtons && (
+                    <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
+                      {enableColumnSelector && (
+                        <ColumnSelectorMemo
+                          uniqueName={uniqueName}
+                          exportMode={false}
+                          indexMapping={indexMap}
+                          dynamicFieldsMappingConfig={dynamicFieldMapping}
+                          displayedColumns={displayedColumns as any}
+                          setDisplayedColumns={onDisplayedColumnsChange as any}
+                          defaultColumns={columns as any}
+                          setColumnSelectorLoading={setColumnSelectorLoading}
+                          excludedRelationshipTypes={excludedRelationshipTypes}
+                          mandatoryDisplayedColumns={mandatoryDisplayedColumns}
+                          nonExportableColumns={nonExportableColumns}
+                        />
+                      )}
+                      {bulkEditPath && (
+                        <BulkEditButton
+                          pathname={bulkEditPath}
+                          singleEditPathName={singleEditPath}
+                        />
+                      )}
+                      {bulkDeleteButtonProps && (
+                        <BulkDeleteButton {...bulkDeleteButtonProps} />
+                      )}
+                      {dataExportProps && (
+                        <DataExportButton
+                          pathname={dataExportProps.dataExportPath}
+                          entityLink={dataExportProps.entityLink}
+                          totalRecords={totalRecords}
+                          query={elasticSearchQuery}
+                          uniqueName={uniqueName}
+                          columns={columns}
+                          dynamicFieldMapping={dynamicFieldMapping}
+                          indexName={indexName}
+                        />
+                      )}
+                      {bulkSplitPath && (
+                        <BulkSplitButton pathname={bulkSplitPath} />
+                      )}
+                      {attachSelectedButtonsProps && (
+                        <AttachSelectedButton {...attachSelectedButtonsProps} />
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
-          </DinaFormSection>
-        )}
+              </DinaFormSection>
+            ) : (
+              <DinaFormSection horizontal={"flex"}>
+                <div className="row">
+                  {/* Bulk edit buttons - Only shown when not in selection mode. */}
+                  {!selectionMode && showActionButtons && (
+                    <div className="col-md-12 mt-3 d-flex gap-2 justify-content-end align-items-start">
+                      {enableColumnSelector && (
+                        <ColumnSelectorMemo
+                          uniqueName={uniqueName}
+                          exportMode={false}
+                          indexMapping={indexMap}
+                          displayedColumns={displayedColumns as any}
+                          setDisplayedColumns={onDisplayedColumnsChange as any}
+                          defaultColumns={columns as any}
+                          setColumnSelectorLoading={setColumnSelectorLoading}
+                          dynamicFieldsMappingConfig={dynamicFieldMapping}
+                          excludedRelationshipTypes={excludedRelationshipTypes}
+                          mandatoryDisplayedColumns={mandatoryDisplayedColumns}
+                          nonExportableColumns={nonExportableColumns}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              </DinaFormSection>
+            )}
 
-        <div
-          className="query-table-wrapper"
-          role="search"
-          aria-label={formatMessage({ id: "queryTable" })}
-        >
-          <div className="row">
-            <div className={selectionMode ? "col-5" : "col-12"}>
-              <div className="d-flex align-items-end justify-content-between">
-                <div className="d-flex align-items-end">
-                  <span id="queryPageCount">
+            <div
+              className="query-table-wrapper"
+              role="search"
+              aria-label={formatMessage({ id: "queryTable" })}
+            >
+              <div className="row">
+                <div className={selectionMode ? "col-5" : "col-12"}>
+                  <div className="d-flex align-items-end justify-content-between">
+                    <div className="d-flex align-items-end">
+                      <span id="queryPageCount">
+                        {/* Loading indicator when total is not calculated yet. */}
+                        {loading || columnSelectorLoading ? (
+                          <></>
+                        ) : (
+                          <CommonMessage
+                            id="tableTotalCount"
+                            values={{ totalCount: formatNumber(totalRecords) }}
+                          />
+                        )}
+                      </span>
+
+                      {/* Multi sort tooltip - Only shown if it's possible to sort */}
+                      {resolvedReactTableProps.enableMultiSort && (
+                        <MultiSortTooltip />
+                      )}
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div
+                      className="alert alert-danger"
+                      style={{
+                        whiteSpace: "pre-line"
+                      }}
+                    >
+                      <p>
+                        {error.errors?.map((e) => e.detail).join("\n") ??
+                          String(error)}
+                      </p>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => {
+                          const newSort = defaultSort ?? DEFAULT_SORT;
+                          setError(undefined);
+                          onSortChange(newSort);
+                        }}
+                      >
+                        <CommonMessage id="resetSort" />
+                      </button>
+                    </div>
+                  )}
+
+                  {loading || columnSelectorLoading ? (
+                    <div
+                      className={
+                        "d-flex justify-content-center align-items-center h-100 query-page-loading-spinner " +
+                        (isFullScreen ? "fullscreen" : "")
+                      }
+                    >
+                      <LoadingSpinner loading={true} />
+                    </div>
+                  ) : (
+                    renderTabsContent()
+                  )}
+
+                  <div className="mt-2">
                     {/* Loading indicator when total is not calculated yet. */}
                     {loading || columnSelectorLoading ? (
                       <></>
@@ -1374,114 +1447,70 @@ export function QueryPage<TData extends KitsuResource>({
                         values={{ totalCount: formatNumber(totalRecords) }}
                       />
                     )}
-                  </span>
-
-                  {/* Multi sort tooltip - Only shown if it's possible to sort */}
-                  {resolvedReactTableProps.enableMultiSort && (
-                    <MultiSortTooltip />
-                  )}
+                  </div>
                 </div>
-              </div>
-
-              {error && (
-                <div
-                  className="alert alert-danger"
-                  style={{
-                    whiteSpace: "pre-line"
-                  }}
-                >
-                  <p>
-                    {error.errors?.map((e) => e.detail).join("\n") ??
-                      String(error)}
-                  </p>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => {
-                      const newSort = defaultSort ?? DEFAULT_SORT;
-                      setError(undefined);
-                      onSortChange(newSort);
-                    }}
-                  >
-                    <CommonMessage id="resetSort" />
-                  </button>
-                </div>
-              )}
-
-              {loading || columnSelectorLoading ? (
-                <div
-                  className={
-                    "d-flex justify-content-center align-items-center h-100 query-page-loading-spinner " +
-                    (isFullScreen ? "fullscreen" : "")
-                  }
-                >
-                  <LoadingSpinner loading={true} />
-                </div>
-              ) : (
-                renderTabsContent()
-              )}
-
-              <div className="mt-2">
-                {/* Loading indicator when total is not calculated yet. */}
-                {loading || columnSelectorLoading ? (
-                  <></>
-                ) : (
-                  <CommonMessage
-                    id="tableTotalCount"
-                    values={{ totalCount: formatNumber(totalRecords) }}
-                  />
+                {selectionMode && (
+                  <>
+                    <div className="col-2 mt-5">
+                      <div className="select-all-checked-button">
+                        <FormikButton
+                          className="btn btn-primary w-100 mb-5"
+                          onClick={moveSelectedResultsToSelectedResources}
+                        >
+                          <div data-testid="move-resources-over">
+                            <FiChevronRight />
+                          </div>
+                        </FormikButton>
+                      </div>
+                      <div className="deselect-all-checked-button">
+                        <FormikButton
+                          className="btn btn-dark w-100 mb-5"
+                          onClick={removeSelectedResources}
+                        >
+                          <div data-testid="remove-resources">
+                            <FiChevronLeft />
+                          </div>
+                        </FormikButton>
+                      </div>
+                    </div>
+                    <div className="col-5">
+                      <span id="selectedResourceCount">
+                        <CommonMessage
+                          id="tableSelectedCount"
+                          values={{
+                            totalCount: selectedResources?.length ?? 0
+                          }}
+                        />
+                      </span>
+                      <ReactTable<TData>
+                        loading={loading}
+                        columns={columnsSelected}
+                        data={selectedResources ?? []}
+                        onRowMove={onRowMove}
+                        enableDnd={enableDnd}
+                        enableSorting={!enableDnd}
+                        showPagination={!enableDnd}
+                        manualPagination={true}
+                        smallPaginationButtons={true}
+                        enableFullscreen={true}
+                      />
+                    </div>
+                  </>
                 )}
               </div>
             </div>
-            {selectionMode && (
-              <>
-                <div className="col-2 mt-5">
-                  <div className="select-all-checked-button">
-                    <FormikButton
-                      className="btn btn-primary w-100 mb-5"
-                      onClick={moveSelectedResultsToSelectedResources}
-                    >
-                      <div data-testid="move-resources-over">
-                        <FiChevronRight />
-                      </div>
-                    </FormikButton>
-                  </div>
-                  <div className="deselect-all-checked-button">
-                    <FormikButton
-                      className="btn btn-dark w-100 mb-5"
-                      onClick={removeSelectedResources}
-                    >
-                      <div data-testid="remove-resources">
-                        <FiChevronLeft />
-                      </div>
-                    </FormikButton>
-                  </div>
-                </div>
-                <div className="col-5">
-                  <span id="selectedResourceCount">
-                    <CommonMessage
-                      id="tableSelectedCount"
-                      values={{ totalCount: selectedResources?.length ?? 0 }}
-                    />
-                  </span>
-                  <ReactTable<TData>
-                    loading={loading}
-                    columns={columnsSelected}
-                    data={selectedResources ?? []}
-                    onRowMove={onRowMove}
-                    enableDnd={enableDnd}
-                    enableSorting={!enableDnd}
-                    showPagination={!enableDnd}
-                    manualPagination={true}
-                    smallPaginationButtons={true}
-                    enableFullscreen={true}
-                  />
-                </div>
-              </>
-            )}
-          </div>
+          </DinaForm>
         </div>
-      </DinaForm>
+        {resultsAside && (
+          <aside className="query-page-results-aside">
+            {resultsAside({
+              query: elasticSearchQuery,
+              totalRecords,
+              loading: loading || columnSelectorLoading
+            })}
+          </aside>
+        )}
+      </div>
     </>
   );
 }

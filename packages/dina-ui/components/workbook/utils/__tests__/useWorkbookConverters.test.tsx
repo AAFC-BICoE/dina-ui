@@ -1297,5 +1297,282 @@ describe("useWorkbookConverters", () => {
         "givenNames"
       );
     });
+
+    it("linkRelationshipAttribute should link each individually mapped person in a multi-value cell", async () => {
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: jest.fn()
+      } as any);
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockResource: any = {
+        preparedBy: [
+          {
+            displayName: "Person A; Person B; Unmapped Org; Person A2.",
+            relationshipConfig: {
+              baseApiPath: "/agent-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK,
+              type: "person"
+            }
+          }
+        ]
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "preparedBy.displayName": {
+          fieldPath: "preparedBy.displayName",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {
+            "Person A": {
+              id: "person-a-id",
+              type: "person",
+              displayName: "Person A"
+            } as any,
+            "Person B": { id: "person-b-id", type: "person" },
+            // Mapped to the same person as "Person A", should not be duplicated
+            "Person A2_": { id: "person-a-id", type: "person" }
+          },
+          numOfUniqueValues: 4,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        "preparedBy",
+        "test-group"
+      );
+
+      expect(mockResource.relationships.preparedBy.data).toEqual([
+        { id: "person-a-id", type: "person" },
+        { id: "person-b-id", type: "person" }
+      ]);
+      expect(mockResource.preparedBy).toBeUndefined();
+    });
+
+    it("linkRelationshipAttribute should remove the attribute when no person in a multi-value cell is mapped", async () => {
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: jest.fn()
+      } as any);
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockResource: any = {
+        preparedBy: [
+          {
+            displayName: "Unmapped 1; Unmapped 2",
+            relationshipConfig: {
+              baseApiPath: "/agent-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK,
+              type: "person"
+            }
+          }
+        ]
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "preparedBy.displayName": {
+          fieldPath: "preparedBy.displayName",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {},
+          numOfUniqueValues: 2,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        "preparedBy",
+        "test-group"
+      );
+
+      expect(mockResource.preparedBy).toBeUndefined();
+      expect(mockResource.relationships).toBeUndefined();
+    });
+
+    it("linkRelationshipAttribute should set uuids for each mapped determiner in a multi-value cell", async () => {
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: jest.fn()
+      } as any);
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockDetermination: any = {
+        determiner: [
+          {
+            displayName: "Person A; Person B",
+            relationshipConfig: {
+              baseApiPath: "/agent-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK_UUID_ONLY,
+              type: "person"
+            }
+          }
+        ]
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "organism.determination.determiner.displayName": {
+          fieldPath: "organism.determination.determiner.displayName",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {
+            "Person A": { id: "person-a-id", type: "person" },
+            "Person B": { id: "person-b-id", type: "person" }
+          },
+          numOfUniqueValues: 2,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockDetermination,
+        mockWorkbookColumnMap,
+        "organism.determination.determiner",
+        "test-group"
+      );
+
+      expect(mockDetermination.determiner).toEqual([
+        "person-a-id",
+        "person-b-id"
+      ]);
+    });
+
+    it("linkRelationshipAttribute should link 'Last, First' names and comma separated names in a multi-value cell", async () => {
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: jest.fn()
+      } as any);
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockResource: any = {
+        preparedBy: [
+          {
+            displayName: "Cardinal, Sophie; Brandon Andre, John Doe",
+            relationshipConfig: {
+              baseApiPath: "/agent-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK,
+              type: "person"
+            }
+          }
+        ]
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "preparedBy.displayName": {
+          fieldPath: "preparedBy.displayName",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {
+            "Cardinal, Sophie": { id: "sophie-cardinal-id", type: "person" },
+            "Brandon Andre": { id: "brandon-andre-id", type: "person" },
+            "John Doe": { id: "john-doe-id", type: "person" }
+          },
+          numOfUniqueValues: 3,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        "preparedBy",
+        "test-group"
+      );
+
+      expect(mockResource.relationships.preparedBy.data).toEqual([
+        { id: "sophie-cardinal-id", type: "person" },
+        { id: "brandon-andre-id", type: "person" },
+        { id: "john-doe-id", type: "person" }
+      ]);
+    });
+
+    it("linkRelationshipAttribute should split a cell the same way as the mapped values", async () => {
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: jest.fn()
+      } as any);
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockResource: any = {
+        preparedBy: [
+          {
+            // "van der Berg, Anna" is a single person, "Smith, John Doe" is two people
+            displayName: "van der Berg, Anna; Smith, John Doe",
+            relationshipConfig: {
+              baseApiPath: "/agent-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK,
+              type: "person"
+            }
+          }
+        ]
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "preparedBy.displayName": {
+          fieldPath: "preparedBy.displayName",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {
+            "van der Berg, Anna": { id: "anna-id", type: "person" },
+            Smith: { id: "smith-id", type: "person" },
+            "John Doe": { id: "john-doe-id", type: "person" }
+          },
+          numOfUniqueValues: 3,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        "preparedBy",
+        "test-group"
+      );
+
+      expect(mockResource.relationships.preparedBy.data).toEqual([
+        { id: "anna-id", type: "person" },
+        { id: "smith-id", type: "person" },
+        { id: "john-doe-id", type: "person" }
+      ]);
+    });
   });
 });

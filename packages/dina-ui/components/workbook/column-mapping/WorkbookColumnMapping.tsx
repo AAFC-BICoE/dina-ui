@@ -128,7 +128,8 @@ export function WorkbookColumnMapping({
     workbookColumnMap,
     relationshipMapping,
     resolveColumnMappingAndRelationshipMapping,
-    getResourceSelectField
+    getResourceSelectField,
+    getRelationshipValues
   } = useColumnMapping();
 
   const { allowAppendData, fieldColumnLocaleId } =
@@ -170,7 +171,10 @@ export function WorkbookColumnMapping({
 
     for (const columnName of relationshipColumnNames) {
       const values = Object.keys(
-        (columnUniqueValues ?? {})[sheet]?.[columnName] || {}
+        getRelationshipValues(
+          (columnUniqueValues ?? {})[sheet]?.[columnName] || {},
+          workbookColumnMap[columnName].fieldPath
+        )
       );
 
       if (Array.isArray(relationshipMapping[columnName])) {
@@ -1054,6 +1058,7 @@ export function WorkbookColumnMapping({
               <RelationshipFieldMapping
                 onChangeRelatedRecord={onRelatedRecordChange}
                 getResourceSelectField={getResourceSelectField}
+                getRelationshipValues={getRelationshipValues}
               />
             </>
           );
