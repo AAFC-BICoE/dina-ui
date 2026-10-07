@@ -60,6 +60,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   agentRemarks: "Remarques de l'agent",
   agentRole: "Rôle de l'agent",
   agentsSectionTitle: "Agents",
+  all: "Tous",
+  allTypes: "Tous les types",
   allowDuplicate: "Permettre les copies",
   allowExisting: "Autoriser l’existant",
   allowNew: "Autoriser le nouveau",
@@ -137,6 +139,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   configureDefaultValues: "Configurer les valeurs par défaut",
   configureFormTemplate: "Configurer un modèle de formulaire",
   contents: "Table des matières",
+  controlledVocabulariesLoadError:
+    "Échec du chargement des vocabulaires contrôlés.",
+  controlledVocabularySearchPlaceholder:
+    "Rechercher par nom, clé, unité ou créateur",
   controlledVocabularyTitle: "Vocabulaire vérifié",
   convertToDepthMinMax: "Conversion de la profondeur min/max",
   convertToElevationMinMax: "Conversion de l’élévation min/max",
@@ -296,6 +302,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   "field_determination.typeStatus": "Type d'état",
   "field_determination.verbatimScientificName": "Nom scientifique verbatim",
   field_determinationRemarks: "Détermination - remarques",
+  field_dinaComponent: "Composante de données",
   field_displayName: "Visualiser le nom",
   field_dwcCoordinateUncertaintyInMeters:
     "Coordonner les incertitudes dans les mesures en mètres",
@@ -409,6 +416,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_materialSample_identifierType_materialSampleId_label:
     "No ID d’échantillon de matière",
   field_materialToBeReturned: "À retourner",
+  field_multilingualTitle: "Titre multilingue",
   field_name: "Nom",
   field_notPubliclyReleasableReason:
     "Raison pour laquelle il n’est pas possible de le divulguer publiquement",
@@ -477,6 +485,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_type: "Catégorie",
   field_typeStatus: "Type de statut",
   field_typeStatusEvidence: "Type de statut - Preuve",
+  field_unit: "Unité",
   field_useNextSequence: "Utiliser le prochain identifiant disponible",
   field_username: "Nom d’utilisateur",
   field_useTargetOrganism: "Utiliser l'organisme ciblé",
@@ -490,6 +499,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_visibleManagedAttributes: "Attributs gérés visibles",
   field_visibleManagedAttributes_tooltip:
     "Ajouter ou retirer un attribut à l'aide du présent menu déroulant ne modifie pas la valeur. Cela ne fait que modifier la visibilité de l'attribut dans l'éditeur.",
+  field_vocabularyElementType: "Type d'élément de vocabulaire",
   field_vocabularyElementType_boolean_label: "Booléen",
   field_vocabularyElementType_date_label: "Date",
   field_vocabularyElementType_decimal_label: "Décimal",
@@ -506,6 +516,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   fileTooBig: "Fichier trop volumineux",
   filterAttribute: "Attribut filtre",
   filterByGroup: "Filtrer par groupe",
+  filterByType: "Filtrer par type",
   filterPredicate: "Prédicat filtre",
   filterValue: "Valeur filtre",
   footerContactInfo: "Coordonnées du contact ",
@@ -673,6 +684,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   myRoleInGroup: "Mon rôle",
   noChildren: "Aucune table enfant",
   noFileToDisplay: "Aucun fichier à afficher",
+  noFiltersAvailable: "Aucun filtre disponible",
   noGroups: "Aucun groupe",
   noManagedAttributeValues: "Aucune valeur d’attribut géré.",
   noResultsFound: "Aucun résultat trouvé.",

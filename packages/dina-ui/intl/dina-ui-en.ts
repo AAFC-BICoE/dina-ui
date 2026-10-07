@@ -130,7 +130,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_west: "West",
   peopleTitle: "People",
   agentsSectionTitle: "Agents",
+  all: "All",
   allGroups: "All Groups",
+  allTypes: "All Types",
   allowDuplicate: "Allow Duplicate",
   allowExisting: "Allow Existing",
   allowNew: "Allow New",
@@ -287,6 +289,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbookUploadBulkEditInfoMessage:
     "{count} files ready for bulk editing. Upload a spreadsheet with an 'Original Filename' column to map metadata changes.",
   contributors: "Contributors",
+  controlledVocabulariesLoadError: "Failed to load controlled vocabularies.",
+  controlledVocabularySearchPlaceholder: "Search by name, key, unit or creator",
   controlledVocabularyTitle: "Controlled Vocabulary",
   addControlledVocabularyItemTitle: "Add Controlled Vocabulary Item",
   editControlledVocabularyItemTitle: "Edit Controlled Vocabulary Item",
@@ -493,6 +497,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_run-summary_items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.analysisType":
     "Analysis Type",
   field_determinationRemarks: "Determination Remarks",
+  field_dinaComponent: "Data Component",
   field_displayName: "Display Name",
   field_dwcCoordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
   field_dwcCoordinateUncertaintyInMeters_tooltip:
@@ -613,6 +618,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_materialSample_identifierType_materialSampleId_label:
     "Material Sample ID",
   field_materialToBeReturned: "To Be Returned",
+  field_multilingualTitle: "Multilingual Title",
   field_name: "Name",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
   field_organismRemarks: "Organism Remarks",
@@ -705,6 +711,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_type: "Type",
   field_typeStatus: "Type Status",
   field_typeStatusEvidence: "Type Status Evidence",
+  field_unit: "Unit",
   field_useNextSequence: "Use Next Available Identifier",
   field_username: "Username",
   field_useTargetOrganism: "Use Target Organism",
@@ -719,6 +726,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_visibleManagedAttributes: "Visible Managed Attributes in Editor",
   field_visibleManagedAttributes_tooltip:
     "Adding or removing an attribute using this dropdown doesn't change or remove the value. It only affects the attribute's visibility in this editor.",
+  field_vocabularyElementType: "Vocabulary Element Type",
   field_vocabularyElementType_boolean_label: "Boolean",
   field_vocabularyElementType_date_label: "Date",
   field_vocabularyElementType_decimal_label: "Decimal",
@@ -737,6 +745,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   fileTooBig: "File too big",
   filterAttribute: "Filter Attribute",
   filterByGroup: "Filter By Group",
+  filterByType: "Filter by Type",
   filterPredicate: "Filter Predicate",
   filterValue: "Filter Value",
   footerContactInfo: "Contact information",
@@ -945,6 +954,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   myRoleInGroup: "My Role",
   noChildren: "No Children",
   noFileToDisplay: "No file to display",
+  noFiltersAvailable: "No filters available",
   noGroups: "No Groups",
   noManagedAttributeValues: "No Managed Attribute values.",
   noResultsFound: "No results found.",
@@ -1684,11 +1694,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAsImage: "Save as Image",
   parentMaterialSampleDisabledTooltip:
     "Material Sample can only have a single link to one of the following relationships: Parent Material Sample or a collecting event.",
-  allManagedAttributesMovedAlertTitle:
-    "All managed attributes have been moved.",
-  managedAttributeTabAlertTitle: "{module} managed attributes have been moved.",
-  managedAttributeTabAlertDescription:
-    "They are now located on the new {link} page.",
   supportedFormats: "Supported Formats",
   maxFileSize: "Maximum file size",
   openInNewTab: "Opens in new tab",

@@ -25,4 +25,23 @@ describe("Nav component", () => {
     expect(wrapper.queryByText("Login")).toBeNull();
     expect(wrapper.queryByText("Logout")).toBeNull();
   });
+
+  it("Links to the Controlled Vocabulary page from the Controlled Vocabulary menu.", async () => {
+    const wrapper = mountWithAppContext(<Nav />, {
+      accountContext: { authenticated: true, roles: [] }
+    });
+
+    await userEvent.hover(
+      wrapper.getByRole("button", { name: "Controlled Vocabulary" })
+    );
+
+    // The dropdown itself is also a "Controlled Vocabulary" menuitem, so find the link by href:
+    const links = wrapper
+      .getAllByRole("menuitem", { name: "Controlled Vocabulary" })
+      .map((item) => item.getAttribute("href"));
+    expect(links).toContain("/controlled-vocabulary/list");
+    expect(
+      wrapper.queryByRole("menuitem", { name: "Managed Attributes" })
+    ).toBeNull();
+  });
 });
