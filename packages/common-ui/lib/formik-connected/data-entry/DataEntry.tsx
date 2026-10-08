@@ -31,6 +31,7 @@ export function DataEntry({
   name,
   readOnly,
   id,
+  className,
   blockAddable = false,
   unitsAddable = false,
   typesAddable = false,
@@ -228,7 +229,12 @@ export function DataEntry({
     return <LoadingSpinner loading={true} />;
   }
   return (
-    <FieldSet legend={legend} wrapLegend={legendWrapper()} id={id}>
+    <FieldSet
+      legend={legend}
+      wrapLegend={legendWrapper()}
+      id={id}
+      className={className}
+    >
       {
         <div style={{ padding: 15 }}>
           {extensionValues

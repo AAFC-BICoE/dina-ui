@@ -11,17 +11,25 @@ import {
 import { connect, Field, FormikContextType } from "formik";
 import _ from "lodash";
 import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../types/collection-api";
-import { useRef, useState } from "react";
 import { PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   GeoReferenceAssertion,
   GeoreferenceVerificationStatus
 } from "../../../types/collection-api/resources/GeoReferenceAssertion";
+import { ReactNode, useRef, useState } from "react";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
   assertion: GeoReferenceAssertion;
+}
+
+function CompactFieldRow({ children }: { children: ReactNode }) {
+  return (
+    <div className="mb-2">
+      <DinaFormSection horizontal={18}>{children}</DinaFormSection>
+    </div>
+  );
 }
 
 export function GeoReferenceAssertionRow({
@@ -129,7 +137,7 @@ export function GeoReferenceAssertionRow({
   return (
     <div>
       <DinaFormSection
-        horizontal={true}
+        horizontal={false}
         componentName={COLLECTING_EVENT_COMPONENT_NAME}
         sectionName="georeferencing-section"
       >
@@ -172,76 +180,116 @@ export function GeoReferenceAssertionRow({
             )
           }
         </Field>
-        <NumberField
-          name={commonRoot + "dwcDecimalLatitude"}
-          customName="dwcDecimalLatitude"
-          className={"dwcDecimalLatitude"}
-          readOnly={georeferenceDisabled}
-          onChangeExternal={updateReservedAssertion}
-          min={-90}
-          max={90}
-        />
-        <NumberField
-          name={commonRoot + "dwcDecimalLongitude"}
-          customName="dwcDecimalLongitude"
-          readOnly={georeferenceDisabled}
-          className={"dwcDecimalLongitude"}
-          onChangeExternal={updateReservedAssertion}
-          min={-180}
-          max={180}
-        />
-        <NumberField
-          name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
-          tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_coordinate_uncertainty_in_meters"
-          tooltipLinkText="fromDinaUserGuide"
-          customName="dwcCoordinateUncertaintyInMeters"
-          isInteger={true}
-          readOnly={georeferenceDisabled}
-          className={"dwcCoordinateUncertaintyInMeters"}
-          onChangeExternal={updateReservedAssertion}
-        />
-        <DateField
-          name={commonRoot + "dwcGeoreferencedDate"}
-          className={"dwcGeoreferencedDate"}
-          label={formatMessage("georeferencedDateLabel")}
-        />
-        <TextField
-          name={commonRoot + "dwcGeodeticDatum"}
-          className={"dwcGeodeticDatum"}
-          customName="dwcGeodeticDatum"
-          readOnly={georeferenceDisabled}
-          onChangeExternal={updateReservedAssertion}
-        />
-        <TextField
-          name={commonRoot + "literalGeoreferencedBy"}
-          className={"literalGeoreferencedBy"}
-          label={formatMessage("literalGeoreferencedByLabel")}
-        />
-        <PersonSelectField
-          name={commonRoot + "georeferencedBy"}
-          label={formatMessage("georeferencedByLabel")}
-          isMulti={true}
-        />
-        <TextField
-          name={commonRoot + "dwcGeoreferenceProtocol"}
-          className={"dwcGeoreferenceProtocol"}
-          customName={"dwcGeoreferenceProtocol"}
-          readOnly={georeferenceDisabled}
-          onChangeExternal={updateReservedAssertion}
-        />
-        <TextField
-          name={commonRoot + "dwcGeoreferenceSources"}
-          className={"dwcGeoreferenceSources"}
-          customName={"dwcGeoreferenceSources"}
-          readOnly={georeferenceDisabled}
-          onChangeExternal={updateReservedAssertion}
-        />
-        <TextField
-          name={commonRoot + "dwcGeoreferenceRemarks"}
-          multiLines={true}
-          className={"dwcGeoreferenceRemarks"}
-          customName={"dwcGeoreferenceRemarks"}
-        />
+
+        <CompactFieldRow>
+          <NumberField
+            name={commonRoot + "dwcDecimalLatitude"}
+            customName="dwcDecimalLatitude"
+            className="dwcDecimalLatitude"
+            readOnly={georeferenceDisabled}
+            onChangeExternal={updateReservedAssertion}
+            min={-90}
+            max={90}
+            removeBottomMargin={true}
+          />
+        </CompactFieldRow>
+
+        <CompactFieldRow>
+          <NumberField
+            name={commonRoot + "dwcDecimalLongitude"}
+            customName="dwcDecimalLongitude"
+            className="dwcDecimalLongitude"
+            readOnly={georeferenceDisabled}
+            onChangeExternal={updateReservedAssertion}
+            min={-180}
+            max={180}
+            removeBottomMargin={true}
+          />
+        </CompactFieldRow>
+
+        <CompactFieldRow>
+          <NumberField
+            name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
+            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_coordinate_uncertainty_in_meters"
+            tooltipLinkText="fromDinaUserGuide"
+            customName="dwcCoordinateUncertaintyInMeters"
+            isInteger={true}
+            readOnly={georeferenceDisabled}
+            className="dwcCoordinateUncertaintyInMeters"
+            onChangeExternal={updateReservedAssertion}
+            removeBottomMargin={true}
+          />
+        </CompactFieldRow>
+
+        <CompactFieldRow>
+          <DateField
+            name={commonRoot + "dwcGeoreferencedDate"}
+            className="dwcGeoreferencedDate"
+            label={formatMessage("georeferencedDateLabel")}
+            removeBottomMargin={true}
+          />
+        </CompactFieldRow>
+
+        <CompactFieldRow>
+          <TextField
+            name={commonRoot + "dwcGeodeticDatum"}
+            className="dwcGeodeticDatum"
+            customName="dwcGeodeticDatum"
+            readOnly={georeferenceDisabled}
+            onChangeExternal={updateReservedAssertion}
+            removeBottomMargin={true}
+          />
+        </CompactFieldRow>
+
+        <CompactFieldRow>
+          <TextField
+            name={commonRoot + "literalGeoreferencedBy"}
+            className="literalGeoreferencedBy"
+            label={formatMessage("literalGeoreferencedByLabel")}
+            removeBottomMargin={true}
+          />
+        </CompactFieldRow>
+
+        <CompactFieldRow>
+          <PersonSelectField
+            name={commonRoot + "georeferencedBy"}
+            label={formatMessage("georeferencedByLabel")}
+            isMulti={true}
+            removeBottomMargin={true}
+          />
+        </CompactFieldRow>
+
+        <CompactFieldRow>
+          <TextField
+            name={commonRoot + "dwcGeoreferenceProtocol"}
+            className="dwcGeoreferenceProtocol"
+            customName="dwcGeoreferenceProtocol"
+            readOnly={georeferenceDisabled}
+            onChangeExternal={updateReservedAssertion}
+            removeBottomMargin={true}
+          />
+        </CompactFieldRow>
+
+        <CompactFieldRow>
+          <TextField
+            name={commonRoot + "dwcGeoreferenceSources"}
+            className="dwcGeoreferenceSources"
+            customName="dwcGeoreferenceSources"
+            readOnly={georeferenceDisabled}
+            onChangeExternal={updateReservedAssertion}
+            removeBottomMargin={true}
+          />
+        </CompactFieldRow>
+
+        <CompactFieldRow>
+          <TextField
+            name={commonRoot + "dwcGeoreferenceRemarks"}
+            multiLines={true}
+            className="dwcGeoreferenceRemarks"
+            customName="dwcGeoreferenceRemarks"
+            removeBottomMargin={true}
+          />
+        </CompactFieldRow>
       </DinaFormSection>
     </div>
   );

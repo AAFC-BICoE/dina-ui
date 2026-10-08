@@ -66,6 +66,8 @@ import { ShowParentAttributesField } from "./ShowParentAttributesField";
 import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
 import { ParentSelectSection } from "../ParentSelectSection";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import { FaUsers } from "react-icons/fa";
+import styles from "./MaterialSampleForm.module.css";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -389,19 +391,21 @@ export function MaterialSampleForm({
           componentName={FIELD_EXTENSIONS_COMPONENT_NAME}
           sectionName="field-extension-section"
         >
-          <DataEntryField
-            legend={<DinaMessage id="materialSampleFieldExtensions" />}
-            name="extensionValues"
-            readOnly={readOnly}
-            isTemplate={isTemplate}
-            id={id}
-            blockOptionsEndpoint={`collection-api/extension`}
-            blockOptionsFilter={{
-              "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
-            }}
-            width={"100%"}
-            disableClearButton={true}
-          />
+          <div className={styles.topLevelEmbeddedSection}>
+            <DataEntryField
+              legend={<DinaMessage id="fieldExtensions" />}
+              name="extensionValues"
+              readOnly={readOnly}
+              isTemplate={isTemplate}
+              id={id}
+              blockOptionsEndpoint={`collection-api/extension`}
+              blockOptionsFilter={{
+                "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
+              }}
+              width={"100%"}
+              disableClearButton={true}
+            />
+          </div>
         </DinaFormSection>
       ),
     [MANAGED_ATTRIBUTES_COMPONENT_NAME]: (id) =>
@@ -411,7 +415,7 @@ export function MaterialSampleForm({
           sectionName="managed-attributes-section"
         >
           <div className="row">
-            <div className="col-md-12">
+            <div className={`col-md-12 ${styles.topLevelEmbeddedSection}`}>
               <ManagedAttributesEditor
                 valuesPath="managedAttributes"
                 managedAttributeApiPath="collection-api/controlled-vocabulary-item"
@@ -419,7 +423,7 @@ export function MaterialSampleForm({
                 controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
                 fieldSetProps={{
                   id,
-                  legend: <DinaMessage id="materialSampleManagedAttributes" />
+                  legend: <DinaMessage id="managedAttributes" />
                 }}
                 managedAttributeOrderFieldName="managedAttributesOrder"
                 visibleAttributeKeys={
@@ -489,51 +493,76 @@ export function MaterialSampleForm({
         componentName={IDENTIFIER_COMPONENT_NAME}
         sectionName="general-section"
       >
-        <div className="flex-grow-1 container-fluid">
+        <div className={`flex-grow-1 container-fluid ${styles.formCanvas}`}>
           {!reduceRendering && (
-            <>
+            <div
+              className="material-sample-general-info rounded border p-3 mb-4"
+              style={{ backgroundColor: "#fff" }}
+            >
               {!isTemplate && materialSample?.materialSampleName && (
-                <MaterialSampleBreadCrumb
-                  disableLastLink={true}
-                  materialSample={materialSample as any}
-                  enableStoredDefaultGroup={enableStoredDefaultGroup}
-                  enableGroupSelectField={true}
-                />
-              )}
-              {!isTemplate && !materialSample?.materialSampleName && (
-                <div className="row">
-                  <div className="col-md-6">
-                    <GroupSelectField
-                      disableTemplateCheckbox={true}
-                      name="group"
-                      enableStoredDefaultGroup={enableStoredDefaultGroup}
-                    />
-                  </div>
+                <div className={styles.overviewHeader}>
+                  <MaterialSampleBreadCrumb
+                    disableLastLink={true}
+                    materialSample={materialSample as any}
+                  />
                 </div>
               )}
               <div className="row">
-                <div className="col-md-8">
-                  <CollectionSelectSection resourcePath="collection-api/collection" />
-                  <ProjectSelectSection resourcePath="collection-api/project" />
+                <div className="col-md-12">
+                  {!isTemplate && (
+                    <div className="mb-2">
+                      <DinaFormSection horizontal={18}>
+                        <GroupSelectField
+                          disableTemplateCheckbox={true}
+                          name="group"
+                          enableStoredDefaultGroup={enableStoredDefaultGroup}
+                          removeBottomMargin={true}
+                          label={
+                            <span>
+                              <FaUsers className="me-2" />
+                              <DinaMessage id="group" />
+                            </span>
+                          }
+                        />
+                      </DinaFormSection>
+                    </div>
+                  )}
+
+                  <CollectionSelectSection
+                    resourcePath="collection-api/collection"
+                    horizontal={18}
+                  />
+                  <ProjectSelectSection
+                    resourcePath="collection-api/project"
+                    horizontal={18}
+                  />
                   <ParentSelectSection
                     enableCollectingEvent={
                       dataComponentState.enableCollectingEvent
                     }
+                    horizontal={18}
                   />
-                  <AssemblageSelectSection resourcePath="collection-api/assemblage" />
-                  <NotPubliclyReleasableSection
-                    defaultToNotReleasable={defaultToNotReleasable}
+                  <AssemblageSelectSection
+                    resourcePath="collection-api/assemblage"
+                    horizontal={18}
                   />
+                  <div className={`mb-2 ${styles.releasableFields}`}>
+                    <NotPubliclyReleasableSection
+                      defaultToNotReleasable={defaultToNotReleasable}
+                      horizontal={18}
+                    />
+                  </div>
                   <TagsAndRestrictionsSection
                     resourcePath="collection-api/material-sample"
                     indexName="dina_material_sample_index"
+                    horizontal={18}
                   />
                 </div>
               </div>
-            </>
+            </div>
           )}
           {/* The toggleable / re-arrangeable form sections: */}
-          <div className="data-components">
+          <div className={`data-components ${styles.dataComponents}`}>
             {sortedFormSectionPairs.map(([id, renderFn]) => (
               <Fragment key={id}>{renderFn(isOffScreen ? "" : id)}</Fragment>
             ))}

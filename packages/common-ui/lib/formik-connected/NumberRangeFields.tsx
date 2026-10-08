@@ -12,11 +12,13 @@ export interface NumberRangeFieldsProps {
   /** Min and max field names. */
   names: [string, string];
   labelMsg: React.JSX.Element;
+  compact?: boolean;
 }
 
 export function NumberRangeFields({
   names: [minName, maxName],
-  labelMsg
+  labelMsg,
+  compact = false
 }: NumberRangeFieldsProps) {
   const { formatMessage } = useIntl();
   const { readOnly, isTemplate, formTemplate, componentName, sectionName } =
@@ -68,6 +70,60 @@ export function NumberRangeFields({
   const neitherAreDefined = _.isNil(minVal) && _.isNil(maxVal);
   const isEmptyValue = readOnly && neitherAreDefined;
 
+  const fields = readOnly ? (
+    bothAreDefined ? (
+      <span>
+        {minVal}–{maxVal}m
+      </span>
+    ) : neitherAreDefined ? (
+      <EmptyFieldValue />
+    ) : (
+      <span>{minVal ?? maxVal ?? ""}m</span>
+    )
+  ) : (
+    <div className="d-flex align-items-center">
+      <MetersField
+        removeLabel={true}
+        removeBottomMargin={true}
+        name={minName}
+        className="flex-grow-1"
+        placeholder={formatMessage({ id: "min" })}
+      />
+      {disabledByFormTemplate.maxNameVisible && (
+        <>
+          <span className="mx-3">
+            <CommonMessage id="to" />
+          </span>
+          <MetersField
+            removeLabel={true}
+            removeBottomMargin={true}
+            name={maxName}
+            className="flex-grow-1"
+            placeholder={formatMessage({ id: "max" })}
+          />
+        </>
+      )}
+    </div>
+  );
+
+  if (compact) {
+    return (
+      <div className="d-flex align-items-center mb-2">
+        <div className="flex-shrink-0" style={{ width: "18em" }}>
+          <strong className={classNames(isEmptyValue && "field-label-empty")}>
+            {labelMsg}
+          </strong>
+          <Tooltip
+            id="metersField_tooltip"
+            iconClassName={isEmptyValue ? "tooltip-info-icon-empty" : undefined}
+          />
+        </div>
+
+        <div className="flex-grow-1">{fields}</div>
+      </div>
+    );
+  }
+
   return (
     <label className="w-100">
       <div className="mb-2">
@@ -80,41 +136,7 @@ export function NumberRangeFields({
         />
       </div>
       <div className="mb-3" style={{ minHeight: "25px" }}>
-        {readOnly ? (
-          bothAreDefined ? (
-            <span>
-              {minVal}–{maxVal}m
-            </span>
-          ) : neitherAreDefined ? (
-            <EmptyFieldValue />
-          ) : (
-            <span>{minVal ?? maxVal ?? ""}m</span>
-          )
-        ) : (
-          <div className="d-flex align-items-center">
-            <MetersField
-              removeLabel={true}
-              removeBottomMargin={true}
-              name={minName}
-              className="flex-grow-1"
-              placeholder={formatMessage({ id: "min" })}
-            />
-            {disabledByFormTemplate.maxNameVisible && (
-              <>
-                <span className="mx-3">
-                  <CommonMessage id="to" />
-                </span>
-                <MetersField
-                  removeLabel={true}
-                  removeBottomMargin={true}
-                  name={maxName}
-                  className="flex-grow-1"
-                  placeholder={formatMessage({ id: "max" })}
-                />
-              </>
-            )}
-          </div>
-        )}
+        {fields}
       </div>
     </label>
   );

@@ -5946,9 +5946,7 @@ describe("Material Sample Edit Page", () => {
 
       // Expedition is visible (a sibling box sharing the "collecting-event-details"
       // section id) and must not be affected by the above:
-      expect(
-        wrapper.getByText(/collecting event expedition/i)
-      ).toBeInTheDocument();
+      expect(wrapper.getByText(/expedition & site/i)).toBeInTheDocument();
       expect(
         wrapper.container.querySelector(".expedition-field")
       ).toBeInTheDocument();

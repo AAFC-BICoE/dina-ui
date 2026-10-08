@@ -284,7 +284,7 @@ function LabelWrapper({
   const [labelStyle, valueStyle] = _.isNumber(horizontal)
     ? [
         { display: "inline-block", width: `${horizontal}em` },
-        { display: "inline-block", width: `calc(100% - ${horizontal}em` }
+        { display: "inline-block", width: `calc(100% - ${horizontal}em)` }
       ]
     : [];
 
