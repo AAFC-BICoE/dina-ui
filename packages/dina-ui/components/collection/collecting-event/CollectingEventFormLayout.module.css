@@ -38,10 +38,6 @@
   color: #274c77;
 }
 
-.accessFields :global(strong) {
-  font-weight: normal !important;
-}
-
 .cleanSection :global(.legend-wrapper) :global(.fieldset-h2-adjustment) {
   font-size: 0.95rem !important;
   font-weight: 600 !important;

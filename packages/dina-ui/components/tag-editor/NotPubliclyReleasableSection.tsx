@@ -6,6 +6,7 @@ import {
   Tooltip
 } from "common-ui";
 import { useFormikContext } from "formik";
+import { useEffect } from "react";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FaGlobe } from "react-icons/fa";
 
@@ -21,15 +22,18 @@ export function NotPubliclyReleasableSection({
   const formik = useFormikContext<any>();
   const { formatMessage } = useDinaIntl();
 
-  if (
+  const shouldSetDefault =
     defaultToNotReleasable !== undefined &&
     formik.values.publiclyReleasable == null &&
     !formik.values.id &&
-    !formik.initialValues.id
-  ) {
-    // Default the field for new records: true -> not releasable, false -> releasable.
-    formik.setFieldValue("publiclyReleasable", !defaultToNotReleasable);
-  }
+    !formik.initialValues.id;
+
+  useEffect(() => {
+    if (shouldSetDefault) {
+      // Default the field for new records: true -> not releasable, false -> releasable.
+      formik.setFieldValue("publiclyReleasable", !defaultToNotReleasable);
+    }
+  }, [shouldSetDefault]);
   return (
     <>
       <DinaFormSection horizontal={horizontal}>

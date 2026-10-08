@@ -511,7 +511,7 @@ export function MaterialSampleForm({
                 <div className="col-md-12">
                   {!isTemplate && (
                     <div className="mb-2">
-                      <DinaFormSection horizontal={16}>
+                      <DinaFormSection horizontal={18}>
                         <GroupSelectField
                           disableTemplateCheckbox={true}
                           name="group"
@@ -530,32 +530,32 @@ export function MaterialSampleForm({
 
                   <CollectionSelectSection
                     resourcePath="collection-api/collection"
-                    horizontal={16}
+                    horizontal={18}
                   />
                   <ProjectSelectSection
                     resourcePath="collection-api/project"
-                    horizontal={16}
+                    horizontal={18}
                   />
                   <ParentSelectSection
                     enableCollectingEvent={
                       dataComponentState.enableCollectingEvent
                     }
-                    horizontal={16}
+                    horizontal={18}
                   />
                   <AssemblageSelectSection
                     resourcePath="collection-api/assemblage"
-                    horizontal={16}
+                    horizontal={18}
                   />
-                  <div className="mb-2">
+                  <div className={`mb-2 ${styles.releasableFields}`}>
                     <NotPubliclyReleasableSection
                       defaultToNotReleasable={defaultToNotReleasable}
-                      horizontal={16}
+                      horizontal={18}
                     />
                   </div>
                   <TagsAndRestrictionsSection
                     resourcePath="collection-api/material-sample"
                     indexName="dina_material_sample_index"
-                    horizontal={16}
+                    horizontal={18}
                   />
                 </div>
               </div>

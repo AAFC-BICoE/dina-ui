@@ -168,6 +168,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectingEventListTitle: "Sammlungsevent",
   collectingEventManagedAttributes: "Zusatzfelder des Sammlungsevents",
   collectingEventPartOfExpedition: "Sammlungsevent Teil von Expedition",
+  collectingEventExpeditionAndSite: "Expedition & Standort",
   collectingEventPermissionAlert: "Sie haben keine Berechtigung",
   collectingEventViewMaterialSamplesAttached:
     "{count} verknüpfte Materialproben anzeigen",

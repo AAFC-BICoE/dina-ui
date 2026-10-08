@@ -43,6 +43,7 @@ export function CollectionSelectSection({
 export interface CollectionSelectFieldProps {
   resourcePath?: string;
   className?: string;
+  horizontal?: boolean | [number, number] | "flex" | number;
 }
 
 export function CollectionSelectField({

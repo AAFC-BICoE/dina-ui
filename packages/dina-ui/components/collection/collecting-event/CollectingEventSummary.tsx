@@ -1,20 +1,24 @@
-import { ReactNode } from "react";
+import { Children, isValidElement, ReactNode } from "react";
 import { useDinaFormContext } from "common-ui";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import { PersonSelectField } from "../../resource-select-fields/resource-select-fields";
 
 interface SummaryRowProps {
   label: string;
   value?: ReactNode;
 }
 
-function SummaryRow({ label, value }: SummaryRowProps) {
-  const hasValue =
+function hasValue(value: ReactNode) {
+  return (
     value !== null &&
     value !== undefined &&
     value !== "" &&
-    (!Array.isArray(value) || value.length > 0);
+    (!Array.isArray(value) || value.length > 0)
+  );
+}
 
-  if (!hasValue) {
+function SummaryRow({ label, value }: SummaryRowProps) {
+  if (!hasValue(value)) {
     return null;
   }
 
@@ -32,6 +36,14 @@ interface SummarySectionProps {
 }
 
 function SummarySection({ title, children }: SummarySectionProps) {
+  const hasRows = Children.toArray(children).some(
+    (child) =>
+      isValidElement<SummaryRowProps>(child) && hasValue(child.props.value)
+  );
+  if (!hasRows) {
+    return null;
+  }
+
   return (
     <section className="mb-4">
       <h3
@@ -149,7 +161,23 @@ export function CollectingEventSummary() {
           }
         />
         <SummaryRow label="Time" value={time} />
-        <SummaryRow label="Collectors" value={collectingEvent.dwcRecordedBy} />
+        <SummaryRow
+          label="Verbatim Collectors"
+          value={collectingEvent.dwcRecordedBy}
+        />
+        <SummaryRow
+          label="Collectors"
+          value={
+            collectingEvent.collectors?.length ? (
+              <PersonSelectField
+                name="collectors"
+                isMulti={true}
+                removeLabel={true}
+                removeBottomMargin={true}
+              />
+            ) : undefined
+          }
+        />
         <SummaryRow
           label="Collector's Number"
           value={collectingEvent.dwcRecordNumber}

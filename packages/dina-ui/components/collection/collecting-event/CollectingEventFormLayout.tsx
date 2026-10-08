@@ -73,6 +73,14 @@ interface CollectingEventFormLayoutProps {
   compactReadOnly?: boolean;
 }
 
+function CompactFieldRow({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-1">
+      <DinaFormSection horizontal={18}>{children}</DinaFormSection>
+    </div>
+  );
+}
+
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
@@ -126,26 +134,6 @@ export function CollectingEventFormLayout({
     }
   };
 
-  function CompactFieldRow({
-    label,
-    children
-  }: {
-    label: React.ReactNode;
-    children: React.ReactNode;
-  }) {
-    return (
-      <div
-        className="d-flex align-items-center mb-1"
-        style={{ maxWidth: "760px" }}
-      >
-        <div className="fw-semibold flex-shrink-0" style={{ width: "230px" }}>
-          {label}
-        </div>
-        <div className="flex-grow-1">{children}</div>
-      </div>
-    );
-  }
-
   function onClickIncludeAll(
     e: ChangeEvent<HTMLInputElement>,
     form,
@@ -178,7 +166,7 @@ export function CollectingEventFormLayout({
       managedAttributeComponent="COLLECTING_EVENT"
       controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
       fieldSetProps={{
-        legend: "Managed Attributes",
+        legend: <DinaMessage id="managedAttributes" />,
         className: `non-strip collecting-event-clean ${styles.cleanSection}`,
         componentName: COLLECTING_EVENT_COMPONENT_NAME,
         sectionName: "collecting-event-managed-attributes-section"
@@ -213,7 +201,7 @@ export function CollectingEventFormLayout({
             <div className={styles.accessFields}>
               <NotPubliclyReleasableSection
                 defaultToNotReleasable={defaultToNotReleasable}
-                horizontal={14.375}
+                horizontal={18}
               />
               <Tooltip
                 id="collecting_event_tag_info"
@@ -223,7 +211,7 @@ export function CollectingEventFormLayout({
                     resourcePath="collection-api/collecting-event"
                     indexName="dina_material_sample_index"
                     tagIncludedType="collecting-event"
-                    horizontal={14.375}
+                    horizontal={18}
                   />
                 }
               />
@@ -240,33 +228,30 @@ export function CollectingEventFormLayout({
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="identifiers-section"
           >
-            <CompactFieldRow label="Collection Number">
+            <CompactFieldRow>
               <TextField
                 name="dwcFieldNumber"
                 tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_collection_number"
                 tooltipLinkText="fromDinaUserGuide"
-                removeLabel={true}
                 removeBottomMargin={true}
               />
             </CompactFieldRow>
 
             {!isTemplate && (
-              <CompactFieldRow label="Other Record Numbers">
+              <CompactFieldRow>
                 <StringArrayField
                   name="otherRecordNumbers"
                   minRows={2}
-                  removeLabel={true}
                   removeBottomMargin={true}
                 />
               </CompactFieldRow>
             )}
 
             {!isTemplate && !readOnly && (
-              <CompactFieldRow label="Group">
+              <CompactFieldRow>
                 <GroupSelectField
                   name="group"
                   enableStoredDefaultGroup={true}
-                  removeLabel={true}
                   removeBottomMargin={true}
                 />
               </CompactFieldRow>
@@ -287,114 +272,112 @@ export function CollectingEventFormLayout({
               componentName={COLLECTING_EVENT_COMPONENT_NAME}
               sectionName="collecting-date-section"
             >
-              {isTemplate && (
-                <Field name="includeAllCollectingDate">
-                  {() => (
-                    <CheckBoxWithoutWrapper
-                      name="includeAllCollectingDate"
-                      parentContainerId="collecting"
-                      onClickIncludeAll={onClickIncludeAll}
-                      includeAllLabel={formatMessage("includeAll")}
-                    />
-                  )}
-                </Field>
-              )}
+              <div id="collectingDateLegend">
+                {isTemplate && (
+                  <Field name="includeAllCollectingDate">
+                    {() => (
+                      <CheckBoxWithoutWrapper
+                        name="includeAllCollectingDate"
+                        parentContainerId="collectingDateLegend"
+                        onClickIncludeAll={onClickIncludeAll}
+                        includeAllLabel={formatMessage("includeAll")}
+                      />
+                    )}
+                  </Field>
+                )}
 
-              <CompactFieldRow label="Verbatim Event DateTime">
-                <TextField
-                  name="verbatimEventDateTime"
-                  label={formatMessage("verbatimEventDateTime")}
-                  removeLabel={true}
-                  removeBottomMargin={true}
-                />
-              </CompactFieldRow>
+                <CompactFieldRow>
+                  <TextField
+                    name="verbatimEventDateTime"
+                    label={formatMessage("verbatimEventDateTime")}
+                    removeBottomMargin={true}
+                  />
+                </CompactFieldRow>
 
-              <CompactFieldRow label="Start Event Date Time">
-                <FormattedTextField
-                  name="startEventDateTime"
-                  className="startEventDateTime"
-                  placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                  removeLabel={true}
-                  removeBottomMargin={true}
-                />
-              </CompactFieldRow>
+                <CompactFieldRow>
+                  <FormattedTextField
+                    name="startEventDateTime"
+                    className="startEventDateTime"
+                    placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+                    removeBottomMargin={true}
+                  />
+                </CompactFieldRow>
 
-              <CompactFieldRow label="End Event Date Time">
-                <FormattedTextField
-                  name="endEventDateTime"
-                  placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                  removeLabel={true}
-                  removeBottomMargin={true}
-                />
-              </CompactFieldRow>
+                <CompactFieldRow>
+                  <FormattedTextField
+                    name="endEventDateTime"
+                    placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+                    removeBottomMargin={true}
+                  />
+                </CompactFieldRow>
+              </div>
             </DinaFormSection>
 
             <DinaFormSection
               componentName={COLLECTING_EVENT_COMPONENT_NAME}
               sectionName="collecting-agents-section"
             >
-              {isTemplate && (
-                <Field name="includeAllCollectingAgent">
-                  {() => (
-                    <CheckBoxWithoutWrapper
-                      name="includeAllCollectingAgent"
-                      parentContainerId="collecting"
-                      onClickIncludeAll={onClickIncludeAll}
-                      includeAllLabel={formatMessage("includeAll")}
-                    />
-                  )}
-                </Field>
-              )}
+              <div id="collectingAgentsLegend">
+                {isTemplate && (
+                  <Field name="includeAllCollectingAgent">
+                    {() => (
+                      <CheckBoxWithoutWrapper
+                        name="includeAllCollectingAgent"
+                        parentContainerId="collectingAgentsLegend"
+                        onClickIncludeAll={onClickIncludeAll}
+                        includeAllLabel={formatMessage("includeAll")}
+                      />
+                    )}
+                  </Field>
+                )}
 
-              <CompactFieldRow label="Verbatim Collectors">
-                <FieldSpy<string> fieldName="group">
-                  {(group) => (
-                    <AutoSuggestTextField<CollectingEvent>
-                      name="dwcRecordedBy"
-                      jsonApiBackend={{
-                        query: (searchValue, ctx) => ({
-                          path: "collection-api/collecting-event",
-                          fiql: simpleSearchFilterToFiql(
-                            SimpleSearchFilterBuilder.create<CollectingEvent>()
-                              .searchFilter("dwcRecordedBy", searchValue)
-                              .whereProvided("group", "EQ", ctx.values.group)
-                              .build()
-                          )
-                        }),
-                        option: (collEvent) => collEvent?.dwcRecordedBy ?? ""
-                      }}
-                      elasticSearchBackend={{
-                        indexName: "dina_material_sample_index",
-                        searchField: "included.attributes.dwcRecordedBy",
-                        group: group ?? undefined,
-                        option: (collEvent) => collEvent?.dwcRecordedBy
-                      }}
-                      preferredBackend={"elastic-search"}
-                      removeLabel={true}
-                      removeBottomMargin={true}
-                    />
-                  )}
-                </FieldSpy>
-              </CompactFieldRow>
+                <CompactFieldRow>
+                  <FieldSpy<string> fieldName="group">
+                    {(group) => (
+                      <AutoSuggestTextField<CollectingEvent>
+                        name="dwcRecordedBy"
+                        jsonApiBackend={{
+                          query: (searchValue, ctx) => ({
+                            path: "collection-api/collecting-event",
+                            fiql: simpleSearchFilterToFiql(
+                              SimpleSearchFilterBuilder.create<CollectingEvent>()
+                                .searchFilter("dwcRecordedBy", searchValue)
+                                .whereProvided("group", "EQ", ctx.values.group)
+                                .build()
+                            )
+                          }),
+                          option: (collEvent) => collEvent?.dwcRecordedBy ?? ""
+                        }}
+                        elasticSearchBackend={{
+                          indexName: "dina_material_sample_index",
+                          searchField: "included.attributes.dwcRecordedBy",
+                          group: group ?? undefined,
+                          option: (collEvent) => collEvent?.dwcRecordedBy
+                        }}
+                        preferredBackend={"elastic-search"}
+                        removeBottomMargin={true}
+                      />
+                    )}
+                  </FieldSpy>
+                </CompactFieldRow>
 
-              <CompactFieldRow label="Collectors">
-                <PersonSelectField
-                  name="collectors"
-                  isMulti={true}
-                  removeLabel={true}
-                  removeBottomMargin={true}
-                />
-              </CompactFieldRow>
+                <CompactFieldRow>
+                  <PersonSelectField
+                    name="collectors"
+                    isMulti={true}
+                    removeBottomMargin={true}
+                  />
+                </CompactFieldRow>
 
-              <CompactFieldRow label="Collector's Number">
-                <TextField
-                  name="dwcRecordNumber"
-                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_collectors_number"
-                  tooltipLinkText="fromDinaUserGuide"
-                  removeLabel={true}
-                  removeBottomMargin={true}
-                />
-              </CompactFieldRow>
+                <CompactFieldRow>
+                  <TextField
+                    name="dwcRecordNumber"
+                    tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_collectors_number"
+                    tooltipLinkText="fromDinaUserGuide"
+                    removeBottomMargin={true}
+                  />
+                </CompactFieldRow>
+              </div>
             </DinaFormSection>
           </FieldSet>
         </div>
@@ -422,15 +405,11 @@ export function CollectingEventFormLayout({
               </Field>
             )}
 
-            <CompactFieldRow label="Verbatim Locality">
-              <TextField
-                name="dwcVerbatimLocality"
-                removeLabel={true}
-                removeBottomMargin={true}
-              />
+            <CompactFieldRow>
+              <TextField name="dwcVerbatimLocality" removeBottomMargin={true} />
             </CompactFieldRow>
 
-            <CompactFieldRow label="Verbatim Coordinate System">
+            <CompactFieldRow>
               <AutoSuggestTextField<ControlledVocabularyItem>
                 name="dwcVerbatimCoordinateSystem"
                 jsonApiBackend={{
@@ -445,7 +424,6 @@ export function CollectingEventFormLayout({
                 }}
                 blankSearchBackend={"json-api"}
                 onChangeExternal={onChangeExternal}
-                removeLabel={true}
                 removeBottomMargin={true}
               />
             </CompactFieldRow>
@@ -474,7 +452,7 @@ export function CollectingEventFormLayout({
                         !hasDegree && !hasMinute && !hasSecond ? "" : "d-none"
                       }
                     >
-                      <CompactFieldRow label="Verbatim Coordinates">
+                      <CompactFieldRow>
                         <TextField
                           name="dwcVerbatimCoordinates"
                           placeholder={
@@ -484,7 +462,6 @@ export function CollectingEventFormLayout({
                                 ]
                               : null
                           }
-                          removeLabel={true}
                           removeBottomMargin={true}
                         />
                       </CompactFieldRow>
@@ -495,7 +472,7 @@ export function CollectingEventFormLayout({
                         hasDegree || hasMinute || hasSecond ? "" : "d-none"
                       }
                     >
-                      <CompactFieldRow label="Verbatim Latitude">
+                      <CompactFieldRow>
                         <TextFieldWithCoordButtons
                           name="dwcVerbatimLatitude"
                           placeholder={
@@ -507,12 +484,11 @@ export function CollectingEventFormLayout({
                           shouldShowDegree={hasDegree || hasMinute || hasSecond}
                           shouldShowMinute={hasMinute || hasSecond}
                           shouldShowSecond={hasSecond}
-                          removeLabel={true}
                           removeBottomMargin={true}
                         />
                       </CompactFieldRow>
 
-                      <CompactFieldRow label="Verbatim Longitude">
+                      <CompactFieldRow>
                         <TextFieldWithCoordButtons
                           name="dwcVerbatimLongitude"
                           placeholder={
@@ -524,12 +500,11 @@ export function CollectingEventFormLayout({
                           shouldShowDegree={hasDegree || hasMinute || hasSecond}
                           shouldShowMinute={hasMinute || hasSecond}
                           shouldShowSecond={hasSecond}
-                          removeLabel={true}
                           removeBottomMargin={true}
                         />
                       </CompactFieldRow>
 
-                      <div className="mb-2" style={{ marginLeft: "230px" }}>
+                      <div className="mb-2" style={{ marginLeft: "18em" }}>
                         <SetCoordinatesFromVerbatimButton
                           sourceLatField="dwcVerbatimLatitude"
                           sourceLonField="dwcVerbatimLongitude"
@@ -547,7 +522,7 @@ export function CollectingEventFormLayout({
               }}
             </Field>
 
-            <CompactFieldRow label="Verbatim SRS">
+            <CompactFieldRow>
               <AutoSuggestTextField<Vocabulary>
                 name="dwcVerbatimSRS"
                 jsonApiBackend={{
@@ -569,20 +544,18 @@ export function CollectingEventFormLayout({
                 }}
                 blankSearchBackend={"json-api"}
                 onChangeExternal={onChangeExternal}
-                removeLabel={true}
                 removeBottomMargin={true}
               />
             </CompactFieldRow>
 
-            <CompactFieldRow label="Verbatim Elevation">
+            <CompactFieldRow>
               <TextField
                 name="dwcVerbatimElevation"
-                removeLabel={true}
                 removeBottomMargin={true}
               />
             </CompactFieldRow>
 
-            <div className="mb-2" style={{ marginLeft: "230px" }}>
+            <div className="mb-2" style={{ marginLeft: "18em" }}>
               <ParseVerbatimToRangeButton
                 verbatimField="dwcVerbatimElevation"
                 rangeFields={[
@@ -593,15 +566,11 @@ export function CollectingEventFormLayout({
               />
             </div>
 
-            <CompactFieldRow label="Verbatim Depth">
-              <TextField
-                name="dwcVerbatimDepth"
-                removeLabel={true}
-                removeBottomMargin={true}
-              />
+            <CompactFieldRow>
+              <TextField name="dwcVerbatimDepth" removeBottomMargin={true} />
             </CompactFieldRow>
 
-            <div style={{ marginLeft: "230px" }}>
+            <div style={{ marginLeft: "18em" }}>
               <ParseVerbatimToRangeButton
                 verbatimField="dwcVerbatimDepth"
                 rangeFields={[
@@ -623,26 +592,21 @@ export function CollectingEventFormLayout({
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-additional-details-section"
           >
-            <CompactFieldRow label="Habitat">
-              <TextField
-                name="habitat"
-                removeLabel={true}
-                removeBottomMargin={true}
-              />
+            <CompactFieldRow>
+              <TextField name="habitat" removeBottomMargin={true} />
             </CompactFieldRow>
 
-            <CompactFieldRow label="Host">
+            <CompactFieldRow>
               <TextField
                 name="host"
                 customName={"collectingEventHost"}
                 tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#ce-host"
                 tooltipLinkText="fromDinaUserGuide"
-                removeLabel={true}
                 removeBottomMargin={true}
               />
             </CompactFieldRow>
 
-            <CompactFieldRow label="Collection Method">
+            <CompactFieldRow>
               <Field name="group">
                 {({ field: { value: group } }) => (
                   <CollectionMethodSelectField
@@ -656,14 +620,13 @@ export function CollectingEventFormLayout({
                         .whereProvided("group", "EQ", group)
                         .build()
                     }
-                    removeLabel={true}
                     removeBottomMargin={true}
                   />
                 )}
               </Field>
             </CompactFieldRow>
 
-            <CompactFieldRow label="Protocol">
+            <CompactFieldRow>
               <ResourceSelectField<Protocol>
                 name="protocol"
                 filter={(searchValue: string) =>
@@ -676,12 +639,11 @@ export function CollectingEventFormLayout({
                 optionLabel={(protocol) => protocol.name}
                 omitNullOption={false}
                 readOnlyLink="/collection/protocol/view?id="
-                removeLabel={true}
                 removeBottomMargin={true}
               />
             </CompactFieldRow>
 
-            <CompactFieldRow label="Substrate">
+            <CompactFieldRow>
               <AutoSuggestTextField<CollectingEvent>
                 name="substrate"
                 customName={"collectingEventSubstrate"}
@@ -699,7 +661,6 @@ export function CollectingEventFormLayout({
                   }),
                   option: (collEvent) => collEvent?.substrate ?? ""
                 }}
-                removeLabel={true}
                 removeBottomMargin={true}
               />
             </CompactFieldRow>
@@ -718,11 +679,10 @@ export function CollectingEventFormLayout({
               compact={true}
             />
 
-            <CompactFieldRow label="Remarks">
+            <CompactFieldRow>
               <TextField
                 name="remarks"
                 multiLines={true}
-                removeLabel={true}
                 removeBottomMargin={true}
               />
             </CompactFieldRow>
@@ -773,12 +733,12 @@ export function CollectingEventFormLayout({
       <div className="row mb-3">
         <div className="col-md-12">
           <FieldSet
-            legend="Expedition & Site"
+            legend={<DinaMessage id="collectingEventExpeditionAndSite" />}
             className={`non-strip collecting-event-clean ${styles.cleanSection}`}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-details"
           >
-            <CompactFieldRow label="Expedition">
+            <CompactFieldRow>
               <ResourceSelectField<Expedition>
                 name="expedition"
                 filter={(searchValue: string) =>
@@ -790,12 +750,11 @@ export function CollectingEventFormLayout({
                 optionLabel={(expedition) => expedition.name}
                 omitNullOption={false}
                 readOnlyLink="/collection/expedition/view?id="
-                removeLabel={true}
                 removeBottomMargin={true}
               />
             </CompactFieldRow>
 
-            <CompactFieldRow label="Site">
+            <CompactFieldRow>
               <ResourceSelectField<Site>
                 name="site"
                 filter={(searchValue: string) =>
@@ -809,7 +768,6 @@ export function CollectingEventFormLayout({
                 }
                 omitNullOption={false}
                 readOnlyLink="/collection/site/view?id="
-                removeLabel={true}
                 removeBottomMargin={true}
               />
             </CompactFieldRow>

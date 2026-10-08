@@ -15,15 +15,18 @@
 .dataComponents > fieldset > :global(.legend-wrapper) {
   background-color: #eaf1f8;
   margin: -0.5rem -1.5rem 1rem;
-  padding: 0.55rem 1.5rem 0.45rem;
+  padding: 0.75rem 1.5rem;
   border-bottom: 1px solid #ccd8e5;
 }
 
-.dataComponents > fieldset fieldset:not(:global(.collecting-event-clean)) {
-  background-color: #fafafa !important;
+/* Bootstrap's legend margin pushes the title off-centre in the header bar. */
+.dataComponents > fieldset > :global(.legend-wrapper) > legend,
+.topLevelEmbeddedSection > fieldset > :global(.legend-wrapper) > legend,
+.topLevelEmbeddedSection > div > fieldset > :global(.legend-wrapper) > legend {
+  margin-bottom: 0;
 }
 
-.dataComponents > fieldset :global(.collecting-event-layout) fieldset {
+.dataComponents fieldset {
   background-color: #fff !important;
 }
 
@@ -37,13 +40,12 @@
 }
 
 .formCanvas {
-  background-color: #f5f6f7;
-  padding-top: 1rem;
+  background-color: #fff;
   padding-bottom: 1rem;
 }
 
-.dataComponents > fieldset {
-  background-color: #fff;
+.releasableFields :global(.notPubliclyReleasableReason) {
+  margin-top: 0.5rem;
 }
 
 .overviewHeader {
@@ -67,7 +69,7 @@
 .topLevelEmbeddedSection > div > fieldset > :global(.legend-wrapper) {
   background-color: #eaf1f8;
   margin: -0.5rem -1.5rem 1rem;
-  padding: 0.55rem 1.5rem 0.45rem;
+  padding: 0.75rem 1.5rem;
   border-bottom: 1px solid #ccd8e5;
 }
 

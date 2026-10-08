@@ -108,14 +108,11 @@ export function NumberRangeFields({
 
   if (compact) {
     return (
-      <div
-        className="d-flex align-items-center mb-2"
-        style={{ maxWidth: "760px" }}
-      >
-        <div className="fw-semibold flex-shrink-0" style={{ width: "230px" }}>
-          <span className={classNames(isEmptyValue && "field-label-empty")}>
+      <div className="d-flex align-items-center mb-2">
+        <div className="flex-shrink-0" style={{ width: "18em" }}>
+          <strong className={classNames(isEmptyValue && "field-label-empty")}>
             {labelMsg}
-          </span>
+          </strong>
           <Tooltip
             id="metersField_tooltip"
             iconClassName={isEmptyValue ? "tooltip-info-icon-empty" : undefined}

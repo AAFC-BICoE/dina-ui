@@ -22,7 +22,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import _ from "lodash";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { useLayoutEffect, useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   BLANK_PREPARATION,
   CollectingEventFormLayout,
@@ -813,16 +813,6 @@ export function useMaterialSampleSave({
   // set on an individual tab, it will just unlink that specific record.
   const [unlinkCollectingEvent, setUnlinkCollectingEvent] =
     useState<boolean>(false);
-
-  // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
-  useLayoutEffect(() => {
-    const dataComponents = document?.querySelectorAll<HTMLDivElement>(
-      ".data-components fieldset:not(.d-none, .non-strip)"
-    );
-    dataComponents?.forEach((element, index) => {
-      element.style.backgroundColor = index % 2 === 1 ? "#f3f3f3" : "";
-    });
-  });
 
   const { withDuplicateSampleNameCheck } = useDuplicateSampleNameDetection();
 

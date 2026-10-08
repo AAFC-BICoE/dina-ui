@@ -24,22 +24,10 @@ export interface GeoReferenceAssertionRowProps {
   assertion: GeoReferenceAssertion;
 }
 
-function CompactFieldRow({
-  label,
-  children
-}: {
-  label: ReactNode;
-  children: ReactNode;
-}) {
+function CompactFieldRow({ children }: { children: ReactNode }) {
   return (
-    <div
-      className="d-flex align-items-center mb-2"
-      style={{ maxWidth: "760px" }}
-    >
-      <div className="fw-semibold flex-shrink-0" style={{ width: "230px" }}>
-        {label}
-      </div>
-      <div className="flex-grow-1">{children}</div>
+    <div className="mb-2">
+      <DinaFormSection horizontal={18}>{children}</DinaFormSection>
     </div>
   );
 }
@@ -193,7 +181,7 @@ export function GeoReferenceAssertionRow({
           }
         </Field>
 
-        <CompactFieldRow label="Decimal Latitude">
+        <CompactFieldRow>
           <NumberField
             name={commonRoot + "dwcDecimalLatitude"}
             customName="dwcDecimalLatitude"
@@ -202,12 +190,11 @@ export function GeoReferenceAssertionRow({
             onChangeExternal={updateReservedAssertion}
             min={-90}
             max={90}
-            removeLabel={true}
             removeBottomMargin={true}
           />
         </CompactFieldRow>
 
-        <CompactFieldRow label="Decimal Longitude">
+        <CompactFieldRow>
           <NumberField
             name={commonRoot + "dwcDecimalLongitude"}
             customName="dwcDecimalLongitude"
@@ -216,12 +203,11 @@ export function GeoReferenceAssertionRow({
             onChangeExternal={updateReservedAssertion}
             min={-180}
             max={180}
-            removeLabel={true}
             removeBottomMargin={true}
           />
         </CompactFieldRow>
 
-        <CompactFieldRow label="Coordinate Uncertainty (meters)">
+        <CompactFieldRow>
           <NumberField
             name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
             tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_coordinate_uncertainty_in_meters"
@@ -231,84 +217,76 @@ export function GeoReferenceAssertionRow({
             readOnly={georeferenceDisabled}
             className="dwcCoordinateUncertaintyInMeters"
             onChangeExternal={updateReservedAssertion}
-            removeLabel={true}
             removeBottomMargin={true}
           />
         </CompactFieldRow>
 
-        <CompactFieldRow label={formatMessage("georeferencedDateLabel")}>
+        <CompactFieldRow>
           <DateField
             name={commonRoot + "dwcGeoreferencedDate"}
             className="dwcGeoreferencedDate"
             label={formatMessage("georeferencedDateLabel")}
-            removeLabel={true}
             removeBottomMargin={true}
           />
         </CompactFieldRow>
 
-        <CompactFieldRow label="Geodetic Datum">
+        <CompactFieldRow>
           <TextField
             name={commonRoot + "dwcGeodeticDatum"}
             className="dwcGeodeticDatum"
             customName="dwcGeodeticDatum"
             readOnly={georeferenceDisabled}
             onChangeExternal={updateReservedAssertion}
-            removeLabel={true}
             removeBottomMargin={true}
           />
         </CompactFieldRow>
 
-        <CompactFieldRow label={formatMessage("literalGeoreferencedByLabel")}>
+        <CompactFieldRow>
           <TextField
             name={commonRoot + "literalGeoreferencedBy"}
             className="literalGeoreferencedBy"
             label={formatMessage("literalGeoreferencedByLabel")}
-            removeLabel={true}
             removeBottomMargin={true}
           />
         </CompactFieldRow>
 
-        <CompactFieldRow label={formatMessage("georeferencedByLabel")}>
+        <CompactFieldRow>
           <PersonSelectField
             name={commonRoot + "georeferencedBy"}
             label={formatMessage("georeferencedByLabel")}
             isMulti={true}
-            removeLabel={true}
             removeBottomMargin={true}
           />
         </CompactFieldRow>
 
-        <CompactFieldRow label="Georeference Protocol">
+        <CompactFieldRow>
           <TextField
             name={commonRoot + "dwcGeoreferenceProtocol"}
             className="dwcGeoreferenceProtocol"
             customName="dwcGeoreferenceProtocol"
             readOnly={georeferenceDisabled}
             onChangeExternal={updateReservedAssertion}
-            removeLabel={true}
             removeBottomMargin={true}
           />
         </CompactFieldRow>
 
-        <CompactFieldRow label="Georeference Sources">
+        <CompactFieldRow>
           <TextField
             name={commonRoot + "dwcGeoreferenceSources"}
             className="dwcGeoreferenceSources"
             customName="dwcGeoreferenceSources"
             readOnly={georeferenceDisabled}
             onChangeExternal={updateReservedAssertion}
-            removeLabel={true}
             removeBottomMargin={true}
           />
         </CompactFieldRow>
 
-        <CompactFieldRow label="Georeference Remarks">
+        <CompactFieldRow>
           <TextField
             name={commonRoot + "dwcGeoreferenceRemarks"}
             multiLines={true}
             className="dwcGeoreferenceRemarks"
             customName="dwcGeoreferenceRemarks"
-            removeLabel={true}
             removeBottomMargin={true}
           />
         </CompactFieldRow>
