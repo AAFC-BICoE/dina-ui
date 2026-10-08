@@ -43,7 +43,7 @@ import "common-ui/lib/settings-button/SettingsButton.css";
  * See: https://github.com/zeit/next.js/#custom-app
  */
 
-export default function DinaUiApp({ Component, pageProps }: AppProps) {
+export default function DinaUiApp({ Component, pageProps, router }: AppProps) {
   const appElement =
     typeof window !== "undefined"
       ? document.querySelector<HTMLElement>("#__next")
@@ -69,7 +69,7 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
               <AuthenticatedApiClientProvider>
                 <DinaIntlProvider>
                   <FileUploadProviderImpl>
-                    <ErrorBoundaryPage>
+                    <ErrorBoundaryPage resetKey={router.asPath}>
                       <DndContext>
                         <ModalProvider appElement={appElement}>
                           <WorkbookUploadContextProvider>
