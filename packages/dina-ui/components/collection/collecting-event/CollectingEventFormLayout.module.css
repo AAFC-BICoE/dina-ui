@@ -10,7 +10,7 @@
 }
 
 .cleanSection > :global(.legend-wrapper) {
-  border-bottom: 1px solid #ccd8e5;
+  border-bottom: 1px solid #d5dbe3;
   margin-bottom: 0.75rem;
   padding-bottom: 0.35rem;
 }
@@ -23,19 +23,19 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #274c77;
+  color: #335075;
   margin: 0 !important;
 }
 
 .sectionHeading {
-  border-bottom: 1px solid #ccd8e5;
+  border-bottom: 1px solid #d5dbe3;
   margin-bottom: 0.75rem;
   padding-bottom: 0.35rem;
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #274c77;
+  color: #335075;
 }
 
 .cleanSection :global(.legend-wrapper) :global(.fieldset-h2-adjustment) {
@@ -43,7 +43,7 @@
   font-weight: 600 !important;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #274c77;
+  color: #335075;
   margin: 0 !important;
 }
 

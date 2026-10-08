@@ -7,16 +7,16 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #274c77;
+  color: #335075;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
 
 .dataComponents > fieldset > :global(.legend-wrapper) {
-  background-color: #eaf1f8;
+  background-color: #eceff4;
   margin: -0.5rem -1.5rem 1rem;
-  padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid #ccd8e5;
+  padding: 0.9rem 1.5rem;
+  border-bottom: 1px solid #d5dbe3;
 }
 
 /* Bootstrap's legend margin pushes the title off-centre in the header bar. */
@@ -49,10 +49,10 @@
 }
 
 .overviewHeader {
-  background-color: #eaf1f8;
+  background-color: #eceff4;
   margin: -1rem -1rem 1rem;
   padding: 0.45rem 1rem;
-  border-bottom: 1px solid #ccd8e5;
+  border-bottom: 1px solid #d5dbe3;
 }
 
 .overviewHeader > h2 {
@@ -67,10 +67,10 @@
 
 .topLevelEmbeddedSection > fieldset > :global(.legend-wrapper),
 .topLevelEmbeddedSection > div > fieldset > :global(.legend-wrapper) {
-  background-color: #eaf1f8;
+  background-color: #eceff4;
   margin: -0.5rem -1.5rem 1rem;
-  padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid #ccd8e5;
+  padding: 0.9rem 1.5rem;
+  border-bottom: 1px solid #d5dbe3;
 }
 
 .topLevelEmbeddedSection
@@ -85,7 +85,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #274c77;
+  color: #335075;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }

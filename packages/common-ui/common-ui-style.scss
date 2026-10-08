@@ -158,6 +158,18 @@ input[id^="react-select"] {
   margin-bottom: 10px !important;
 }
 
+.fieldset-h2-adjustment:has(> .fieldset-legend-icon) {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.fieldset-legend-icon {
+  flex: none;
+  margin-right: 0.6rem;
+  vertical-align: -0.125em;
+}
+
 .material-sample-nav-column {
   width: 260px;
   flex: none;

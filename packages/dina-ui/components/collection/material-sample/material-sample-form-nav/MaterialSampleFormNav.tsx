@@ -115,7 +115,7 @@ interface SubNavLink {
   msg: React.JSX.Element;
 }
 
-const SECTION_ICONS: Partial<Record<string, IconType>> = {
+export const SECTION_ICONS: Record<string, IconType> = {
   [IDENTIFIER_COMPONENT_NAME]: FaFingerprint,
   [MATERIAL_SAMPLE_INFO_COMPONENT_NAME]: FaCircleInfo,
   [COLLECTING_EVENT_COMPONENT_NAME]: FaLocationDot,
