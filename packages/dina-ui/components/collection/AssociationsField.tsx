@@ -26,6 +26,7 @@ export function AssociationsField({ id = ASSOCIATIONS_COMPONENT_NAME }) {
     >
       <FieldSet
         legend={<DinaMessage id="hostOrganismLegend" />}
+        id="associations-host-organism"
         className="non-strip"
         sectionName="associations-host-organism-section"
       >

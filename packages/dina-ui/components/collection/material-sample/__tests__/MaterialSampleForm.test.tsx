@@ -5689,7 +5689,9 @@ describe("Material Sample Edit Page", () => {
         wrapper.container.querySelector(".lifeStage-field")
       ).not.toBeInTheDocument();
       expect(
-        wrapper.getByText(/organism managed attributes/i)
+        within(
+          wrapper.container.querySelector(".data-components") as HTMLElement
+        ).getByText(/organism managed attributes/i)
       ).toBeInTheDocument();
     });
 
@@ -5765,7 +5767,9 @@ describe("Material Sample Edit Page", () => {
         wrapper.container.querySelector(".verbatimScientificName-field")
       ).not.toBeInTheDocument();
       expect(
-        wrapper.getByText(/determination managed attributes/i)
+        within(
+          wrapper.container.querySelector(".data-components") as HTMLElement
+        ).getByText(/determination managed attributes/i)
       ).toBeInTheDocument();
     });
 
@@ -5877,7 +5881,9 @@ describe("Material Sample Edit Page", () => {
 
       // Managed Attributes is a separate, always-shown section - unaffected by the above:
       expect(
-        wrapper.getByText(/determination managed attributes/i)
+        within(
+          wrapper.container.querySelector(".data-components") as HTMLElement
+        ).getByText(/determination managed attributes/i)
       ).toBeInTheDocument();
     });
 
@@ -5946,7 +5952,11 @@ describe("Material Sample Edit Page", () => {
 
       // Expedition is visible (a sibling box sharing the "collecting-event-details"
       // section id) and must not be affected by the above:
-      expect(wrapper.getByText(/expedition & site/i)).toBeInTheDocument();
+      expect(
+        within(
+          wrapper.container.querySelector(".data-components") as HTMLElement
+        ).getByText(/expedition & site/i)
+      ).toBeInTheDocument();
       expect(
         wrapper.container.querySelector(".expedition-field")
       ).toBeInTheDocument();

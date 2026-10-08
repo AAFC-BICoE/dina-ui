@@ -56,15 +56,21 @@ export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 
 export interface DeterminationFieldProps {
   id?: string;
+  /** When set, the cards inside each determination get ids like `${navIdPrefix}-type-specimen`. */
+  navIdPrefix?: string;
   name?: string;
   visibleManagedAttributeKeys?: string[];
 }
 
 export function DeterminationField({
   id = "determination-section",
+  navIdPrefix,
   name,
   visibleManagedAttributeKeys
 }: DeterminationFieldProps) {
+  const navId = (suffix: string) =>
+    navIdPrefix ? `${navIdPrefix}-${suffix}` : undefined;
+
   const { formatMessage, locale } = useDinaIntl();
   const { readOnly, isTemplate, initialValues } = useDinaFormContext();
   const form = useFormikContext<MaterialSample>();
@@ -173,6 +179,7 @@ export function DeterminationField({
               <div className="col-md-6">
                 <FieldSet
                   legend={<DinaMessage id="verbatimDeterminationLegend" />}
+                  id={navId("verbatim-determination")}
                   className="non-strip"
                   componentName={ORGANISMS_COMPONENT_NAME}
                   sectionName="organism-verbatim-determination-section"
@@ -204,6 +211,7 @@ export function DeterminationField({
                 </FieldSet>
                 <FieldSet
                   legend={<DinaMessage id="typeSpecimen" />}
+                  id={navId("type-specimen")}
                   className="non-strip"
                   componentName={ORGANISMS_COMPONENT_NAME}
                   sectionName="organism-type-specimen-section"
@@ -231,6 +239,7 @@ export function DeterminationField({
               <div className="col-md-6">
                 <FieldSet
                   legend={<DinaMessage id="determination" />}
+                  id={navId("determination")}
                   className="non-strip"
                   componentName={ORGANISMS_COMPONENT_NAME}
                   sectionName="organism-determination-section"
@@ -351,6 +360,7 @@ export function DeterminationField({
                         legend: (
                           <DinaMessage id="determinationManagedAttributes" />
                         ),
+                        id: navId("determination-managed-attributes"),
                         className: "non-strip",
                         sectionName: "organism-managed-attributes-section"
                       }}

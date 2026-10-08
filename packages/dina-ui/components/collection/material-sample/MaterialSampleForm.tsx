@@ -474,7 +474,7 @@ export function MaterialSampleForm({
 
   const formLayout = (
     <div className="d-md-flex">
-      <div style={{ minWidth: "20rem", maxWidth: "20rem" }}>
+      <div className="material-sample-nav-column">
         {(!isOffScreen || !reduceRendering) && (
           <MaterialSampleFormNav
             dataComponentState={dataComponentState}

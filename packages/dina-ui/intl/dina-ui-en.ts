@@ -317,7 +317,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createStorage: "Create Storage",
   customPlaceName: "Custom Place Name",
   customPlaceNamePlaceholder: "Enter a custom place name...",
-  dataComponents: "Data Components",
+  dataComponents: "Sections",
   dataEntryLabel: "Data Entry",
   dataType: "Type: ",
   dataValue: "Value: ",

@@ -165,7 +165,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createSplitWorkflow: "Créer un fractionnement",
   createStorage: "Créer un espace d'entreposage",
   customPlaceName: "Nom de lieu personnalisé",
-  dataComponents: "Éléments de données",
+  dataComponents: "Sections",
   dataEntryLabel: "Saisie de données",
   dataType: "Taper: ",
   dataValue: "Valeur: ",

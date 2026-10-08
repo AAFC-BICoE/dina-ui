@@ -167,6 +167,7 @@ export function CollectingEventFormLayout({
       controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
       fieldSetProps={{
         legend: <DinaMessage id="managedAttributes" />,
+        id: "collectingEventManagedAttributes",
         className: `non-strip collecting-event-clean ${styles.cleanSection}`,
         componentName: COLLECTING_EVENT_COMPONENT_NAME,
         sectionName: "collecting-event-managed-attributes-section"
@@ -588,6 +589,7 @@ export function CollectingEventFormLayout({
         <div className="col-md-12">
           <FieldSet
             legend={<DinaMessage id="collectingEventDetails" />}
+            id="collectingEventDetails"
             className={`non-strip h-100 ${styles.cleanSection}`}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-additional-details-section"
@@ -734,6 +736,7 @@ export function CollectingEventFormLayout({
         <div className="col-md-12">
           <FieldSet
             legend={<DinaMessage id="collectingEventExpeditionAndSite" />}
+            id="collectingEventExpeditionAndSite"
             className={`non-strip collecting-event-clean ${styles.cleanSection}`}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-details"
@@ -781,6 +784,7 @@ export function CollectingEventFormLayout({
         >
           <DataEntryField
             legend={<DinaMessage id="collectingEventFieldExtensions" />}
+            id="collectingEventFieldExtensions"
             name="extensionValues"
             readOnly={readOnly}
             isTemplate={isTemplate}
@@ -800,6 +804,7 @@ export function CollectingEventFormLayout({
         ) : JSON.stringify(initialValues?.managedAttributes) !== "{}" ? ( // if read-only, check for managed attributes
           <FieldSet
             legend={<DinaMessage id="collectingEventManagedAttributes" />}
+            id="collectingEventManagedAttributes"
             className="non-strip collecting-event-clean-section"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-managed-attributes-section"
@@ -808,7 +813,7 @@ export function CollectingEventFormLayout({
           </FieldSet>
         ) : null}
       </>
-      <div className="mb-3">
+      <div className="mb-3" id="collectingEventAttachments">
         {!readOnly
           ? collectingEventAttachmentsComponent
           : initialValues?.attachment // if read-only, check for attachment

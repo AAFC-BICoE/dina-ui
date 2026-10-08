@@ -9,6 +9,7 @@ import { CSS } from "@dnd-kit/utilities";
 import classNames from "classnames";
 import {
   AreYouSureModal,
+  SmallSwitch,
   Tooltip,
   useDinaFormContext,
   useModal
@@ -21,9 +22,39 @@ import {
   useState
 } from "react";
 import { FaGripLines } from "react-icons/fa";
-import Switch, { ReactSwitchProps } from "react-switch";
+import {
+  FaBoxArchive,
+  FaBug,
+  FaCalendarDays,
+  FaCircleInfo,
+  FaFingerprint,
+  FaFlask,
+  FaLink,
+  FaLocationDot,
+  FaLock,
+  FaPaperclip,
+  FaPuzzlePiece,
+  FaQuoteRight,
+  FaSliders
+} from "react-icons/fa6";
+import { IconType } from "react-icons";
+import { ReactSwitchProps } from "react-switch";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
-import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../../types/collection-api";
+import {
+  ASSOCIATIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
+  COLLECTING_EVENT_COMPONENT_NAME,
+  FIELD_EXTENSIONS_COMPONENT_NAME,
+  IDENTIFIER_COMPONENT_NAME,
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
+  MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
+  ORGANISMS_COMPONENT_NAME,
+  PREPARATIONS_COMPONENT_NAME,
+  RESTRICTION_COMPONENT_NAME,
+  SCHEDULED_ACTIONS_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
+} from "../../../../types/collection-api";
 import { useMaterialSampleSave } from "../useMaterialSample";
 import { useMaterialSampleSectionOrder } from "./useMaterialSampleSectionOrder";
 import { NativeScrollSpyNav } from "./NativeScrollSpyNav";
@@ -61,6 +92,14 @@ const renderNav = process.env.NODE_ENV !== "test";
 
 const ScrollSpyNav = renderNav ? NativeScrollSpyNav : "div";
 
+const FORM_SECTION_HOVER_CLASS = "nav-hover-highlight";
+
+function setFormSectionHovered(targetId: string, hovered: boolean) {
+  document
+    .getElementById(targetId)
+    ?.classList.toggle(FORM_SECTION_HOVER_CLASS, hovered);
+}
+
 export interface ScrollTarget {
   id: string;
   msg: string | React.JSX.Element;
@@ -70,6 +109,97 @@ export interface ScrollTarget {
   setDeleted?: (val: boolean) => void;
   customSwitch?: ComponentType<ReactSwitchProps>;
 }
+
+interface SubNavLink {
+  id: string;
+  msg: React.JSX.Element;
+}
+
+const SECTION_ICONS: Partial<Record<string, IconType>> = {
+  [IDENTIFIER_COMPONENT_NAME]: FaFingerprint,
+  [MATERIAL_SAMPLE_INFO_COMPONENT_NAME]: FaCircleInfo,
+  [COLLECTING_EVENT_COMPONENT_NAME]: FaLocationDot,
+  [PREPARATIONS_COMPONENT_NAME]: FaFlask,
+  [ORGANISMS_COMPONENT_NAME]: FaBug,
+  [ASSOCIATIONS_COMPONENT_NAME]: FaLink,
+  [STORAGE_COMPONENT_NAME]: FaBoxArchive,
+  [RESTRICTION_COMPONENT_NAME]: FaLock,
+  [SCHEDULED_ACTIONS_COMPONENT_NAME]: FaCalendarDays,
+  [CITATIONS_COMPONENT_NAME]: FaQuoteRight,
+  [FIELD_EXTENSIONS_COMPONENT_NAME]: FaPuzzlePiece,
+  [MANAGED_ATTRIBUTES_COMPONENT_NAME]: FaSliders,
+  [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: FaPaperclip
+};
+
+/** Sub-links shown under a top-level nav item while it's the active scroll target. */
+const SECTION_SUB_LINKS: Partial<Record<string, SubNavLink[]>> = {
+  [ORGANISMS_COMPONENT_NAME]: [
+    {
+      id: "organism-managed-attributes",
+      msg: <DinaMessage id="organismManagedAttributes" />
+    },
+    {
+      id: "organism-verbatim-determination",
+      msg: <DinaMessage id="verbatimDeterminationLegend" />
+    },
+    { id: "organism-type-specimen", msg: <DinaMessage id="typeSpecimen" /> },
+    { id: "organism-determination", msg: <DinaMessage id="determination" /> },
+    {
+      id: "organism-determination-managed-attributes",
+      msg: <DinaMessage id="determinationManagedAttributes" />
+    }
+  ],
+  [ASSOCIATIONS_COMPONENT_NAME]: [
+    {
+      id: "associations-host-organism",
+      msg: <DinaMessage id="hostOrganismLegend" />
+    },
+    {
+      id: "associations-tabs",
+      msg: <DinaMessage id="materialSampleAssociationLegend" />
+    }
+  ],
+  [COLLECTING_EVENT_COMPONENT_NAME]: [
+    { id: "identifiers", msg: <DinaMessage id="identifiers" /> },
+    {
+      id: "collectingDateLegend",
+      msg: <DinaMessage id="collectingDateLegend" />
+    },
+    {
+      id: "collectingAgentsLegend",
+      msg: <DinaMessage id="collectingAgentsLegend" />
+    },
+    {
+      id: "verbatimLabelLegend",
+      msg: <DinaMessage id="verbatimLabelLegend" />
+    },
+    {
+      id: "collectingEventDetails",
+      msg: <DinaMessage id="collectingEventDetails" />
+    },
+    {
+      id: "geoReferencingLegend",
+      msg: <DinaMessage id="geoReferencingLegend" />
+    },
+    { id: "geographicPlace", msg: <DinaMessage id="toponymyLegend" /> },
+    {
+      id: "collectingEventExpeditionAndSite",
+      msg: <DinaMessage id="collectingEventExpeditionAndSite" />
+    },
+    {
+      id: "collectingEventFieldExtensions",
+      msg: <DinaMessage id="collectingEventFieldExtensions" />
+    },
+    {
+      id: "collectingEventManagedAttributes",
+      msg: <DinaMessage id="managedAttributes" />
+    },
+    {
+      id: "collectingEventAttachments",
+      msg: <DinaMessage id="collectingEventAttachments" />
+    }
+  ]
+};
 
 /** Form navigation and toggles to enable/disable form sections. */
 export function MaterialSampleFormNav({
@@ -108,7 +238,7 @@ export function MaterialSampleFormNav({
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
         <div className="sticky-md-top material-sample-nav">
-          <style>{`.material-sample-nav .active a { color: inherit !important; } .material-sample-nav { top: 70px; }`}</style>
+          <style>{`.material-sample-nav .active a { color: inherit !important; } .material-sample-nav { top: 72px; }`}</style>
           <ScrollSpyNav
             {...(renderNav
               ? {
@@ -116,8 +246,10 @@ export function MaterialSampleFormNav({
                   scrollTargetIds: sortedScrollTargets
                     .filter((it) => !it.disabled)
                     .map((it) => it.id),
-                  activeNavClass: "active",
-                  offset: -20
+                  subScrollTargetIds: Object.values(SECTION_SUB_LINKS).flatMap(
+                    (links) => links?.map((link) => link.id) ?? []
+                  ),
+                  activeNavClass: "active"
                 }
               : {})}
           >
@@ -189,7 +321,7 @@ const DataComponentNavItem = ({
   const { isTemplate } = useDinaFormContext();
 
   const Tag = section.disabled ? "div" : "a";
-  const SwitchComponent = section.customSwitch ?? Switch;
+  const SwitchComponent = section.customSwitch ?? SmallSwitch;
 
   function toggle(newVal: boolean) {
     if (!newVal && !disableRemovePrompt) {
@@ -218,46 +350,83 @@ const DataComponentNavItem = ({
     }
   }
 
+  const subLinks = SECTION_SUB_LINKS[section.id];
+
+  // Cards can be missing (e.g. hidden by a form template), so only link to the ones rendered.
+  const [renderedSubLinkIds, setRenderedSubLinkIds] = useState<string[]>([]);
+  useEffect(() => {
+    const ids = (subLinks ?? [])
+      .filter((subLink) => document.getElementById(subLink.id))
+      .map((subLink) => subLink.id);
+    setRenderedSubLinkIds((previous) =>
+      previous.join() === ids.join() ? previous : ids
+    );
+  });
+  const visibleSubLinks = subLinks?.filter((subLink) =>
+    renderedSubLinkIds.includes(subLink.id)
+  );
+  const SectionIcon = SECTION_ICONS[section.id];
+
   return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      data-dragging={isDragging}
-      className={classNames(
-        section.className,
-        "list-group-item d-flex gap-2 align-items-center"
-      )}
-      key={section.id}
-      style={{ ...style, height: "3rem", zIndex: 1030 }}
-    >
-      {isTemplate && <NavSortHandle {...listeners} isDragging={isDragging} />}
-      <Tag
-        className="flex-grow-1 text-decoration-none"
-        href={section.disabled ? undefined : `#${section.id}`}
+    <div className="nav-item-group">
+      <div
+        ref={setNodeRef}
+        {...attributes}
+        data-dragging={isDragging}
+        className={classNames(
+          section.className,
+          "list-group-item d-flex gap-2 align-items-center"
+        )}
+        key={section.id}
+        style={{ ...style, height: "3rem", zIndex: 1030 }}
       >
-        {section.msg}
-      </Tag>
-      {section.setEnabled &&
-        (disableSwitch ? (
-          <Tooltip
-            id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
-            disableSpanMargin={true}
-            visibleElement={
-              <SwitchComponent
-                className="mt-2"
-                checked={!section.disabled}
-                onChange={toggle}
-                disabled={disableSwitch}
-              />
-            }
-          />
-        ) : (
-          <SwitchComponent
-            checked={!section.disabled}
-            onChange={toggle}
-            disabled={disableSwitch}
-          />
-        ))}
+        {isTemplate && <NavSortHandle {...listeners} isDragging={isDragging} />}
+        <Tag
+          className="flex-grow-1 text-decoration-none"
+          href={section.disabled ? undefined : `#${section.id}`}
+          onMouseEnter={() => setFormSectionHovered(section.id, true)}
+          onMouseLeave={() => setFormSectionHovered(section.id, false)}
+        >
+          {SectionIcon && <SectionIcon className="nav-item-icon" />}
+          {section.msg}
+        </Tag>
+        {section.setEnabled &&
+          (disableSwitch ? (
+            <Tooltip
+              id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
+              disableSpanMargin={true}
+              visibleElement={
+                <SwitchComponent
+                  className="mt-2"
+                  checked={!section.disabled}
+                  onChange={toggle}
+                  disabled={disableSwitch}
+                />
+              }
+            />
+          ) : (
+            <SwitchComponent
+              checked={!section.disabled}
+              onChange={toggle}
+              disabled={disableSwitch}
+            />
+          ))}
+      </div>
+      {visibleSubLinks && !section.disabled && (
+        <ul className="sub-nav-list list-unstyled">
+          {visibleSubLinks.map((subLink) => (
+            <li key={subLink.id}>
+              <a
+                href={`#${subLink.id}`}
+                onMouseEnter={() => setFormSectionHovered(subLink.id, true)}
+                onMouseLeave={() => setFormSectionHovered(subLink.id, false)}
+              >
+                {subLink.msg}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
