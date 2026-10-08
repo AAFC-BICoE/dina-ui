@@ -13,6 +13,7 @@ import { QueryPage } from "common-ui";
 import { KitsuResource } from "kitsu";
 import React from "react";
 import { QueryPageTabProps } from "../QueryPage";
+import { writeStorage } from "@rehooks/local-storage";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   return mockResponses[path] ?? { data: [] };
@@ -279,6 +280,46 @@ describe("QueryPage test", () => {
 
         expect(component.queryByRole("tablist")).not.toBeInTheDocument();
         expect(component.getByTestId("ReactTable")).toBeInTheDocument();
+      });
+    });
+
+    it("Should reset pagination when the stored page is outside the available results", async () => {
+      const uniqueName = "test-invalid-page-offset";
+      const pageOffsetKey = `${uniqueName}-last-used-page-offset`;
+
+      writeStorage(pageOffsetKey, 50);
+
+      mockPost.mockImplementation(
+        async (path) => mockResponsesTabs[path] ?? { data: [] }
+      );
+
+      mountWithAppContext(
+        <DinaForm initialValues={{}}>
+          <QueryPage<TestResource>
+            indexName="test_index"
+            uniqueName={uniqueName}
+            columns={COLUMNS as any}
+          />
+        </DinaForm>,
+        testCtx
+      );
+
+      await waitForLoadingToDisappear();
+
+      await waitFor(() => {
+        expect(JSON.parse(localStorage.getItem(pageOffsetKey) ?? "null")).toBe(
+          0
+        );
+      });
+
+      await waitFor(() => {
+        const searchRequests = mockPost.mock.calls.filter(
+          ([path]) => path === "search-api/search-ws/search"
+        );
+
+        expect(searchRequests.length).toBeGreaterThanOrEqual(2);
+        expect(searchRequests[0][1].from).toBe(50);
+        expect(searchRequests.at(-1)?.[1].from).toBe(0);
       });
     });
 
