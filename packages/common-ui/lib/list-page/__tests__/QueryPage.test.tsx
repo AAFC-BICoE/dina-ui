@@ -311,6 +311,16 @@ describe("QueryPage test", () => {
           0
         );
       });
+
+      await waitFor(() => {
+        const searchRequests = mockPost.mock.calls.filter(
+          ([path]) => path === "search-api/search-ws/search"
+        );
+
+        expect(searchRequests.length).toBeGreaterThanOrEqual(2);
+        expect(searchRequests[0][1].from).toBe(50);
+        expect(searchRequests.at(-1)?.[1].from).toBe(0);
+      });
     });
 
     describe("Tab Rendering", () => {

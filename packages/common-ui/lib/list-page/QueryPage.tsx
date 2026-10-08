@@ -685,6 +685,24 @@ export function QueryPage<TData extends KitsuResource>({
       elasticSearchRequest(queryDSL)
         .then((result) => {
           const processedResult = processResults(result);
+          const correctInvalidPageOffset = (recordCount: number) => {
+            if (pageSize === 0 || pageOffset < recordCount) {
+              return false;
+            }
+
+            const lastValidOffset =
+              recordCount > 0
+                ? Math.floor((recordCount - 1) / pageSize) * pageSize
+                : 0;
+
+            if (lastValidOffset === pageOffset) {
+              return false;
+            }
+
+            isActionTriggeredQuery.current = true;
+            setPageOffset(lastValidOffset);
+            return true;
+          };
 
           // If we have reached the count limit, we will need to perform another request for the true
           // query size.
@@ -692,16 +710,26 @@ export function QueryPage<TData extends KitsuResource>({
             elasticSearchCountRequest(queryDSL)
               .then((countResult) => {
                 setTotalRecords(countResult);
+                if (correctInvalidPageOffset(countResult)) {
+                  return;
+                }
+
+                setAvailableResources(processedResult);
+                setSearchResults(processedResult);
               })
               .catch((elasticSearchError) => {
                 setError(elasticSearchError);
               });
           } else {
-            setTotalRecords(result?.total?.value ?? 0);
-          }
+            const recordCount = result?.total?.value ?? 0;
+            setTotalRecords(recordCount);
+            if (correctInvalidPageOffset(recordCount)) {
+              return;
+            }
 
-          setAvailableResources(processedResult);
-          setSearchResults(processedResult);
+            setAvailableResources(processedResult);
+            setSearchResults(processedResult);
+          }
         })
         .catch((elasticSearchError) => {
           setError(elasticSearchError);
