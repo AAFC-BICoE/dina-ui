@@ -585,6 +585,15 @@ export function QueryPage<TData extends KitsuResource>({
     }
   }, [queryBuilderTree]);
 
+  useEffect(() => {
+    if (totalRecords > 0 && pageOffset >= totalRecords) {
+      const lastValidOffset =
+        Math.floor((totalRecords - 1) / pageSize) * pageSize;
+
+      setPageOffset(lastValidOffset);
+    }
+  }, [totalRecords, pageOffset, pageSize]);
+
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
     // If in view mode with selected resources, no requests need to be made.
