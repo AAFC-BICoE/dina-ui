@@ -1,4 +1,5 @@
 import { PersistedResource, InputResource } from "kitsu";
+import { FormikProps } from "formik";
 import moment from "moment";
 import { ApiClientContext, useAccount } from "../../../../common-ui/lib";
 import { BULK_ADD_IDS_KEY } from "../../../pages/object-store/upload";
@@ -15,10 +16,10 @@ import { useContext, useState, useEffect } from "react";
 import { useLocalStorage } from "@rehooks/local-storage";
 
 interface MetadataUploadProps {
-  buttonBar?: React.JSX.Element;
+  metadataFormRef?: React.Ref<FormikProps<InputResource<Metadata>>>;
 }
 
-export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
+export function MetadataUpload({ metadataFormRef }: MetadataUploadProps) {
   const router = useRouter();
   const { apiClient, bulkGet } = useContext(ApiClientContext);
   const { agentId } = useAccount();
@@ -94,7 +95,7 @@ export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
       defaultToNotReleasable={true}
       metadata={uploadMetadata as InputResource<Metadata>}
       onSaved={redirectToSingleMetadataPage}
-      buttonBar={buttonBar}
+      metadataFormRef={metadataFormRef}
     />
   ) : null;
 }

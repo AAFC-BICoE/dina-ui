@@ -7,7 +7,7 @@ import {
   MetadataBulkEditor,
   MetadataBulkEditorHandle
 } from "./MetadataBulkEditor";
-import { forwardRef } from "react";
+import { forwardRef, ReactNode } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface ExistingMetadataBulkEditorProps {
@@ -15,12 +15,13 @@ export interface ExistingMetadataBulkEditorProps {
   onSaved: (metadataIds: string[]) => void | Promise<void>;
   onPreviousClick?: () => void;
   insideModal?: boolean;
+  renderLayout?: (buttonBar: ReactNode, content: ReactNode) => ReactNode;
 }
 
 export const ExistingMetadataBulkEditor = forwardRef<
   MetadataBulkEditorHandle,
   ExistingMetadataBulkEditorProps
->(({ ids, onSaved, onPreviousClick, insideModal }, ref) => {
+>(({ ids, onSaved, onPreviousClick, insideModal, renderLayout }, ref) => {
   const metadataQueries = useMetadataEditQueries(ids);
 
   /** Whether any query is loading. */
@@ -69,6 +70,7 @@ export const ExistingMetadataBulkEditor = forwardRef<
         onSaved={onSaved}
         onPreviousClick={onPreviousClick}
         insideModal={insideModal}
+        renderLayout={renderLayout}
       />
     );
   }
