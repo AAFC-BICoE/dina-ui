@@ -157,6 +157,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   associationType: "Association Type",
   associationsLegend: "Associations",
   linkExisting: "Link Existing",
+  linkedToResource: "Linked to",
+  sharedWithMaterialSamples: "shared with {count} material samples",
   unlinkAll: "Unlink All",
   noCollectingEventAttached:
     "None of these material samples currently have a Collecting Event.",
@@ -249,6 +251,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Shared collecting event — linked to {count} material samples. Edit from the Details Page.",
   collectingEventEditErrorMessageSingle:
     "Linked collecting event — linked to 1 material sample. Edit from the Details Page.",
+  collectingEventEditOnDetailsPage:
+    "Editing is only available on the Collecting Event Details page.",
   collectingEventEditAlertTitle: "Update Collecting Event?",
   collectingEventGoToDetails: "Go to Collecting Event details page",
   collectingEventViewMaterialSamplesAttached:

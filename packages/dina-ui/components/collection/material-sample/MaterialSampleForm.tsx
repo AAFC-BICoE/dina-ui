@@ -212,6 +212,7 @@ export function MaterialSampleForm({
   const {
     initialValues,
     nestedCollectingEventForm,
+    materialSampleUsageCount,
     dataComponentState,
     colEventId,
     setColEventId,
@@ -286,6 +287,11 @@ export function MaterialSampleForm({
             )
           }
           nestedForm={nestedCollectingEventForm}
+          usageCount={materialSampleUsageCount}
+          getSummary={(colEvent) => ({
+            name: colEvent.dwcVerbatimLocality ?? colEvent.id,
+            date: colEvent.startEventDateTime?.slice(0, 10)
+          })}
           useResourceQuery={useCollectingEventQuery}
           setResourceId={setColEventId}
           disableLinkerTab={templateAttachesCollectingEvent}

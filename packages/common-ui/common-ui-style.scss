@@ -310,6 +310,10 @@ fieldset.card.border,
   outline-offset: 4px;
 }
 
+.number-range-fields-compact label.mb-2 {
+  margin-bottom: 0 !important;
+}
+
 .modal-header {
   justify-content: center;
 }

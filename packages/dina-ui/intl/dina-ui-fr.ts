@@ -118,6 +118,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectingAgentsLegend: "Agents de collecte",
   collectingDateLegend: "Date de collecte",
   collectingEvent: "Événement de collecte",
+  collectingEventEditOnDetailsPage:
+    "La modification n'est disponible que sur la page de détails de l'événement de collecte.",
+  linkedToResource: "Lié à",
+  sharedWithMaterialSamples: "partagé avec {count} échantillons de matériaux",
   collectingEventAttachments: "Pièces jointes de l’événement de collecte",
   collectingEventDetails: "Détails de l'activité de collecte",
   collectingEventListTitle: "Événement de collecte",

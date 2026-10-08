@@ -549,14 +549,15 @@ export function CollectingEventFormLayout({
               />
             </CompactFieldRow>
 
-            <CompactFieldRow>
-              <TextField
-                name="dwcVerbatimElevation"
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
-
-            <div className="mb-2" style={{ marginLeft: "18em" }}>
+            <div className="d-flex align-items-start gap-2">
+              <div className="flex-grow-1">
+                <CompactFieldRow>
+                  <TextField
+                    name="dwcVerbatimElevation"
+                    removeBottomMargin={true}
+                  />
+                </CompactFieldRow>
+              </div>
               <ParseVerbatimToRangeButton
                 verbatimField="dwcVerbatimElevation"
                 rangeFields={[
@@ -564,14 +565,19 @@ export function CollectingEventFormLayout({
                   "dwcMaximumElevationInMeters"
                 ]}
                 buttonText={formatMessage("convertToElevationMinMax")}
+                className="mb-1"
               />
             </div>
 
-            <CompactFieldRow>
-              <TextField name="dwcVerbatimDepth" removeBottomMargin={true} />
-            </CompactFieldRow>
-
-            <div style={{ marginLeft: "18em" }}>
+            <div className="d-flex align-items-start gap-2">
+              <div className="flex-grow-1">
+                <CompactFieldRow>
+                  <TextField
+                    name="dwcVerbatimDepth"
+                    removeBottomMargin={true}
+                  />
+                </CompactFieldRow>
+              </div>
               <ParseVerbatimToRangeButton
                 verbatimField="dwcVerbatimDepth"
                 rangeFields={[
@@ -579,6 +585,7 @@ export function CollectingEventFormLayout({
                   "dwcMaximumDepthInMeters"
                 ]}
                 buttonText={formatMessage("convertToDepthMinMax")}
+                className="mb-1"
               />
             </div>
           </FieldSet>
