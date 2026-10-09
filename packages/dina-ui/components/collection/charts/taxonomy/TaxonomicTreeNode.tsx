@@ -175,6 +175,8 @@ export default function TaxonomicTreeNode({ query }) {
         setRoot(prunedTree);
       } catch (err) {
         console.error("Error loading taxonomy:", err);
+        // Show an empty tree instead of leaving the spinner up forever.
+        setRoot({ id: "root", name: "Taxonomic Tree", count: 0, children: [] });
       }
     }
 
