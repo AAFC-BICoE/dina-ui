@@ -159,12 +159,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectingEventEditAlertMessage:
     "Dieses Sammlungsevent ist derzeit mit {count} Materialproben verknüpft. Stellen Sie sicher",
   collectingEventEditAlertTitle: "Sammlungsevent aktualisieren?",
-  collectingEventEditErrorMessage:
-    "Geteiltes Sammlungsevent — mit {count} Materialproben verknüpft. Bearbeitung über die Detailseite.",
-  collectingEventEditErrorMessageSingle:
-    "Verknüpftes Sammlungsevent — mit 1 Materialprobe verknüpft. Bearbeitung über die Detailseite.",
   collectingEventFieldExtensions: "Sammlungsevent-Felderweiterungen",
-  collectingEventGoToDetails: "Zur Detailseite des Sammlungsevents",
   collectingEventListTitle: "Sammlungsevent",
   collectingEventManagedAttributes: "Zusatzfelder des Sammlungsevents",
   collectingEventPartOfExpedition: "Sammlungsevent Teil von Expedition",

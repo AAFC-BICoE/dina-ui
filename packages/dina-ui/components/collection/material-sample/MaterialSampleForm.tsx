@@ -31,6 +31,7 @@ import {
   NotPubliclyReleasableSection
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { getLinkedMaterialSamplesHref } from "../collecting-event/CollectingEventEditAlert";
 import { getCollectingEventName } from "../collecting-event/getCollectingEventName";
 import { SECTION_ICONS } from "./material-sample-form-nav/MaterialSampleFormNav";
 import {
@@ -289,6 +290,9 @@ export function MaterialSampleForm({
           }
           nestedForm={nestedCollectingEventForm}
           usageCount={materialSampleUsageCount}
+          usageHref={
+            colEventId ? getLinkedMaterialSamplesHref(colEventId) : undefined
+          }
           getSummary={(colEvent) => ({
             name: getCollectingEventName(colEvent),
             date: colEvent.startEventDateTime?.slice(0, 10)

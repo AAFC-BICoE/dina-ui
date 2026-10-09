@@ -134,15 +134,10 @@ export function NativeScrollSpyNav({
         (target) => target.top
       )?.id;
 
-      // Sub-sections: everything overlapping the band, since several can be in view at once.
-      let nextSubIds = subScrollTargetIds.filter((id) => {
-        const rect = document.getElementById(id)?.getBoundingClientRect();
-        return !!rect && rect.bottom > bandTop && rect.top < bandBottom;
-      });
-
       // The page can't scroll far enough for the last targets to reach the band,
       // so at the bottom, use whatever is showing there instead.
-      if (isScrolledToPageBottom()) {
+      const atBottom = isScrolledToPageBottom();
+      if (atBottom) {
         const pinnedTop = targets.find(
           (target) => target.id === pinnedIdRef.current
         )?.top;
@@ -154,14 +149,14 @@ export function NativeScrollSpyNav({
           pinnedTop !== undefined && pinnedTop < window.innerHeight
             ? pinnedIdRef.current ?? undefined
             : lastTarget?.id;
-
-        nextSubIds = subScrollTargetIds.filter((id) => {
-          const rect = document.getElementById(id)?.getBoundingClientRect();
-          return (
-            !!rect && rect.bottom > bandTop && rect.top < window.innerHeight
-          );
-        });
       }
+
+      // Sub-sections: everything overlapping the band, since several can be in view at once.
+      const subBottom = atBottom ? window.innerHeight : bandBottom;
+      const nextSubIds = subScrollTargetIds.filter((id) => {
+        const rect = document.getElementById(id)?.getBoundingClientRect();
+        return !!rect && rect.bottom > bandTop && rect.top < subBottom;
+      });
 
       if (nextActiveId) {
         setActiveId(nextActiveId);

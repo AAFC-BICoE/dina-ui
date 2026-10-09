@@ -263,13 +263,19 @@ input[id^="react-select"] {
 .material-sample-nav .sub-nav-list {
   max-height: 0;
   overflow: hidden;
+
+  /* Closed lists must also leave the tab order and screen readers. */
+  visibility: hidden;
+
   margin: 0;
   padding: 0;
-  transition: max-height 0.3s ease;
+  transition: max-height 0.3s ease, visibility 0s 0.3s;
 }
 
 .material-sample-nav .list-group-item.active + .sub-nav-list {
   max-height: 30rem;
+  visibility: visible;
+  transition: max-height 0.3s ease;
 }
 
 .material-sample-nav .sub-nav-list li {

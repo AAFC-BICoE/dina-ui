@@ -201,6 +201,10 @@ const SECTION_SUB_LINKS: Partial<Record<string, SubNavLink[]>> = {
   ]
 };
 
+const SUB_SCROLL_TARGET_IDS = Object.values(SECTION_SUB_LINKS).flatMap(
+  (links) => links?.map((link) => link.id) ?? []
+);
+
 /** Form navigation and toggles to enable/disable form sections. */
 export function MaterialSampleFormNav({
   dataComponentState,
@@ -217,6 +221,13 @@ export function MaterialSampleFormNav({
   });
 
   const [items, setItems] = useState(sortedScrollTargets.map((it) => it.id));
+
+  // Stable arrays, so the scroll spy only re-runs when the ids actually change.
+  const enabledIds = sortedScrollTargets
+    .filter((it) => !it.disabled)
+    .map((it) => it.id);
+  const enabledIdsKey = enabledIds.join();
+  const scrollTargetIds = useMemo(() => enabledIds, [enabledIdsKey]);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -242,13 +253,9 @@ export function MaterialSampleFormNav({
           <ScrollSpyNav
             {...(renderNav
               ? {
-                  key: sortedScrollTargets.filter((it) => !it.disabled).length,
-                  scrollTargetIds: sortedScrollTargets
-                    .filter((it) => !it.disabled)
-                    .map((it) => it.id),
-                  subScrollTargetIds: Object.values(SECTION_SUB_LINKS).flatMap(
-                    (links) => links?.map((link) => link.id) ?? []
-                  ),
+                  key: scrollTargetIds.length,
+                  scrollTargetIds,
+                  subScrollTargetIds: SUB_SCROLL_TARGET_IDS,
                   activeNavClass: "active"
                 }
               : {})}

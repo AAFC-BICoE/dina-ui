@@ -11,6 +11,7 @@ import {
   withResponse
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
+import { LinkProps } from "next/link";
 import {
   ReactNode,
   useState,
@@ -56,6 +57,8 @@ export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   overrideCollectingEvent?: boolean;
   /** The number of records sharing the linked resource. */
   usageCount?: number | null;
+  /** Where to list the records sharing the linked resource. */
+  usageHref?: LinkProps["href"];
   /** The name and date shown in the linked resource summary bar. */
   getSummary?: (resource: PersistedResource<T>) => {
     name?: ReactNode;
@@ -71,6 +74,7 @@ function LinkedResourceSummary({
   name,
   date,
   usageCount,
+  usageHref,
   readOnlyLink,
   resourceId,
   disableUnlink,
@@ -80,6 +84,7 @@ function LinkedResourceSummary({
   name?: ReactNode;
   date?: string | null;
   usageCount?: number | null;
+  usageHref?: LinkProps["href"];
   readOnlyLink?: string;
   resourceId: string;
   disableUnlink?: boolean;
@@ -88,6 +93,12 @@ function LinkedResourceSummary({
 }) {
   const { formatMessage } = useDinaIntl();
   const isShared = !!usageCount && usageCount > 1;
+  const sharedWith = (
+    <DinaMessage
+      id="sharedWithMaterialSamples"
+      values={{ count: usageCount }}
+    />
+  );
 
   return (
     <div
@@ -104,10 +115,11 @@ function LinkedResourceSummary({
           <>
             {" "}
             ·{" "}
-            <DinaMessage
-              id="sharedWithMaterialSamples"
-              values={{ count: usageCount }}
-            />
+            {usageHref ? (
+              <ExternalLink href={usageHref}>{sharedWith}</ExternalLink>
+            ) : (
+              sharedWith
+            )}
           </>
         )}
       </span>
@@ -154,6 +166,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   setUnlinkCollectingEvent,
   overrideCollectingEvent,
   usageCount,
+  usageHref,
   getSummary
 }: TabbedResourceLinkerProps<T>) {
   const { isTemplate, isBulkEditAllTab } = useDinaFormContext();
@@ -349,6 +362,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                     name={summary?.name}
                     date={summary?.date}
                     usageCount={usageCount}
+                    usageHref={usageHref}
                     readOnlyLink={readOnlyLink}
                     resourceId={resourceId}
                     disableUnlink={disableLinkerTab}
