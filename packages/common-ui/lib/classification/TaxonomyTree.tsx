@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import * as echarts from "echarts";
+import { IntlShape, useIntl } from "react-intl";
+import { FaArrowRotateRight, FaDownload } from "react-icons/fa6";
 import { useApiClient } from "..";
 import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOptions";
 import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
-import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
+import { Tooltip } from "../tooltip/Tooltip";
 interface TreeNode {
   name: string;
   value?: number;
@@ -39,9 +41,223 @@ export interface TaxonomyTreeProps {
   inputQuery?: any;
 }
 
+const FONT =
+  '"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif';
+const NAVY = "#335075";
+const MUTED = "#6c757d";
+const TREE_LEFT = 16;
+const TREE_RIGHT = 150;
+const HEADER_Y = 26;
+
+const capitalizeFirstLetter = (string: string): string => {
+  if (!string) return "";
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
+
+const countLeaves = (node: TreeNode): number =>
+  node.children?.length
+    ? node.children.reduce((sum, child) => sum + countLeaves(child), 0)
+    : 1;
+
+/** Deepest expanded depth below an ECharts tree node, i.e. what its layout spaces columns by. */
+const visibleDepth = (node: { isExpand: boolean; children: any[] }): number =>
+  node.isExpand && node.children.length
+    ? 1 + Math.max(...node.children.map(visibleDepth))
+    : 0;
+
+export interface TaxonomyTreeOptionParams {
+  tree: TreeNode;
+  /** Rank keys in vocabulary order, e.g. ["kingdom", "phylum", ...]. */
+  ranks: string[];
+  /** Localized rank labels keyed by rank key. */
+  rankLabels: Record<string, string>;
+  formatMessage: IntlShape["formatMessage"];
+}
+
+/** Builds the left-to-right, one-column-per-rank tree option. */
+export function buildTaxonomyTreeOption({
+  tree,
+  ranks,
+  rankLabels,
+  formatMessage
+}: TaxonomyTreeOptionParams): echarts.EChartsOption {
+  const total = tree.value ?? 0;
+  const genusIndex = ranks.indexOf("genus");
+
+  // Genus and lower ranks are italicized by taxonomic convention.
+  const decorate = (node: TreeNode) => ({
+    ...node,
+    rankLabel: node.rank
+      ? rankLabels[node.rank] || capitalizeFirstLetter(node.rank)
+      : undefined,
+    it: genusIndex !== -1 && ranks.indexOf(node.rank ?? "") >= genusIndex,
+    children: node.children?.map(decorate)
+  });
+
+  const label = {
+    position: "right" as const,
+    distance: 8,
+    verticalAlign: "middle" as const,
+    align: "left" as const,
+    rich: {
+      n: { color: "#333", fontWeight: 600, fontSize: 13, fontFamily: FONT },
+      i: {
+        color: "#333",
+        fontWeight: 600,
+        fontSize: 13,
+        fontStyle: "italic" as const,
+        fontFamily: FONT
+      },
+      // Count badge, styled like a Bootstrap pill.
+      c: {
+        color: "#495057",
+        fontSize: 11,
+        fontWeight: 600,
+        fontFamily: FONT,
+        backgroundColor: "#e9ecef",
+        borderColor: "#dee2e6",
+        borderWidth: 1,
+        borderRadius: 8,
+        padding: [2, 6]
+      }
+    },
+    formatter: ({ data }: any) =>
+      `{${data.it ? "i" : "n"}|${data.name}} {c|${(
+        data.value ?? 0
+      ).toLocaleString()}}`
+  };
+
+  return {
+    animation: false,
+    textStyle: { fontFamily: FONT },
+    tooltip: {
+      trigger: "item",
+      backgroundColor: "#fff",
+      borderColor: "#dee2e6",
+      borderWidth: 1,
+      padding: [6, 10],
+      textStyle: { color: "#333", fontSize: 13, fontFamily: FONT },
+      extraCssText:
+        "box-shadow:0 .5rem 1rem rgba(0,0,0,.15);border-radius:.375rem;",
+      formatter: ({ data }: any) => {
+        const records = formatMessage(
+          { id: "taxonomyHierarchyNodeRecords" },
+          {
+            count: (data.value ?? 0).toLocaleString(),
+            percent: total ? Math.round(((data.value ?? 0) / total) * 100) : 0
+          }
+        );
+        if (!data.rank) {
+          return `${formatMessage({
+            id: "taxonomyHierarchyRootTooltip"
+          })}<br/>${records}`;
+        }
+        const name = echarts.format.encodeHTML(data.name);
+        return `${echarts.format.encodeHTML(data.rankLabel)}<br/><b${
+          data.it ? ' style="font-style:italic"' : ""
+        }>${name}</b><br/>${records}`;
+      }
+    },
+    series: [
+      {
+        type: "tree",
+        name: "Taxonomy",
+        data: [{ ...decorate(tree), name: formatMessage({ id: "all" }) }],
+        orient: "LR",
+        left: TREE_LEFT,
+        right: TREE_RIGHT,
+        top: 48,
+        bottom: 16,
+        roam: false,
+        expandAndCollapse: true,
+        initialTreeDepth: -1, // Show all expanded nodes
+        animation: false,
+        symbol: "circle",
+        // Scaled to the total so dense datasets keep the root at a fixed size.
+        symbolSize: (value: number) =>
+          6 + 18 * Math.sqrt((value || 0) / (total || 1)),
+        edgeShape: "curve",
+        lineStyle: { color: "#ced4da", width: 1.5, curveness: 0.5 },
+        itemStyle: { color: NAVY, borderColor: NAVY },
+        label,
+        leaves: { label },
+        emphasis: { focus: "ancestor", lineStyle: { color: NAVY, width: 2 } }
+      }
+    ]
+  };
+}
+
+/** Rank headers and column guides at the x positions ECharts' LR tree layout gives each depth. */
+export function buildRankGraphics(
+  width: number,
+  height: number,
+  headers: string[]
+) {
+  // ECharts spaces depths evenly: (width - left - right) / deepest visible depth.
+  const step = (width - TREE_LEFT - TREE_RIGHT) / (headers.length || 1);
+  return [
+    ...headers.flatMap((text, i) => {
+      const x = TREE_LEFT + step * (i + 1);
+      return [
+        new echarts.graphic.Line({
+          silent: true,
+          z: -1,
+          shape: { x1: x, y1: HEADER_Y, x2: x, y2: height },
+          style: { stroke: "#f0f1f3" }
+        }),
+        new echarts.graphic.Text({
+          silent: true,
+          x: x - 4,
+          y: 4,
+          style: { text, fill: MUTED, font: `600 12px ${FONT}` }
+        })
+      ];
+    }),
+    new echarts.graphic.Line({
+      silent: true,
+      shape: { x1: 0, y1: HEADER_Y, x2: width, y2: HEADER_Y },
+      style: { stroke: "#dee2e6" }
+    })
+  ];
+}
+
+/**
+ * Draws the rank columns and redraws them whenever the visible depth or the size changes
+ * (load, collapse, resize). Returns a function that removes them.
+ */
+export function bindRankColumns(chart: echarts.ECharts, rankHeaders: string[]) {
+  // Drawn on zrender directly: any setOption call rebuilds the tree and re-expands collapsed nodes.
+  const columns = new echarts.graphic.Group({ silent: true });
+  chart.getZr().add(columns);
+  let columnsKey = "";
+  const redraw = () => {
+    // getModel is untyped internal API, but the only way to see which nodes are collapsed.
+    const realRoot = (chart as any).getModel().getSeriesByIndex(0)?.getData()
+      .tree.root.children[0];
+    const depth = realRoot ? visibleDepth(realRoot) : 0;
+    const key = `${chart.getWidth()}x${chart.getHeight()}:${depth}`;
+    if (key === columnsKey) return;
+    columnsKey = key;
+    columns.removeAll();
+    buildRankGraphics(
+      chart.getWidth(),
+      chart.getHeight(),
+      rankHeaders.slice(0, depth)
+    ).forEach((element) => columns.add(element));
+  };
+  chart.on("finished", redraw);
+
+  return () => {
+    if (chart.isDisposed()) return;
+    chart.off("finished", redraw);
+    chart.getZr().remove(columns);
+  };
+}
+
 export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
   const [error, setError] = useState<string | null>(null);
   const [taxonomicRanks, setTaxonomicRanks] = useState<string[]>([]);
+  const [rankLabels, setRankLabels] = useState<Record<string, string>>({});
   const [treeData, setTreeData] = useState<TreeNode>({ name: "Taxonomy" });
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
@@ -54,11 +270,14 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
   });
 
   useEffect(() => {
+    const handleResize = () => chartInstance.current?.resize();
+    window.addEventListener("resize", handleResize);
     // Clean up chart on unmount
     return () => {
-      if (chartInstance.current) {
-        chartInstance.current.dispose();
-      }
+      window.removeEventListener("resize", handleResize);
+      chartInstance.current?.dispose();
+      // Effects can re-run without remounting (Fast Refresh, hidden Activity); init a fresh chart then.
+      chartInstance.current = null;
     };
   }, []);
 
@@ -71,18 +290,55 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
         .filter(Boolean);
       if (ranks.length > 0) {
         setTaxonomicRanks(ranks);
+        setRankLabels(
+          Object.fromEntries(
+            taxonomicRankOptions.map((option) => [
+              option.value.toLowerCase(),
+              // The vocabulary titles are lowercase, e.g. "kingdom" and "règne".
+              capitalizeFirstLetter(option.label)
+            ])
+          )
+        );
         // Only fetch the top level (kingdom) initially
         fetchTaxonomyData(ranks[0], undefined, undefined, inputQuery);
       }
     }
   }, [loading, inputQuery]);
 
-  // Update the chart whenever treeData changes
+  const option = useMemo(
+    () =>
+      buildTaxonomyTreeOption({
+        tree: treeData,
+        ranks: taxonomicRanks,
+        rankLabels,
+        formatMessage
+      }),
+    [treeData, taxonomicRanks, rankLabels, formatMessage]
+  );
+
+  // About 46px per leaf so dense trees don't squash together.
+  const chartHeight = Math.max(460, countLeaves(treeData) * 46);
+
+  // Update the chart whenever the tree data changes
   useEffect(() => {
-    if (treeData && chartRef.current) {
-      renderChart();
-    }
-  }, [treeData]);
+    if (!chartRef.current) return;
+    const chart = (chartInstance.current ??= echarts.init(chartRef.current));
+
+    // Handlers are re-bound so they see the current ranks and input query.
+    chart.off("click");
+    chart.on("click", "series", handleNodeClick);
+
+    const unbindRankColumns = bindRankColumns(
+      chart,
+      taxonomicRanks.map(
+        (rank) => rankLabels[rank] || capitalizeFirstLetter(rank)
+      )
+    );
+
+    chart.resize(); // The container height follows the leaf count.
+    chart.setOption(option, true);
+    return unbindRankColumns;
+  }, [option]);
 
   // Build optimized query for taxonomic aggregations
   const buildTaxonomyQuery = (
@@ -177,22 +433,22 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
         const rankAggName = `taxonomy_${rank}`;
         const aggKey = getAggregationKey(rankAggName, response.data);
         const buckets = response.data.aggregations[aggKey]?.buckets || [];
+        const children = buckets.map((bucket) => ({
+          name: capitalizeFirstLetter(bucket.key),
+          value: bucket.doc_count,
+          id: `${rank}_${bucket.key}`,
+          rank: rank,
+          parentPath: [...parentNodePath], // Store the full path to this node
+          loaded: false,
+          children: []
+        }));
 
         // If this is the top level, create a new tree
         if (!parentNodeId) {
-          const rootChildren = buckets.map((bucket) => ({
-            name: capitalizeFirstLetter(bucket.key),
-            value: bucket.doc_count,
-            id: `${rank}_${bucket.key}`,
-            rank: rank,
-            parentPath: [], // Empty for top level
-            loaded: false,
-            children: []
-          }));
-
           setTreeData({
             name: capitalizeFirstLetter(rank),
-            children: rootChildren
+            value: children.reduce((sum, child) => sum + child.value, 0),
+            children
           });
         } else {
           // Otherwise, update the existing tree by finding the parent node and adding children
@@ -207,15 +463,7 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
             ): boolean => {
               if (node.id === nodeId) {
                 // Add children to this node
-                node.children = buckets.map((bucket) => ({
-                  name: capitalizeFirstLetter(bucket.key),
-                  value: bucket.doc_count,
-                  id: `${rank}_${bucket.key}`,
-                  rank: rank,
-                  parentPath: [...parentNodePath], // Store the full path to this node
-                  loaded: false,
-                  children: []
-                }));
+                node.children = children;
                 node.loaded = true;
                 return true;
               }
@@ -269,155 +517,17 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
     }
   };
 
-  const renderChart = (): void => {
-    if (!chartRef.current) return;
-
-    // Initialize chart if it doesn't exist
-    if (!chartInstance.current) {
-      chartInstance.current = echarts.init(chartRef.current);
-
-      // Add click event handler
-      chartInstance.current.on("click", "series", (params) => {
-        handleNodeClick(params);
-      });
-    }
-
-    // Define color scheme for taxonomic levels
-    const levelColors = [
-      "#5470c6",
-      "#91cc75",
-      "#fac858",
-      "#ee6666",
-      "#73c0de",
-      "#3ba272"
-    ];
-
-    // Set up chart options
-    const option: echarts.EChartsOption = {
-      tooltip: {
-        trigger: "item",
-        triggerOn: "mousemove",
-        formatter: (params: any) => {
-          const { value, rank } = params.data;
-          const name = echarts.format.encodeHTML(params.data.name);
-          if (value) {
-            return `<div class="tooltip-content">
-                     <strong>${name}</strong><br/>
-                     Count: ${value.toLocaleString()}<br/>
-                     Rank: ${rank ? capitalizeFirstLetter(rank) : "Root"}
-                   </div>`;
-          }
-          return name;
-        }
-      },
-      series: [
-        {
-          type: "tree",
-          name: "Taxonomy",
-          data: [treeData],
-          top: "5%",
-          left: "5%",
-          bottom: "5%",
-          right: "25%",
-          symbolSize: (value: number) => {
-            if (!value) return 7;
-            // Scale node size based on log of count
-            return Math.max(7, Math.min(25, 5 + Math.log10(value) * 3));
-          },
-          symbol: "circle",
-          // Set orientation to vertical
-          orient: "vertical",
-          layout: "orthogonal",
-          itemStyle: {
-            color: (params) => {
-              const depth = params.treePathInfo
-                ? params.treePathInfo.length - 1
-                : 0;
-              return levelColors[depth % levelColors.length];
-            },
-            borderWidth: 1,
-            borderColor: "#fff"
-          } as any,
-          label: {
-            // Adjust label position for vertical layout
-            position: "right",
-            verticalAlign: "middle",
-            align: "left",
-            fontSize: 12,
-            fontWeight: "bold",
-            distance: 5,
-            formatter: (params: any) => {
-              const { name, value } = params.data;
-              if (value) {
-                return `{name|${name}} {count|${value.toLocaleString()}}`;
-              }
-              return `{name|${name}}`;
-            },
-            rich: {
-              name: {
-                fontSize: 12,
-                fontWeight: "bold"
-              },
-              count: {
-                fontSize: 10,
-                color: "#999",
-                padding: [0, 0, 0, 4]
-              }
-            }
-          },
-          leaves: {
-            label: {
-              position: "right",
-              verticalAlign: "middle",
-              align: "left"
-            }
-          },
-          expandAndCollapse: true,
-          initialTreeDepth: -1, // Show all expanded nodes
-          animationDuration: 550,
-          animationDurationUpdate: 750,
-          roam: true,
-          lineStyle: {
-            width: 1.5,
-            curveness: 0.5,
-            opacity: 0.7
-          }
-        }
-      ],
-      toolbox: {
-        show: true,
-        feature: {
-          restore: { show: true, title: formatMessage({ id: "resetView" }) },
-          saveAsImage: {
-            show: true,
-            name: "taxonomic_tree",
-            title: formatMessage({ id: "saveAsImage" })
-          }
-        },
-        orient: "vertical",
-        right: 10
-      }
-    };
-
-    // Apply the options to the chart
-    chartInstance.current.setOption(option, true); // Force update
-
-    // Handle window resize
-    const handleResize = () => {
-      if (chartInstance.current) {
-        chartInstance.current.resize();
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    // This cleanup is handled by the useEffect
-    return;
-  };
-
-  const capitalizeFirstLetter = (string: string): string => {
-    if (!string) return "";
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  const downloadImage = () => {
+    const url = chartInstance.current?.getDataURL({
+      type: "png",
+      pixelRatio: 2,
+      backgroundColor: "#fff"
+    });
+    if (!url) return;
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "taxonomic_tree.png";
+    link.click();
   };
 
   if (loading) {
@@ -430,27 +540,54 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
 
   return (
     <div className="taxonomy-tree-container">
-      <div className="chart-instructions mb-2">
+      <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
         <strong>
-          <DinaMessage id="taxonomyHierarchySubtitle" />
+          <DinaMessage id="taxonomicHierarchy" />
         </strong>
+        <Tooltip
+          disableSpanMargin={true}
+          directComponent={
+            <>
+              <DinaMessage id="taxonomyHierarchySubtitle" />
+              {"\n\n"}
+              <DinaMessage id="taxonomyHierarchyChartInstructions" />
+            </>
+          }
+        />
+        <span className="text-muted">
+          <DinaMessage
+            id="taxonomyHierarchyRecordCount"
+            values={{ total: (treeData.value ?? 0).toLocaleString() }}
+          />
+        </span>
+        <div className="ms-auto d-flex gap-2">
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-secondary"
+            disabled={!taxonomicRanks.length}
+            onClick={() =>
+              fetchTaxonomyData(
+                taxonomicRanks[0],
+                undefined,
+                undefined,
+                inputQuery
+              )
+            }
+          >
+            <FaArrowRotateRight className="me-1" />
+            <DinaMessage id="refreshButtonText" />
+          </button>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-secondary"
+            onClick={downloadImage}
+          >
+            <FaDownload className="me-1" />
+            <DinaMessage id="downloadFile" />
+          </button>
+        </div>
       </div>
-      <div
-        ref={chartRef}
-        className="chart-container"
-        style={{ height: "700px", width: "100%" }}
-      ></div>
-      <div className="taxonomy-ranks">
-        <strong>
-          <DinaMessage id="classificationlevels" />
-        </strong>{" "}
-        {taxonomicRanks.map(capitalizeFirstLetter).join(" → ")}
-      </div>
-      <div className="chart-instructions">
-        <strong>
-          <DinaMessage id="taxonomyHierarchyChartInstructions" />
-        </strong>
-      </div>
+      <div ref={chartRef} style={{ height: chartHeight, width: "100%" }} />
     </div>
   );
 }

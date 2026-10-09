@@ -1638,9 +1638,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   viewMaterialSamplesInCollection: "View material samples in this collection",
   generateURLButtonText: "Generate URL",
   taxonomicHierarchy: "Taxonomic Hierarchy",
-  classificationlevels: "Classification levels:",
   taxonomyHierarchyChartInstructions:
-    "Interactions: Scroll to zoom, drag to pan, click on nodes to fetch child taxonomic ranks",
+    "Click a node to load the next taxonomic rank; click it again to collapse it.",
+  taxonomyHierarchyNodeRecords: "{count} records · {percent}% of all",
+  taxonomyHierarchyRecordCount:
+    "Aggregated from primary determinations · {total} records",
+  taxonomyHierarchyRootTooltip: "All primary determinations",
   taxonomyHierarchySubtitle:
     "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination.",
   notPubliclyReleasableWithReason: "Not Publicly Releasable: {reason}",
@@ -1692,8 +1695,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   exportRequestSubmittedTitle: "Export Request Submitted",
   exportRequestSubmittedMessage:
     "Your export is being processed. You will receive a notification when it's ready to download.",
-  resetView: "Reset View",
-  saveAsImage: "Save as Image",
   parentMaterialSampleDisabledTooltip:
     "Material Sample can only have a single link to one of the following relationships: Parent Material Sample or a collecting event.",
   supportedFormats: "Supported Formats",

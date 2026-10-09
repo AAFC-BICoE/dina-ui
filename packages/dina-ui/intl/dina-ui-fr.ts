@@ -198,6 +198,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   dinaManagementSectionTitle: "Gestion",
   disabledForChildMaterialSamples:
     "Table enfant désactivée pour les échantillons de matériau",
+  downloadFile: "Télécharger",
   dragDropInstructionsHeader: "Pour modifier l'ordre des attributs : ",
   dragDropKeyboardInstructions:
     "Utiliser le tabulateur pour accéder à l'attribut, puis appuyer sur la barre d'espacement pour le sélectionner. Utiliser les touches fléchées pour déplacer l'élément, puis appuyer sur la barre d'espacement pour le placer.",
@@ -937,6 +938,16 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   systemInfoUnknown: "Inconnu",
   tags: "Étiquettes",
   target: "Cible",
+  taxonomicHierarchy: "Hiérarchie taxonomique",
+  taxonomyHierarchyChartInstructions:
+    "Cliquer sur un nœud pour charger le rang taxonomique suivant; cliquer de nouveau pour le réduire.",
+  taxonomyHierarchyNodeRecords:
+    "{count} enregistrements · {percent} % du total",
+  taxonomyHierarchyRecordCount:
+    "Agrégé à partir des déterminations principales · {total} enregistrements",
+  taxonomyHierarchyRootTooltip: "Toutes les déterminations principales",
+  taxonomyHierarchySubtitle:
+    "Une vue agrégée en temps réel des hiérarchies taxonomiques appliquées à chaque détermination principale.",
   template: "Modèle",
   thisWillRemoveYourTemplate:
     "Cette opération supprimera les champs du modèle sélectionnés et les valeurs par défaut.",
