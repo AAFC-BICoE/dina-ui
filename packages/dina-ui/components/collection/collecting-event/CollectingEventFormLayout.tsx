@@ -54,6 +54,7 @@ import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
 import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 import { GeographyFormLayout } from "./GeographyFormLayout";
+import { SectionHeading } from "./SectionHeading";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { CollectingEventSummary } from "./CollectingEventSummary";
 import styles from "./CollectingEventFormLayout.module.css";
@@ -197,7 +198,7 @@ export function CollectingEventFormLayout({
               collectingEventUUID={initialValues.id}
             />
 
-            <div className={styles.sectionHeading}>Access &amp; Tags</div>
+            <SectionHeading>Access &amp; Tags</SectionHeading>
 
             <div className={styles.accessFields}>
               <NotPubliclyReleasableSection

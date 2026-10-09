@@ -31,6 +31,7 @@ import {
   NotPubliclyReleasableSection
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { getCollectingEventName } from "../collecting-event/getCollectingEventName";
 import { SECTION_ICONS } from "./material-sample-form-nav/MaterialSampleFormNav";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
@@ -289,7 +290,7 @@ export function MaterialSampleForm({
           nestedForm={nestedCollectingEventForm}
           usageCount={materialSampleUsageCount}
           getSummary={(colEvent) => ({
-            name: colEvent.dwcVerbatimLocality ?? colEvent.id,
+            name: getCollectingEventName(colEvent),
             date: colEvent.startEventDateTime?.slice(0, 10)
           })}
           useResourceQuery={useCollectingEventQuery}

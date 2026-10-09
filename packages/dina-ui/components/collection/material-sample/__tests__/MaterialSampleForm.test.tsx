@@ -1002,9 +1002,7 @@ describe("Material Sample Edit Page", () => {
 
     // Should also be in read only mode:
     await waitFor(() => {
-      expect(
-        wrapper.getByText(/linked collecting event:/i)
-      ).toBeInTheDocument();
+      expect(wrapper.getAllByText(/linked to/i)[0]).toBeInTheDocument();
     });
 
     // Save the material sample form

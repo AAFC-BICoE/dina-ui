@@ -11,7 +11,6 @@ import {
   withResponse
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
-import Link from "next/link";
 import {
   ReactNode,
   useState,
@@ -392,17 +391,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                   )}
 
                   {isReadOnlyMode ? (
-                    <div>
-                      <div className="attached-resource-link mb-3">
-                        <strong>
-                          <DinaMessage id="linked" />:{" "}
-                        </strong>
-                        <Link href={`${readOnlyLink}${resourceId}`}>
-                          {linkedResource.id}
-                        </Link>
-                      </div>
-                      {nestedForm(activeResource, true)}
-                    </div>
+                    <div>{nestedForm(activeResource, true)}</div>
                   ) : (
                     nestedForm(activeResource, false)
                   )}

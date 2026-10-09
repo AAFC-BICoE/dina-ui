@@ -36,26 +36,6 @@
   margin: 0 !important;
 }
 
-.sectionHeading {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #335075;
-}
-
-.sectionHeading::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  margin-top: -3px;
-  background-color: #d5dbe3;
-}
-
 .cleanSection :global(.legend-wrapper) :global(.fieldset-h2-adjustment) {
   font-size: 0.95rem !important;
   font-weight: 600 !important;
