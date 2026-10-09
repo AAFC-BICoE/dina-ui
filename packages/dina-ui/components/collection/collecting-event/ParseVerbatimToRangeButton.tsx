@@ -17,12 +17,14 @@ export interface ParseVerbatimToRangeButtonProps {
   verbatimField: string;
   rangeFields: [string, string];
   buttonText: string;
+  className?: string;
 }
 
 export function ParseVerbatimToRangeButton({
   verbatimField,
   rangeFields: [minField, maxField],
-  buttonText
+  buttonText,
+  className = "mb-3"
 }: ParseVerbatimToRangeButtonProps) {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [feedbackMsg, setFeedbackMsg] = useState<string>("");
@@ -83,10 +85,11 @@ export function ParseVerbatimToRangeButton({
   const { readOnly } = useDinaFormContext();
 
   return readOnly ? null : (
-    <div className="mb-3 d-flex align-items-center gap-2">
+    <div className={`${className} d-flex align-items-center gap-2`}>
       <FormikButton
         className="btn btn-info parse-verbatim-to-range-button"
         onClick={convertToMinMax}
+        buttonProps={() => ({ style: { minWidth: "15rem" } })}
       >
         <FaArrowsRotate className="me-2" />
         {buttonText}

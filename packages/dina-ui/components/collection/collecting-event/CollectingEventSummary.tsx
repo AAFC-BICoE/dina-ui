@@ -2,6 +2,7 @@ import { Children, isValidElement, ReactNode } from "react";
 import { useDinaFormContext } from "common-ui";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import { PersonSelectField } from "../../resource-select-fields/resource-select-fields";
+import { SectionHeading } from "./SectionHeading";
 
 interface SummaryRowProps {
   label: string;
@@ -46,18 +47,7 @@ function SummarySection({ title, children }: SummarySectionProps) {
 
   return (
     <section className="mb-4">
-      <h3
-        className="border-bottom pb-2 mb-2"
-        style={{
-          fontSize: "0.95rem",
-          fontWeight: 600,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "#274c77"
-        }}
-      >
-        {title}
-      </h3>
+      <SectionHeading>{title}</SectionHeading>
       {children}
     </section>
   );

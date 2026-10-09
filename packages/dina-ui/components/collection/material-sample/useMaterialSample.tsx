@@ -57,7 +57,6 @@ import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { generateSequence } from "./useGenerateSequence";
 import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { Alert } from "react-bootstrap";
-import CollectingEventEditAlert from "../collecting-event/CollectingEventEditAlert";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { Association } from "../../../types/collection-api/resources/Association";
 import { MolecularAnalysisRunItem } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
@@ -1721,7 +1720,6 @@ export function useMaterialSampleSave({
     const hasMultipleUsages = Boolean(
       materialSampleUsageCount && materialSampleUsageCount > 1
     );
-    const hasExistingColEvent = Boolean(!!colEventId && !isCreatingNewColEvent);
 
     // Permission Evaluation...
     const permissionsProvided = initialValues?.meta?.permissionsProvider;
@@ -1730,22 +1728,6 @@ export function useMaterialSampleSave({
           colEvent?.id ? "update" : "create"
         ) ?? false
       : true;
-
-    const shouldShowCollectingEventEditAlert = (() => {
-      // If already being forced into read only, do not display this message.
-      if (forceReadOnlyMode) return false;
-
-      // If no permissions don't show this alert, another alert will be displayed.
-      if (!canEdit) return false;
-
-      // If you are creating a new collecting event, do not display this message.
-      if (isCreatingNewColEvent) return false;
-
-      // If it has a collecting event, and multiple usages then display a warning message.
-      return Boolean(
-        disableNestedFormEdits || (hasMultipleUsages && hasExistingColEvent)
-      );
-    })();
 
     const makeCollectingEventReadOnly = (() => {
       // If forcing read only, then go into read only.
@@ -1772,15 +1754,6 @@ export function useMaterialSampleSave({
         <div />
       ) : (
         <div className={nestedFormClassName}>
-          {shouldShowCollectingEventEditAlert && (
-            <CollectingEventEditAlert
-              materialSampleUsageCount={materialSampleUsageCount}
-              alertMessage="collectingEventEditErrorMessage"
-              collectingEventUUID={initialValues?.id}
-              displayCollectingEventDetailsLink={false}
-              override={disableNestedFormEdits}
-            />
-          )}
           <CollectingEventFormLayout
             compactReadOnly={makeCollectingEventReadOnly}
             defaultToNotReleasable={true}
@@ -1808,6 +1781,7 @@ export function useMaterialSampleSave({
   return {
     initialValues: msInitialValues,
     nestedCollectingEventForm,
+    materialSampleUsageCount,
     dataComponentState,
     colEventId,
     setColEventId,

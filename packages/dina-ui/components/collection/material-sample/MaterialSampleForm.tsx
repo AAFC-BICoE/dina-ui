@@ -2,6 +2,7 @@ import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import _ from "lodash";
 import {
+  FieldSetIconContext,
   BackButton,
   ButtonBar,
   DataEntryField,
@@ -30,6 +31,9 @@ import {
   NotPubliclyReleasableSection
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { getLinkedMaterialSamplesHref } from "../collecting-event/CollectingEventEditAlert";
+import { getCollectingEventName } from "../collecting-event/getCollectingEventName";
+import { SECTION_ICONS } from "./material-sample-form-nav/MaterialSampleFormNav";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
@@ -210,6 +214,7 @@ export function MaterialSampleForm({
   const {
     initialValues,
     nestedCollectingEventForm,
+    materialSampleUsageCount,
     dataComponentState,
     colEventId,
     setColEventId,
@@ -284,6 +289,14 @@ export function MaterialSampleForm({
             )
           }
           nestedForm={nestedCollectingEventForm}
+          usageCount={materialSampleUsageCount}
+          usageHref={
+            colEventId ? getLinkedMaterialSamplesHref(colEventId) : undefined
+          }
+          getSummary={(colEvent) => ({
+            name: getCollectingEventName(colEvent),
+            date: colEvent.startEventDateTime?.slice(0, 10)
+          })}
           useResourceQuery={useCollectingEventQuery}
           setResourceId={setColEventId}
           disableLinkerTab={templateAttachesCollectingEvent}
@@ -473,103 +486,105 @@ export function MaterialSampleForm({
   ]);
 
   const formLayout = (
-    <div className="d-md-flex">
-      <div style={{ minWidth: "20rem", maxWidth: "20rem" }}>
-        {(!isOffScreen || !reduceRendering) && (
-          <MaterialSampleFormNav
-            dataComponentState={dataComponentState}
-            disableRemovePrompt={disableNavRemovePrompt}
-            disableCollectingEventSwitch={
-              disableCollectingEventSwitch ||
-              initialValues.parentMaterialSample !== undefined
-            }
-            navOrder={navOrder}
-            onChangeNavOrder={onChangeNavOrder}
-            isTemplate={isTemplate ?? false}
-          />
-        )}
-      </div>
-      <DinaFormSection
-        componentName={IDENTIFIER_COMPONENT_NAME}
-        sectionName="general-section"
-      >
-        <div className={`flex-grow-1 container-fluid ${styles.formCanvas}`}>
-          {!reduceRendering && (
-            <div
-              className="material-sample-general-info rounded border p-3 mb-4"
-              style={{ backgroundColor: "#fff" }}
-            >
-              {!isTemplate && materialSample?.materialSampleName && (
-                <div className={styles.overviewHeader}>
-                  <MaterialSampleBreadCrumb
-                    disableLastLink={true}
-                    materialSample={materialSample as any}
-                  />
-                </div>
-              )}
-              <div className="row">
-                <div className="col-md-12">
-                  {!isTemplate && (
-                    <div className="mb-2">
-                      <DinaFormSection horizontal={18}>
-                        <GroupSelectField
-                          disableTemplateCheckbox={true}
-                          name="group"
-                          enableStoredDefaultGroup={enableStoredDefaultGroup}
-                          removeBottomMargin={true}
-                          label={
-                            <span>
-                              <FaUsers className="me-2" />
-                              <DinaMessage id="group" />
-                            </span>
-                          }
-                        />
-                      </DinaFormSection>
-                    </div>
-                  )}
+    <FieldSetIconContext.Provider value={SECTION_ICONS}>
+      <div className="d-md-flex">
+        <div className="material-sample-nav-column">
+          {(!isOffScreen || !reduceRendering) && (
+            <MaterialSampleFormNav
+              dataComponentState={dataComponentState}
+              disableRemovePrompt={disableNavRemovePrompt}
+              disableCollectingEventSwitch={
+                disableCollectingEventSwitch ||
+                initialValues.parentMaterialSample !== undefined
+              }
+              navOrder={navOrder}
+              onChangeNavOrder={onChangeNavOrder}
+              isTemplate={isTemplate ?? false}
+            />
+          )}
+        </div>
+        <DinaFormSection
+          componentName={IDENTIFIER_COMPONENT_NAME}
+          sectionName="general-section"
+        >
+          <div className={`flex-grow-1 container-fluid ${styles.formCanvas}`}>
+            {!reduceRendering && (
+              <div
+                className="material-sample-general-info rounded border p-3 mb-4"
+                style={{ backgroundColor: "#fff" }}
+              >
+                {!isTemplate && materialSample?.materialSampleName && (
+                  <div className={styles.overviewHeader}>
+                    <MaterialSampleBreadCrumb
+                      disableLastLink={true}
+                      materialSample={materialSample as any}
+                    />
+                  </div>
+                )}
+                <div className="row">
+                  <div className="col-md-12">
+                    {!isTemplate && (
+                      <div className="mb-2">
+                        <DinaFormSection horizontal={18}>
+                          <GroupSelectField
+                            disableTemplateCheckbox={true}
+                            name="group"
+                            enableStoredDefaultGroup={enableStoredDefaultGroup}
+                            removeBottomMargin={true}
+                            label={
+                              <span>
+                                <FaUsers className="me-2" />
+                                <DinaMessage id="group" />
+                              </span>
+                            }
+                          />
+                        </DinaFormSection>
+                      </div>
+                    )}
 
-                  <CollectionSelectSection
-                    resourcePath="collection-api/collection"
-                    horizontal={18}
-                  />
-                  <ProjectSelectSection
-                    resourcePath="collection-api/project"
-                    horizontal={18}
-                  />
-                  <ParentSelectSection
-                    enableCollectingEvent={
-                      dataComponentState.enableCollectingEvent
-                    }
-                    horizontal={18}
-                  />
-                  <AssemblageSelectSection
-                    resourcePath="collection-api/assemblage"
-                    horizontal={18}
-                  />
-                  <div className={`mb-2 ${styles.releasableFields}`}>
-                    <NotPubliclyReleasableSection
-                      defaultToNotReleasable={defaultToNotReleasable}
+                    <CollectionSelectSection
+                      resourcePath="collection-api/collection"
+                      horizontal={18}
+                    />
+                    <ProjectSelectSection
+                      resourcePath="collection-api/project"
+                      horizontal={18}
+                    />
+                    <ParentSelectSection
+                      enableCollectingEvent={
+                        dataComponentState.enableCollectingEvent
+                      }
+                      horizontal={18}
+                    />
+                    <AssemblageSelectSection
+                      resourcePath="collection-api/assemblage"
+                      horizontal={18}
+                    />
+                    <div className={`mb-2 ${styles.releasableFields}`}>
+                      <NotPubliclyReleasableSection
+                        defaultToNotReleasable={defaultToNotReleasable}
+                        horizontal={18}
+                      />
+                    </div>
+                    <TagsAndRestrictionsSection
+                      resourcePath="collection-api/material-sample"
+                      indexName="dina_material_sample_index"
                       horizontal={18}
                     />
                   </div>
-                  <TagsAndRestrictionsSection
-                    resourcePath="collection-api/material-sample"
-                    indexName="dina_material_sample_index"
-                    horizontal={18}
-                  />
                 </div>
               </div>
+            )}
+            {/* The toggleable / re-arrangeable form sections: */}
+            <div className={`data-components ${styles.dataComponents}`}>
+              {sortedFormSectionPairs.map(([id, renderFn]) => (
+                <Fragment key={id}>{renderFn(isOffScreen ? "" : id)}</Fragment>
+              ))}
             </div>
-          )}
-          {/* The toggleable / re-arrangeable form sections: */}
-          <div className={`data-components ${styles.dataComponents}`}>
-            {sortedFormSectionPairs.map(([id, renderFn]) => (
-              <Fragment key={id}>{renderFn(isOffScreen ? "" : id)}</Fragment>
-            ))}
           </div>
-        </div>
-      </DinaFormSection>
-    </div>
+        </DinaFormSection>
+      </div>
+    </FieldSetIconContext.Provider>
   );
 
   return isTemplate ? (

@@ -1777,9 +1777,9 @@ describe("MaterialSampleBulkEditor", () => {
     ).toBeInTheDocument();
 
     // Should be in read only mode...
-    expect(wrapper.getByText(/linked collecting event:/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/linked to/i)[0]).toBeInTheDocument();
     expect(
-      wrapper.getByRole("link", { name: /col\-event\-1/i })
+      wrapper.getAllByRole("link", { name: /details page/i })[0]
     ).toBeInTheDocument();
   });
 
