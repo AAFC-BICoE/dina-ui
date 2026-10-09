@@ -22,6 +22,9 @@ export interface CollapsibleSectionProps {
    * Default is false.
    */
   removePadding?: boolean;
+
+  /** Start expanded. Default is false. */
+  defaultOpen?: boolean;
 }
 
 interface CollapsibleSectionContextType {
@@ -35,11 +38,12 @@ export function CollapsibleSection({
   children,
   id,
   headerKey,
-  removePadding = false
+  removePadding = false,
+  defaultOpen = false
 }: PropsWithChildren<CollapsibleSectionProps>) {
   const { formatMessage, messages } = useIntl();
 
-  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const [isAccordionOpen, setIsAccordionOpen] = useState(defaultOpen);
 
   const handleAccordionSelect = (eventKey) => {
     setIsAccordionOpen(eventKey !== null);
@@ -52,7 +56,11 @@ export function CollapsibleSection({
 
   return (
     <CollapsibleSectionContext.Provider value={{ isAccordionOpen }}>
-      <Accordion className="mb-3" onSelect={handleAccordionSelect}>
+      <Accordion
+        className="mb-3"
+        onSelect={handleAccordionSelect}
+        defaultActiveKey={defaultOpen ? id : undefined}
+      >
         <Accordion.Item eventKey={id}>
           <Accordion.Header style={{ marginTop: "0px" }}>
             {headerLabel}

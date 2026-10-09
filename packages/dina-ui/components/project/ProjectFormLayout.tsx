@@ -13,8 +13,8 @@ import { useRouter } from "next/router";
 import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { AgentRolesField } from "../collection/AgentRolesField";
 import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
-import ProjectRelatedObjectTypeChart from "./ProjectRelatedObjectTypeChart";
-import ProjectRecordsAddedChart from "./ProjectRecordsAddedChart";
+import RelatedObjectTypeChart from "../collection/charts/RelatedObjectTypeChart";
+import RecordsAddedChart from "../collection/charts/RecordsAddedChart";
 
 export function ProjectFormLayout() {
   const { readOnly } = useDinaFormContext();
@@ -26,6 +26,18 @@ export function ProjectFormLayout() {
     "data.relationships.projects.data.id"
   );
   const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
+  // Material samples in this project.
+  const samplesQuery = {
+    bool: {
+      must: [
+        {
+          bool: {
+            filter: [{ match: { "data.relationships.projects.data.id": uuid } }]
+          }
+        }
+      ]
+    }
+  };
 
   const relationshipPresenceUUIDSearch = generateSearchURLFromSimpleRows([
     {
@@ -145,10 +157,10 @@ export function ProjectFormLayout() {
       {readOnly && (
         <div className="row">
           <div className="col-md-6">
-            <ProjectRecordsAddedChart id={uuid} />
+            <RecordsAddedChart inputQuery={samplesQuery} />
           </div>
           <div className="col-md-6">
-            <ProjectRelatedObjectTypeChart id={uuid} />
+            <RelatedObjectTypeChart query={samplesQuery} />
           </div>
         </div>
       )}
