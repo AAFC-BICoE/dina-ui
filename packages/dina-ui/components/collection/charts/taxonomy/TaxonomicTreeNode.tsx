@@ -2,6 +2,74 @@ import React, { useEffect, useState } from "react";
 import { Tooltip, useApiClient } from "common-ui";
 import { useMessage } from "../../context/MessageContext";
 import { LoadingSpinner } from "common-ui";
+import { findAgg } from "../findAgg";
+
+const CLASSIFICATION =
+  "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification";
+
+/** Kingdom-to-species terms aggregation shared by the taxonomic tree and chart. */
+export const TAXONOMY_AGGS = {
+  by_kingdom: {
+    terms: {
+      field: `${CLASSIFICATION}.kingdom.keyword`,
+      size: 100,
+      missing: "MISSING KINGDOM"
+    },
+    aggs: {
+      by_phylum: {
+        terms: {
+          field: `${CLASSIFICATION}.phylum.keyword`,
+          size: 100,
+          missing: "MISSING PHYLUM"
+        },
+        aggs: {
+          by_class: {
+            terms: {
+              field: `${CLASSIFICATION}.class.keyword`,
+              size: 100,
+              missing: "MISSING CLASS"
+            },
+            aggs: {
+              by_order: {
+                terms: {
+                  field: `${CLASSIFICATION}.order.keyword`,
+                  size: 100,
+                  missing: "MISSING ORDER"
+                },
+                aggs: {
+                  by_family: {
+                    terms: {
+                      field: `${CLASSIFICATION}.family.keyword`,
+                      size: 10000,
+                      missing: "MISSING FAMILY"
+                    },
+                    aggs: {
+                      by_genus: {
+                        terms: {
+                          field: `${CLASSIFICATION}.genus.keyword`,
+                          size: 10000,
+                          missing: "MISSING GENUS"
+                        },
+                        aggs: {
+                          by_species: {
+                            terms: {
+                              field: `${CLASSIFICATION}.species.keyword`,
+                              size: 10000
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+};
 
 export function prunePlaceholders(node) {
   if (!node) return null;
@@ -42,13 +110,6 @@ export default function TaxonomicTreeNode({ query }) {
 
   const [root, setRoot] = useState<TreeNodeData | null>(null);
 
-  // Find an aggregation key that ends with the given suffix (e.g. "by_kingdom")
-  function findAgg(obj: any, suffix: string) {
-    if (!obj) return undefined;
-    const key = Object.keys(obj).find((k) => k.endsWith(suffix));
-    return key ? obj[key] : undefined;
-  }
-
   function buildTree(buckets: any[], parentId = ""): TreeNodeData[] {
     return buckets.map((b) => {
       // Path-based id: unique per branch and must match TaxonomicChart's ids for drilldown.
@@ -86,75 +147,7 @@ export default function TaxonomicTreeNode({ query }) {
           {
             size: 0,
             query,
-            aggs: {
-              by_kingdom: {
-                terms: {
-                  field:
-                    "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword",
-                  size: 100,
-                  missing: "MISSING KINGDOM"
-                },
-                aggs: {
-                  by_phylum: {
-                    terms: {
-                      field:
-                        "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.phylum.keyword",
-                      size: 100,
-                      missing: "MISSING PHYLUM"
-                    },
-                    aggs: {
-                      by_class: {
-                        terms: {
-                          field:
-                            "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.class.keyword",
-                          size: 100,
-                          missing: "MISSING CLASS"
-                        },
-                        aggs: {
-                          by_order: {
-                            terms: {
-                              field:
-                                "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.order.keyword",
-                              size: 100,
-                              missing: "MISSING ORDER"
-                            },
-                            aggs: {
-                              by_family: {
-                                terms: {
-                                  field:
-                                    "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.family.keyword",
-                                  size: 10000,
-                                  missing: "MISSING FAMILY"
-                                },
-                                aggs: {
-                                  by_genus: {
-                                    terms: {
-                                      field:
-                                        "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.genus.keyword",
-                                      size: 10000,
-                                      missing: "MISSING GENUS"
-                                    },
-                                    aggs: {
-                                      by_species: {
-                                        terms: {
-                                          field:
-                                            "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.species.keyword",
-                                          size: 10000
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            aggs: TAXONOMY_AGGS
           },
           { params: { indexName: "dina_material_sample_index" } }
         );

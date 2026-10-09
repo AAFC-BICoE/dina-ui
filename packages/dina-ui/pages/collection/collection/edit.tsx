@@ -23,11 +23,11 @@ import { Collection } from "../../../types/collection-api";
 import _ from "lodash";
 import PageLayout from "../../../components/page/PageLayout";
 import { CollectionLinkedProjectsTable } from "../../../components/collection/collection/CollectionLinkedProjectsTable";
-import CollectionSampleTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
-import CollectionRelatedObjectTypeChart from "../../../components/collection/collection/CollectionRelatedObjectTypeChart";
-import CollectionRecordsAddedChart from "../../../components/collection/collection/CollectionRecordsAddedChart";
-import CollectionTaxonomicDetChart from "../../../components/collection/collection/CollectionTaxonomicDetChart";
-import CollectionDrilldown from "../../../components/collection/CollectionDrilldown";
+import SampleTypeChart from "../../../components/collection/charts/SampleTypeChart";
+import RelatedObjectTypeChart from "../../../components/collection/charts/RelatedObjectTypeChart";
+import RecordsAddedChart from "../../../components/collection/charts/RecordsAddedChart";
+import TaxonomicDetChart from "../../../components/collection/charts/taxonomy/TaxonomicDetChart";
+import TaxonomicDrilldown from "../../../components/collection/charts/TaxonomicDrilldown";
 
 export default function CollectionEditPage() {
   const router = useRouter();
@@ -146,6 +146,12 @@ export function CollectionFormFields() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const uuid = String(router.query?.id ?? "");
+  // Material samples in this collection.
+  const samplesQuery = {
+    bool: {
+      must: [{ term: { "data.relationships.collection.data.id": uuid } }]
+    }
+  };
 
   return (
     <div>
@@ -202,22 +208,22 @@ export function CollectionFormFields() {
           </div>
           <div className="row">
             <div className="col-md-6">
-              <CollectionSampleTypeChart id={uuid} />
+              <SampleTypeChart query={samplesQuery} />
             </div>
             <div className="col-md-6">
-              <CollectionRecordsAddedChart id={uuid} />
+              <RecordsAddedChart inputQuery={samplesQuery} />
             </div>
           </div>
           <div className="row mt-3 mb-3">
             <div className="col-md-6">
-              <CollectionRelatedObjectTypeChart id={uuid} />
+              <RelatedObjectTypeChart query={samplesQuery} />
             </div>
             <div className="col-md-6">
-              <CollectionTaxonomicDetChart id={uuid} />
+              <TaxonomicDetChart query={samplesQuery} />
             </div>
           </div>
           <div className="row mt-3 mb-3">
-            <CollectionDrilldown id={uuid} />
+            <TaxonomicDrilldown query={samplesQuery} />
           </div>
         </>
       )}

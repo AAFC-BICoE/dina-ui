@@ -45,7 +45,6 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
   const [treeData, setTreeData] = useState<TreeNode>({ name: "Taxonomy" });
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
-  const expandedNodesRef = useRef<Set<string>>(new Set()); // Track expanded nodes
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
 
@@ -201,9 +200,6 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
             // Create a deep copy of the tree to avoid reference issues
             const newData = JSON.parse(JSON.stringify(prevData));
 
-            // Track that this node is expanded
-            expandedNodesRef.current.add(parentNodeId);
-
             // Find the parent node and update its children
             const updateNodeChildren = (
               node: TreeNode,
@@ -270,13 +266,6 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
       });
 
       fetchTaxonomyData(nextRank, parentPath, node.id, inputQuery);
-    } else if (node.loaded) {
-      // Toggle expanded state if already loaded
-      if (expandedNodesRef.current.has(node.id)) {
-        expandedNodesRef.current.delete(node.id);
-      } else {
-        expandedNodesRef.current.add(node.id);
-      }
     }
   };
 

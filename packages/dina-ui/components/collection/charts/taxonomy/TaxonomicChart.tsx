@@ -5,6 +5,8 @@ import { format } from "echarts";
 import { Card, CardHeader } from "react-bootstrap";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { useMessage } from "../../context/MessageContext";
+import { findAgg } from "../findAgg";
+import { prunePlaceholders, TAXONOMY_AGGS } from "./TaxonomicTreeNode";
 
 interface TaxonNode {
   name: any;
@@ -31,30 +33,6 @@ const TAXON_LABELS = [
   "Species"
 ];
 
-const getAggregationKey = (aggName: string, obj: any): string | null => {
-  if (!obj || typeof obj !== "object") return null;
-
-  const topAggs = obj?.data?.aggregations;
-  if (topAggs) {
-    if (topAggs[aggName]) return aggName;
-    if (topAggs[`sterms#${aggName}`]) return `sterms#${aggName}`;
-
-    for (const key of Object.keys(topAggs)) {
-      if (key.endsWith(aggName)) return key;
-    }
-    return null;
-  }
-
-  if (obj[aggName]) return aggName;
-  if (obj[`sterms#${aggName}`]) return `sterms#${aggName}`;
-
-  for (const key of Object.keys(obj)) {
-    if (key.endsWith(aggName)) return key;
-  }
-
-  return null;
-};
-
 function convertBucketsToSunburst(
   buckets: any[],
   aggNames: string[],
@@ -66,9 +44,7 @@ function convertBucketsToSunburst(
   return buckets.map((bucket) => {
     // Path-based id: unique per branch and must match TaxonomicTreeNode's ids for drilldown.
     const id = `${parentId}/${bucket.key}`;
-    const aggName = aggNames[depth + 1];
-    const nextAggKey = getAggregationKey(aggName, bucket);
-    const childrenBuckets = nextAggKey ? bucket[nextAggKey]?.buckets ?? [] : [];
+    const childrenBuckets = findAgg(bucket, aggNames[depth + 1])?.buckets ?? [];
 
     const children = convertBucketsToSunburst(
       childrenBuckets,
@@ -84,24 +60,6 @@ function convertBucketsToSunburst(
       children: Array.isArray(children) ? children : []
     };
   });
-}
-
-export function prunePlaceholders(node) {
-  if (!node) return null;
-
-  const isPlaceholder = node.name.includes("MISSING");
-
-  if (!node.children || node.children.length === 0) {
-    return isPlaceholder ? null : node;
-  }
-
-  const prunedChildren = node.children.map(prunePlaceholders).filter(Boolean);
-
-  if (prunedChildren.length === 0) {
-    return isPlaceholder ? null : { ...node, children: [] };
-  }
-
-  return { ...node, children: prunedChildren };
 }
 
 export function transformTreeForEcharts(tree) {
@@ -134,56 +92,20 @@ export default function TaxonomySunburstChart({ query }) {
   const chartRef = useRef<any>(null);
   const [chartType, setChartType] = useState("sunburst");
 
-  type SourceFilter = "GNA" | "CUSTOM" | "VERBATIM" | "NO_DETERMINATION" | null;
+  type SourceFilter = "GNA" | "CUSTOM" | null;
 
   const [selectedSource, setSelectedSource] = useState<SourceFilter>(null);
   const [chartData, setChartData] = useState<TaxonNode | null>();
   const [chartReady, setChartReady] = useState(false);
 
-  function buildSourceFilter(selectedSource) {
-    switch (selectedSource) {
-      case "GNA":
-        return {
-          term: {
-            "included.attributes.determination.scientificNameSource.keyword":
-              "GNA"
-          }
-        };
-
-      case "CUSTOM":
-        return {
-          term: {
-            "included.attributes.determination.scientificNameSource.keyword":
-              "CUSTOM"
-          }
-        };
-
-      case "VERBATIM":
-        return {
-          exists: {
-            field: "included.attributes.determination.verbatimScientificName"
-          }
-        };
-
-      case "NO_DETERMINATION":
-        return {
-          bool: {
-            must_not: {
-              exists: {
-                field: "included.attributes.determination"
-              }
-            }
-          }
-        };
-
-      default:
-        return null; // no filter applied
-    }
-  }
-
   async function fetchData(selectedSource) {
     try {
-      const sourceFilter = buildSourceFilter(selectedSource);
+      const sourceFilter = selectedSource && {
+        term: {
+          "included.attributes.determination.scientificNameSource.keyword":
+            selectedSource
+        }
+      };
 
       const response = await apiClient.axios.post(
         "search-api/search-ws/search",
@@ -195,90 +117,15 @@ export default function TaxonomySunburstChart({ query }) {
               ...(sourceFilter ? { filter: sourceFilter } : {})
             }
           },
-          aggs: {
-            by_kingdom: {
-              terms: {
-                field:
-                  "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword",
-                size: 100,
-                order: { _count: "desc" },
-                missing: "MISSING KINGDOM"
-              },
-              aggs: {
-                by_phylum: {
-                  terms: {
-                    field:
-                      "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.phylum.keyword",
-                    size: 100,
-                    order: { _count: "desc" },
-                    missing: "MISSING PHYLUM"
-                  },
-                  aggs: {
-                    by_class: {
-                      terms: {
-                        field:
-                          "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.class.keyword",
-                        size: 100,
-                        order: { _count: "desc" },
-                        missing: "MISSING CLASS"
-                      },
-                      aggs: {
-                        by_order: {
-                          terms: {
-                            field:
-                              "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.order.keyword",
-                            size: 100,
-                            order: { _count: "desc" },
-                            missing: "MISSING ORDER"
-                          },
-                          aggs: {
-                            by_family: {
-                              terms: {
-                                field:
-                                  "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.family.keyword",
-                                size: 10000,
-                                order: { _count: "desc" },
-                                missing: "MISSING FAMILY"
-                              },
-                              aggs: {
-                                by_genus: {
-                                  terms: {
-                                    field:
-                                      "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.genus.keyword",
-                                    size: 10000,
-                                    order: { _count: "desc" },
-                                    missing: "MISSING GENUS"
-                                  },
-                                  aggs: {
-                                    by_species: {
-                                      terms: {
-                                        field:
-                                          "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.species.keyword",
-                                        size: 10000,
-                                        order: { _count: "desc" }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          aggs: TAXONOMY_AGGS
         },
         { params: { indexName: "dina_material_sample_index" } }
       );
 
-      const aggKey = getAggregationKey("by_kingdom", response);
-      if (!aggKey) return null;
+      const kingdomAgg = findAgg(response.data?.aggregations, "by_kingdom");
+      if (!kingdomAgg) return null;
 
-      const buckets = response.data.aggregations[aggKey]?.buckets ?? [];
+      const buckets = kingdomAgg.buckets ?? [];
 
       const rawTrees = convertBucketsToSunburst(buckets, TAXON_LEVELS);
 

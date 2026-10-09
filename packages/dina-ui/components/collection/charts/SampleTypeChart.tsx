@@ -5,6 +5,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Card } from "react-bootstrap";
 import { Utils } from "@react-awesome-query-builder/ui";
 import _ from "lodash";
+import { findAgg } from "./findAgg";
 
 interface SampleTypeChart {
   /**
@@ -52,24 +53,6 @@ export default function SampleTypeChart({
   setSubmittedQueryBuilderTree
 }: SampleTypeChart) {
   const { apiClient } = useApiClient();
-
-  // Helper function to get aggregation key format
-  const getAggregationKey = (aggName: string, response: any): string => {
-    if (response.aggregations[aggName]) {
-      return aggName;
-    }
-    if (response.aggregations[`sterms#${aggName}`]) {
-      return `sterms#${aggName}`;
-    }
-
-    for (const key of Object.keys(response.aggregations)) {
-      if (key.endsWith(aggName)) {
-        return key;
-      }
-    }
-
-    return aggName;
-  };
 
   const addClickToQuery = (params: { name: string }) => {
     if (!queryBuilderTree || !setQueryBuilderTree) return;
@@ -151,8 +134,8 @@ export default function SampleTypeChart({
       );
 
       if (response.data.aggregations) {
-        const aggKey = getAggregationKey("by_sample_type", response.data);
-        const buckets = response.data.aggregations[aggKey]?.buckets ?? [];
+        const buckets =
+          findAgg(response.data.aggregations, "by_sample_type")?.buckets ?? [];
         if (buckets.length != 0) {
           buckets.map((b) => (dataMap[b.key] = b.doc_count));
 
