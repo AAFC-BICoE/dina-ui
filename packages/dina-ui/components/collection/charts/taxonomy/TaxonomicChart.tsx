@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { Tooltip, useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
+import { format } from "echarts";
 import { Card, CardHeader } from "react-bootstrap";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { useMessage } from "../../context/MessageContext";
@@ -387,7 +388,7 @@ export default function TaxonomySunburstChart({ query }) {
           border-radius:4px;
           font-family:Arial;">
             <strong style="color:#333; font-size:14px;">
-              ${TAXON_LABELS[labelIndex]} : ${info.name}
+              ${TAXON_LABELS[labelIndex]} : ${format.encodeHTML(info.name)}
             </strong><br/>
             <span style="color:#333; font-size:12px;">
               Value: ${info.value}
@@ -435,7 +436,7 @@ export default function TaxonomySunburstChart({ query }) {
             border-radius:4px;
             font-family:Arial;">
               <strong style="color:#333; font-size:14px;">
-                ${label} : ${info.name}
+                ${label} : ${format.encodeHTML(info.name)}
               </strong><br/>
               <span style="color:#333; font-size:12px;">
                 Value: ${info.value}
@@ -561,7 +562,7 @@ export default function TaxonomySunburstChart({ query }) {
 
   useEffect(() => {
     fetchData(selectedSource);
-  }, [selectedSource]);
+  }, [query, selectedSource]);
 
   return (
     <div>

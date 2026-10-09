@@ -309,7 +309,8 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
         trigger: "item",
         triggerOn: "mousemove",
         formatter: (params: any) => {
-          const { name, value, rank } = params.data;
+          const { value, rank } = params.data;
+          const name = echarts.format.encodeHTML(params.data.name);
           if (value) {
             return `<div class="tooltip-content">
                      <strong>${name}</strong><br/>

@@ -30,16 +30,15 @@ export function prunePlaceholders(node) {
  * @returns {React.JSX.Element} The rendered node component.
  */
 
+interface TreeNodeData {
+  id: string;
+  name: string;
+  count: number;
+  children: TreeNodeData[];
+}
+
 export default function TaxonomicTreeNode({ query }) {
   const { apiClient } = useApiClient();
-  const { setMessage } = useMessage();
-
-  interface TreeNodeData {
-    id: string;
-    name: string;
-    count: number;
-    children: TreeNodeData[];
-  }
 
   const [root, setRoot] = useState<TreeNodeData | null>(null);
 
@@ -181,79 +180,6 @@ export default function TaxonomicTreeNode({ query }) {
     load();
   }, [query]);
 
-  function RenderNode({ node }: { node: TreeNodeData }) {
-    const [expanded, setExpanded] = useState(node.id === "root");
-    const hasChildren = node.children.length > 0;
-
-    return (
-      <div style={{ marginLeft: node.id === "root" ? 0 : 16 }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "4px 0",
-            cursor: hasChildren ? "pointer" : "default",
-            fontWeight: node.id === "root" ? 600 : 400,
-            fontSize: node.id === "root" ? "1.1rem" : "0.95rem",
-            color: "#222"
-          }}
-        >
-          {node.name === "Taxonomic Tree" ? (
-            <Tooltip id="addTaxonomicTreeTooltip" />
-          ) : null}
-
-          {hasChildren ? (
-            <span
-              onClick={() => hasChildren && setExpanded(!expanded)}
-              style={{
-                display: "inline-block",
-                transition: "transform 0.2s ease",
-                transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
-                color: "#666"
-              }}
-            >
-              ▶
-            </span>
-          ) : (
-            <span style={{ width: 12, display: "inline-block" }}>•</span>
-          )}
-
-          <span onClick={() => setMessage(node.id)}>{node.name}</span>
-
-          {node.id !== "root" && (
-            <span
-              style={{
-                background: "#e8e8e8",
-                borderRadius: 12,
-                padding: "1px 8px",
-                fontSize: "0.75rem",
-                color: "#555"
-              }}
-            >
-              {node.count}
-            </span>
-          )}
-        </div>
-
-        <div
-          style={{
-            marginLeft: 14,
-            borderLeft: hasChildren ? "1px solid #ddd" : "none",
-            paddingLeft: 10,
-            display: expanded ? "block" : "none",
-            transition: "all 0.2s ease"
-          }}
-        >
-          {expanded &&
-            node.children.map((child) => (
-              <RenderNode key={child.id} node={child} />
-            ))}
-        </div>
-      </div>
-    );
-  }
-
   if (!root)
     return (
       <div>
@@ -262,4 +188,78 @@ export default function TaxonomicTreeNode({ query }) {
     );
 
   return <RenderNode node={root} />;
+}
+
+function RenderNode({ node }: { node: TreeNodeData }) {
+  const { setMessage } = useMessage();
+  const [expanded, setExpanded] = useState(node.id === "root");
+  const hasChildren = node.children.length > 0;
+
+  return (
+    <div style={{ marginLeft: node.id === "root" ? 0 : 16 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "4px 0",
+          cursor: hasChildren ? "pointer" : "default",
+          fontWeight: node.id === "root" ? 600 : 400,
+          fontSize: node.id === "root" ? "1.1rem" : "0.95rem",
+          color: "#222"
+        }}
+      >
+        {node.name === "Taxonomic Tree" ? (
+          <Tooltip id="addTaxonomicTreeTooltip" />
+        ) : null}
+
+        {hasChildren ? (
+          <span
+            onClick={() => hasChildren && setExpanded(!expanded)}
+            style={{
+              display: "inline-block",
+              transition: "transform 0.2s ease",
+              transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
+              color: "#666"
+            }}
+          >
+            ▶
+          </span>
+        ) : (
+          <span style={{ width: 12, display: "inline-block" }}>•</span>
+        )}
+
+        <span onClick={() => setMessage(node.id)}>{node.name}</span>
+
+        {node.id !== "root" && (
+          <span
+            style={{
+              background: "#e8e8e8",
+              borderRadius: 12,
+              padding: "1px 8px",
+              fontSize: "0.75rem",
+              color: "#555"
+            }}
+          >
+            {node.count}
+          </span>
+        )}
+      </div>
+
+      <div
+        style={{
+          marginLeft: 14,
+          borderLeft: hasChildren ? "1px solid #ddd" : "none",
+          paddingLeft: 10,
+          display: expanded ? "block" : "none",
+          transition: "all 0.2s ease"
+        }}
+      >
+        {expanded &&
+          node.children.map((child) => (
+            <RenderNode key={child.id} node={child} />
+          ))}
+      </div>
+    </div>
+  );
 }
