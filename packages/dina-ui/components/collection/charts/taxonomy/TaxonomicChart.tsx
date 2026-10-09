@@ -58,11 +58,14 @@ const getAggregationKey = (aggName: string, obj: any): string | null => {
 function convertBucketsToSunburst(
   buckets: any[],
   aggNames: string[],
-  depth = 0
+  depth = 0,
+  parentId = ""
 ) {
   if (!Array.isArray(buckets) || depth >= aggNames.length) return [];
 
   return buckets.map((bucket) => {
+    // Path-based id: unique per branch and must match TaxonomicTreeNode's ids for drilldown.
+    const id = `${parentId}/${bucket.key}`;
     const aggName = aggNames[depth + 1];
     const nextAggKey = getAggregationKey(aggName, bucket);
     const childrenBuckets = nextAggKey ? bucket[nextAggKey]?.buckets ?? [] : [];
@@ -70,14 +73,12 @@ function convertBucketsToSunburst(
     const children = convertBucketsToSunburst(
       childrenBuckets,
       aggNames,
-      depth + 1
+      depth + 1,
+      id
     );
 
-    //ensures different ids for drilldown
-    let newID = bucket.key + bucket.doc_count;
-
     return {
-      id: newID,
+      id,
       name: bucket.key,
       value: bucket.doc_count,
       children: Array.isArray(children) ? children : []

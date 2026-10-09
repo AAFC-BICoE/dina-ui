@@ -49,11 +49,12 @@ export default function TaxonomicTreeNode({ query }) {
     return key ? obj[key] : undefined;
   }
 
-  function buildTree(buckets: any[]): TreeNodeData[] {
+  function buildTree(buckets: any[], parentId = ""): TreeNodeData[] {
     return buckets.map((b) => {
-      //ensures different ids for drilldown
+      // Path-based id: unique per branch and must match TaxonomicChart's ids for drilldown.
+      const id = `${parentId}/${b.key}`;
       const node: TreeNodeData = {
-        id: b.key + b.doc_count,
+        id,
         name: b.key,
         count: b.doc_count ?? 0,
         children: []
@@ -66,12 +67,12 @@ export default function TaxonomicTreeNode({ query }) {
       const genusAgg = findAgg(b, "by_genus");
       const speciesAgg = findAgg(b, "by_species");
 
-      if (phylumAgg) node.children = buildTree(phylumAgg.buckets);
-      if (classAgg) node.children = buildTree(classAgg.buckets);
-      if (orderAgg) node.children = buildTree(orderAgg.buckets);
-      if (familyAgg) node.children = buildTree(familyAgg.buckets);
-      if (genusAgg) node.children = buildTree(genusAgg.buckets);
-      if (speciesAgg) node.children = buildTree(speciesAgg.buckets);
+      if (phylumAgg) node.children = buildTree(phylumAgg.buckets, id);
+      if (classAgg) node.children = buildTree(classAgg.buckets, id);
+      if (orderAgg) node.children = buildTree(orderAgg.buckets, id);
+      if (familyAgg) node.children = buildTree(familyAgg.buckets, id);
+      if (genusAgg) node.children = buildTree(genusAgg.buckets, id);
+      if (speciesAgg) node.children = buildTree(speciesAgg.buckets, id);
 
       return node;
     });
