@@ -94,6 +94,35 @@ describe("TaxonomyTree option builder", () => {
     expect(apis.children[0]).toMatchObject({ rankLabel: "Species", it: true });
   });
 
+  it("Italicizes genus and every rank below it, as in the taxonomicRank vocabulary", () => {
+    const ranks = [...RANKS, "subspecies", "variety"];
+    const option = buildTaxonomyTreeOption({
+      tree: {
+        name: "Kingdom",
+        value: ranks.length,
+        children: ranks.map((rank) => node(`${rank} name`, rank, 1))
+      },
+      ranks,
+      rankLabels: {},
+      formatMessage
+    }) as any;
+
+    const italic = Object.fromEntries(
+      option.series[0].data[0].children.map((child) => [child.rank, child.it])
+    );
+    expect(italic).toEqual({
+      kingdom: false,
+      phylum: false,
+      class: false,
+      order: false,
+      family: false,
+      genus: true,
+      species: true,
+      subspecies: true,
+      variety: true
+    });
+  });
+
   it("Shows the rank, an italic name and the share of records in the tooltip", () => {
     const { formatter } = buildOption().tooltip;
     const species = { ...node("Apis mellifera", "species", 1), it: true };

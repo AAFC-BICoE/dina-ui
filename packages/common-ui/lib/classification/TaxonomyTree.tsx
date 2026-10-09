@@ -434,7 +434,8 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
         const aggKey = getAggregationKey(rankAggName, response.data);
         const buckets = response.data.aggregations[aggKey]?.buckets || [];
         const children = buckets.map((bucket) => ({
-          name: capitalizeFirstLetter(bucket.key),
+          // Kept as stored: it is shown as-is and is the exact term filter for drilling down.
+          name: bucket.key,
           value: bucket.doc_count,
           id: `${rank}_${bucket.key}`,
           rank: rank,

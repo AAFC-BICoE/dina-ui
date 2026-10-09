@@ -36,11 +36,15 @@ const mockGet = jest.fn(async () => ({
 
 const BUCKETS = {
   kingdom: [
-    { key: "animalia", doc_count: 3 },
-    { key: "plantae", doc_count: 1 }
+    { key: "Animalia", doc_count: 3 },
+    { key: "Plantae", doc_count: 1 }
   ],
-  phylum: [{ key: "arthropoda", doc_count: 3 }],
-  class: [{ key: "insecta", doc_count: 3 }]
+  // An unconventionally cased value, which must be shown and queried exactly as stored.
+  phylum: [
+    { key: "Arthropoda", doc_count: 2 },
+    { key: "incertae sedis", doc_count: 1 }
+  ],
+  class: [{ key: "Insecta", doc_count: 2 }]
 };
 
 const mockPost = jest.fn(async (_path, query: any) => {
@@ -167,5 +171,52 @@ describe("TaxonomyTree component", () => {
     await waitFor(() => expect(headers()).toEqual(["Kingdom"]));
     clickNode(getChart(container), "Animalia");
     await waitFor(() => expect(headers()).toEqual(["Kingdom", "Phylum"]));
+  });
+
+  it("Shows and queries taxon names exactly as stored", async () => {
+    const { container } = await mountTree();
+    clickNode(getChart(container), "Animalia");
+    await waitFor(() =>
+      expect(nodeNames(getChart(container))).toEqual([
+        "All",
+        "Animalia",
+        "Arthropoda",
+        "incertae sedis",
+        "Plantae"
+      ])
+    );
+    const data = (getChart(container) as any)
+      .getModel()
+      .getSeriesByIndex(0)
+      .getData();
+    const label = data
+      .getItemGraphicEl(data.indexOfName("incertae sedis"))
+      .getSymbolPath()
+      .getTextContent();
+    expect(label.style.text).toEqual("{n|incertae sedis} {c|1}");
+
+    clickNode(getChart(container), "incertae sedis");
+    await waitFor(() =>
+      expect(requestedRanks()).toEqual([
+        "taxonomy_kingdom",
+        "taxonomy_phylum",
+        "taxonomy_class"
+      ])
+    );
+    const [, classQuery] = mockPost.mock.calls[2] as any;
+    expect(classQuery.query.bool.must).toEqual([
+      {
+        term: {
+          "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword":
+            "Animalia"
+        }
+      },
+      {
+        term: {
+          "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.phylum.keyword":
+            "incertae sedis"
+        }
+      }
+    ]);
   });
 });

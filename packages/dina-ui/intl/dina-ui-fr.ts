@@ -568,6 +568,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   groupSearchPlaceholder: "Rechercher par code, chemin ou étiquette",
   groupsIBelongTo: "Mes groupes",
   hideSelectedOptions: "Masquer les sélectionnés",
+  hierarchyMoreLevels: "{count} de plus",
+  hierarchyOtherType: "Autre / aucun type",
+  hierarchyShowMoreLevels: "Afficher {count} niveaux de plus",
   groupsIDoNotBelongTo: "Autres groupes",
   hostOrganismLegend: "Organisme hôte",
   http403ForbiddenError: "Accès refusé",
@@ -623,6 +626,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Modèle de formulaire des échantillons de matériau",
   materialSampleFormTemplates:
     "Modèles de formulaire des échantillons de matériau",
+  materialSampleHierarchy: "Hiérarchie de l’échantillon de matériau",
   materialSampleInfo: "Info sur l'échantillon de matière",
   materialSampleListTitle: "Échantillons de matériaux",
   materialSampleManagedAttributes:
@@ -689,6 +693,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   noGroups: "Aucun groupe",
   noManagedAttributeValues: "Aucune valeur d’attribut géré.",
   noResultsFound: "Aucun résultat trouvé.",
+  noStorageUnit: "Aucune unité de stockage",
   noneTopLevel: "Aucun (niveau supérieur)",
   notEditableWhenThereAreChildStorageUnits:
     "Non modifiable lorsqu’il y a des unités de stockage enfant ",
