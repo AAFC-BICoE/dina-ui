@@ -44,7 +44,10 @@ export async function downloadDataExport(
     let fileExtension: string;
     if (exportToDownload.type === "data-export") {
       fileName = exportName ?? exportToDownload?.name ?? exportToDownload.id;
-      if (exportToDownload.exportType === "OBJECT_ARCHIVE") {
+      if (
+        exportToDownload.exportType === "OBJECT_ARCHIVE" ||
+        exportToDownload.exportType === "DWCA"
+      ) {
         fileExtension = ".zip";
       } else {
         fileExtension =

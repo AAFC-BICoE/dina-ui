@@ -16,9 +16,11 @@ import {
 import { TabbedArrayField } from "./TabbedArrayField";
 
 export function GeoReferenceAssertionField({
-  onChangeTabIndex
+  onChangeTabIndex,
+  className
 }: {
   onChangeTabIndex: (newIndex: number) => void;
+  className?: string;
 }) {
   const { isTemplate, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
@@ -54,10 +56,10 @@ export function GeoReferenceAssertionField({
         id="geoReferencingLegend"
         componentName={COLLECTING_EVENT_COMPONENT_NAME}
         sectionName="georeferencing-section"
-        className="non-strip"
+        className={`non-strip ${className ?? ""}`}
       >
         <TabbedArrayField<GeoReferenceAssertion>
-          className="non-strip"
+          className="non-strip collecting-event-georeferencing"
           typeName={formatMessage("geoReferenceAssertion")}
           removePadding={true}
           renderAboveTabs={() =>

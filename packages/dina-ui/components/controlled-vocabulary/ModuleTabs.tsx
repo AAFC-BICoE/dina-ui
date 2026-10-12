@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ReactNode, useCallback, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -11,10 +10,6 @@ export interface ModuleTabConfig {
 export interface ModuleTabsProps {
   /** Tab configurations to display */
   tabs: ModuleTabConfig[];
-  /**
-   * Indices of tabs that should show the "moved to controlled vocabulary" alert.
-   */
-  alertTabIndices?: number[];
   /** ID for the tabs container element */
   id?: string;
   /**
@@ -51,7 +46,6 @@ export interface ModuleTabsProps {
  */
 export function ModuleTabs({
   tabs,
-  alertTabIndices = [],
   id = "moduleTabs",
   renderTabContent,
   selectedIndex: controlledIndex,
@@ -86,9 +80,6 @@ export function ModuleTabs({
     [isControlled, onSelect]
   );
 
-  const showAlert = (tabIndex: number) => alertTabIndices.includes(tabIndex);
-  const hasListTabs = tabs.some((_, idx) => !showAlert(idx));
-
   return (
     <Tabs
       selectedIndex={currentTab}
@@ -103,23 +94,15 @@ export function ModuleTabs({
       </TabList>
 
       {tabs.map((tab, index) => {
-        const isAlertTab = showAlert(index);
-        const showContent = !isAlertTab;
         const isActive = index === currentTab;
 
         return (
           <TabPanel key={tab.titleKey}>
-            {isAlertTab && (
-              <ManagedAttributeMovedAlert moduleKey={tab.titleKey} />
-            )}
-
-            {showContent && mountedTabs.has(index) && renderTabContent && (
+            {mountedTabs.has(index) && renderTabContent && (
               <>
-                {hasListTabs && (
-                  <h3 className="mb-3">
-                    <DinaMessage id={tab.titleKey as any} />
-                  </h3>
-                )}
+                <h3 className="mb-3">
+                  <DinaMessage id={tab.titleKey as any} />
+                </h3>
                 {/*
                  * Only render content for the active tab.
                  */}
@@ -130,38 +113,5 @@ export function ModuleTabs({
         );
       })}
     </Tabs>
-  );
-}
-
-export interface ManagedAttributeMovedAlertProps {
-  /** i18n key for the module name, passed as the {module} parameter. */
-  moduleKey: string;
-}
-
-/** Alert banner indicating resources have been moved to Controlled Vocabulary. */
-export function ManagedAttributeMovedAlert({
-  moduleKey
-}: ManagedAttributeMovedAlertProps) {
-  const { formatMessage } = useDinaIntl();
-
-  return (
-    <div className="alert alert-warning mt-3" role="alert">
-      <h5>
-        <DinaMessage
-          id="managedAttributeTabAlertTitle"
-          values={{ module: formatMessage(moduleKey as any) }}
-        />
-      </h5>
-      <DinaMessage
-        id="managedAttributeTabAlertDescription"
-        values={{
-          link: (
-            <Link href="/controlled-vocabulary/list">
-              <DinaMessage id="controlledVocabularyTitle" />
-            </Link>
-          )
-        }}
-      />
-    </div>
   );
 }

@@ -18,7 +18,7 @@ import { DinaMessage, useDinaIntl } from "../intl/dina-ui-intl";
 import { SeqdbMessage } from "../intl/seqdb-intl";
 
 export function Home() {
-  const { isAdmin, isSuperUser, rolesPerGroup, subject } = useAccount();
+  const { isAdmin, rolesPerGroup, subject } = useAccount();
   const router = useRouter();
 
   const { useNewLayout, activateNewLayout, deactivateNewLayout, loading } =
@@ -227,6 +227,9 @@ export function Home() {
               </h2>
 
               <Stack style={{ display: "inline-flex" }}>
+                <Link href="/controlled-vocabulary/list">
+                  <DinaMessage id="controlledVocabularyTitle" />
+                </Link>
                 <Link href="/collection/collection-method/list">
                   <DinaMessage id="collectionMethodListTitle" />
                 </Link>
@@ -235,9 +238,6 @@ export function Home() {
                 </Link>
                 <Link href="/collection/institution/list">
                   <DinaMessage id="institutionListTitle" />
-                </Link>
-                <Link href="/managed-attribute/list">
-                  <DinaMessage id="managedAttributes" />
                 </Link>
                 <Link href="/collection/preparation-method/list">
                   <DinaMessage id="title_preparationMethod" />
@@ -289,11 +289,6 @@ export function Home() {
                 </h2>
 
                 <Stack style={{ display: "inline-flex" }}>
-                  {(isAdmin || isSuperUser) && (
-                    <Link href="/controlled-vocabulary/list">
-                      <DinaMessage id="controlledVocabularyTitle" />
-                    </Link>
-                  )}
                   <Link href="/group/list">
                     <DinaMessage id="groupListTitle" />
                   </Link>

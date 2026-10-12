@@ -548,7 +548,6 @@ function NavSequenceDropdown({ formatMessage }) {
 function NavControlledVocabularyDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     useMenuDisplayControl();
-  const { isAdmin } = useAccount();
   return (
     <NavDropdown
       title={formatMessage("controlledVocabularyTitle")}
@@ -559,6 +558,11 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
       role="menuitem"
       menuRole="menu"
     >
+      <Link href="/controlled-vocabulary/list" passHref={true} legacyBehavior>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="controlledVocabularyTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link
         href="/collection/collection-method/list"
         passHref={true}
@@ -576,11 +580,6 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
       <Link href="/collection/institution/list" passHref={true} legacyBehavior>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="institutionListTitle" />
-        </NavDropdown.Item>
-      </Link>
-      <Link href="/managed-attribute/list" passHref={true} legacyBehavior>
-        <NavDropdown.Item role="menuitem">
-          <DinaMessage id="managedAttributes" />
         </NavDropdown.Item>
       </Link>
       {/* Permission page here. */}
@@ -612,10 +611,7 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
         passHref={true}
         legacyBehavior
       >
-        <NavDropdown.Item
-          onKeyDown={!isAdmin ? onKeyDownLastItem : undefined}
-          role="menuitem"
-        >
+        <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
           <DinaMessage id="storageUnitTypeListTitle" />
         </NavDropdown.Item>
       </Link>
@@ -626,7 +622,7 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
 function NavDinaManagementDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     useMenuDisplayControl();
-  const { isAdmin, isSuperUser } = useAccount();
+  const { isAdmin } = useAccount();
   return (
     <NavDropdown
       title={formatMessage("dinaManagementSectionTitle")}
@@ -639,13 +635,6 @@ function NavDinaManagementDropdown({ formatMessage }) {
       menuRole="menu"
       style={{ marginLeft: "auto" }}
     >
-      {(isAdmin || isSuperUser) && (
-        <Link href="/controlled-vocabulary/list" passHref={true} legacyBehavior>
-          <NavDropdown.Item role="menuitem">
-            <DinaMessage id="controlledVocabularyTitle" />
-          </NavDropdown.Item>
-        </Link>
-      )}
       <Link
         href="/group/list"
         onKeyDown={onKeyDown}

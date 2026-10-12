@@ -13,22 +13,25 @@ import Link from "next/link";
 export interface ProjectSelectSectionProps {
   resourcePath?: string;
   classNames?: string;
+  horizontal?: boolean | [number, number] | "flex" | number;
 }
 
 export function ProjectSelectSection({
   resourcePath,
-  classNames
+  classNames,
+  horizontal = "flex"
 }: ProjectSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
     <ProjectsSelectField resourcePath={resourcePath} />
   ) : (
     <div className={`${classNames} row`}>
-      <DinaFormSection horizontal="flex">
+      <DinaFormSection horizontal={horizontal}>
         <div className="d-flex flex-row gap-1">
           <ProjectsSelectField
             resourcePath={resourcePath}
             className="flex-grow-1 mb-2"
+            horizontal={horizontal}
           />
         </div>
       </DinaFormSection>
@@ -39,15 +42,17 @@ export function ProjectSelectSection({
 export interface ProjectSelectFieldProps {
   resourcePath?: string;
   className?: string;
+  horizontal?: boolean | [number, number] | "flex" | number;
 }
 
 export function ProjectsSelectField({
   resourcePath,
-  className
+  className,
+  horizontal = "flex"
 }: ProjectSelectFieldProps) {
   const { readOnly } = useDinaFormContext();
   return (
-    <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
+    <DinaFormSection horizontal={horizontal} readOnly={readOnly}>
       <ResourceSelectField<Project>
         name="projects"
         isMulti={true}

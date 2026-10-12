@@ -163,7 +163,7 @@ export function OtherIdentifiersSection({
                             addIdentifier();
                           }
                         }}
-                        size="2em"
+                        size="1.00em"
                         onMouseOver={(event) => {
                           if (!disableAddButton) {
                             event.currentTarget.style.color = "blue";
@@ -260,7 +260,7 @@ export function OtherIdentifiersSection({
                             className="ms-auto"
                             style={{ marginTop: "-10px", cursor: "pointer" }}
                             onClick={() => removeIdentifier(index)}
-                            size="2em"
+                            size="1.00em"
                             onMouseOver={(event) =>
                               (event.currentTarget.style.color = "blue")
                             }
@@ -382,7 +382,7 @@ export function OtherIdentifiersSection({
                             addCatalogNumber();
                           }
                         }}
-                        size="2em"
+                        size="1.00em"
                         onMouseOver={(event) => {
                           if (!disableAddButton) {
                             event.currentTarget.style.color = "blue";
@@ -435,7 +435,7 @@ export function OtherIdentifiersSection({
                             className="ms-auto"
                             style={{ marginTop: "-10px", cursor: "pointer" }}
                             onClick={() => removeCatalogNumber(index)}
-                            size="2em"
+                            size="1.00em"
                             onMouseOver={(event) =>
                               (event.currentTarget.style.color = "blue")
                             }

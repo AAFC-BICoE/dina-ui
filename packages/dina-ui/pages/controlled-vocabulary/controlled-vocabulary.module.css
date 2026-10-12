@@ -2,20 +2,46 @@
 
 .cvGrid {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 340px 1fr;
   gap: 1rem;
   align-items: start;
 }
 
+/*
+ * Added to the shared .list-filter-panel: the search input and the dropdowns share the
+ * row (about a third each), and the buttons go on their own row below.
+ */
+.cvFilterPanel > :first-child {
+  flex: 1 1 14rem;
+}
+
+/* The dropdowns */
+.cvFilterPanel > :nth-child(2) {
+  flex: 2 1 28rem;
+}
+
+.cvFilterDropdown {
+  flex: 1 1 13rem;
+}
+
+.cvFilterPanel :global(.list-inline),
+.cvFilterPanel :global(.list-inline-item) {
+  display: block;
+  margin-right: 0;
+}
+
+.cvFilterPanel :global(.search-input) {
+  min-width: 0;
+}
+
+.cvFilterPanel :global(.filter-form-buttons) {
+  flex-basis: 100%;
+}
+
+/* Holds the Managed Attributes and Filter by Type sections */
 .cvSidebar {
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 0.75rem;
-  background: #fff;
-  width: 280px;
-  max-width: 280px;
-  position: sticky;
-  top: 70px;
+  width: 340px;
+  max-width: 340px;
 }
 
 /* Main (table container) */
@@ -62,10 +88,7 @@
     grid-template-columns: 1fr;
   }
   .cvSidebar {
-    max-height: unset;
-    border-right: 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
+    width: 100%;
+    max-width: none;
   }
 }

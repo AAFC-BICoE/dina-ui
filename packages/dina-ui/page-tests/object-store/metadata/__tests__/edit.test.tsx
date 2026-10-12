@@ -151,6 +151,10 @@ describe("Metadata single record edit page.", () => {
   it("Lets you edit the Metadata.", async () => {
     const wrapper = mountWithAppContext(<MetadataEditPage />, { apiContext });
 
+    expect(
+      wrapper.container.querySelector("main")?.previousElementSibling
+    ).toHaveClass("button-bar");
+
     // Check for the right initial values:
     await waitFor(() => {
       expect(
@@ -220,7 +224,7 @@ describe("Metadata single record edit page.", () => {
     );
 
     // Submit form
-    fireEvent.submit(wrapper.container.querySelector("form")!);
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Check only the changed values
     await waitFor(() => {
@@ -265,7 +269,7 @@ describe("Metadata single record edit page.", () => {
     await userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
 
     // Submit form
-    fireEvent.submit(wrapper.container.querySelector("form")!);
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Expect the xmpRightsWebStatement to be set to empty.
     await waitFor(() => {

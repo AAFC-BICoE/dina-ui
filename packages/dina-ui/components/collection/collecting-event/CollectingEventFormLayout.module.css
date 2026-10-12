@@ -1,0 +1,57 @@
+.cleanSection {
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-bottom: 1rem !important;
+}
+
+:global(fieldset).cleanSection {
+  background-color: #fff !important;
+}
+
+.cleanSection > :global(.legend-wrapper) {
+  border-bottom: 1px solid #ccd8e5;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.35rem;
+}
+
+.cleanSection
+  > :global(.legend-wrapper)
+  > legend
+  > :global(.fieldset-h2-adjustment) {
+  font-size: 0.95rem !important;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #274c77;
+  margin: 0 !important;
+}
+
+.sectionHeading {
+  border-bottom: 1px solid #ccd8e5;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #274c77;
+}
+
+.cleanSection :global(.legend-wrapper) :global(.fieldset-h2-adjustment) {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #274c77;
+  margin: 0 !important;
+}
+
+.cleanSection :global(.collecting-event-georeferencing) :global(.card-body) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.accessFields :global(.publiclyReleasable-field) {
+  margin-bottom: 1rem;
+}

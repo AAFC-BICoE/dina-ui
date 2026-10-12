@@ -24,11 +24,16 @@ export interface RelationshipFieldMappingProps {
     fieldPath?: string | undefined,
     fieldValue?: string | undefined
   ) => React.JSX.Element | undefined;
+  getRelationshipValues: (
+    counts: { [value: string]: number },
+    fieldPath?: string
+  ) => { [value: string]: number };
 }
 
 export function RelationshipFieldMapping({
   onChangeRelatedRecord,
-  getResourceSelectField
+  getResourceSelectField,
+  getRelationshipValues
 }: RelationshipFieldMappingProps) {
   const { columnUniqueValues, relationshipMapping, workbookColumnMap, sheet } =
     useWorkbookContext();
@@ -103,7 +108,10 @@ export function RelationshipFieldMapping({
           .map((columnName, index1) => {
             const thisColumnMap = workbookColumnMap[columnName]!;
             const fieldPath = thisColumnMap.fieldPath;
-            const counts = columnUniqueValues[sheet][columnName];
+            const counts = getRelationshipValues(
+              columnUniqueValues[sheet][columnName],
+              fieldPath
+            );
             const lastIndex = fieldPath!.lastIndexOf(".");
             const parentPath = fieldPath!.substring(0, lastIndex);
             return Object.keys(counts).map((fieldValue, index2) => (

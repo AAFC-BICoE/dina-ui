@@ -6,6 +6,7 @@ import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { BULK_ADD_IDS_KEY } from "../upload";
 import { ExistingMetadataBulkEditor } from "../../../components/bulk-metadata/ExistingMetadataBulkEditor";
 import { UploadingMetadataBulkEditor } from "../../../components/bulk-metadata/UploadingMetadataBulkEditor";
+import { ReactNode } from "react";
 
 export default function MetadataBulkEditPage() {
   const router = useRouter();
@@ -29,29 +30,38 @@ export default function MetadataBulkEditPage() {
 
   const title = metadataIds ? "editMetadataTitle" : "addMetadataTitle";
 
+  const renderEditorLayout = (buttonBar: ReactNode, content: ReactNode) => (
+    <>
+      {buttonBar}
+      <main className="container-fluid">
+        <h1 id="wb-cont">{formatMessage(title)}</h1>
+        {content}
+      </main>
+    </>
+  );
+
   return (
     <div>
       <Head title={formatMessage(title)} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">{formatMessage(title)}</h1>
-        {metadataIds ? (
-          <ExistingMetadataBulkEditor
-            ids={metadataIds}
+      <Nav marginBottom={false} />
+      {metadataIds ? (
+        <ExistingMetadataBulkEditor
+          ids={metadataIds}
+          onSaved={onSaved}
+          onPreviousClick={() => router.push("/object-store/object/list")}
+          renderLayout={renderEditorLayout}
+        />
+      ) : (
+        objectUploadIds && (
+          <UploadingMetadataBulkEditor
+            objectUploadIds={objectUploadIds}
             onSaved={onSaved}
             onPreviousClick={() => router.push("/object-store/object/list")}
+            insideModal={false}
+            renderLayout={renderEditorLayout}
           />
-        ) : (
-          objectUploadIds && (
-            <UploadingMetadataBulkEditor
-              objectUploadIds={objectUploadIds}
-              onSaved={onSaved}
-              onPreviousClick={() => router.push("/object-store/object/list")}
-              insideModal={false}
-            />
-          )
-        )}
-      </main>
+        )
+      )}
       <Footer />
     </div>
   );

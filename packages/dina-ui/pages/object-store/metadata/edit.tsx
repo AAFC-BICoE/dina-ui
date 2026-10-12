@@ -1,5 +1,12 @@
-import { withResponse, BackButton, ButtonBar, SubmitButton } from "common-ui";
+import {
+  withResponse,
+  BackButton,
+  ButtonBar,
+  RefSubmitButton
+} from "common-ui";
+import { FormikProps } from "formik";
 import { useRouter } from "next/router";
+import { useRef } from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
@@ -14,13 +21,15 @@ export default function MetadataEditPage() {
   const { formatMessage } = useDinaIntl();
   const query = useMetadataEditQuery(id);
   const title = id ? "editMetadataTitle" : "addMetadataTitle";
+  const metadataFormRef = useRef<FormikProps<InputResource<Metadata>>>(null);
+
   const buttonBar = (
-    <ButtonBar className="mb-3">
+    <ButtonBar>
       <div className="col-md-6 mt-2">
         <BackButton entityId={id} entityLink="/object-store/object" />
       </div>
       <div className="col-md-6 flex d-flex ms-auto">
-        <SubmitButton className="ms-auto" />
+        <RefSubmitButton formRef={metadataFormRef} className="ms-auto" />
       </div>
     </ButtonBar>
   );
@@ -31,7 +40,8 @@ export default function MetadataEditPage() {
   return (
     <div>
       <Head title={formatMessage(title)} />
-      <Nav />
+      <Nav marginBottom={false} />
+      {buttonBar}
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id={title} />
@@ -43,12 +53,12 @@ export default function MetadataEditPage() {
                 defaultToNotReleasable={true}
                 metadata={editMetadata as InputResource<Metadata>}
                 onSaved={redirectToSingleMetadataPage}
-                buttonBar={buttonBar}
+                metadataFormRef={metadataFormRef}
               />
             ))}
           </div>
         ) : (
-          <MetadataUpload buttonBar={buttonBar} />
+          <MetadataUpload metadataFormRef={metadataFormRef} />
         )}
       </main>
       <Footer />

@@ -1,7 +1,7 @@
 import { ApiClientContext, useAccount } from "common-ui";
 import { useRouter } from "next/router";
 import { InputResource, PersistedResource } from "kitsu";
-import { useState, useEffect, useContext, forwardRef } from "react";
+import { useState, useEffect, useContext, forwardRef, ReactNode } from "react";
 import moment from "moment";
 import {
   DefaultValue,
@@ -20,6 +20,7 @@ export interface UploadingMetadataBulkEditorProps {
   onPreviousClick?: () => void;
   inputGroup?: string;
   insideModal?: boolean;
+  renderLayout?: (buttonBar: ReactNode, content: ReactNode) => ReactNode;
 }
 
 export const UploadingMetadataBulkEditor = forwardRef<
@@ -32,7 +33,8 @@ export const UploadingMetadataBulkEditor = forwardRef<
       onSaved,
       onPreviousClick,
       inputGroup,
-      insideModal = false
+      insideModal = false,
+      renderLayout
     },
     ref
   ) => {
@@ -110,12 +112,13 @@ export const UploadingMetadataBulkEditor = forwardRef<
         onSaved={onSaved}
         onPreviousClick={onPreviousClick}
         insideModal={insideModal}
+        renderLayout={renderLayout}
       />
     );
 
     return (
       <>
-        {insideModal ? (
+        {insideModal || renderLayout ? (
           editorContent
         ) : (
           <main className="container-fluid">{editorContent}</main>

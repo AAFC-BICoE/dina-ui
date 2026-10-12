@@ -77,6 +77,35 @@ describe("MetadataBulkEditor", () => {
     jest.restoreAllMocks();
   });
 
+  it("supports rendering the button bar separately from the editor content", async () => {
+    const wrapper = mountWithAppContext(
+      <MetadataBulkEditor
+        metadatas={TEST_NEW_METADATA}
+        onSaved={mockOnSaved}
+        renderLayout={(buttonBar, content) => (
+          <>
+            <div data-testid="bulk-button-bar">{buttonBar}</div>
+            <div data-testid="bulk-editor-content">{content}</div>
+          </>
+        )}
+      />,
+      testCtx as any
+    );
+
+    await waitForLoadingToDisappear();
+
+    expect(
+      wrapper.getByTestId("bulk-button-bar").querySelector(".button-bar")
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByTestId("bulk-button-bar").querySelector(".button-bar-sticky")
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByTestId("bulk-button-bar").querySelector("form")
+    ).not.toBeInTheDocument();
+    expect(wrapper.getByTestId("bulk-editor-content")).toBeInTheDocument();
+  });
+
   describe("Bulk Upload Metadata", () => {
     it("Upload 3 files, bulk editor opens with correct information", async () => {
       const wrapper = mountWithAppContext(

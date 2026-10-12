@@ -45,6 +45,8 @@ const config: Config.InitialOptions = {
     "^pdfjs-dist/legacy/build/pdf\\.worker\\.min\\.mjs$":
       "<rootDir>/__mocks__/empty.js",
     "^@dina-ui/(.*)$": "<rootDir>/packages/dina-ui/$1",
+    // Root-relative imports such as "packages/dina-ui/components", as in tsconfig:
+    "^packages/(.*)$": "<rootDir>/packages/$1",
     "^common-ui$": "<rootDir>/packages/common-ui/lib/index.ts"
   },
   setupFiles: ["<rootDir>/jest.setup.js"],
@@ -52,9 +54,24 @@ const config: Config.InitialOptions = {
   testPathIgnorePatterns: ["/.next/", "/node_modules/"],
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$",
   transform: {
-    "^.+\\.tsx?$": ["babel-jest", { presets: [["next/babel", { "preset-react": { runtime: "automatic" } }]] }],
-    "^.+\\.js?$": ["babel-jest", { presets: [["next/babel", { "preset-react": { runtime: "automatic" } }]] }],
-    "\\.mjs?$": ["babel-jest", { presets: [["next/babel", { "preset-react": { runtime: "automatic" } }]] }]
+    "^.+\\.tsx?$": [
+      "babel-jest",
+      {
+        presets: [["next/babel", { "preset-react": { runtime: "automatic" } }]]
+      }
+    ],
+    "^.+\\.js?$": [
+      "babel-jest",
+      {
+        presets: [["next/babel", { "preset-react": { runtime: "automatic" } }]]
+      }
+    ],
+    "\\.mjs?$": [
+      "babel-jest",
+      {
+        presets: [["next/babel", { "preset-react": { runtime: "automatic" } }]]
+      }
+    ]
   },
   transformIgnorePatterns: [
     `/node_modules/(?!common-ui|axios|dnd-core|uuid|dexie)`

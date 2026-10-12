@@ -1,11 +1,11 @@
-import React, { useMemo, useState, useEffect } from "react";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
+import { FieldSet } from "common-ui";
+import React, { useMemo } from "react";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface SidebarOption {
   id: string;
   label: string;
   count?: number;
-  hasChildren?: boolean;
 }
 
 export interface TypeFilterState {
@@ -15,67 +15,29 @@ export interface TypeFilterState {
 
 export interface TypeFilterSideBarDynamicProps {
   parents: SidebarOption[];
+  /** Data components of the Managed Attribute vocabularies, by vocabulary id. */
   childrenMap?: Record<string, SidebarOption[]>;
-  loadChildren?: (
-    parentId: string
-  ) => Promise<SidebarOption[]> | SidebarOption[];
   selected: TypeFilterState;
   onChange: (next: TypeFilterState) => void;
-  title?: string;
 }
 
+/**
+ * Sidebar filters for the controlled vocabulary list.
+ * Every vocabulary is listed under "Filter by Type". The data components of the Managed Attribute
+ * vocabularies are also listed under "Managed Attributes". Selecting a data component selects its
+ * vocabulary, and deselecting the vocabulary deselects its data components.
+ */
 export function TypeFilterSideBarDynamic({
   parents,
-  childrenMap,
-  loadChildren,
+  childrenMap = {},
   selected,
-  onChange,
-  title = "Filters"
+  onChange
 }: TypeFilterSideBarDynamicProps) {
-  // Local UI state for open/closed parents
-  const [open, setOpen] = useState<Record<string, boolean>>({});
-  // Local data state for asynchronously loaded children
-  const [loadedChildren, setLoadedChildren] = useState<
-    Record<string, SidebarOption[]>
-  >({});
-  // Track if we've already auto-expanded
-  const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
-
-  // 1. Merge static children map with dynamically loaded children
-  const allChildren = useMemo(
-    () => ({ ...(childrenMap ?? {}), ...loadedChildren }),
-    [childrenMap, loadedChildren]
+  // Vocabularies with data components listed under "Managed Attributes"
+  const componentParents = useMemo(
+    () => parents.filter((p) => (childrenMap[p.id]?.length ?? 0) > 0),
+    [parents, childrenMap]
   );
-
-  // Auto-expand all parents on mount to load their children
-  useEffect(() => {
-    if (hasAutoExpanded || parents.length === 0 || !loadChildren) {
-      return;
-    }
-
-    const expandAll = async () => {
-      const newOpen: Record<string, boolean> = {};
-      const newChildren: Record<string, SidebarOption[]> = {};
-
-      for (const parent of parents) {
-        if (parent.hasChildren && !allChildren[parent.id]) {
-          newOpen[parent.id] = true;
-          try {
-            const loaded = await loadChildren(parent.id);
-            newChildren[parent.id] = Array.isArray(loaded) ? loaded : [];
-          } catch (err) {
-            console.error("Failed to auto-load children for", parent.id, err);
-          }
-        }
-      }
-
-      setOpen((prev) => ({ ...prev, ...newOpen }));
-      setLoadedChildren((prev) => ({ ...prev, ...newChildren }));
-      setHasAutoExpanded(true);
-    };
-
-    expandAll();
-  }, [parents, loadChildren, hasAutoExpanded, allChildren]);
 
   const selectedParentSet = useMemo(
     () => new Set(selected.parent_cv_ids ?? []),
@@ -86,100 +48,112 @@ export function TypeFilterSideBarDynamic({
     [selected.children]
   );
 
-  // 2. Derived State: Calculate the status of every parent based on current selection props
-  const parentStatus = useMemo(() => {
-    const status: Record<string, { checked: boolean; indeterminate: boolean }> =
-      {};
-
-    parents.forEach((p) => {
-      const pChildren = allChildren[p.id] ?? [];
-      const childIds = pChildren.map((c) => c.id);
-
-      if (childIds.length > 0) {
-        // A parent with children is checked only when the parent itself is
-        // selected in parent_cv_ids AND all of its children are selected.
-        const parentSelected = selectedParentSet.has(p.id);
-        const allSelected = childIds.every((id) => selectedChildSet.has(id));
-        const someSelected = childIds.some((id) => selectedChildSet.has(id));
-
-        status[p.id] = {
-          checked: parentSelected && allSelected,
-          indeterminate: parentSelected && !allSelected && someSelected
-        };
-      } else {
-        // If no children (or not loaded yet), rely on explicit parent selection
-        const isSelected = selectedParentSet.has(p.id);
-        status[p.id] = { checked: isSelected, indeterminate: false };
-      }
-    });
-    return status;
-  }, [parents, allChildren, selectedChildSet, selectedParentSet]);
-
-  // 3. Global Stats
-  const globalStats = useMemo(() => {
-    const allStats = Object.values(parentStatus);
-    const allChecked = allStats.length > 0 && allStats.every((s) => s.checked);
-    const someChecked = allStats.some((s) => s.checked || s.indeterminate);
-
-    // Calculate total count for the "All Types" badge
-    let totalCount = 0;
-    parents.forEach((p) => {
-      const kids = allChildren[p.id] ?? [];
-
-      // If p.count is undefined, fall back to the loaded children length.
-      if (typeof p.count === "number") {
-        totalCount += p.count;
-      } else if (p.hasChildren || kids.length > 0) {
-        totalCount += kids.length;
-      } else {
-        // It's a leaf node parent, count it as 1
-        totalCount += 1;
-      }
-    });
+  // "All" stats for the Managed Attributes section
+  const allComponentsStats = useMemo(() => {
+    const components = componentParents.flatMap((p) =>
+      childrenMap[p.id].map((c) => ({ parentId: p.id, child: c }))
+    );
+    const selectedCount = components.filter(
+      ({ parentId, child }) =>
+        selectedParentSet.has(parentId) && selectedChildSet.has(child.id)
+    ).length;
+    const totalCount = components.reduce(
+      (sum, { child }) => sum + Math.max(child.count ?? 0, 0),
+      0
+    );
 
     return {
-      checked: allChecked,
-      indeterminate: !allChecked && someChecked,
+      checked: components.length > 0 && selectedCount === components.length,
+      indeterminate: selectedCount > 0 && selectedCount < components.length,
       totalCount
     };
-  }, [parentStatus, parents, allChildren]);
+  }, [componentParents, childrenMap, selectedParentSet, selectedChildSet]);
+
+  // "All Types" stats for the Filter by Type section
+  const allTypesStats = useMemo(() => {
+    const selectedCount = parents.filter((p) =>
+      selectedParentSet.has(p.id)
+    ).length;
+    const totalCount = parents.reduce(
+      (sum, p) => sum + Math.max(displayCount(p), 0),
+      0
+    );
+
+    return {
+      checked: parents.length > 0 && selectedCount === parents.length,
+      indeterminate: selectedCount > 0 && selectedCount < parents.length,
+      totalCount
+    };
+  }, [parents, selectedParentSet]);
+
+  // --- Selection helpers ---
+
+  /** Selects a vocabulary with all of its data components. */
+  function selectParent(
+    parentSet: Set<string>,
+    childSet: Set<string>,
+    parentId: string
+  ) {
+    parentSet.add(parentId);
+    (childrenMap[parentId] ?? []).forEach((c) => childSet.add(c.id));
+  }
+
+  /** Deselects a vocabulary with all of its data components. */
+  function deselectParent(
+    parentSet: Set<string>,
+    childSet: Set<string>,
+    parentId: string
+  ) {
+    parentSet.delete(parentId);
+    (childrenMap[parentId] ?? []).forEach((c) => {
+      // Keep a data component that another selected vocabulary still filters on.
+      const stillHasChild = Array.from(parentSet).some((pid) =>
+        (childrenMap[pid] ?? []).some((k) => k.id === c.id)
+      );
+      if (!stillHasChild) {
+        childSet.delete(c.id);
+      }
+    });
+  }
+
+  function emitChange(parentSet: Set<string>, childSet: Set<string>) {
+    onChange({
+      parent_cv_ids: Array.from(parentSet),
+      children: Array.from(childSet)
+    });
+  }
 
   // --- Handlers ---
 
-  const handleToggleAll = () => {
-    if (!globalStats.checked) {
-      // Select All
-      const allPIds = parents.map((p) => p.id);
-      const allCIds = Object.values(allChildren)
-        .flat()
-        .map((c) => c.id);
-      onChange({ parent_cv_ids: allPIds, children: allCIds });
-    } else {
-      // Deselect All
-      onChange({ parent_cv_ids: [], children: [] });
-    }
-  };
-
-  const handleToggleParent = (parentId: string) => {
-    const currentStatus = parentStatus[parentId];
-    const shouldSelect = !currentStatus.checked; // If indeterminate, we also want to select all
-
-    const children = allChildren[parentId] ?? [];
+  const handleToggleAllComponents = () => {
     const nextParentSet = new Set(selectedParentSet);
     const nextChildSet = new Set(selectedChildSet);
+    componentParents.forEach((p) =>
+      allComponentsStats.checked
+        ? deselectParent(nextParentSet, nextChildSet, p.id)
+        : selectParent(nextParentSet, nextChildSet, p.id)
+    );
+    emitChange(nextParentSet, nextChildSet);
+  };
 
-    if (shouldSelect) {
-      nextParentSet.add(parentId);
-      children.forEach((c) => nextChildSet.add(c.id));
-    } else {
-      nextParentSet.delete(parentId);
-      children.forEach((c) => nextChildSet.delete(c.id));
+  const handleToggleAllTypes = () => {
+    const nextParentSet = new Set<string>();
+    const nextChildSet = new Set<string>();
+    if (!allTypesStats.checked) {
+      parents.forEach((p) => selectParent(nextParentSet, nextChildSet, p.id));
     }
+    emitChange(nextParentSet, nextChildSet);
+  };
 
-    onChange({
-      parent_cv_ids: Array.from(nextParentSet),
-      children: Array.from(nextChildSet)
-    });
+  const handleToggleType = (parentId: string) => {
+    const nextParentSet = new Set(selectedParentSet);
+    const nextChildSet = new Set(selectedChildSet);
+    if (selectedParentSet.has(parentId)) {
+      deselectParent(nextParentSet, nextChildSet, parentId);
+    } else {
+      selectParent(nextParentSet, nextChildSet, parentId);
+    }
+    emitChange(nextParentSet, nextChildSet);
   };
 
   const handleToggleChild = (childId: string, parentId: string) => {
@@ -195,7 +169,7 @@ export function TypeFilterSideBarDynamic({
       // Unchecking this child under this parent
       nextChildSet.delete(childId);
       // If no other children of this parent remain selected, remove the parent
-      const siblings = allChildren[parentId] ?? [];
+      const siblings = childrenMap[parentId] ?? [];
       const anySiblingSelected = siblings.some(
         (s) => s.id !== childId && nextChildSet.has(s.id)
       );
@@ -206,7 +180,7 @@ export function TypeFilterSideBarDynamic({
       // has it — otherwise we'd incorrectly remove a filter that still applies across parents.
       const stillHasChild = Array.from(nextParentSet).some((pid) => {
         if (pid === parentId) return false;
-        const kids = allChildren[pid] ?? [];
+        const kids = childrenMap[pid] ?? [];
         return kids.some((k) => k.id === childId);
       });
       if (stillHasChild) {
@@ -218,187 +192,124 @@ export function TypeFilterSideBarDynamic({
       nextParentSet.add(parentId);
     }
 
-    onChange({
-      parent_cv_ids: Array.from(nextParentSet),
-      children: Array.from(nextChildSet)
-    });
+    emitChange(nextParentSet, nextChildSet);
   };
-
-  const handleToggleOpen = async (parentId: string, hasChildren?: boolean) => {
-    const nextOpenState = !open[parentId];
-    setOpen((prev) => ({ ...prev, [parentId]: nextOpenState }));
-
-    // Dynamic Load Logic
-    if (
-      nextOpenState &&
-      hasChildren &&
-      !allChildren[parentId] &&
-      loadChildren
-    ) {
-      try {
-        const loaded = await loadChildren(parentId);
-        // Using functional update to ensure we don't overwrite concurrent loads
-        setLoadedChildren((prev) => ({
-          ...prev,
-          [parentId]: Array.isArray(loaded) ? loaded : []
-        }));
-
-        // Edge Case: If the parent was ALREADY selected (checked) when we opened it,
-        // we must select the newly loaded children to maintain logic consistency.
-        if (
-          parentStatus[parentId]?.checked &&
-          Array.isArray(loaded) &&
-          loaded.length > 0
-        ) {
-          const nextChildSet = new Set(selected.children ?? []);
-          loaded.forEach((c) => nextChildSet.add(c.id));
-          onChange({ ...selected, children: Array.from(nextChildSet) });
-        }
-      } catch (err) {
-        console.error("Failed to load children for", parentId, err);
-      }
-    }
-  };
-
-  if (!parents.length) {
-    return (
-      <div aria-label={title}>
-        <div className="text-muted" style={{ fontSize: "0.9em" }}>
-          (No filters available yet)
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div aria-label={title}>
-      {/* Header / Select All */}
-      <div className="d-flex align-items-center justify-content-between mb-2">
-        <div className="d-flex align-items-center">
-          <input
-            id="cv-select-all"
-            type="checkbox"
-            className="me-2"
-            checked={globalStats.checked}
-            ref={(el) => {
-              if (el) el.indeterminate = globalStats.indeterminate;
-            }}
-            onChange={handleToggleAll}
-          />
-          <label htmlFor="cv-select-all" className="m-0">
-            All Types
-          </label>
-          <span className="badge bg-light text-secondary ms-2">
-            {globalStats.totalCount}
-          </span>
-        </div>
-      </div>
-
-      <hr className="my-2" />
-
-      {/* List of Parents */}
-      <ul className="list-unstyled m-0">
-        {parents.map((p) => {
-          const children = allChildren[p.id] ?? [];
-          const isExpandable = p.hasChildren || children.length > 0;
-          const isOpen = !!open[p.id];
-          const status = parentStatus[p.id] || {
-            checked: false,
-            indeterminate: false
-          };
-
-          let countDisplay = 1;
-          if (typeof p.count === "number") {
-            countDisplay = p.count;
-          } else if (isExpandable) {
-            countDisplay = children.length;
-          }
-
-          return (
-            <li key={p.id} className="py-1">
-              <div className="d-flex align-items-center justify-content-between">
-                <div className="d-flex align-items-center">
-                  <input
-                    id={`cv-${p.id}`}
-                    type="checkbox"
-                    className="me-2"
-                    checked={status.checked}
-                    ref={(el) => {
-                      if (el) el.indeterminate = status.indeterminate;
-                    }}
-                    onChange={() => handleToggleParent(p.id)}
+    <>
+      {componentParents.length > 0 && (
+        <FieldSet
+          legend={<DinaMessage id="managedAttributes" />}
+          id="cv-managed-attributes-filter"
+        >
+          <ul className="list-unstyled m-0">
+            <FilterCheckboxRow
+              id="cv-select-all-components"
+              label={<DinaMessage id="all" />}
+              count={allComponentsStats.totalCount}
+              checked={allComponentsStats.checked}
+              indeterminate={allComponentsStats.indeterminate}
+              onChange={handleToggleAllComponents}
+            />
+            {componentParents.flatMap((p) =>
+              childrenMap[p.id].map((c) => {
+                // Use a compound key so children with the same name
+                // under different parents are treated independently.
+                const compoundId = `${p.id}::${c.id}`;
+                return (
+                  <FilterCheckboxRow
+                    key={compoundId}
+                    id={`cv-child-${compoundId}`}
+                    label={c.label}
+                    count={c.count}
+                    checked={
+                      selectedChildSet.has(c.id) && selectedParentSet.has(p.id)
+                    }
+                    onChange={() => handleToggleChild(c.id, p.id)}
                   />
-                  <label htmlFor={`cv-${p.id}`} className="m-0">
-                    {p.label}
-                  </label>
-                  {/* Only show badge if count > 0 or if you want to show 0 explicitly */}
-                  {countDisplay > 0 && (
-                    <span className="badge bg-light text-secondary ms-2">
-                      {countDisplay}
-                    </span>
-                  )}
-                </div>
+                );
+              })
+            )}
+          </ul>
+        </FieldSet>
+      )}
 
-                {isExpandable && (
-                  <button
-                    type="button"
-                    className="btn btn-sm p-0 border-0 bg-transparent ms-2"
-                    onClick={() => handleToggleOpen(p.id, p.hasChildren)}
-                    aria-expanded={isOpen}
-                  >
-                    {isOpen ? <FaChevronUp /> : <FaChevronDown />}
-                  </button>
-                )}
-              </div>
+      <FieldSet legend={<DinaMessage id="filterByType" />} id="cv-type-filter">
+        {parents.length ? (
+          <ul className="list-unstyled m-0">
+            <FilterCheckboxRow
+              id="cv-select-all"
+              label={<DinaMessage id="allTypes" />}
+              count={allTypesStats.totalCount}
+              checked={allTypesStats.checked}
+              indeterminate={allTypesStats.indeterminate}
+              onChange={handleToggleAllTypes}
+            />
+            {parents.map((p) => (
+              <FilterCheckboxRow
+                key={p.id}
+                id={`cv-${p.id}`}
+                label={p.label}
+                count={displayCount(p)}
+                checked={selectedParentSet.has(p.id)}
+                onChange={() => handleToggleType(p.id)}
+              />
+            ))}
+          </ul>
+        ) : (
+          <div className="text-muted small">
+            <DinaMessage id="noFiltersAvailable" />
+          </div>
+        )}
+      </FieldSet>
+    </>
+  );
+}
 
-              {/* Children List */}
-              {isOpen && children.length > 0 && (
-                <div className="ms-4 mt-1">
-                  <ul className="list-unstyled m-0 small">
-                    {children.map((c) => {
-                      // Use a compound key so children with the same name
-                      // under different parents are treated independently.
-                      const compoundId = `${p.id}::${c.id}`;
-                      // A child is checked only when both it and its parent
-                      // are selected
-                      const isChecked =
-                        selectedChildSet.has(c.id) &&
-                        selectedParentSet.has(p.id);
-                      return (
-                        <li
-                          key={compoundId}
-                          className="d-flex align-items-center justify-content-between py-1"
-                        >
-                          <div className="d-flex align-items-center">
-                            <input
-                              id={`cv-child-${compoundId}`}
-                              type="checkbox"
-                              className="me-2"
-                              checked={isChecked}
-                              onChange={() => handleToggleChild(c.id, p.id)}
-                            />
-                            <label
-                              htmlFor={`cv-child-${compoundId}`}
-                              className="m-0"
-                            >
-                              {c.label}
-                            </label>
-                            {typeof c.count === "number" && (
-                              <span className="badge bg-light text-secondary ms-2">
-                                {c.count}
-                              </span>
-                            )}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+/** A parent without a loaded count represents a single type. */
+function displayCount(option: SidebarOption): number {
+  return typeof option.count === "number" ? option.count : 1;
+}
+
+interface FilterCheckboxRowProps {
+  id: string;
+  label: React.ReactNode;
+  count?: number;
+  checked: boolean;
+  indeterminate?: boolean;
+  onChange: () => void;
+}
+
+/** Checkbox with its label on the left and its count badge on the right. */
+function FilterCheckboxRow({
+  id,
+  label,
+  count,
+  checked,
+  indeterminate = false,
+  onChange
+}: FilterCheckboxRowProps) {
+  return (
+    <li className="d-flex align-items-center justify-content-between py-1">
+      <div className="form-check m-0">
+        <input
+          id={id}
+          type="checkbox"
+          className="form-check-input"
+          checked={checked}
+          ref={(el) => {
+            if (el) el.indeterminate = indeterminate;
+          }}
+          onChange={onChange}
+        />
+        <label htmlFor={id} className="form-check-label">
+          {label}
+        </label>
+      </div>
+      {/* Hide the badge when the count is unknown (-1) or empty */}
+      {typeof count === "number" && count > 0 && (
+        <span className="badge bg-secondary ms-2">{count}</span>
+      )}
+    </li>
   );
 }

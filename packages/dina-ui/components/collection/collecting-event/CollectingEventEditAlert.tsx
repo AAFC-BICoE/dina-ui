@@ -1,7 +1,7 @@
 import { AreYouSureModal, ExternalLink } from "common-ui";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import React from "react";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { FaInfoCircle } from "react-icons/fa";
 import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
 
 interface CollectingEventEditAlertProps {
@@ -59,11 +59,11 @@ function CollectingEventEditAlert({
   ]);
 
   return (
-    <div className="alert alert-warning" role="alert">
+    <div className="alert alert-info py-2 mb-3" role="status">
       <div className="d-flex gap-3">
-        <FaExclamationTriangle
+        <FaInfoCircle
           aria-hidden="true"
-          style={{ width: "24px", height: "24px", flexShrink: 0 }}
+          style={{ width: "20px", height: "20px", flexShrink: 0 }}
         />
         <div>
           <span>
@@ -90,7 +90,10 @@ function CollectingEventEditAlert({
                   }
                 }}
               >
-                <DinaMessage id="collectingEventViewMaterialSamplesAttached" />{" "}
+                <DinaMessage
+                  id="collectingEventViewMaterialSamplesAttached"
+                  values={{ count: resolvedUsageCount }}
+                />{" "}
               </ExternalLink>
             </span>
           )}

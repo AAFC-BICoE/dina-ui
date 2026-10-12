@@ -82,7 +82,7 @@ function LinkedResourceHeaderActions({
   bulkEditView: boolean;
 }) {
   return (
-    <div className="d-flex justify-content-end align-items-center gap-3 mb-3">
+    <div className="d-flex justify-content-end align-items-center gap-3 mb-2">
       {readOnlyLink && (
         <ExternalLink
           href={`${readOnlyLink}${resourceId}`}

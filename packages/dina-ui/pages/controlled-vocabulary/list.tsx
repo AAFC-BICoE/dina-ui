@@ -6,6 +6,7 @@ import {
   ListPageLayout,
   useApiClient,
   LoadingSpinner,
+  SelectField,
   SimpleSearchFilterBuilder,
   simpleSearchFilterToFiql
 } from "common-ui";
@@ -35,22 +36,27 @@ import {
   ControlledVocabularyApiConfig
 } from "packages/dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
+import { VOCABULARY_ELEMENT_TYPE_OPTIONS } from "packages/dina-ui/types/collection-api/resources/VocabularyElementType";
 
 const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy"];
 
+/** Key of the Managed Attribute vocabulary in every module's API. */
+const MANAGED_ATTRIBUTE_VOCABULARY_KEY = "managed_attribute";
+
 function getColumns(
-  viewRoute: string
+  viewRoute: string,
+  componentLabel: (component: string) => string
 ): ColumnDefinition<ControlledVocabularyItem>[] {
   return [
     {
       accessorKey: "multilingualTitle",
-      header: "Multilingual Title",
+      header: () => <DinaMessage id="field_multilingualTitle" />,
       cell: ({ row: { original } }) =>
         original.multilingualTitle?.titles?.[0]?.title ?? ""
     },
     {
       accessorKey: "name",
-      header: "Name",
+      header: () => <DinaMessage id="field_name" />,
       cell: ({ row: { original } }) => (
         <Link href={`${viewRoute}?id=${original.id}`}>
           {original.name ?? original.id}
@@ -59,25 +65,32 @@ function getColumns(
     },
     {
       accessorKey: "dinaComponent",
-      header: "Data Component",
-      cell: ({ row: { original } }) => {
-        const comp = original.dinaComponent as any;
-        return comp ?? "";
-      }
+      header: () => <DinaMessage id="field_dinaComponent" />,
+      cell: ({ row: { original } }) =>
+        original.dinaComponent ? componentLabel(original.dinaComponent) : ""
     },
     {
       accessorKey: "vocabularyElementType",
-      header: "Vocabulary Element Type",
-      cell: ({ row: { original } }) => original.vocabularyElementType ?? ""
+      header: () => <DinaMessage id="field_vocabularyElementType" />,
+      cell: ({ row: { original } }) => {
+        const option = VOCABULARY_ELEMENT_TYPE_OPTIONS.find(
+          ({ value }) => value === original.vocabularyElementType
+        );
+        return option ? (
+          <DinaMessage id={option.labelKey} />
+        ) : (
+          original.vocabularyElementType ?? ""
+        );
+      }
     },
     {
       accessorKey: "unit",
-      header: "Unit",
+      header: () => <DinaMessage id="field_unit" />,
       cell: ({ row: { original } }) => original.unit ?? ""
     },
     {
       accessorKey: "acceptedValues",
-      header: "Accepted Values",
+      header: () => <DinaMessage id="field_acceptedValues" />,
       cell: ({ row: { original } }) =>
         Array.isArray(original.acceptedValues)
           ? original.acceptedValues.map((v) => `"${v}"`).join(", ")
@@ -130,6 +143,7 @@ const SHARED_CV_PARAMS = {
 /**
  * Groups controlled-vocabulary-items by dinaComponent into SidebarOptions
  * representing component types and their item counts.
+ * The label is the raw dinaComponent; it is translated when rendered.
  */
 function groupChildItems(items: ControlledVocabularyItem[]): SidebarOption[] {
   const counts = new Map<string, number>();
@@ -202,33 +216,16 @@ export default function ControlledVocabularyListPage() {
     children: []
   });
 
-  // 3. Load Children Helper using the active tab API.
-  const loadChildItems = useCallback(
-    async (parentUuid: string): Promise<ControlledVocabularyItem[]> => {
-      const resp: any = await apiClient.get(
-        `${activeModule.apiBaseUrl}/controlled-vocabulary-item`,
-        {
-          page: { limit: 1000 },
-          filter: { "controlledVocabulary.uuid": { EQ: parentUuid } },
-          fields: { "controlled-vocabulary-item": "id,dinaComponent" }
-        }
-      );
-
-      return Array.isArray(resp?.data)
-        ? (resp.data as ControlledVocabularyItem[])
-        : [];
+  // 3. Data component label for the sidebar, e.g. "Material Sample" for MATERIAL_SAMPLE.
+  const componentLabel = useCallback(
+    (component: string) => {
+      const labelKey = activeModule.componentTypeLabels[component];
+      return labelKey ? formatMessage(labelKey as any) : component;
     },
-    [apiClient, activeModule]
-  );
-
-  const loadChildren = useCallback(
-    async (parentUuid: string): Promise<SidebarOption[]> =>
-      groupChildItems(await loadChildItems(parentUuid)),
-    [loadChildItems]
+    [activeModule, formatMessage]
   );
 
   // Fetch all child items for the active module in a single bulk request.
-  // The per-parent loadChildItems is kept as a fallback for missing children.
   const loadAllChildItems = useCallback(async (): Promise<
     ControlledVocabularyItem[]
   > => {
@@ -249,6 +246,17 @@ export default function ControlledVocabularyListPage() {
       : [];
   }, [apiClient, activeModule]);
 
+  // Managed Attribute vocabularies, which can also be filtered by data component.
+  const managedAttributeIds = useMemo(
+    () =>
+      new Set(
+        cvItems
+          .filter((cv) => cv.key === MANAGED_ATTRIBUTE_VOCABULARY_KEY)
+          .map((cv) => String((cv as any).id))
+      ),
+    [cvItems]
+  );
+
   const [parentCounts, setParentCounts] = useState<Record<string, number>>({});
   const [parentsWithChildren, setParentsWithChildren] = useState<Set<string>>(
     new Set()
@@ -261,6 +269,9 @@ export default function ControlledVocabularyListPage() {
   // in a single bulk request and grouped client-side to reduce requests.
   useEffect(() => {
     if (!cvItems || cvItems.length === 0) return;
+
+    // Ignore the result of a load that finishes after the tab was changed.
+    let cancelled = false;
 
     const fetchAllCounts = async () => {
       const newCounts: Record<string, number> = {};
@@ -287,13 +298,15 @@ export default function ControlledVocabularyListPage() {
         }
 
         for (const [parentId, items] of itemsByParent) {
+          newCounts[parentId] = items.length;
+          // Only Managed Attribute vocabularies are filtered by data component.
+          // Other vocabularies (e.g. Identifier Type) are filtered as a whole even
+          // when their items have a dinaComponent.
+          if (!managedAttributeIds.has(parentId)) continue;
           const componentChildren = groupChildItems(items);
-          // Treat vocabularies as having children only if they have component children.
-          // Vocabularies without a dinaComponent should not show an expand arrow.
           if (componentChildren.length > 0) {
             withChildren.add(parentId);
           }
-          newCounts[parentId] = items.length;
           byParent[parentId] = componentChildren;
         }
       } catch (e) {
@@ -303,13 +316,42 @@ export default function ControlledVocabularyListPage() {
         }
       }
 
+      if (cancelled) return;
+
       setParentCounts(newCounts);
       setParentsWithChildren(withChildren);
       setChildrenMap(byParent);
+
+      // Every vocabulary and data component is selected by default.
+      setTypeFilter({
+        parent_cv_ids: cvItems.map((cv) => String((cv as any).id)),
+        children: Array.from(
+          new Set(
+            Object.values(byParent)
+              .flat()
+              .map((c) => c.id)
+          )
+        )
+      });
     };
 
     fetchAllCounts();
-  }, [cvItems, loadAllChildItems, activeModule]);
+    return () => {
+      cancelled = true;
+    };
+  }, [cvItems, loadAllChildItems, activeModule, managedAttributeIds]);
+
+  // Data components with their translated labels for the sidebar.
+  const labelledChildrenMap = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(childrenMap).map(([parentId, components]) => [
+          parentId,
+          components.map((c) => ({ ...c, label: componentLabel(c.id) }))
+        ])
+      ),
+    [childrenMap, componentLabel]
+  );
 
   // 4. Build Sidebar Options (merged with Counts)
   const parentOptions = useMemo(() => {
@@ -318,28 +360,31 @@ export default function ControlledVocabularyListPage() {
       return {
         id,
         label: String(cv.name),
-        hasChildren: parentsWithChildren.has(id),
         count: parentCounts[id]
       };
     });
-  }, [cvItems, parentCounts, parentsWithChildren]);
+  }, [cvItems, parentCounts]);
 
   // 5. Filter group helpers
   const getParentFilterGroups = useCallback(
     (selectedParents: string[], selectedChildren: string[]) => {
-      const needsFilter =
-        selectedChildren.length > 0
-          ? selectedParents.filter((id) => parentsWithChildren.has(id))
-          : [];
+      // A vocabulary is filtered by data component only when some of its components
+      // are deselected. With all of them selected, all of its items are shown.
+      const needsComponentFilter = (id: string) => {
+        const components = childrenMap[id] ?? [];
+        return (
+          selectedChildren.length > 0 &&
+          parentsWithChildren.has(id) &&
+          !components.every((c) => selectedChildren.includes(c.id))
+        );
+      };
 
-      const withoutFilter =
-        selectedChildren.length > 0
-          ? selectedParents.filter((id) => !parentsWithChildren.has(id))
-          : selectedParents;
-
-      return { needsFilter, withoutFilter };
+      return {
+        needsFilter: selectedParents.filter(needsComponentFilter),
+        withoutFilter: selectedParents.filter((id) => !needsComponentFilter(id))
+      };
     },
-    [parentsWithChildren]
+    [parentsWithChildren, childrenMap]
   );
 
   const selectedParents = typeFilter.parent_cv_ids ?? [];
@@ -353,31 +398,67 @@ export default function ControlledVocabularyListPage() {
     [selectedParents, selectedChildren, parentsWithChildren]
   );
 
-  const isMixedCase = useMemo(() => {
-    if (effectiveParents.length === 0 || selectedChildren.length === 0)
-      return false;
-    const { needsFilter, withoutFilter } = getParentFilterGroups(
-      effectiveParents,
-      selectedChildren
-    );
-    return needsFilter.length > 0 && withoutFilter.length > 0;
-  }, [effectiveParents, selectedChildren, getParentFilterGroups]);
+  const { needsFilter, withoutFilter } = useMemo(
+    () => getParentFilterGroups(effectiveParents, selectedChildren),
+    [effectiveParents, selectedChildren, getParentFilterGroups]
+  );
+
+  const isMixedCase = needsFilter.length > 0 && withoutFilter.length > 0;
+
+  // Everything selected shows every item, the same as nothing selected.
+  const isEverythingSelected =
+    parentOptions.length > 0 &&
+    needsFilter.length === 0 &&
+    parentOptions.every((p) => effectiveParents.includes(p.id));
 
   const mixedCaseFilterFn = useCallback(
     (filterForm: any, item: any) => {
       const cv = item.controlledVocabulary;
       const parentId = typeof cv === "string" ? cv : cv?.id;
 
-      if (typeof parentId === "string" && parentsWithChildren.has(parentId)) {
+      if (typeof parentId === "string" && needsFilter.includes(parentId)) {
         if (!selectedChildren.includes(item.dinaComponent)) return false;
       }
 
       const group = filterForm?.group as string | undefined;
       if (group && item.group !== group) return false;
 
+      const elementType = filterForm?.vocabularyElementType as
+        | string
+        | undefined;
+      if (elementType && item.vocabularyElementType !== elementType) {
+        return false;
+      }
+
+      // Same case-insensitive "contains" match as the server-side free-text search.
+      const searchText = String(
+        filterForm?.filterBuilderModel?.value ?? ""
+      ).toLowerCase();
+      if (
+        searchText &&
+        !CV_FILTER_ATTRIBUTES.some((attribute) =>
+          String(item[attribute] ?? "")
+            .toLowerCase()
+            .includes(searchText)
+        )
+      ) {
+        return false;
+      }
+
       return true;
     },
-    [parentsWithChildren, selectedChildren]
+    [needsFilter, selectedChildren]
+  );
+
+  const vocabularyElementTypeOptions = useMemo(
+    () => [
+      { label: "<any>", value: undefined },
+      ...VOCABULARY_ELEMENT_TYPE_OPTIONS.map(({ labelKey, value }) => ({
+        label: formatMessage(labelKey),
+        value
+      }))
+    ],
+    [formatMessage]
   );
 
   // 9. Query table props with API path depending on active tab.
@@ -385,7 +466,7 @@ export default function ControlledVocabularyListPage() {
     const filter: Record<string, any> = {};
     const itemsPath = `${activeModule.apiBaseUrl}/controlled-vocabulary-item`;
 
-    if (effectiveParents.length > 0) {
+    if (effectiveParents.length > 0 && !isEverythingSelected) {
       filter["controlledVocabulary.uuid"] = {
         IN: effectiveParents.join(",")
       };
@@ -393,18 +474,13 @@ export default function ControlledVocabularyListPage() {
 
     if (isMixedCase) {
       return {
-        columns: getColumns(activeModule.viewRoute),
+        columns: getColumns(activeModule.viewRoute, componentLabel),
         path: itemsPath,
         filter,
         include: "controlledVocabulary",
         defaultPageSize: 1000
       };
     }
-
-    const { needsFilter } = getParentFilterGroups(
-      effectiveParents,
-      selectedChildren
-    );
 
     if (
       needsFilter.length === effectiveParents.length &&
@@ -414,7 +490,7 @@ export default function ControlledVocabularyListPage() {
     }
 
     return {
-      columns: getColumns(activeModule.viewRoute),
+      columns: getColumns(activeModule.viewRoute, componentLabel),
       path: itemsPath,
       ...(Object.keys(filter).length > 0 ? { filter } : {})
     };
@@ -422,8 +498,10 @@ export default function ControlledVocabularyListPage() {
     effectiveParents,
     selectedChildren,
     isMixedCase,
-    getParentFilterGroups,
-    activeModule
+    needsFilter,
+    isEverythingSelected,
+    activeModule,
+    componentLabel
   ]);
 
   return (
@@ -451,13 +529,20 @@ export default function ControlledVocabularyListPage() {
       <ModuleTabs
         tabs={MODULE_TABS}
         selectedIndex={currentTab}
-        onSelect={setCurrentTab}
+        onSelect={(tabIndex) => {
+          setCurrentTab(tabIndex);
+          setTypeFilter({ parent_cv_ids: [], children: [] });
+        }}
       />
 
       <ListPageLayout<ControlledVocabularyItem>
-        id="controlled-vocabulary-items-list"
-        filterType={ListLayoutFilterType.FILTER_BUILDER}
+        id="controlled-vocabulary-list"
+        filterType={ListLayoutFilterType.FREE_TEXT}
         filterAttributes={CV_FILTER_ATTRIBUTES}
+        filterFormClassName={`list-filter-panel ${styles.cvFilterPanel}`}
+        filterPlaceholder={formatMessage(
+          "controlledVocabularySearchPlaceholder"
+        )}
         additionalFilters={(filterForm) =>
           SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
             .whereProvided(
@@ -465,15 +550,30 @@ export default function ControlledVocabularyListPage() {
               "EQ",
               isMixedCase ? undefined : (filterForm.group as string | undefined)
             )
+            .whereProvided(
+              "vocabularyElementType",
+              "EQ",
+              isMixedCase
+                ? undefined
+                : (filterForm.vocabularyElementType as string | undefined)
+            )
             .build()
         }
         enableInMemoryFilter={isMixedCase}
         filterFn={isMixedCase ? mixedCaseFilterFn : undefined}
         filterFormchildren={({ submitForm }) => (
-          <div className="mb-3">
-            <div style={{ width: 300 }}>
+          <div className="d-flex gap-3 flex-wrap">
+            <div className={styles.cvFilterDropdown}>
+              <SelectField
+                onChange={() => setImmediate(submitForm)}
+                name="vocabularyElementType"
+                label={formatMessage("field_vocabularyElementType")}
+                options={vocabularyElementTypeOptions}
+              />
+            </div>
+            <div className={styles.cvFilterDropdown}>
               <GroupSelectField
-                onChange={() => setTimeout(() => submitForm(), 0)}
+                onChange={() => setImmediate(submitForm)}
                 name="group"
                 showAnyOption
               />
@@ -482,19 +582,19 @@ export default function ControlledVocabularyListPage() {
         )}
         wrapTable={(children) => (
           <div className={styles.cvGrid}>
-            <aside className={styles.cvSidebar} aria-label="Filter by Type">
-              <h2 className="h6 mb-2">Filter by Type</h2>
+            <aside
+              className={styles.cvSidebar}
+              aria-label={formatMessage("filterByType")}
+            >
               <TypeFilterSideBarDynamic
-                title="Controlled Vocabularies"
                 parents={parentOptions}
-                childrenMap={childrenMap}
+                childrenMap={labelledChildrenMap}
                 selected={typeFilter}
                 onChange={setTypeFilter}
-                loadChildren={loadChildren}
               />
               {!!cvError && (
                 <div className="text-danger small mt-2">
-                  Failed to load controlled vocabularies.
+                  <DinaMessage id="controlledVocabulariesLoadError" />
                 </div>
               )}
             </aside>
