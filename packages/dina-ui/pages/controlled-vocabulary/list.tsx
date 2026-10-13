@@ -2,6 +2,7 @@ import {
   ColumnDefinition,
   dateCell,
   descriptionCell,
+  getPreferredMultilingualPair,
   ListLayoutFilterType,
   ListPageLayout,
   useApiClient,
@@ -43,24 +44,65 @@ const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy"];
 /** Key of the Managed Attribute vocabulary in every module's API. */
 const MANAGED_ATTRIBUTE_VOCABULARY_KEY = "managed_attribute";
 
+/** Accepted values past this count are hidden behind a "Show More" toggle. */
+const ACCEPTED_VALUES_LIMIT = 7;
+
+function AcceptedValuesBadges({ values }: { values: string[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const shown = expanded ? values : values.slice(0, ACCEPTED_VALUES_LIMIT);
+
+  return (
+    <div className="d-flex flex-wrap align-items-center gap-1">
+      {shown.map((value, index) => (
+        <span key={index} className="badge rounded-pill bg-secondary">
+          {value}
+        </span>
+      ))}
+      {values.length > ACCEPTED_VALUES_LIMIT && (
+        <button
+          type="button"
+          className="btn btn-link btn-sm p-0"
+          onClick={() => setExpanded(!expanded)}
+        >
+          <DinaMessage id={expanded ? "showLess" : "showMore"} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** Links the item by its title in the user's language, falling back to its name. */
+function NameCell({
+  item,
+  viewRoute
+}: {
+  item: ControlledVocabularyItem;
+  viewRoute: string;
+}) {
+  const { locale } = useDinaIntl();
+  const title = getPreferredMultilingualPair(
+    item.multilingualTitle?.titles,
+    "title",
+    locale
+  )?.title;
+
+  return (
+    <Link href={`${viewRoute}?id=${item.id}`}>
+      {title || item.name || item.id}
+    </Link>
+  );
+}
+
 function getColumns(
   viewRoute: string,
   componentLabel: (component: string) => string
 ): ColumnDefinition<ControlledVocabularyItem>[] {
   return [
     {
-      accessorKey: "multilingualTitle",
-      header: () => <DinaMessage id="field_multilingualTitle" />,
-      cell: ({ row: { original } }) =>
-        original.multilingualTitle?.titles?.[0]?.title ?? ""
-    },
-    {
       accessorKey: "name",
       header: () => <DinaMessage id="field_name" />,
       cell: ({ row: { original } }) => (
-        <Link href={`${viewRoute}?id=${original.id}`}>
-          {original.name ?? original.id}
-        </Link>
+        <NameCell item={original} viewRoute={viewRoute} />
       )
     },
     {
@@ -92,9 +134,11 @@ function getColumns(
       accessorKey: "acceptedValues",
       header: () => <DinaMessage id="field_acceptedValues" />,
       cell: ({ row: { original } }) =>
-        Array.isArray(original.acceptedValues)
-          ? original.acceptedValues.map((v) => `"${v}"`).join(", ")
-          : ""
+        Array.isArray(original.acceptedValues) ? (
+          <AcceptedValuesBadges values={original.acceptedValues} />
+        ) : (
+          ""
+        )
     },
     descriptionCell(false, false, "multilingualDescription"),
     groupCell("group"),

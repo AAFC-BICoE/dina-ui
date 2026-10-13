@@ -163,6 +163,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   selected: "selected",
   showChanges: "Show Changes",
   showHide: "Show / Hide",
+  showLess: "Show Less",
+  showMore: "Show More",
   somethingWentWrong: "Something went wrong",
   sourceField: "Source Field",
   sourceText: "Source Text",

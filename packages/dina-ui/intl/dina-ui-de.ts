@@ -1139,8 +1139,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   settingLabel: "Einstellungen",
   shipmentAddress: "Lieferadresse",
   shipmentDetails: "Lieferdetails",
-  showLess: "Weniger anzeigen",
-  showMore: "Mehr anzeigen",
   showParentAttributes: "Übergeordnete Materialprobe",
   showing: "Anzeigen",
   showingFilteredStorageUnits: "Gefilterte Lagerungseinheiten anzeigen",

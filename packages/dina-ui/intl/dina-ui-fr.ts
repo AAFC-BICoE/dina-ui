@@ -864,8 +864,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   settingLabel: "Paramètres",
   shipmentAddress: "Adresse d'expédition",
   shipmentDetails: "Détails de l'expédition",
-  showLess: "Montrer moins",
-  showMore: "Montrer plus",
   showing: "Affiché",
   showingFilteredStorageUnits: "Afficher les unités de stockage filtrées",
   showingTopLevelStorageUnits:

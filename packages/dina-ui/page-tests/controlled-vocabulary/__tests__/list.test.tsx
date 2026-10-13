@@ -38,6 +38,7 @@ const TEST_ITEMS = [
     type: "controlled-vocabulary-item",
     name: "Sample attribute",
     dinaComponent: "MATERIAL_SAMPLE",
+    acceptedValues: Array.from({ length: 12 }, (_, i) => `value ${i + 1}`),
     controlledVocabulary: { id: "managed-attribute-id" }
   },
   {
@@ -45,6 +46,12 @@ const TEST_ITEMS = [
     type: "controlled-vocabulary-item",
     name: "Event attribute",
     dinaComponent: "COLLECTING_EVENT",
+    multilingualTitle: {
+      titles: [
+        { lang: "fr", title: "Attribut d'événement" },
+        { lang: "en", title: "Event Attribute Title" }
+      ]
+    },
     controlledVocabulary: { id: "managed-attribute-id" }
   }
 ];
@@ -116,5 +123,39 @@ describe("Controlled vocabulary list page", () => {
         isSidebarItemsRequest(path, params)
       )
     ).toHaveLength(1);
+  });
+
+  it("Shows accepted values as badges, hiding those past the limit.", async () => {
+    const wrapper = mountWithAppContext(<ControlledVocabularyListPage />, {
+      apiContext
+    });
+
+    // Wait for the sidebar to load, which re-renders the table:
+    await waitFor(() =>
+      expect(wrapper.getByLabelText("Material Sample")).toBeChecked()
+    );
+
+    expect(await wrapper.findByText("value 1")).toHaveClass("badge");
+    expect(wrapper.getByText("value 7")).toBeInTheDocument();
+    expect(wrapper.queryByText("value 8")).not.toBeInTheDocument();
+
+    await userEvent.click(wrapper.getByRole("button", { name: "Show More" }));
+    expect(wrapper.getByText("value 12")).toBeInTheDocument();
+
+    await userEvent.click(wrapper.getByRole("button", { name: "Show Less" }));
+    expect(wrapper.queryByText("value 8")).not.toBeInTheDocument();
+  });
+
+  it("Shows the title in the user's language as the name, falling back to the name.", async () => {
+    const wrapper = mountWithAppContext(<ControlledVocabularyListPage />, {
+      apiContext
+    });
+
+    expect(
+      await wrapper.findByText("Event Attribute Title")
+    ).toBeInTheDocument();
+    expect(wrapper.queryByText("Event attribute")).not.toBeInTheDocument();
+    expect(wrapper.queryByText("Attribut d'événement")).not.toBeInTheDocument();
+    expect(wrapper.getByText("Has vector")).toBeInTheDocument();
   });
 });

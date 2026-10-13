@@ -1213,8 +1213,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   settingLabel: "Settings",
   shipmentAddress: "Shipment Address",
   shipmentDetails: "Shipment Details",
-  showLess: " Show Less",
-  showMore: "Show More",
   showing: "Showing",
   showingFilteredStorageUnits: "Showing Filtered Storage Units",
   showingTopLevelStorageUnits: "Showing Top Level Storage Units",

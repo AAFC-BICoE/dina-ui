@@ -133,6 +133,8 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     selected: "sélectionné ",
     showChanges: "Visualiser les modifications ",
     showHide: "Afficher/Masquer",
+    showLess: "Montrer moins",
+    showMore: "Montrer plus",
     somethingWentWrong: "Un problème est survenu",
     sourceField: "Champ source",
     sourceText: "Texte de départ",
