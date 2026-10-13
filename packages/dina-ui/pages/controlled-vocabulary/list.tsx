@@ -44,6 +44,9 @@ const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy"];
 /** Key of the Managed Attribute vocabulary in every module's API. */
 const MANAGED_ATTRIBUTE_VOCABULARY_KEY = "managed_attribute";
 
+/** Sidebar option for items without a dinaComponent, so they're still counted and filterable. */
+const NO_DATA_COMPONENT = "NO_DATA_COMPONENT";
+
 /** Accepted values past this count are hidden behind a "Show More" toggle. */
 const ACCEPTED_VALUES_LIMIT = 7;
 
@@ -193,13 +196,18 @@ function groupChildItems(items: ControlledVocabularyItem[]): SidebarOption[] {
   const counts = new Map<string, number>();
 
   for (const item of items) {
-    const comp = (item as any).attributes?.dinaComponent ?? item.dinaComponent;
-    if (comp) {
-      counts.set(comp, (counts.get(comp) ?? 0) + 1);
-    }
+    const comp =
+      (item as any).attributes?.dinaComponent ||
+      item.dinaComponent ||
+      NO_DATA_COMPONENT;
+    counts.set(comp, (counts.get(comp) ?? 0) + 1);
   }
 
-  return Array.from(counts, ([id, count]) => ({ id, label: id, count }));
+  return Array.from(counts, ([id, count]) => ({ id, label: id, count })).sort(
+    // Keep "No Data Component" last.
+    (a, b) =>
+      Number(a.id === NO_DATA_COMPONENT) - Number(b.id === NO_DATA_COMPONENT)
+  );
 }
 
 export default function ControlledVocabularyListPage() {
@@ -263,6 +271,9 @@ export default function ControlledVocabularyListPage() {
   // 3. Data component label for the sidebar, e.g. "Material Sample" for MATERIAL_SAMPLE.
   const componentLabel = useCallback(
     (component: string) => {
+      if (component === NO_DATA_COMPONENT) {
+        return formatMessage("noDataComponent");
+      }
       const labelKey = activeModule.componentTypeLabels[component];
       return labelKey ? formatMessage(labelKey as any) : component;
     },
@@ -447,7 +458,10 @@ export default function ControlledVocabularyListPage() {
     [effectiveParents, selectedChildren, getParentFilterGroups]
   );
 
-  const isMixedCase = needsFilter.length > 0 && withoutFilter.length > 0;
+  // The API filter can't match "component IN (...) OR no component", so filter in memory then too.
+  const isMixedCase =
+    needsFilter.length > 0 &&
+    (withoutFilter.length > 0 || selectedChildren.includes(NO_DATA_COMPONENT));
 
   // Everything selected shows every item, the same as nothing selected.
   const isEverythingSelected =
@@ -461,7 +475,11 @@ export default function ControlledVocabularyListPage() {
       const parentId = typeof cv === "string" ? cv : cv?.id;
 
       if (typeof parentId === "string" && needsFilter.includes(parentId)) {
-        if (!selectedChildren.includes(item.dinaComponent)) return false;
+        if (
+          !selectedChildren.includes(item.dinaComponent || NO_DATA_COMPONENT)
+        ) {
+          return false;
+        }
       }
 
       const group = filterForm?.group as string | undefined;

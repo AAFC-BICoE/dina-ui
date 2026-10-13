@@ -53,6 +53,12 @@ const TEST_ITEMS = [
       ]
     },
     controlledVocabulary: { id: "managed-attribute-id" }
+  },
+  {
+    id: "item-4",
+    type: "controlled-vocabulary-item",
+    name: "Attribute without component",
+    controlledVocabulary: { id: "managed-attribute-id" }
   }
 ];
 
@@ -69,7 +75,7 @@ const mockGet = jest.fn<any, any>(async (path: string) => {
     case "/collection-api/controlled-vocabulary":
       return { data: TEST_VOCABULARIES };
     case "/collection-api/controlled-vocabulary-item":
-      return { data: TEST_ITEMS, meta: { totalResourceCount: 3 } };
+      return { data: TEST_ITEMS, meta: { totalResourceCount: 4 } };
     default:
       return { data: [] };
   }
@@ -157,5 +163,38 @@ describe("Controlled vocabulary list page", () => {
     expect(wrapper.queryByText("Event attribute")).not.toBeInTheDocument();
     expect(wrapper.queryByText("Attribut d'événement")).not.toBeInTheDocument();
     expect(wrapper.getByText("Has vector")).toBeInTheDocument();
+  });
+
+  it("Counts and filters items without a data component.", async () => {
+    const wrapper = mountWithAppContext(<ControlledVocabularyListPage />, {
+      apiContext
+    });
+
+    await waitFor(() =>
+      expect(wrapper.getByLabelText("No Data Component")).toBeChecked()
+    );
+
+    // Deselecting a component keeps the items without one, filtered in memory:
+    await userEvent.click(wrapper.getByLabelText("Collecting Event"));
+
+    await waitFor(() =>
+      expect(
+        wrapper.queryByText("Event Attribute Title")
+      ).not.toBeInTheDocument()
+    );
+    expect(
+      wrapper.getByText("Attribute without component")
+    ).toBeInTheDocument();
+    expect(wrapper.getByText("Sample attribute")).toBeInTheDocument();
+    expect(wrapper.getByText("Has vector")).toBeInTheDocument();
+
+    // Deselecting "No Data Component" hides them:
+    await userEvent.click(wrapper.getByLabelText("No Data Component"));
+    await waitFor(() =>
+      expect(
+        wrapper.queryByText("Attribute without component")
+      ).not.toBeInTheDocument()
+    );
+    expect(wrapper.getByText("Sample attribute")).toBeInTheDocument();
   });
 });

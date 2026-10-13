@@ -955,6 +955,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   myGroups: "My Groups",
   myRoleInGroup: "My Role",
   noChildren: "No Children",
+  noDataComponent: "No Data Component",
   noFileToDisplay: "No file to display",
   noFiltersAvailable: "No filters available",
   noGroups: "No Groups",

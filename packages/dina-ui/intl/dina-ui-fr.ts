@@ -683,6 +683,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   mustBeValidIntegerValue: "Doit être une valeur entière valide.",
   myRoleInGroup: "Mon rôle",
   noChildren: "Aucune table enfant",
+  noDataComponent: "Aucun composant de données",
   noFileToDisplay: "Aucun fichier à afficher",
   noFiltersAvailable: "Aucun filtre disponible",
   noGroups: "Aucun groupe",
