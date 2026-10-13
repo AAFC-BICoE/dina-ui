@@ -93,7 +93,7 @@ async function mountTree() {
     </Activity>,
     testCtx
   );
-  await screen.findByText("Aggregated from primary determinations · 4 records");
+  await screen.findByText("4 determinations found");
   return result;
 }
 
@@ -109,12 +109,18 @@ describe("TaxonomyTree component", () => {
     await waitFor(() =>
       expect(nodeNames(getChart(container))).toContain("Arthropoda")
     );
+    // Two levels deep, so the refresh removes a node that has children.
+    clickNode(chart, "Arthropoda");
+    await waitFor(() =>
+      expect(nodeNames(getChart(container))).toContain("Insecta")
+    );
 
     await userEvent.click(screen.getByRole("button", { name: "Refresh" }));
     await waitFor(() =>
       expect(requestedRanks()).toEqual([
         "taxonomy_kingdom",
         "taxonomy_phylum",
+        "taxonomy_class",
         "taxonomy_kingdom"
       ])
     );

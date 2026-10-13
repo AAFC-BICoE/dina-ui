@@ -948,8 +948,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Cliquer sur un nœud pour charger le rang taxonomique suivant; cliquer de nouveau pour le réduire.",
   taxonomyHierarchyNodeRecords:
     "{count} enregistrements · {percent} % du total",
-  taxonomyHierarchyRecordCount:
-    "Agrégé à partir des déterminations principales · {total} enregistrements",
+  taxonomyHierarchyRecordCount: "{total} déterminations trouvées",
   taxonomyHierarchyRootTooltip: "Toutes les déterminations principales",
   taxonomyHierarchySubtitle:
     "Une vue agrégée en temps réel des hiérarchies taxonomiques appliquées à chaque détermination principale.",

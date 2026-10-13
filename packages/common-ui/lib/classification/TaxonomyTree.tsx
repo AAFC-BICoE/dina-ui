@@ -336,6 +336,7 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
     );
 
     chart.resize(); // The container height follows the leaf count.
+    chart.clear();
     chart.setOption(option, true);
     return unbindRankColumns;
   }, [option]);

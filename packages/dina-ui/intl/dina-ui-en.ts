@@ -1646,8 +1646,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   taxonomyHierarchyChartInstructions:
     "Click a node to load the next taxonomic rank; click it again to collapse it.",
   taxonomyHierarchyNodeRecords: "{count} records · {percent}% of all",
-  taxonomyHierarchyRecordCount:
-    "Aggregated from primary determinations · {total} records",
+  taxonomyHierarchyRecordCount: "{total} determinations found",
   taxonomyHierarchyRootTooltip: "All primary determinations",
   taxonomyHierarchySubtitle:
     "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination.",
