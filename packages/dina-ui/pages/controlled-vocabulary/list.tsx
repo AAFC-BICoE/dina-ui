@@ -11,6 +11,7 @@ import {
   SimpleSearchFilterBuilder,
   simpleSearchFilterToFiql
 } from "common-ui";
+import { useLocalStorage } from "@rehooks/local-storage";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo, useCallback, useState, useEffect } from "react";
@@ -40,6 +41,8 @@ import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/
 import { VOCABULARY_ELEMENT_TYPE_OPTIONS } from "packages/dina-ui/types/collection-api/resources/VocabularyElementType";
 
 const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy"];
+
+const CV_LIST_ID = "controlled-vocabulary-list";
 
 /** Key of the Managed Attribute vocabulary in every module's API. */
 const MANAGED_ATTRIBUTE_VOCABULARY_KEY = "managed_attribute";
@@ -210,6 +213,51 @@ function groupChildItems(items: ControlledVocabularyItem[]): SidebarOption[] {
   );
 }
 
+/** Whether an item matches the top filter form (group, element type and search text). */
+function matchesFilterForm(filterForm: any, item: any) {
+  const group = filterForm?.group as string | undefined;
+  if (group && item.group !== group) return false;
+
+  const elementType = filterForm?.vocabularyElementType as string | undefined;
+  if (elementType && item.vocabularyElementType !== elementType) {
+    return false;
+  }
+
+  // Same case-insensitive "contains" match as the server-side free-text search.
+  const searchText = String(
+    filterForm?.filterBuilderModel?.value ?? ""
+  ).toLowerCase();
+  return (
+    !searchText ||
+    CV_FILTER_ATTRIBUTES.some((attribute) =>
+      String(item[attribute] ?? "")
+        .toLowerCase()
+        .includes(searchText)
+    )
+  );
+}
+
+/** Item count per vocabulary, and per data component within each vocabulary. */
+function countByParent(items: ControlledVocabularyItem[]) {
+  const parents: Record<string, number> = {};
+  const components: Record<string, Record<string, number>> = {};
+  for (const item of items) {
+    const parentId = getParentId(item);
+    if (!parentId) continue;
+    const component = item.dinaComponent || NO_DATA_COMPONENT;
+    parents[parentId] = (parents[parentId] ?? 0) + 1;
+    components[parentId] ??= {};
+    components[parentId][component] =
+      (components[parentId][component] ?? 0) + 1;
+  }
+  return { parents, components };
+}
+
+function getParentId(item: ControlledVocabularyItem): string | undefined {
+  const cv = (item as any).controlledVocabulary;
+  return typeof cv === "string" ? cv : (cv?.id as string | undefined);
+}
+
 export default function ControlledVocabularyListPage() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
@@ -290,7 +338,10 @@ export default function ControlledVocabularyListPage() {
         page: { limit: 1000 },
         include: "controlledVocabulary",
         fields: {
-          "controlled-vocabulary-item": "id,dinaComponent",
+          // The fields matchesFilterForm checks, so the counts follow the filter form.
+          "controlled-vocabulary-item": `id,dinaComponent,group,vocabularyElementType,${CV_FILTER_ATTRIBUTES.join(
+            ","
+          )}`,
           "controlled-vocabulary": "id"
         }
       }
@@ -312,13 +363,19 @@ export default function ControlledVocabularyListPage() {
     [cvItems]
   );
 
-  const [parentCounts, setParentCounts] = useState<Record<string, number>>({});
+  const [countsFailed, setCountsFailed] = useState(false);
   const [parentsWithChildren, setParentsWithChildren] = useState<Set<string>>(
     new Set()
   );
   const [childrenMap, setChildrenMap] = useState<
     Record<string, SidebarOption[]>
   >({});
+  const [allChildItems, setAllChildItems] = useState<
+    ControlledVocabularyItem[]
+  >([]);
+
+  // The list's filter form, shared with ListPageLayout through local storage.
+  const [filterForm] = useLocalStorage<any>(`${CV_LIST_ID}_filterForm`, {});
 
   // Load counts and sidebar children on dataset changes. Child items are fetched
   // in a single bulk request and grouped client-side to reduce requests.
@@ -329,18 +386,17 @@ export default function ControlledVocabularyListPage() {
     let cancelled = false;
 
     const fetchAllCounts = async () => {
-      const newCounts: Record<string, number> = {};
       const withChildren = new Set<string>();
       const byParent: Record<string, SidebarOption[]> = {};
+      let allChildItems: ControlledVocabularyItem[] = [];
+      let failed = false;
 
       try {
-        const allChildItems = await loadAllChildItems();
+        allChildItems = await loadAllChildItems();
 
         const itemsByParent = new Map<string, ControlledVocabularyItem[]>();
         for (const item of allChildItems) {
-          const cv = (item as any).controlledVocabulary;
-          const parentId =
-            typeof cv === "string" ? cv : (cv?.id as string | undefined);
+          const parentId = getParentId(item);
           if (!parentId) continue;
 
           const items = itemsByParent.get(parentId) ?? [];
@@ -348,12 +404,7 @@ export default function ControlledVocabularyListPage() {
           itemsByParent.set(parentId, items);
         }
 
-        for (const cv of cvItems) {
-          newCounts[String((cv as any).id)] = 0;
-        }
-
         for (const [parentId, items] of itemsByParent) {
-          newCounts[parentId] = items.length;
           // Only Managed Attribute vocabularies are filtered by data component.
           // Other vocabularies (e.g. Identifier Type) are filtered as a whole even
           // when their items have a dinaComponent.
@@ -366,14 +417,13 @@ export default function ControlledVocabularyListPage() {
         }
       } catch (e) {
         console.error("Error loading counts for CV items", e);
-        for (const cv of cvItems) {
-          newCounts[String((cv as any).id)] = -1;
-        }
+        failed = true;
       }
 
       if (cancelled) return;
 
-      setParentCounts(newCounts);
+      setCountsFailed(failed);
+      setAllChildItems(allChildItems);
       setParentsWithChildren(withChildren);
       setChildrenMap(byParent);
 
@@ -396,16 +446,29 @@ export default function ControlledVocabularyListPage() {
     };
   }, [cvItems, loadAllChildItems, activeModule, managedAttributeIds]);
 
+  // Counts of the items matching the filter form, so they follow the table.
+  const filteredCounts = useMemo(
+    () =>
+      countByParent(
+        allChildItems.filter((item) => matchesFilterForm(filterForm, item))
+      ),
+    [allChildItems, filterForm]
+  );
+
   // Data components with their translated labels for the sidebar.
   const labelledChildrenMap = useMemo(
     () =>
       Object.fromEntries(
         Object.entries(childrenMap).map(([parentId, components]) => [
           parentId,
-          components.map((c) => ({ ...c, label: componentLabel(c.id) }))
+          components.map((c) => ({
+            ...c,
+            label: componentLabel(c.id),
+            count: filteredCounts.components[parentId]?.[c.id] ?? 0
+          }))
         ])
       ),
-    [childrenMap, componentLabel]
+    [childrenMap, componentLabel, filteredCounts]
   );
 
   // 4. Build Sidebar Options (merged with Counts)
@@ -415,10 +478,11 @@ export default function ControlledVocabularyListPage() {
       return {
         id,
         label: String(cv.name),
-        count: parentCounts[id]
+        // -1 marks a failed count load.
+        count: countsFailed ? -1 : filteredCounts.parents[id] ?? 0
       };
     });
-  }, [cvItems, parentCounts]);
+  }, [cvItems, countsFailed, filteredCounts]);
 
   // 5. Filter group helpers
   const getParentFilterGroups = useCallback(
@@ -482,32 +546,7 @@ export default function ControlledVocabularyListPage() {
         }
       }
 
-      const group = filterForm?.group as string | undefined;
-      if (group && item.group !== group) return false;
-
-      const elementType = filterForm?.vocabularyElementType as
-        | string
-        | undefined;
-      if (elementType && item.vocabularyElementType !== elementType) {
-        return false;
-      }
-
-      // Same case-insensitive "contains" match as the server-side free-text search.
-      const searchText = String(
-        filterForm?.filterBuilderModel?.value ?? ""
-      ).toLowerCase();
-      if (
-        searchText &&
-        !CV_FILTER_ATTRIBUTES.some((attribute) =>
-          String(item[attribute] ?? "")
-            .toLowerCase()
-            .includes(searchText)
-        )
-      ) {
-        return false;
-      }
-
-      return true;
+      return matchesFilterForm(filterForm, item);
     },
     [needsFilter, selectedChildren]
   );
@@ -598,7 +637,7 @@ export default function ControlledVocabularyListPage() {
       />
 
       <ListPageLayout<ControlledVocabularyItem>
-        id="controlled-vocabulary-list"
+        id={CV_LIST_ID}
         filterType={ListLayoutFilterType.FREE_TEXT}
         filterAttributes={CV_FILTER_ATTRIBUTES}
         filterFormClassName={`list-filter-panel ${styles.cvFilterPanel}`}

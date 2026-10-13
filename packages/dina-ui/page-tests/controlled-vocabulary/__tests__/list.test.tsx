@@ -84,7 +84,11 @@ const mockGet = jest.fn<any, any>(async (path: string) => {
 const apiContext: any = { apiClient: { get: mockGet } };
 
 describe("Controlled vocabulary list page", () => {
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // The filter form is kept in local storage.
+    localStorage.clear();
+  });
 
   it("Selects every vocabulary and data component by default.", async () => {
     const wrapper = mountWithAppContext(<ControlledVocabularyListPage />, {
@@ -196,5 +200,30 @@ describe("Controlled vocabulary list page", () => {
       ).not.toBeInTheDocument()
     );
     expect(wrapper.getByText("Sample attribute")).toBeInTheDocument();
+  });
+
+  it("Updates the sidebar counts when the filter form changes.", async () => {
+    const wrapper = mountWithAppContext(<ControlledVocabularyListPage />, {
+      apiContext
+    });
+    const countOf = (label: string) =>
+      wrapper.getByLabelText(label).closest("li")?.querySelector(".badge")
+        ?.textContent;
+
+    await waitFor(() => expect(countOf("Managed Attribute")).toEqual("3"));
+    expect(countOf("Collecting Event")).toEqual("1");
+    expect(countOf("Association Type")).toEqual("1");
+
+    await userEvent.type(
+      wrapper.getByPlaceholderText("Search by name, key, unit or creator"),
+      "sample"
+    );
+    await userEvent.click(wrapper.getByRole("button", { name: /Filter List/ }));
+
+    await waitFor(() => expect(countOf("Managed Attribute")).toEqual("1"));
+    expect(countOf("Material Sample")).toEqual("1");
+    // Zero counts hide the badge:
+    expect(countOf("Collecting Event")).toBeUndefined();
+    expect(countOf("Association Type")).toBeUndefined();
   });
 });
