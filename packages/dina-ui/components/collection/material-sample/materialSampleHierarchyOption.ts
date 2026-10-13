@@ -240,6 +240,8 @@ export function buildHierarchyOption(
     series: [
       {
         type: "tree",
+        // A new root gets a new view: ECharts' tree diff crashes removing the root (+) when animation is off.
+        id: root.id ?? "up",
         orient: "LR",
         left: MARGIN_LEFT,
         right: MARGIN_RIGHT,

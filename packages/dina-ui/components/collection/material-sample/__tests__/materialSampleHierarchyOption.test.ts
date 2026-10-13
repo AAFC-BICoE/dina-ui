@@ -1,3 +1,4 @@
+import * as echarts from "echarts";
 import {
   HierarchyData,
   HierarchyNode,
@@ -257,6 +258,29 @@ describe("buildHierarchyOption", () => {
     expect(html).toContain("<b>&lt;img src=x onerror=alert(1)&gt;</b>");
     expect(html).toContain("Preparation Type: Pinned");
     expect(html).toContain("Storage Unit: —");
+  });
+
+  it("Survives loading the last ancestors in real ECharts", () => {
+    const ancestors = Array.from({ length: 7 }, (_v, i) => sample(`a${i}`));
+    const chart = echarts.init(null as any, null as any, {
+      renderer: "svg",
+      ssr: true,
+      width: 3000,
+      height: 600
+    });
+    const render = (loaded: number) =>
+      chart.setOption(
+        buildHierarchyOption(
+          baseData({ ancestors: ancestors.slice(0, loaded), ancestorTotal: 7 }),
+          formatMessage
+        ).option as any,
+        true
+      );
+
+    render(5);
+    // The root (+) disappears here while its children stay.
+    expect(() => render(7)).not.toThrow();
+    chart.dispose();
   });
 });
 
