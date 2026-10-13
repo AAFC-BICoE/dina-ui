@@ -107,6 +107,25 @@ export function useStorageUnitSave({
         }
       });
 
+      // Serialize Object Store attachments as JSON:API relationships.
+      savedArgs.forEach((arg) => {
+        const resource = arg.resource;
+
+        if (resource.attachment !== undefined) {
+          (resource as any).relationships = {
+            ...(resource as any).relationships,
+            attachment: {
+              data: resource.attachment.map((item) => ({
+                id: item.id,
+                type: item.type
+              }))
+            }
+          };
+
+          delete resource.attachment;
+        }
+      });
+
       const savedStorage = await save<StorageUnit>(savedArgs, {
         apiBaseUrl: "/collection-api"
       });

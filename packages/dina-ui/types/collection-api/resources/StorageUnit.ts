@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { StorageUnitType } from "./StorageUnitType";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 export interface StorageUnitAttributes {
   type: "storage-unit";
@@ -31,6 +32,7 @@ export interface StorageHierarchyItem extends HierarchyItem {
 export interface StorageUnitRelationships {
   storageUnitType?: StorageUnitType;
   parentStorageUnit?: StorageUnit;
+  attachment?: ResourceIdentifierObject[];
 }
 
 export type StorageUnit = KitsuResource &

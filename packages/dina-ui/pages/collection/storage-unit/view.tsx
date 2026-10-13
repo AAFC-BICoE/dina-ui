@@ -34,7 +34,7 @@ export default function StorageUnitDetailsPage() {
       )}
       query={(id) => ({
         path: `collection-api/storage-unit/${id}`,
-        include: "parentStorageUnit,storageUnitType",
+        include: "parentStorageUnit,storageUnitType,attachment",
         optfields: { "storage-unit": "storageUnitChildren, hierarchy" }
       })}
       entityLink="/collection/storage-unit"

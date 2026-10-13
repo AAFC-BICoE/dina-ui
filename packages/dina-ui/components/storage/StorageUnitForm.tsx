@@ -32,6 +32,7 @@ import { Ref, useState } from "react";
 import StorageUnitGrid from "./grid/StorageUnitGrid";
 import { FormikProps, useFormikContext } from "formik";
 import { useStorageUnitSave } from "./useStorageUnit";
+import { AttachmentsField } from "../object-store/attachment-list/AttachmentsField";
 
 export const storageUnitFormSchema = yup.object({
   storageUnitType: yup.object().required()
@@ -277,6 +278,15 @@ export function StorageUnitFormFields({
         <div className="row">
           <DateField className="col-md-6" name="createdOn" showTime={true} />
           <TextField className="col-md-6" name="createdBy" />
+        </div>
+      )}
+
+      {!reduceRendering && !isBulkEditTabForm && (
+        <div className="mb-3">
+          <AttachmentsField
+            name="attachment"
+            title={formatMessage("attachments")}
+          />
         </div>
       )}
     </div>
