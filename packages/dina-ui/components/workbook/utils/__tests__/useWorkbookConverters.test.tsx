@@ -1140,6 +1140,120 @@ describe("useWorkbookConverters", () => {
       );
     });
 
+    it("linkRelationshipAttribute should handle numeric child values in a single relationship", async () => {
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: jest.fn()
+      } as any);
+
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockResource: any = {
+        location: {
+          code: 3500,
+          relationshipConfig: {
+            baseApiPath: "/collection-api",
+            hasGroup: false,
+            linkOrCreateSetting: LinkOrCreateSetting.LINK,
+            type: "location"
+          }
+        }
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "location.code": {
+          fieldPath: "location.code",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {
+            "3500": {
+              id: "location-id",
+              type: "location"
+            } as any
+          },
+          numOfUniqueValues: 1,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        "location",
+        "test-group"
+      );
+
+      expect(mockResource.relationships.location.data).toEqual({
+        id: "location-id",
+        type: "location"
+      });
+    });
+
+    it("linkRelationshipAttribute should handle numeric child values in an array relationship", async () => {
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: jest.fn()
+      } as any);
+
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockResource: any = {
+        locations: [
+          {
+            code: 3500,
+            relationshipConfig: {
+              baseApiPath: "/collection-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK,
+              type: "location"
+            }
+          }
+        ]
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "locations.code": {
+          fieldPath: "locations.code",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {
+            "3500": {
+              id: "location-id",
+              type: "location"
+            } as any
+          },
+          numOfUniqueValues: 1,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        "locations",
+        "test-group"
+      );
+
+      expect(mockResource.relationships.locations.data).toEqual([
+        {
+          id: "location-id",
+          type: "location"
+        }
+      ]);
+    });
+
     it("linkRelationshipAttribute should strip extra fields from single relationship", async () => {
       const mockSave = jest.fn();
       jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({

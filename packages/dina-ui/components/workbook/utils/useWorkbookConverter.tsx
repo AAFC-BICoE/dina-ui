@@ -482,7 +482,7 @@ export function useWorkbookConverter(
               ) {
                 valueToLink =
                   columnMap[fieldPath + "." + attrNameInValue]?.[
-                    childValue.trim().replaceAll(".", "_")
+                    String(childValue).trim().replaceAll(".", "_")
                   ];
                 if (valueToLink) {
                   break;
@@ -667,7 +667,7 @@ export function useWorkbookConverter(
                   } else {
                     valueToLink =
                       columnMap[childFieldPath]?.[
-                        childValue.trim().replaceAll(".", "_")
+                        String(childValue).trim().replaceAll(".", "_")
                       ];
                   }
 
