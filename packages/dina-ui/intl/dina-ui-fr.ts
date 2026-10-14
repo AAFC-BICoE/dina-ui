@@ -687,6 +687,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   mustBeValidIntegerValue: "Doit être une valeur entière valide.",
   myRoleInGroup: "Mon rôle",
   noChildren: "Aucune table enfant",
+  noDataComponent: "Aucun composant de données",
   noFileToDisplay: "Aucun fichier à afficher",
   noFiltersAvailable: "Aucun filtre disponible",
   noGroups: "Aucun groupe",
@@ -868,8 +869,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   settingLabel: "Paramètres",
   shipmentAddress: "Adresse d'expédition",
   shipmentDetails: "Détails de l'expédition",
-  showLess: "Montrer moins",
-  showMore: "Montrer plus",
   showing: "Affiché",
   showingFilteredStorageUnits: "Afficher les unités de stockage filtrées",
   showingTopLevelStorageUnits:
