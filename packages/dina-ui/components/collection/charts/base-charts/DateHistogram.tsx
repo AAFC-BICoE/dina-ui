@@ -1,12 +1,20 @@
-import { ReactNode, useEffect, useId, useState } from "react";
+import { Fragment, ReactNode, useEffect, useId, useState } from "react";
 import { useApiClient, Tooltip } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { Dropdown, DropdownButton, Card } from "react-bootstrap";
 import _ from "lodash";
 import { Utils } from "@react-awesome-query-builder/ui";
-import { useDinaIntl } from "../../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
+import { findAgg } from "../findAgg";
 
 export type HistogramInterval = "hour" | "day" | "month" | "year";
+
+const SECTION_HEADERS: Record<HistogramInterval, ReactNode> = {
+  hour: <DinaMessage id="dateRangeHeaderRealTime" />,
+  day: <DinaMessage id="dateRangeHeaderByDay" />,
+  month: <DinaMessage id="dateRangeHeaderByMonth" />,
+  year: <DinaMessage id="dateRangeHeaderByYear" />
+};
 
 interface DateHistogramPreset {
   key: string;
@@ -183,29 +191,6 @@ interface DateHistogramProps {
     /** Optional nested type value used with the nested type field. */
     typeValue?: string;
   };
-  /** Label shown in the chart legend and axis for the series. */
-  seriesName?: string;
-  /** Base color used for the histogram bars or line series. */
-  seriesColor?: string;
-  /** Emphasis color used when the series is highlighted. */
-  seriesEmphasisColor?: string;
-  /** Optional DOM id for the preset dropdown button. */
-  dropdownId?: string;
-  /** Optional DOM id for the add-filter tooltip trigger. */
-  tooltipId?: string;
-  /** Labels for the dropdown section headings. */
-  menuSectionLabels: {
-    /** Section label for real-time presets. */
-    realTime: ReactNode;
-    /** Section label for day-based presets. */
-    byDay: ReactNode;
-    /** Section label for month-based presets. */
-    byMonth: ReactNode;
-    /** Section label for year-based presets. */
-    byYear: ReactNode;
-  };
-  /** Empty-state text shown when the chart has no data. */
-  emptyStateLabel?: ReactNode;
 }
 
 /**
@@ -221,20 +206,11 @@ export default function DateHistogram({
   setQueryBuilderTree,
   queryBuilderTree,
   setSubmittedQueryBuilderTree,
-  nestedQuery,
-  seriesName = "Sample Count",
-  seriesColor = "#5470c6",
-  seriesEmphasisColor = "#3b5998",
-  dropdownId,
-  tooltipId,
-  menuSectionLabels,
-  emptyStateLabel = "No data"
+  nestedQuery
 }: DateHistogramProps) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const idBase = useId();
-  const resolvedDropdownId = dropdownId || `${idBase}-date-preset-dropdown`;
-  const resolvedTooltipId = tooltipId || `${idBase}-add-filter-tooltip`;
 
   const defaultPresetKey = "all-time-year";
 
@@ -469,27 +445,9 @@ export default function DateHistogram({
         };
   };
 
-  const getAggregationKey = (aggName: string, responseData: any): string => {
-    if (responseData.aggregations[aggName]) {
-      return aggName;
-    }
-    if (responseData.aggregations[`sterms#${aggName}`]) {
-      return `sterms#${aggName}`;
-    }
-
-    for (const key of Object.keys(responseData.aggregations)) {
-      if (key.endsWith(aggName)) {
-        return key;
-      }
-    }
-
-    return aggName;
-  };
-
   const getBuckets = (responseData: any) => {
     if (!nestedQuery) {
-      const aggKey = getAggregationKey("by_date", responseData);
-      return responseData.aggregations[aggKey]?.buckets ?? [];
+      return findAgg(responseData.aggregations, "by_date")?.buckets ?? [];
     }
 
     const nestedAgg = responseData.aggregations["nested#by_date"];
@@ -637,7 +595,7 @@ export default function DateHistogram({
             <div style="font-weight: bold; margin-bottom: 4px;">${
               param.name
             }</div>
-            <div style="color: ${seriesColor};">
+            <div style="color: #5470c6;">
               Count: <strong>${param.value?.toLocaleString()}</strong>
             </div>
           </div>
@@ -688,17 +646,17 @@ export default function DateHistogram({
     },
     series: [
       {
-        name: seriesName,
+        name: "Sample Count",
         type: "bar",
         data: chartData.map((d) => d.value),
         barMaxWidth: 50,
         itemStyle: {
-          color: seriesColor,
+          color: "#5470c6",
           borderRadius: [4, 4, 0, 0]
         },
         emphasis: {
           itemStyle: {
-            color: seriesEmphasisColor,
+            color: "#3b5998",
             shadowBlur: 10,
             shadowColor: "rgba(0, 0, 0, 0.2)"
           }
@@ -707,108 +665,47 @@ export default function DateHistogram({
     ]
   };
 
-  const currentPresetLabel =
-    datePresets.find((preset) => preset.key === selectedPreset)?.label ||
-    formatMessage("allTime");
+  const currentPreset = datePresets.find(
+    (preset) => preset.key === selectedPreset
+  );
 
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center">
         <div>
           <strong className="d-block">
-            {renderTitle(
-              datePresets.find((preset) => preset.key === selectedPreset)
-                ?.interval || "year"
-            )}
-            {addFilter && <Tooltip id={resolvedTooltipId} />}
+            {renderTitle(currentPreset?.interval || "year")}
+            {addFilter && <Tooltip id={`${idBase}-add-filter-tooltip`} />}
           </strong>
         </div>
         <DropdownButton
-          id={resolvedDropdownId}
-          title={currentPresetLabel}
+          id={`${idBase}-date-preset-dropdown`}
+          title={currentPreset?.label || formatMessage("allTime")}
           onSelect={handlePresetSelect}
           variant="outline-primary"
           size="sm"
         >
-          <Dropdown.Header>{menuSectionLabels.realTime}</Dropdown.Header>
-          <Dropdown.Item
-            eventKey="last-24-hours"
-            active={selectedPreset === "last-24-hours"}
-          >
-            {
-              datePresets.find((preset) => preset.key === "last-24-hours")
-                ?.label
-            }
-          </Dropdown.Item>
-
-          <Dropdown.Divider />
-          <Dropdown.Header>{menuSectionLabels.byDay}</Dropdown.Header>
-          <Dropdown.Item
-            eventKey="last-7-days"
-            active={selectedPreset === "last-7-days"}
-          >
-            {datePresets.find((preset) => preset.key === "last-7-days")?.label}
-          </Dropdown.Item>
-          <Dropdown.Item
-            eventKey="last-30-days"
-            active={selectedPreset === "last-30-days"}
-          >
-            {datePresets.find((preset) => preset.key === "last-30-days")?.label}
-          </Dropdown.Item>
-
-          <Dropdown.Divider />
-          <Dropdown.Header>{menuSectionLabels.byMonth}</Dropdown.Header>
-          <Dropdown.Item
-            eventKey="last-3-months"
-            active={selectedPreset === "last-3-months"}
-          >
-            {
-              datePresets.find((preset) => preset.key === "last-3-months")
-                ?.label
-            }
-          </Dropdown.Item>
-          <Dropdown.Item
-            eventKey="last-6-months"
-            active={selectedPreset === "last-6-months"}
-          >
-            {
-              datePresets.find((preset) => preset.key === "last-6-months")
-                ?.label
-            }
-          </Dropdown.Item>
-          <Dropdown.Item
-            eventKey="this-year"
-            active={selectedPreset === "this-year"}
-          >
-            {datePresets.find((preset) => preset.key === "this-year")?.label}
-          </Dropdown.Item>
-          <Dropdown.Item
-            eventKey="last-year"
-            active={selectedPreset === "last-year"}
-          >
-            {datePresets.find((preset) => preset.key === "last-year")?.label}
-          </Dropdown.Item>
-          <Dropdown.Item
-            eventKey="all-time-month"
-            active={selectedPreset === "all-time-month"}
-          >
-            {
-              datePresets.find((preset) => preset.key === "all-time-month")
-                ?.label
-            }
-          </Dropdown.Item>
-
-          <Dropdown.Divider />
-          <Dropdown.Header>{menuSectionLabels.byYear}</Dropdown.Header>
-          <Dropdown.Item
-            eventKey="all-time-year"
-            active={selectedPreset === "all-time-year"}
-          >
-            {
-              datePresets.find((preset) => preset.key === "all-time-year")
-                ?.label
-            }
-          </Dropdown.Item>
+          {datePresets.map((preset, index) => {
+            // Presets are ordered by interval, so a new interval starts a new menu section.
+            const newSection =
+              preset.interval !== datePresets[index - 1]?.interval;
+            return (
+              <Fragment key={preset.key}>
+                {newSection && index > 0 && <Dropdown.Divider />}
+                {newSection && (
+                  <Dropdown.Header>
+                    {SECTION_HEADERS[preset.interval]}
+                  </Dropdown.Header>
+                )}
+                <Dropdown.Item
+                  eventKey={preset.key}
+                  active={selectedPreset === preset.key}
+                >
+                  {preset.label}
+                </Dropdown.Item>
+              </Fragment>
+            );
+          })}
         </DropdownButton>
       </div>
       <Card>
@@ -829,7 +726,7 @@ export default function DateHistogram({
               fontSize: 18
             }}
           >
-            {emptyStateLabel}
+            <DinaMessage id="noData" />
           </div>
         )}
       </Card>

@@ -146,7 +146,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   childCultureStrains: "Kulturstämme",
   childMaterialSamples: "Materialprobe Nachfahre",
   childrenStorageUnits: "Lagerungseinheit für Kindelemente",
-  classificationlevels: "Klassifikationsebenen:",
   clearAllNamesButtonText: "Alle Namen löschen",
   closePreviewButtonText: "Vorschau schließen",
   colSearchBoxTooltip: "Catalog of Life durchsuchen",
