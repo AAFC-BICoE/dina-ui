@@ -4,29 +4,30 @@ import React from "react";
 import { FaInfoCircle } from "react-icons/fa";
 import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
 
+/** The material samples list, filtered to the samples linked to this collecting event. */
+export function getLinkedMaterialSamplesHref(collectingEventUUID: string) {
+  return {
+    pathname: "/collection/material-sample/list",
+    query: {
+      queryTree: generateSearchURLFromSimpleRows([
+        {
+          f: "_relationshipPresence",
+          o: "uuid",
+          v: "collectingEvent",
+          t: "relationshipPresence",
+          d: collectingEventUUID
+        }
+      ])
+    }
+  };
+}
+
 interface CollectingEventEditAlertProps {
   /** The number of material samples linked. Shows if > 1. */
   materialSampleUsageCount?: number | null;
 
-  /** Localized text id for the warning message. Warning always assumes a count is provided. */
-  alertMessage?: string;
-
-  /**
-   * Used for the collecting event details link and generating the query to display the current
-   * material samples linked.
-   */
+  /** Used to link to the material samples currently linked to the collecting event. */
   collectingEventUUID?: string;
-
-  /** Whether to display the link to the Collecting Event Details page. */
-  displayCollectingEventDetailsLink?: boolean;
-
-  /**
-   * Override the don't render condition. Helpful if the condition is already being checked by
-   * the parent component.
-   *
-   * Default is false so it will use the internal check.
-   */
-  override?: boolean;
 }
 
 /**
@@ -34,29 +35,12 @@ interface CollectingEventEditAlertProps {
  */
 function CollectingEventEditAlert({
   materialSampleUsageCount,
-  alertMessage = "collectingEventEditAlertMessage",
-  collectingEventUUID,
-  displayCollectingEventDetailsLink = false,
-  override = false
+  collectingEventUUID
 }: CollectingEventEditAlertProps) {
-  const resolvedUsageCount =
-    materialSampleUsageCount ?? (override ? 1 : undefined);
-
   // Don't render if there are not multiple usages.
-  if (!override && (!resolvedUsageCount || resolvedUsageCount <= 1)) {
+  if (!materialSampleUsageCount || materialSampleUsageCount <= 1) {
     return null;
   }
-
-  // Generate the search URL for Material Samples linked to this Collecting Event.
-  const relationshipPresenceUUIDSearch = generateSearchURLFromSimpleRows([
-    {
-      f: "_relationshipPresence",
-      o: "uuid",
-      v: "collectingEvent",
-      t: "relationshipPresence",
-      d: collectingEventUUID ?? ""
-    }
-  ]);
 
   return (
     <div className="alert alert-info py-2 mb-3" role="status">
@@ -68,14 +52,8 @@ function CollectingEventEditAlert({
         <div>
           <span>
             <DinaMessage
-              id={
-                (alertMessage +
-                  (alertMessage === "collectingEventEditErrorMessage" &&
-                  resolvedUsageCount === 1
-                    ? "Single"
-                    : "")) as any
-              }
-              values={{ count: resolvedUsageCount }}
+              id="collectingEventEditAlertMessage"
+              values={{ count: materialSampleUsageCount }}
             />
           </span>
           {collectingEventUUID && (
@@ -83,33 +61,12 @@ function CollectingEventEditAlert({
               <br />
               <ExternalLink
                 className="mt-2"
-                href={{
-                  pathname: `/collection/material-sample/list`,
-                  query: {
-                    queryTree: relationshipPresenceUUIDSearch
-                  }
-                }}
+                href={getLinkedMaterialSamplesHref(collectingEventUUID)}
               >
                 <DinaMessage
                   id="collectingEventViewMaterialSamplesAttached"
-                  values={{ count: resolvedUsageCount }}
+                  values={{ count: materialSampleUsageCount }}
                 />{" "}
-              </ExternalLink>
-            </span>
-          )}
-          {displayCollectingEventDetailsLink && collectingEventUUID && (
-            <span>
-              <br />
-              <ExternalLink
-                className="mt-2"
-                href={{
-                  pathname: `/collection/collecting-event/view`,
-                  query: {
-                    id: collectingEventUUID
-                  }
-                }}
-              >
-                <DinaMessage id="collectingEventGoToDetails" />{" "}
               </ExternalLink>
             </span>
           )}

@@ -157,6 +157,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   associationType: "Association Type",
   associationsLegend: "Associations",
   linkExisting: "Link Existing",
+  linkedToResource: "Linked to",
+  sharedWithMaterialSamples: "Shared with {count} material samples",
   unlinkAll: "Unlink All",
   noCollectingEventAttached:
     "None of these material samples currently have a Collecting Event.",
@@ -245,12 +247,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "You do not have permission to edit this collecting event. All fields are in read-only mode.",
   collectingEventEditAlertMessage:
     "This collecting event is currently linked to {count} material samples. Please ensure that any changes made here are appropriate for all linked material samples.",
-  collectingEventEditErrorMessage:
-    "Shared collecting event — linked to {count} material samples. Edit from the Details Page.",
-  collectingEventEditErrorMessageSingle:
-    "Linked collecting event — linked to 1 material sample. Edit from the Details Page.",
+  collectingEventEditOnDetailsPage:
+    "Editing is only available on the Collecting Event Details page.",
   collectingEventEditAlertTitle: "Update Collecting Event?",
-  collectingEventGoToDetails: "Go to Collecting Event details page",
   collectingEventViewMaterialSamplesAttached:
     "View {count} linked material samples",
   collection: "Collection",
@@ -317,7 +316,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createStorage: "Create Storage",
   customPlaceName: "Custom Place Name",
   customPlaceNamePlaceholder: "Enter a custom place name...",
-  dataComponents: "Data Components",
+  dataComponents: "Sections",
   dataEntryLabel: "Data Entry",
   dataType: "Type: ",
   dataValue: "Value: ",

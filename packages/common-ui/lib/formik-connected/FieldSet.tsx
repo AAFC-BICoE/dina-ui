@@ -1,9 +1,13 @@
 import classNames from "classnames";
-import { CSSProperties, useMemo } from "react";
+import { CSSProperties, createContext, useMemo } from "react";
 import { useContext } from "react";
+import { IconType } from "react-icons";
 import { DinaFormContext, FieldSpy, FieldSpyRenderProps } from "..";
 import { DinaFormSection, DinaFormSectionProps } from "./DinaForm";
 import _ from "lodash";
+
+/** Icons to show before the legend of FieldSets, keyed by the FieldSet's id. */
+export const FieldSetIconContext = createContext<Record<string, IconType>>({});
 
 export interface FieldSetProps extends DinaFormSectionProps {
   /** fieldset title. */
@@ -36,6 +40,7 @@ export function FieldSet({
   ...formSectionProps
 }: FieldSetProps) {
   const context = useContext(DinaFormContext);
+  const LegendIcon = useContext(FieldSetIconContext)[id ?? ""];
   const { componentName, sectionName } = formSectionProps;
 
   // Check the section to see if it should be visible or not.
@@ -75,7 +80,10 @@ export function FieldSet({
 
   const legendElement = (
     <legend className={classNames("w-auto", fieldName && "field-label")}>
-      <h2 className="fieldset-h2-adjustment">{legend}</h2>
+      <h2 className="fieldset-h2-adjustment">
+        {LegendIcon && <LegendIcon className="fieldset-legend-icon" />}
+        {legend}
+      </h2>
     </legend>
   );
 

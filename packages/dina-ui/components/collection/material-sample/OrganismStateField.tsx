@@ -60,6 +60,9 @@ export function OrganismStateField({
 
   const determinationFieldProps = fieldProps("determination");
 
+  // Fixed ids can only be unique on the first organism when several are rendered.
+  const navIdPrefix = index === 0 ? "organism" : undefined;
+
   return (
     <DinaFormSection sectionName="organisms-general-section">
       <div className="organism-state-field">
@@ -132,6 +135,7 @@ export function OrganismStateField({
             attributeSelectorWidth={12}
             fieldSetProps={{
               legend: <DinaMessage id="organismManagedAttributes" />,
+              id: navIdPrefix && `${navIdPrefix}-managed-attributes`,
               className: "non-strip",
               sectionName: "organism-managed-attributes-section"
             }}
@@ -147,6 +151,7 @@ export function OrganismStateField({
             readOnly && !determinations?.length ? null : (
               <DeterminationField
                 {...determinationFieldProps}
+                navIdPrefix={navIdPrefix}
                 visibleManagedAttributeKeys={visibleManagedAttributeKeys}
               />
             )

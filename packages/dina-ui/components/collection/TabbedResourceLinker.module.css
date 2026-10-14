@@ -1,0 +1,49 @@
+.linkerFieldSet > :global(.legend-wrapper) {
+  padding-top: 1.1rem !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 1.5rem !important;
+  border-bottom: 0 !important;
+}
+
+.headerTabs {
+  flex-wrap: nowrap;
+  margin: 0 -1.5rem;
+  padding: 1.1rem 1.5rem 0;
+  border-bottom: 1px solid #d5dbe3;
+}
+
+.headerTabs :global(.nav-link) {
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 1.1rem;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: #495057;
+}
+
+.headerTabs :global(.nav-link:hover:not(.active):not(.disabled)) {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: transparent;
+}
+
+.headerTabs :global(.nav-link.active) {
+  background: #fff;
+  color: #212529;
+  border-color: #d5dbe3 #d5dbe3 #fff;
+}
+
+.summaryBar {
+  padding: 10px 14px;
+  background: var(--bs-gray-100, #f8f9fa);
+  border: var(--border-width, 1px) solid var(--border-subtle, #dee2e6);
+  border-radius: var(--radius, 0.5rem);
+}
+
+.summaryText {
+  font-size: var(--text-sm, 0.875rem);
+}
+
+.summaryBar a svg {
+  width: 11px;
+  height: 11px;
+}

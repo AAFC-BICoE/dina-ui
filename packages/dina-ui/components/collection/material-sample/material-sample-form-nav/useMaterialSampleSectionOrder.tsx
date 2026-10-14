@@ -3,6 +3,7 @@ import { useDinaIntl } from "../../../../intl/dina-ui-intl";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
+  MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
   MATERIAL_SAMPLE_FORM_LEGEND,
   ORGANISMS_COMPONENT_NAME,
   PREPARATIONS_COMPONENT_NAME,
@@ -95,9 +96,12 @@ export function useMaterialSampleSectionOrder({
       isTemplate ? true : !component.formTemplateOnly
     ).map((component) => ({
       id: component.id,
-      msg: messages[component.labelKey]
-        ? formatMessage(component.labelKey as any)
-        : component.labelKey,
+      msg:
+        component.id === MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME
+          ? formatMessage("attachments")
+          : messages[component.labelKey]
+          ? formatMessage(component.labelKey as any)
+          : component.labelKey,
       className: component.switchClassName,
       disabled: scrollTargetSwitches[component.id]?.disabled,
       setEnabled: scrollTargetSwitches[component.id]?.setEnabled,

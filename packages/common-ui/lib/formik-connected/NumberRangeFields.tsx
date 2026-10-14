@@ -108,7 +108,7 @@ export function NumberRangeFields({
 
   if (compact) {
     return (
-      <div className="d-flex align-items-center mb-2">
+      <div className="d-flex align-items-center mb-1">
         <div className="flex-shrink-0" style={{ width: "18em" }}>
           <strong className={classNames(isEmptyValue && "field-label-empty")}>
             {labelMsg}
@@ -119,7 +119,7 @@ export function NumberRangeFields({
           />
         </div>
 
-        <div className="flex-grow-1">{fields}</div>
+        <div className="flex-grow-1 number-range-fields-compact">{fields}</div>
       </div>
     );
   }

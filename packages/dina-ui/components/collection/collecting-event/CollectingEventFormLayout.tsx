@@ -54,6 +54,7 @@ import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
 import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 import { GeographyFormLayout } from "./GeographyFormLayout";
+import { SectionHeading } from "./SectionHeading";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { CollectingEventSummary } from "./CollectingEventSummary";
 import styles from "./CollectingEventFormLayout.module.css";
@@ -167,6 +168,7 @@ export function CollectingEventFormLayout({
       controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
       fieldSetProps={{
         legend: <DinaMessage id="managedAttributes" />,
+        id: "collectingEventManagedAttributes",
         className: `non-strip collecting-event-clean ${styles.cleanSection}`,
         componentName: COLLECTING_EVENT_COMPONENT_NAME,
         sectionName: "collecting-event-managed-attributes-section"
@@ -196,7 +198,7 @@ export function CollectingEventFormLayout({
               collectingEventUUID={initialValues.id}
             />
 
-            <div className={styles.sectionHeading}>Access &amp; Tags</div>
+            <SectionHeading>Access &amp; Tags</SectionHeading>
 
             <div className={styles.accessFields}>
               <NotPubliclyReleasableSection
@@ -548,14 +550,15 @@ export function CollectingEventFormLayout({
               />
             </CompactFieldRow>
 
-            <CompactFieldRow>
-              <TextField
-                name="dwcVerbatimElevation"
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
-
-            <div className="mb-2" style={{ marginLeft: "18em" }}>
+            <div className="d-flex align-items-start gap-2">
+              <div className="flex-grow-1">
+                <CompactFieldRow>
+                  <TextField
+                    name="dwcVerbatimElevation"
+                    removeBottomMargin={true}
+                  />
+                </CompactFieldRow>
+              </div>
               <ParseVerbatimToRangeButton
                 verbatimField="dwcVerbatimElevation"
                 rangeFields={[
@@ -563,14 +566,19 @@ export function CollectingEventFormLayout({
                   "dwcMaximumElevationInMeters"
                 ]}
                 buttonText={formatMessage("convertToElevationMinMax")}
+                className="mb-1"
               />
             </div>
 
-            <CompactFieldRow>
-              <TextField name="dwcVerbatimDepth" removeBottomMargin={true} />
-            </CompactFieldRow>
-
-            <div style={{ marginLeft: "18em" }}>
+            <div className="d-flex align-items-start gap-2">
+              <div className="flex-grow-1">
+                <CompactFieldRow>
+                  <TextField
+                    name="dwcVerbatimDepth"
+                    removeBottomMargin={true}
+                  />
+                </CompactFieldRow>
+              </div>
               <ParseVerbatimToRangeButton
                 verbatimField="dwcVerbatimDepth"
                 rangeFields={[
@@ -578,6 +586,7 @@ export function CollectingEventFormLayout({
                   "dwcMaximumDepthInMeters"
                 ]}
                 buttonText={formatMessage("convertToDepthMinMax")}
+                className="mb-1"
               />
             </div>
           </FieldSet>
@@ -588,6 +597,7 @@ export function CollectingEventFormLayout({
         <div className="col-md-12">
           <FieldSet
             legend={<DinaMessage id="collectingEventDetails" />}
+            id="collectingEventDetails"
             className={`non-strip h-100 ${styles.cleanSection}`}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-additional-details-section"
@@ -734,6 +744,7 @@ export function CollectingEventFormLayout({
         <div className="col-md-12">
           <FieldSet
             legend={<DinaMessage id="collectingEventExpeditionAndSite" />}
+            id="collectingEventExpeditionAndSite"
             className={`non-strip collecting-event-clean ${styles.cleanSection}`}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-details"
@@ -781,6 +792,7 @@ export function CollectingEventFormLayout({
         >
           <DataEntryField
             legend={<DinaMessage id="collectingEventFieldExtensions" />}
+            id="collectingEventFieldExtensions"
             name="extensionValues"
             readOnly={readOnly}
             isTemplate={isTemplate}
@@ -800,6 +812,7 @@ export function CollectingEventFormLayout({
         ) : JSON.stringify(initialValues?.managedAttributes) !== "{}" ? ( // if read-only, check for managed attributes
           <FieldSet
             legend={<DinaMessage id="collectingEventManagedAttributes" />}
+            id="collectingEventManagedAttributes"
             className="non-strip collecting-event-clean-section"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-managed-attributes-section"
@@ -808,7 +821,7 @@ export function CollectingEventFormLayout({
           </FieldSet>
         ) : null}
       </>
-      <div className="mb-3">
+      <div className="mb-3" id="collectingEventAttachments">
         {!readOnly
           ? collectingEventAttachmentsComponent
           : initialValues?.attachment // if read-only, check for attachment
