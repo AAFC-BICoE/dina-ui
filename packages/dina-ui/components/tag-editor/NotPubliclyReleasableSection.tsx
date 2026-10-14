@@ -1,5 +1,6 @@
 import {
   DinaFormSection,
+  DinaFormSectionProps,
   SelectField,
   TextField,
   useBulkEditTabContext,
@@ -12,7 +13,7 @@ import { FaGlobe } from "react-icons/fa";
 
 export interface NotPubliclyReleasableSectionProps {
   defaultToNotReleasable?: boolean;
-  horizontal?: boolean | [number, number] | "flex" | number;
+  horizontal?: DinaFormSectionProps["horizontal"];
 }
 export function NotPubliclyReleasableSection({
   defaultToNotReleasable,

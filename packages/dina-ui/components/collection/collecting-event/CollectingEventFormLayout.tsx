@@ -6,8 +6,10 @@ import {
   FieldSet,
   FieldSpy,
   FormattedTextField,
+  INLINE_LABEL_WIDTH,
   NumberRangeFields,
   ResourceSelectField,
+  SectionHeading,
   SimpleSearchFilterBuilder,
   StringArrayField,
   TextField,
@@ -54,7 +56,6 @@ import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
 import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 import { GeographyFormLayout } from "./GeographyFormLayout";
-import { SectionHeading } from "./SectionHeading";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { CollectingEventSummary } from "./CollectingEventSummary";
 import styles from "./CollectingEventFormLayout.module.css";
@@ -72,14 +73,6 @@ interface CollectingEventFormLayoutProps {
 
   defaultToNotReleasable?: boolean;
   compactReadOnly?: boolean;
-}
-
-function CompactFieldRow({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-1">
-      <DinaFormSection horizontal={18}>{children}</DinaFormSection>
-    </div>
-  );
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
@@ -169,7 +162,7 @@ export function CollectingEventFormLayout({
       fieldSetProps={{
         legend: <DinaMessage id="managedAttributes" />,
         id: "collectingEventManagedAttributes",
-        className: `non-strip collecting-event-clean ${styles.cleanSection}`,
+        className: "non-strip clean-section",
         componentName: COLLECTING_EVENT_COMPONENT_NAME,
         sectionName: "collecting-event-managed-attributes-section"
       }}
@@ -180,7 +173,7 @@ export function CollectingEventFormLayout({
   );
 
   return (
-    <div ref={layoutWrapperRef} className="collecting-event-layout">
+    <div ref={layoutWrapperRef}>
       <DinaFormSection
         componentName={COLLECTING_EVENT_COMPONENT_NAME}
         sectionName="general-section"
@@ -198,12 +191,16 @@ export function CollectingEventFormLayout({
               collectingEventUUID={initialValues.id}
             />
 
-            <SectionHeading>Access &amp; Tags</SectionHeading>
-
-            <div className={styles.accessFields}>
+            <div
+              id="collectingEventAccessAndTags"
+              className={`rounded ${styles.accessFields}`}
+            >
+              <SectionHeading>
+                <DinaMessage id="accessAndTags" />
+              </SectionHeading>
               <NotPubliclyReleasableSection
                 defaultToNotReleasable={defaultToNotReleasable}
-                horizontal={18}
+                horizontal={INLINE_LABEL_WIDTH}
               />
               <Tooltip
                 id="collecting_event_tag_info"
@@ -213,7 +210,7 @@ export function CollectingEventFormLayout({
                     resourcePath="collection-api/collecting-event"
                     indexName="dina_material_sample_index"
                     tagIncludedType="collecting-event"
-                    horizontal={18}
+                    horizontal={INLINE_LABEL_WIDTH}
                   />
                 }
               />
@@ -226,37 +223,24 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="identifiers" />}
             id="identifiers"
-            className={`non-strip collecting-event-clean ${styles.cleanSection}`}
+            className="non-strip clean-section"
+            horizontal={INLINE_LABEL_WIDTH}
+            compact={true}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="identifiers-section"
           >
-            <CompactFieldRow>
-              <TextField
-                name="dwcFieldNumber"
-                tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_collection_number"
-                tooltipLinkText="fromDinaUserGuide"
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
+            <TextField
+              name="dwcFieldNumber"
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_collection_number"
+              tooltipLinkText="fromDinaUserGuide"
+            />
 
             {!isTemplate && (
-              <CompactFieldRow>
-                <StringArrayField
-                  name="otherRecordNumbers"
-                  minRows={2}
-                  removeBottomMargin={true}
-                />
-              </CompactFieldRow>
+              <StringArrayField name="otherRecordNumbers" minRows={2} />
             )}
 
             {!isTemplate && !readOnly && (
-              <CompactFieldRow>
-                <GroupSelectField
-                  name="group"
-                  enableStoredDefaultGroup={true}
-                  removeBottomMargin={true}
-                />
-              </CompactFieldRow>
+              <GroupSelectField name="group" enableStoredDefaultGroup={true} />
             )}
           </FieldSet>
         </div>
@@ -267,7 +251,9 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="collecting" />}
             id="collecting"
-            className={`non-strip collecting-event-clean ${styles.cleanSection}`}
+            className="non-strip clean-section"
+            horizontal={INLINE_LABEL_WIDTH}
+            compact={true}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
           >
             <DinaFormSection
@@ -288,30 +274,21 @@ export function CollectingEventFormLayout({
                   </Field>
                 )}
 
-                <CompactFieldRow>
-                  <TextField
-                    name="verbatimEventDateTime"
-                    label={formatMessage("verbatimEventDateTime")}
-                    removeBottomMargin={true}
-                  />
-                </CompactFieldRow>
+                <TextField
+                  name="verbatimEventDateTime"
+                  label={formatMessage("verbatimEventDateTime")}
+                />
 
-                <CompactFieldRow>
-                  <FormattedTextField
-                    name="startEventDateTime"
-                    className="startEventDateTime"
-                    placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                    removeBottomMargin={true}
-                  />
-                </CompactFieldRow>
+                <FormattedTextField
+                  name="startEventDateTime"
+                  className="startEventDateTime"
+                  placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+                />
 
-                <CompactFieldRow>
-                  <FormattedTextField
-                    name="endEventDateTime"
-                    placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                    removeBottomMargin={true}
-                  />
-                </CompactFieldRow>
+                <FormattedTextField
+                  name="endEventDateTime"
+                  placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+                />
               </div>
             </DinaFormSection>
 
@@ -333,52 +310,40 @@ export function CollectingEventFormLayout({
                   </Field>
                 )}
 
-                <CompactFieldRow>
-                  <FieldSpy<string> fieldName="group">
-                    {(group) => (
-                      <AutoSuggestTextField<CollectingEvent>
-                        name="dwcRecordedBy"
-                        jsonApiBackend={{
-                          query: (searchValue, ctx) => ({
-                            path: "collection-api/collecting-event",
-                            fiql: simpleSearchFilterToFiql(
-                              SimpleSearchFilterBuilder.create<CollectingEvent>()
-                                .searchFilter("dwcRecordedBy", searchValue)
-                                .whereProvided("group", "EQ", ctx.values.group)
-                                .build()
-                            )
-                          }),
-                          option: (collEvent) => collEvent?.dwcRecordedBy ?? ""
-                        }}
-                        elasticSearchBackend={{
-                          indexName: "dina_material_sample_index",
-                          searchField: "included.attributes.dwcRecordedBy",
-                          group: group ?? undefined,
-                          option: (collEvent) => collEvent?.dwcRecordedBy
-                        }}
-                        preferredBackend={"elastic-search"}
-                        removeBottomMargin={true}
-                      />
-                    )}
-                  </FieldSpy>
-                </CompactFieldRow>
+                <FieldSpy<string> fieldName="group">
+                  {(group) => (
+                    <AutoSuggestTextField<CollectingEvent>
+                      name="dwcRecordedBy"
+                      jsonApiBackend={{
+                        query: (searchValue, ctx) => ({
+                          path: "collection-api/collecting-event",
+                          fiql: simpleSearchFilterToFiql(
+                            SimpleSearchFilterBuilder.create<CollectingEvent>()
+                              .searchFilter("dwcRecordedBy", searchValue)
+                              .whereProvided("group", "EQ", ctx.values.group)
+                              .build()
+                          )
+                        }),
+                        option: (collEvent) => collEvent?.dwcRecordedBy ?? ""
+                      }}
+                      elasticSearchBackend={{
+                        indexName: "dina_material_sample_index",
+                        searchField: "included.attributes.dwcRecordedBy",
+                        group: group ?? undefined,
+                        option: (collEvent) => collEvent?.dwcRecordedBy
+                      }}
+                      preferredBackend={"elastic-search"}
+                    />
+                  )}
+                </FieldSpy>
 
-                <CompactFieldRow>
-                  <PersonSelectField
-                    name="collectors"
-                    isMulti={true}
-                    removeBottomMargin={true}
-                  />
-                </CompactFieldRow>
+                <PersonSelectField name="collectors" isMulti={true} />
 
-                <CompactFieldRow>
-                  <TextField
-                    name="dwcRecordNumber"
-                    tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_collectors_number"
-                    tooltipLinkText="fromDinaUserGuide"
-                    removeBottomMargin={true}
-                  />
-                </CompactFieldRow>
+                <TextField
+                  name="dwcRecordNumber"
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_collectors_number"
+                  tooltipLinkText="fromDinaUserGuide"
+                />
               </div>
             </DinaFormSection>
           </FieldSet>
@@ -389,7 +354,9 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="verbatimLabelLegend" />}
             id="verbatimLabelLegend"
-            className={`non-strip h-100 ${styles.cleanSection}`}
+            className="non-strip h-100 clean-section"
+            horizontal={INLINE_LABEL_WIDTH}
+            compact={true}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="verbatim-label-section"
           >
@@ -407,28 +374,23 @@ export function CollectingEventFormLayout({
               </Field>
             )}
 
-            <CompactFieldRow>
-              <TextField name="dwcVerbatimLocality" removeBottomMargin={true} />
-            </CompactFieldRow>
+            <TextField name="dwcVerbatimLocality" />
 
-            <CompactFieldRow>
-              <AutoSuggestTextField<ControlledVocabularyItem>
-                name="dwcVerbatimCoordinateSystem"
-                jsonApiBackend={{
-                  query: () => ({
-                    path: "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format"
-                  }),
-                  option: (vocabElement) =>
-                    _.find(
-                      vocabElement?.multilingualTitle?.titles || [],
-                      (item) => item.lang === locale
-                    )?.title
-                }}
-                blankSearchBackend={"json-api"}
-                onChangeExternal={onChangeExternal}
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
+            <AutoSuggestTextField<ControlledVocabularyItem>
+              name="dwcVerbatimCoordinateSystem"
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format"
+                }),
+                option: (vocabElement) =>
+                  _.find(
+                    vocabElement?.multilingualTitle?.titles || [],
+                    (item) => item.lang === locale
+                  )?.title
+              }}
+              blankSearchBackend={"json-api"}
+              onChangeExternal={onChangeExternal}
+            />
 
             <Field name="dwcVerbatimCoordinateSystem">
               {({ field: { value: coordSysSelected } }) => {
@@ -454,19 +416,14 @@ export function CollectingEventFormLayout({
                         !hasDegree && !hasMinute && !hasSecond ? "" : "d-none"
                       }
                     >
-                      <CompactFieldRow>
-                        <TextField
-                          name="dwcVerbatimCoordinates"
-                          placeholder={
-                            isUTM
-                              ? CoordinateSystemEnumPlaceHolder[
-                                  coordSysSelected
-                                ]
-                              : null
-                          }
-                          removeBottomMargin={true}
-                        />
-                      </CompactFieldRow>
+                      <TextField
+                        name="dwcVerbatimCoordinates"
+                        placeholder={
+                          isUTM
+                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                            : null
+                        }
+                      />
                     </div>
 
                     <div
@@ -474,39 +431,36 @@ export function CollectingEventFormLayout({
                         hasDegree || hasMinute || hasSecond ? "" : "d-none"
                       }
                     >
-                      <CompactFieldRow>
-                        <TextFieldWithCoordButtons
-                          name="dwcVerbatimLatitude"
-                          placeholder={
-                            hasDegree || hasMinute || hasSecond
-                              ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}N`
-                              : undefined
-                          }
-                          isExternallyControlled={true}
-                          shouldShowDegree={hasDegree || hasMinute || hasSecond}
-                          shouldShowMinute={hasMinute || hasSecond}
-                          shouldShowSecond={hasSecond}
-                          removeBottomMargin={true}
-                        />
-                      </CompactFieldRow>
+                      <TextFieldWithCoordButtons
+                        name="dwcVerbatimLatitude"
+                        placeholder={
+                          hasDegree || hasMinute || hasSecond
+                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}N`
+                            : undefined
+                        }
+                        isExternallyControlled={true}
+                        shouldShowDegree={hasDegree || hasMinute || hasSecond}
+                        shouldShowMinute={hasMinute || hasSecond}
+                        shouldShowSecond={hasSecond}
+                      />
 
-                      <CompactFieldRow>
-                        <TextFieldWithCoordButtons
-                          name="dwcVerbatimLongitude"
-                          placeholder={
-                            hasDegree || hasMinute || hasSecond
-                              ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}E`
-                              : undefined
-                          }
-                          isExternallyControlled={true}
-                          shouldShowDegree={hasDegree || hasMinute || hasSecond}
-                          shouldShowMinute={hasMinute || hasSecond}
-                          shouldShowSecond={hasSecond}
-                          removeBottomMargin={true}
-                        />
-                      </CompactFieldRow>
+                      <TextFieldWithCoordButtons
+                        name="dwcVerbatimLongitude"
+                        placeholder={
+                          hasDegree || hasMinute || hasSecond
+                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}E`
+                            : undefined
+                        }
+                        isExternallyControlled={true}
+                        shouldShowDegree={hasDegree || hasMinute || hasSecond}
+                        shouldShowMinute={hasMinute || hasSecond}
+                        shouldShowSecond={hasSecond}
+                      />
 
-                      <div className="mb-2" style={{ marginLeft: "18em" }}>
+                      <div
+                        className="mb-2"
+                        style={{ marginLeft: `${INLINE_LABEL_WIDTH}em` }}
+                      >
                         <SetCoordinatesFromVerbatimButton
                           sourceLatField="dwcVerbatimLatitude"
                           sourceLonField="dwcVerbatimLongitude"
@@ -524,40 +478,32 @@ export function CollectingEventFormLayout({
               }}
             </Field>
 
-            <CompactFieldRow>
-              <AutoSuggestTextField<Vocabulary>
-                name="dwcVerbatimSRS"
-                jsonApiBackend={{
-                  query: () => ({
-                    path: "collection-api/vocabulary2/srs"
-                  }),
-                  option: (vocabElement) =>
-                    _.compact(
-                      vocabElement?.vocabularyElements?.map(
-                        (it) =>
-                          _.find(
-                            it?.multilingualTitle?.titles || [],
-                            (item) => item.lang === locale
-                          )?.title ||
-                          it.name ||
-                          ""
-                      ) ?? []
-                    )
-                }}
-                blankSearchBackend={"json-api"}
-                onChangeExternal={onChangeExternal}
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
+            <AutoSuggestTextField<Vocabulary>
+              name="dwcVerbatimSRS"
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/vocabulary2/srs"
+                }),
+                option: (vocabElement) =>
+                  _.compact(
+                    vocabElement?.vocabularyElements?.map(
+                      (it) =>
+                        _.find(
+                          it?.multilingualTitle?.titles || [],
+                          (item) => item.lang === locale
+                        )?.title ||
+                        it.name ||
+                        ""
+                    ) ?? []
+                  )
+              }}
+              blankSearchBackend={"json-api"}
+              onChangeExternal={onChangeExternal}
+            />
 
             <div className="d-flex align-items-start gap-2">
               <div className="flex-grow-1">
-                <CompactFieldRow>
-                  <TextField
-                    name="dwcVerbatimElevation"
-                    removeBottomMargin={true}
-                  />
-                </CompactFieldRow>
+                <TextField name="dwcVerbatimElevation" />
               </div>
               <ParseVerbatimToRangeButton
                 verbatimField="dwcVerbatimElevation"
@@ -572,12 +518,7 @@ export function CollectingEventFormLayout({
 
             <div className="d-flex align-items-start gap-2">
               <div className="flex-grow-1">
-                <CompactFieldRow>
-                  <TextField
-                    name="dwcVerbatimDepth"
-                    removeBottomMargin={true}
-                  />
-                </CompactFieldRow>
+                <TextField name="dwcVerbatimDepth" />
               </div>
               <ParseVerbatimToRangeButton
                 verbatimField="dwcVerbatimDepth"
@@ -598,120 +539,95 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="collectingEventDetails" />}
             id="collectingEventDetails"
-            className={`non-strip h-100 ${styles.cleanSection}`}
+            className="non-strip h-100 clean-section"
+            horizontal={INLINE_LABEL_WIDTH}
+            compact={true}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-additional-details-section"
           >
-            <CompactFieldRow>
-              <TextField name="habitat" removeBottomMargin={true} />
-            </CompactFieldRow>
+            <TextField name="habitat" />
 
-            <CompactFieldRow>
-              <TextField
-                name="host"
-                customName={"collectingEventHost"}
-                tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#ce-host"
-                tooltipLinkText="fromDinaUserGuide"
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
+            <TextField
+              name="host"
+              customName={"collectingEventHost"}
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#ce-host"
+              tooltipLinkText="fromDinaUserGuide"
+            />
 
-            <CompactFieldRow>
-              <Field name="group">
-                {({ field: { value: group } }) => (
-                  <CollectionMethodSelectField
-                    name="collectionMethod"
-                    customName={"collectingEventCollectionMethod"}
-                    tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#collection-method"
-                    tooltipLinkText="fromDinaUserGuide"
-                    filter={(searchValue: string) =>
-                      SimpleSearchFilterBuilder.create<CollectionMethod>()
-                        .searchFilter("name", searchValue)
-                        .whereProvided("group", "EQ", group)
-                        .build()
-                    }
-                    removeBottomMargin={true}
-                  />
-                )}
-              </Field>
-            </CompactFieldRow>
+            <Field name="group">
+              {({ field: { value: group } }) => (
+                <CollectionMethodSelectField
+                  name="collectionMethod"
+                  customName={"collectingEventCollectionMethod"}
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#collection-method"
+                  tooltipLinkText="fromDinaUserGuide"
+                  filter={(searchValue: string) =>
+                    SimpleSearchFilterBuilder.create<CollectionMethod>()
+                      .searchFilter("name", searchValue)
+                      .whereProvided("group", "EQ", group)
+                      .build()
+                  }
+                />
+              )}
+            </Field>
 
-            <CompactFieldRow>
-              <ResourceSelectField<Protocol>
-                name="protocol"
-                filter={(searchValue: string) =>
-                  SimpleSearchFilterBuilder.create<Protocol>()
-                    .searchFilter("name", searchValue)
-                    .where("protocolType", "EQ", "collection_method")
-                    .build()
-                }
-                model="collection-api/protocol"
-                optionLabel={(protocol) => protocol.name}
-                omitNullOption={false}
-                readOnlyLink="/collection/protocol/view?id="
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
+            <ResourceSelectField<Protocol>
+              name="protocol"
+              filter={(searchValue: string) =>
+                SimpleSearchFilterBuilder.create<Protocol>()
+                  .searchFilter("name", searchValue)
+                  .where("protocolType", "EQ", "collection_method")
+                  .build()
+              }
+              model="collection-api/protocol"
+              optionLabel={(protocol) => protocol.name}
+              omitNullOption={false}
+              readOnlyLink="/collection/protocol/view?id="
+            />
 
-            <CompactFieldRow>
-              <AutoSuggestTextField<CollectingEvent>
-                name="substrate"
-                customName={"collectingEventSubstrate"}
-                tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_substrate"
-                tooltipLinkText="fromDinaUserGuide"
-                jsonApiBackend={{
-                  query: (searchValue, ctx) => ({
-                    path: "collection-api/collecting-event",
-                    fiql: simpleSearchFilterToFiql(
-                      SimpleSearchFilterBuilder.create<CollectingEvent>()
-                        .searchFilter("substrate", searchValue)
-                        .whereProvided("group", "EQ", ctx.values.group)
-                        .build()
-                    )
-                  }),
-                  option: (collEvent) => collEvent?.substrate ?? ""
-                }}
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
+            <AutoSuggestTextField<CollectingEvent>
+              name="substrate"
+              customName={"collectingEventSubstrate"}
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_substrate"
+              tooltipLinkText="fromDinaUserGuide"
+              jsonApiBackend={{
+                query: (searchValue, ctx) => ({
+                  path: "collection-api/collecting-event",
+                  fiql: simpleSearchFilterToFiql(
+                    SimpleSearchFilterBuilder.create<CollectingEvent>()
+                      .searchFilter("substrate", searchValue)
+                      .whereProvided("group", "EQ", ctx.values.group)
+                      .build()
+                  )
+                }),
+                option: (collEvent) => collEvent?.substrate ?? ""
+              }}
+            />
             <NumberRangeFields
               names={[
                 "dwcMinimumElevationInMeters",
                 "dwcMaximumElevationInMeters"
               ]}
               labelMsg={<DinaMessage id="elevationInMeters" />}
-              compact={true}
             />
 
             <NumberRangeFields
               names={["dwcMinimumDepthInMeters", "dwcMaximumDepthInMeters"]}
               labelMsg={<DinaMessage id="depthInMeters" />}
-              compact={true}
             />
 
-            <CompactFieldRow>
-              <TextField
-                name="remarks"
-                multiLines={true}
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
+            <TextField name="remarks" multiLines={true} />
           </FieldSet>
         </div>
       </div>
       <div className="row">
         <div className="col-md-12">
-          {!readOnly ? (
+          {(!readOnly || !hideGeoreferences) && (
             <GeoReferenceAssertionField
               onChangeTabIndex={setGeoAssertionTabIdx}
-              className={`collecting-event-clean ${styles.cleanSection}`}
+              className="clean-section"
             />
-          ) : !hideGeoreferences ? (
-            <GeoReferenceAssertionField
-              onChangeTabIndex={setGeoAssertionTabIdx}
-              className={`collecting-event-clean ${styles.cleanSection}`}
-            />
-          ) : null}
+          )}
         </div>
         <div className="col-md-12">
           {supportedGeographicReferences.includes("OSM") ? (
@@ -721,7 +637,7 @@ export function CollectingEventFormLayout({
                   geoAssertionTabIdx={geoAssertionTabIdx}
                   geoSearchValue={geoSearchValue}
                   setGeoSearchValue={setGeoSearchValue}
-                  className={`collecting-event-clean ${styles.cleanSection}`}
+                  className="clean-section"
                 />
               </div>
             </div>
@@ -729,12 +645,9 @@ export function CollectingEventFormLayout({
           {supportedGeographicReferences.includes("TGN") ? (
             <div className="row">
               <div className="col">
-                {!readOnly ? (
-                  <TgnSourceSelection />
-                ) : initialValues?.geographicThesaurus?.source ===
-                  GeographicThesaurusSource.TGN ? (
-                  <TgnSourceSelection />
-                ) : null}
+                {(!readOnly ||
+                  initialValues?.geographicThesaurus?.source ===
+                    GeographicThesaurusSource.TGN) && <TgnSourceSelection />}
               </div>
             </div>
           ) : null}
@@ -745,43 +658,39 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="collectingEventExpeditionAndSite" />}
             id="collectingEventExpeditionAndSite"
-            className={`non-strip collecting-event-clean ${styles.cleanSection}`}
+            className="non-strip clean-section"
+            horizontal={INLINE_LABEL_WIDTH}
+            compact={true}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-details"
           >
-            <CompactFieldRow>
-              <ResourceSelectField<Expedition>
-                name="expedition"
-                filter={(searchValue: string) =>
-                  SimpleSearchFilterBuilder.create<CollectionMethod>()
-                    .searchFilter("name", searchValue)
-                    .build()
-                }
-                model="collection-api/expedition"
-                optionLabel={(expedition) => expedition.name}
-                omitNullOption={false}
-                readOnlyLink="/collection/expedition/view?id="
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
+            <ResourceSelectField<Expedition>
+              name="expedition"
+              filter={(searchValue: string) =>
+                SimpleSearchFilterBuilder.create<CollectionMethod>()
+                  .searchFilter("name", searchValue)
+                  .build()
+              }
+              model="collection-api/expedition"
+              optionLabel={(expedition) => expedition.name}
+              omitNullOption={false}
+              readOnlyLink="/collection/expedition/view?id="
+            />
 
-            <CompactFieldRow>
-              <ResourceSelectField<Site>
-                name="site"
-                filter={(searchValue: string) =>
-                  SimpleSearchFilterBuilder.create<CollectionMethod>()
-                    .searchFilter("name", searchValue)
-                    .build()
-                }
-                model="collection-api/site"
-                optionLabel={(site) =>
-                  site.name + (site.code ? ` (${site.code})` : "")
-                }
-                omitNullOption={false}
-                readOnlyLink="/collection/site/view?id="
-                removeBottomMargin={true}
-              />
-            </CompactFieldRow>
+            <ResourceSelectField<Site>
+              name="site"
+              filter={(searchValue: string) =>
+                SimpleSearchFilterBuilder.create<CollectionMethod>()
+                  .searchFilter("name", searchValue)
+                  .build()
+              }
+              model="collection-api/site"
+              optionLabel={(site) =>
+                site.name + (site.code ? ` (${site.code})` : "")
+              }
+              omitNullOption={false}
+              readOnlyLink="/collection/site/view?id="
+            />
           </FieldSet>
         </div>
       </div>
@@ -802,7 +711,7 @@ export function CollectingEventFormLayout({
             }}
             width={"100%"}
             disableClearButton={true}
-            className={`non-strip collecting-event-clean ${styles.cleanSection}`}
+            className="non-strip clean-section"
           />
         </DinaFormSection>
       </div>
@@ -813,7 +722,7 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="collectingEventManagedAttributes" />}
             id="collectingEventManagedAttributes"
-            className="non-strip collecting-event-clean-section"
+            className="non-strip clean-section"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-managed-attributes-section"
           >
@@ -821,12 +730,9 @@ export function CollectingEventFormLayout({
           </FieldSet>
         ) : null}
       </>
-      <div className="mb-3" id="collectingEventAttachments">
-        {!readOnly
-          ? collectingEventAttachmentsComponent
-          : initialValues?.attachment // if read-only, check for attachment
-          ? collectingEventAttachmentsComponent
-          : null}
+      <div className="mb-3 rounded" id="collectingEventAttachments">
+        {(!readOnly || !!initialValues?.attachment) &&
+          collectingEventAttachmentsComponent}
       </div>
     </div>
   );

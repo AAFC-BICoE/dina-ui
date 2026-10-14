@@ -3,6 +3,7 @@ import { DINAUI_MESSAGES_ENGLISH } from "./dina-ui-en";
 export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   LETTER: "Lettre",
   NUMERICAL: "Numérique",
+  accessAndTags: "Accès et étiquettes",
   actionType: "Type d’action",
   addAnother: "Ajouter un autre {typeName}",
   addAnotherIdentifier: "Ajouter un autre identifiant",

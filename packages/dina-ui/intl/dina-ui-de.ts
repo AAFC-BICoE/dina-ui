@@ -6,6 +6,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   LETTER: "Buchstabe",
   NUMERICAL: "Numerisch",
   actionType: "Aktionstyp",
+  accessAndTags: "Zugriff & Tags",
   actions: "Aktionen",
   addAnother: "weiteren {typeName} hinzufügen",
   addAnotherIdentifier: "weiteren Identifier hinzufügen",

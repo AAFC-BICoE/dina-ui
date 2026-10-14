@@ -4,6 +4,7 @@
 export const DINAUI_MESSAGES_ENGLISH = {
   LETTER: "Letter",
   NUMERICAL: "Numerical",
+  accessAndTags: "Access & Tags",
   actions: "Actions",
   actionType: "Action Type",
   addAnother: "Add Another {typeName}",
