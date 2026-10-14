@@ -1,5 +1,4 @@
-import { FieldSpy, useBulkEditTabContext } from "common-ui";
-import Switch from "react-switch";
+import { SmallSwitch, FieldSpy, useBulkEditTabContext } from "common-ui";
 
 /** Adds an initial parentAttributes if there isn't one already. */
 
@@ -9,7 +8,7 @@ export function ShowParentAttributesSwitch(props) {
   return (
     <FieldSpy<string[]> fieldName="parentAttributes">
       {(parentAttributes, { form: { setFieldValue } }) => (
-        <Switch
+        <SmallSwitch
           {...props}
           onChange={(newVal) => {
             props.onChange?.(newVal);

@@ -313,6 +313,7 @@ export function GeographyFormLayout({
     <FieldSet
       fieldName="geographicPlaceNameSourceDetail"
       legend={<DinaMessage id="toponymyLegend" />}
+      id="geographicPlace"
       className={`non-strip ${className ?? ""}`}
       componentName={COLLECTING_EVENT_COMPONENT_NAME}
       sectionName="current-geographic-place"

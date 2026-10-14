@@ -1,5 +1,9 @@
-import { FieldSpy, useBulkEditTabContext, useDinaFormContext } from "common-ui";
-import Switch from "react-switch";
+import {
+  SmallSwitch,
+  FieldSpy,
+  useBulkEditTabContext,
+  useDinaFormContext
+} from "common-ui";
 import { Organism } from "../../../../types/collection-api";
 
 /** The organisms switch adds an initial organism if there isn't one already. */
@@ -11,7 +15,7 @@ export function OrganismsSwitch(props) {
   return (
     <FieldSpy<Organism[]> fieldName="organism">
       {(organism, { form: { setFieldValue } }) => (
-        <Switch
+        <SmallSwitch
           {...props}
           onChange={(newVal) => {
             props.onChange?.(newVal);

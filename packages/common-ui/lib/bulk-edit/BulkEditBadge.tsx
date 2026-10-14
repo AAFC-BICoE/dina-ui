@@ -20,7 +20,7 @@ export function BulkEditBadge({ bulkTab, className }: BulkEditBadgeProps) {
     return (
       <Tooltip
         directText={formatMessage({ id: "clearedFieldTooltip" })}
-        className={className ?? "ms-auto"}
+        className={className ?? "ms-auto me-3"}
         visibleElement={
           <span className="badge pill bg-warning">
             <i>{formatMessage({ id: "cleared" })}</i>
@@ -35,7 +35,7 @@ export function BulkEditBadge({ bulkTab, className }: BulkEditBadgeProps) {
     return (
       <Tooltip
         directText={formatMessage({ id: "deletedTooltip" })}
-        className={className ?? "ms-auto"}
+        className={className ?? "ms-auto me-3"}
         visibleElement={
           <span className="badge pill bg-danger">
             <i>{formatMessage({ id: "deleted" })}</i>
@@ -50,7 +50,7 @@ export function BulkEditBadge({ bulkTab, className }: BulkEditBadgeProps) {
     return (
       <Tooltip
         directText={formatMessage({ id: "changesMadeTooltip" })}
-        className={className ?? "ms-auto"}
+        className={className ?? "ms-auto me-3"}
         visibleElement={
           <span className="badge pill bg-success">
             <i>{formatMessage({ id: "changesMade" })}</i>
@@ -64,7 +64,7 @@ export function BulkEditBadge({ bulkTab, className }: BulkEditBadgeProps) {
   return (
     <Tooltip
       directText={formatMessage({ id: "noChangesMadeTooltip" })}
-      className={className ?? "ms-auto"}
+      className={className ?? "ms-auto me-3"}
       visibleElement={
         <span className="badge pill bg-secondary">
           <i>{formatMessage({ id: "noChangesMade" })}</i>
