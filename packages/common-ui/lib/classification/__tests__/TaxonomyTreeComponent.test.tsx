@@ -75,12 +75,28 @@ const nodeNames = (chart: echarts.ECharts) => {
   );
 };
 
-/** Clicks a tree node the way a user does, through zrender's click event. */
-function clickNode(chart: echarts.ECharts, name: string) {
-  const data = (chart as any).getModel().getSeriesByIndex(0).getData();
-  const target = data.getItemGraphicEl(data.indexOfName(name)).getSymbolPath();
-  act(() => chart.getZr().trigger("click", { target }));
+/** Sends a pointer event to a tree node the way a user does, through zrender. */
+function pointAtNode(
+  chart: echarts.ECharts,
+  name: string,
+  eventName: "click" | "mousemove"
+) {
+  const series = (chart as any).getModel().getSeriesByIndex(0);
+  const data = series.getData();
+  const index = data.indexOfName(name);
+  const target = data.getItemGraphicEl(index).getSymbolPath();
+  const { x, y } = data.getItemLayout(index);
+  act(() =>
+    chart.getZr().trigger(eventName, {
+      target,
+      offsetX: series.layoutInfo.x + x,
+      offsetY: series.layoutInfo.y + y
+    })
+  );
 }
+
+const clickNode = (chart: echarts.ECharts, name: string) =>
+  pointAtNode(chart, name, "click");
 
 const testCtx = {
   apiContext: { apiClient: { get: mockGet, axios: { post: mockPost } } as any }
@@ -137,6 +153,31 @@ describe("TaxonomyTree component", () => {
     await waitFor(() =>
       expect(nodeNames(getChart(container))).toContain("Arthropoda")
     );
+  });
+
+  it("Keeps the tooltip alive across re-renders while it is showing", async () => {
+    const errors: string[] = [];
+    const onError = (event: ErrorEvent) => errors.push(event.message);
+    window.addEventListener("error", onError);
+    const { container } = await mountTree();
+    const tooltipView = () =>
+      (getChart(container) as any)._componentsViews.find(
+        (view) => view.type === "tooltip"
+      );
+
+    // With a tooltip showing, each re-render schedules a tooltip refresh at the cursor.
+    pointAtNode(getChart(container), "Animalia", "mousemove");
+    const shownTooltip = tooltipView();
+    await userEvent.click(screen.getByRole("button", { name: "Refresh" }));
+    await waitFor(() => expect(requestedRanks().length).toEqual(2));
+    await new Promise((resolve) => setTimeout(resolve, 50)); // Let the refresh run.
+    window.removeEventListener("error", onError);
+
+    // ECharts never cancels a disposed tooltip's pending refresh, which then throws
+    // "Cannot set properties of null (setting 'innerHTML')" when a node is under the cursor.
+    // Compared as a boolean: printing ECharts views on failure crashes Jest.
+    expect(tooltipView() === shownTooltip).toEqual(true);
+    expect(errors).toEqual([]);
   });
 
   it("Keeps working after its effects re-run, as with Fast Refresh or a hidden tab", async () => {
