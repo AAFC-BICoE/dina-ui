@@ -160,15 +160,12 @@ const SECTION_SUB_LINKS: Partial<Record<string, SubNavLink[]>> = {
     }
   ],
   [COLLECTING_EVENT_COMPONENT_NAME]: [
+    {
+      id: "collectingEventAccessAndTags",
+      msg: <DinaMessage id="accessAndTags" />
+    },
     { id: "identifiers", msg: <DinaMessage id="identifiers" /> },
-    {
-      id: "collectingDateLegend",
-      msg: <DinaMessage id="collectingDateLegend" />
-    },
-    {
-      id: "collectingAgentsLegend",
-      msg: <DinaMessage id="collectingAgentsLegend" />
-    },
+    { id: "collecting", msg: <DinaMessage id="collecting" /> },
     {
       id: "verbatimLabelLegend",
       msg: <DinaMessage id="verbatimLabelLegend" />

@@ -191,11 +191,13 @@ export function CollectingEventFormLayout({
               collectingEventUUID={initialValues.id}
             />
 
-            <SectionHeading>
-              <DinaMessage id="accessAndTags" />
-            </SectionHeading>
-
-            <div className={styles.accessFields}>
+            <div
+              id="collectingEventAccessAndTags"
+              className={`rounded ${styles.accessFields}`}
+            >
+              <SectionHeading>
+                <DinaMessage id="accessAndTags" />
+              </SectionHeading>
               <NotPubliclyReleasableSection
                 defaultToNotReleasable={defaultToNotReleasable}
                 horizontal={INLINE_LABEL_WIDTH}
@@ -728,7 +730,7 @@ export function CollectingEventFormLayout({
           </FieldSet>
         ) : null}
       </>
-      <div className="mb-3" id="collectingEventAttachments">
+      <div className="mb-3 rounded" id="collectingEventAttachments">
         {(!readOnly || !!initialValues?.attachment) &&
           collectingEventAttachmentsComponent}
       </div>
