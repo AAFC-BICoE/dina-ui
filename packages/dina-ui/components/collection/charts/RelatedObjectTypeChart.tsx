@@ -3,6 +3,14 @@ import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Card } from "react-bootstrap";
+import { findAgg } from "./findAgg";
+
+/**
+ * Elasticsearch's default cap on IDs in a terms query (index.max_terms_count). At most this many
+ * distinct attachments are counted, page with a composite aggregation if a query ever matches more.
+ */
+const MAX_TERMS = 65536;
+
 interface RelatedObjectTypeChart {
   query?: any;
 }
@@ -14,25 +22,28 @@ export default function RelatedObjectTypeChart({
 
   async function fetchData() {
     try {
-      // Get the Material Sample IDs that have attachments in this collection
+      // Get the distinct attachment IDs of all the Material Samples matching the query
       const sampleResponse = await apiClient.axios.post(
         "search-api/search-ws/search",
         {
-          _source: { includes: ["data.relationships"] },
-          query
+          size: 0,
+          query,
+          aggs: {
+            attachment_ids: {
+              terms: {
+                field: "data.relationships.attachment.data.id",
+                size: MAX_TERMS
+              }
+            }
+          }
         },
         { params: { indexName: "dina_material_sample_index" } }
       );
 
-      // Extract and flatten the attachment IDs
-      const attachmentIds = sampleResponse.data.hits.hits
-        .flatMap(
-          (hit) =>
-            hit._source?.data?.relationships?.attachment?.data?.map(
-              (a) => a.id
-            ) ?? []
-        )
-        .filter((id) => !!id);
+      const attachmentIds = (
+        findAgg(sampleResponse.data.aggregations, "attachment_ids")?.buckets ??
+        []
+      ).map((b) => b.key);
 
       if (attachmentIds.length === 0) {
         setChartData([]);
@@ -60,32 +71,11 @@ export default function RelatedObjectTypeChart({
         { params: { indexName: "dina_object_store_index" } }
       );
 
-      // Helper function to get aggregation key format
-      const getAggregationKey = (aggName: string, response: any): string => {
-        if (response.aggregations[aggName]) {
-          return aggName;
-        }
-        if (response.aggregations[`sterms#${aggName}`]) {
-          return `sterms#${aggName}`;
-        }
-
-        for (const key of Object.keys(response.aggregations)) {
-          if (key.endsWith(aggName)) {
-            return key;
-          }
-        }
-
-        return aggName;
-      };
-
       // Process aggregations
       if (metadataResponse.data.aggregations) {
-        const aggKey = getAggregationKey(
-          "by_file_extension",
-          metadataResponse.data
-        );
         const buckets =
-          metadataResponse.data.aggregations[aggKey]?.buckets ?? [];
+          findAgg(metadataResponse.data.aggregations, "by_file_extension")
+            ?.buckets ?? [];
 
         setChartData(buckets.map((b) => ({ name: b.key, value: b.doc_count })));
       }

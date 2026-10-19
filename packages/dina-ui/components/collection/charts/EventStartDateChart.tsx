@@ -55,13 +55,6 @@ export default function EventStartDateChart({
         typeField: "type",
         typeValue: "collecting-event"
       }}
-      menuSectionLabels={{
-        realTime: <DinaMessage id="dateRangeHeaderRealTime" />,
-        byDay: <DinaMessage id="dateRangeHeaderByDay" />,
-        byMonth: <DinaMessage id="dateRangeHeaderByMonth" />,
-        byYear: <DinaMessage id="dateRangeHeaderByYear" />
-      }}
-      emptyStateLabel={<DinaMessage id="noData" />}
     />
   );
 }
