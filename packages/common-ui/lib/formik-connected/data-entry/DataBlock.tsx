@@ -127,7 +127,7 @@ export function DataBlock({
   const rowKeys = Object.keys(extensionKeys ?? {});
 
   return (
-    <div className="border rounded">
+    <div className="border rounded data-entry-block">
       <div className="d-flex align-items-center justify-content-between gap-3 px-3 py-2 bg-light border-bottom">
         {blockOptions && (
           <div style={{ width: 280 }}>

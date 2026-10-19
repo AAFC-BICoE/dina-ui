@@ -150,6 +150,7 @@ export function CollectingEventFormLayout({
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
         allowAttachmentsConfig={attachmentsConfig}
+        className="non-strip clean-section"
       />
     </DinaFormSection>
   );

@@ -160,33 +160,11 @@ export function DataEntry({
     formik.setFieldValue(name, newExtensionValues);
   }
 
-  function legendWrapper():
-    | ((legendElement: React.JSX.Element) => React.JSX.Element)
-    | undefined {
-    return (legendElement) => {
-      return (
-        <div className="d-flex align-items-center justify-content-between legend-with-actions">
-          {legendElement}
-          {!readOnly && (
-            <Button onClick={() => addBlock()} className="add-datablock">
-              <FaPlus className="me-2" />
-              <DinaMessage id="addExtension" />
-            </Button>
-          )}
-        </div>
-      );
-    };
-  }
   if (blockOptionsQuery?.loading) {
     return <LoadingSpinner loading={true} />;
   }
   return (
-    <FieldSet
-      legend={legend}
-      wrapLegend={legendWrapper()}
-      id={id}
-      className={className}
-    >
+    <FieldSet legend={legend} id={id} className={className}>
       {
         <div className="d-flex flex-column gap-3">
           {extensionValues
@@ -218,6 +196,15 @@ export function DataEntry({
                 );
               })
             : null}
+          {!readOnly && (
+            <Button
+              onClick={() => addBlock()}
+              className="add-datablock align-self-start mb-3"
+            >
+              <FaPlus className="me-2" />
+              <DinaMessage id="addExtension" />
+            </Button>
+          )}
         </div>
       }
     </FieldSet>

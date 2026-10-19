@@ -358,15 +358,6 @@ fieldset.clean-section {
   background-color: #d5dbe3;
 }
 
-/* A wrapped legend with actions (e.g. an "Add" button): legend, rule, then the actions. */
-.clean-section > .legend-wrapper > .legend-with-actions {
-  display: contents !important;
-}
-
-.clean-section > .legend-wrapper > .legend-with-actions > :not(legend) {
-  order: 1;
-}
-
 /* Light red button for removing a whole item, e.g. "Remove Extension". */
 .btn-remove-light {
   color: #fff;
@@ -404,6 +395,11 @@ fieldset.clean-section {
 
 .btn-link.data-entry-remove {
   color: #0000cd;
+}
+
+/* These inputs have no visible labels; drop FieldWrapper's label gap so they centre in their row. */
+.data-entry-block label.mb-2 {
+  margin-bottom: 0 !important;
 }
 
 .modal-header {
