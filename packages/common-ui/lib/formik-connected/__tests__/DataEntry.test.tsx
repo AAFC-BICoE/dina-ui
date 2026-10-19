@@ -5,6 +5,7 @@ import {
   waitForLoadingToDisappear
 } from "common-ui";
 import { DataEntryField } from "../data-entry/DataEntryField";
+import { DataEntryViewer } from "../data-entry/DataEntryViewer";
 import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -346,6 +347,64 @@ describe("DataEntry", () => {
           })
         }
       });
+    });
+  });
+
+  it("Shows field extension names in read-only mode from the extension list", async () => {
+    const mockExtensionGet = jest.fn(async (path) =>
+      path === "collection-api/extension"
+        ? {
+            data: [
+              {
+                id: "ext-1",
+                type: "extension",
+                extension: {
+                  name: "Agronomy Ontology",
+                  key: "agronomy_ontology_v1",
+                  fields: [
+                    { key: "crop", name: "Crop Name" },
+                    { key: "1000_grain_weight", name: "1000-grain weight" }
+                  ]
+                }
+              }
+            ]
+          }
+        : { data: [] }
+    );
+
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        readOnly={true}
+        initialValues={{
+          extensionValues: {
+            agronomy_ontology_v1: {
+              select: "agronomy_ontology_v1",
+              rows: {
+                crop: { type: "crop", value: "wheat" },
+                "1000_grain_weight": { type: "1000_grain_weight", value: "3" }
+              }
+            }
+          }
+        }}
+      >
+        <DataEntryViewer
+          name="extensionValues"
+          legend={<span />}
+          disableDinaForm={true}
+          blockOptionsEndpoint="collection-api/extension"
+          blockOptionsFilter={{
+            "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
+          }}
+        />
+      </DinaForm>,
+      { apiContext: { apiClient: { get: mockExtensionGet } } as any }
+    );
+
+    // More than one field used to need a bulk lookup the API doesn't support:
+    await waitFor(() => {
+      expect(wrapper.getByText("Agronomy Ontology")).toBeInTheDocument();
+      expect(wrapper.getByText("Crop Name")).toBeInTheDocument();
+      expect(wrapper.getByText("1000-grain weight")).toBeInTheDocument();
     });
   });
 });

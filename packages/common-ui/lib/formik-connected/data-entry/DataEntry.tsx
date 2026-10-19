@@ -2,11 +2,7 @@ import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
 import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOptions";
 import { ProtocolElement } from "@dina-ui/types/collection-api";
-import {
-  ExtensionField,
-  FieldExtension,
-  FieldExtensionValue
-} from "@dina-ui/types/collection-api/resources/FieldExtension";
+import { FieldExtension } from "@dina-ui/types/collection-api/resources/FieldExtension";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
@@ -17,13 +13,11 @@ import {
   SelectOption,
   useApiClient,
   useBulkEditTabContext,
-  useBulkGet,
   useQuery
 } from "../..";
 import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { DataBlock } from "./DataBlock";
 import { DataEntryFieldProps } from "./DataEntryField";
-import _ from "lodash";
 
 export interface DataEntryProps extends DataEntryFieldProps {}
 
@@ -51,20 +45,8 @@ export function DataEntry({
   let extensionValues =
     formik?.values?.[name] ?? getBulkContextExtensionValues(bulkContext, name);
 
-  const ids: string[] = [];
-  _.forOwn(extensionValues, (extensionValue, extensionKey) => {
-    _.forOwn(extensionValue.rows, (_fieldValue, fieldKey) => {
-      ids.push(`${extensionKey}.${fieldKey}`);
-    });
-  });
-
   const vocabOptions = useVocabularyOptions({
     path: blockOptionsEndpoint
-  });
-
-  const extensionValuesQuery = useBulkGet<FieldExtensionValue>({
-    ids,
-    listPath: "collection-api/field-extension-value"
   });
 
   const fieldExtensionQuery = useQuery<FieldExtension[]>({
@@ -72,52 +54,20 @@ export function DataEntry({
     filter: blockOptionsFilter
   });
 
+  // Read-only uses the same extension definitions as edit mode for its labels and tooltips.
   const blockOptionsQuery: any = isVocabularyBasedEnabledForBlock
     ? vocabOptions
-    : readOnly
-    ? extensionValuesQuery
     : fieldExtensionQuery;
 
   function getBlockOptions() {
-    if (readOnly) {
-      if (isVocabularyBasedEnabledForBlock) {
-        return blockOptionsQuery?.vocabOptions;
-      }
-
-      const nestedExtensionFieldValue = _.groupBy(
-        blockOptionsQuery.data,
-        (extensionFieldValue: FieldExtensionValue) =>
-          extensionFieldValue.extensionKey
-      );
-
-      const options: any = [];
-      _.forOwn(nestedExtensionFieldValue, (fieldExtensionValue) => {
-        const blockOption = fieldExtensionValue.reduce(
-          (acc, cur: FieldExtensionValue) => {
-            acc.label = cur.extensionName;
-            acc.value = cur.extensionKey;
-            acc.fields.push(cur.field);
-            return acc;
-          },
-          { value: "", label: "", fields: [] } as {
-            value: string;
-            label: string;
-            fields: ExtensionField[];
-          }
-        );
-        options.push(blockOption);
-      });
-      return options;
-    }
     if (isVocabularyBasedEnabledForBlock) {
       return blockOptionsQuery?.vocabOptions;
-    } else {
-      return blockOptionsQuery?.response?.data.map((data) => ({
-        label: data.extension.name,
-        value: data.extension.key,
-        fields: data.extension.fields
-      }));
     }
+    return blockOptionsQuery?.response?.data.map((data) => ({
+      label: data.extension.name,
+      value: data.extension.key,
+      fields: data.extension.fields
+    }));
   }
   const blockOptions = getBlockOptions();
   const [queriedTypeOptions, setQueriedTypeOptions] = useState<

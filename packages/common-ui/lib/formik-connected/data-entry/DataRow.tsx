@@ -134,7 +134,7 @@ export function DataRow({
   return (
     <div className="data-entry-grid mb-2">
       <div className="d-flex align-items-center gap-2">
-        <div className="flex-grow-1">
+        <div className={readOnly ? undefined : "flex-grow-1"}>
           {typesAddable ? (
             <CreatableSelectField
               {...labelProps}
