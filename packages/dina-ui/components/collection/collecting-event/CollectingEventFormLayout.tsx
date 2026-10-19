@@ -504,8 +504,9 @@ export function CollectingEventFormLayout({
               onChangeExternal={onChangeExternal}
             />
 
-            <div className="d-flex align-items-start gap-2">
-              <div className="flex-grow-1">
+            <div className="d-flex flex-wrap align-items-start gap-2">
+              {/* Keep the input usable; the convert button wraps below when space runs out. */}
+              <div style={{ flex: `1 1 ${INLINE_LABEL_WIDTH + 12}em` }}>
                 <TextField name="dwcVerbatimElevation" />
               </div>
               <ParseVerbatimToRangeButton
@@ -519,8 +520,8 @@ export function CollectingEventFormLayout({
               />
             </div>
 
-            <div className="d-flex align-items-start gap-2">
-              <div className="flex-grow-1">
+            <div className="d-flex flex-wrap align-items-start gap-2">
+              <div style={{ flex: `1 1 ${INLINE_LABEL_WIDTH + 12}em` }}>
                 <TextField name="dwcVerbatimDepth" />
               </div>
               <ParseVerbatimToRangeButton
