@@ -163,6 +163,8 @@ export function CollectingEventFormLayout({
         legend: <DinaMessage id="managedAttributes" />,
         id: "collectingEventManagedAttributes",
         className: "non-strip clean-section",
+        horizontal: INLINE_LABEL_WIDTH,
+        compact: true,
         componentName: COLLECTING_EVENT_COMPONENT_NAME,
         sectionName: "collecting-event-managed-attributes-section"
       }}
@@ -723,6 +725,8 @@ export function CollectingEventFormLayout({
             legend={<DinaMessage id="collectingEventManagedAttributes" />}
             id="collectingEventManagedAttributes"
             className="non-strip clean-section"
+            horizontal={INLINE_LABEL_WIDTH}
+            compact={true}
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-managed-attributes-section"
           >
