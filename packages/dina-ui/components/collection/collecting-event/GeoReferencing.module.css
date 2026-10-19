@@ -1,0 +1,53 @@
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.assertionList {
+  flex: none;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.assertionCard {
+  width: 100%;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+}
+
+.assertionCard.active {
+  border-color: #335075;
+  background-color: rgba(51, 80, 117, 0.08);
+}
+
+:global(.badge).primaryBadge {
+  background-color: #335075;
+}
+
+.removeButton {
+  color: #fff;
+  background-color: #ea868f;
+  border-color: #ea868f;
+}
+
+.removeButton:hover,
+.removeButton:focus {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+/* Beats the site-wide blue .btn-outline-secondary text colour (wet-beow-bootstrap-4.css). */
+.grayButton:global(.btn-outline-secondary) {
+  color: #495057;
+}
+
+.grayButton:global(.btn-outline-secondary):hover:not(:disabled) {
+  color: #fff;
+}

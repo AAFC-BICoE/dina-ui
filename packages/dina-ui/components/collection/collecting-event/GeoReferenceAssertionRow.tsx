@@ -1,7 +1,7 @@
 import {
-  CheckBoxField,
   DateField,
   DinaFormSection,
+  FieldWrapper,
   FormikButton,
   INLINE_LABEL_WIDTH,
   TextField,
@@ -9,7 +9,7 @@ import {
   Tooltip,
   useDinaFormContext
 } from "common-ui";
-import { connect, Field, FormikContextType } from "formik";
+import { connect, FormikContextType } from "formik";
 import _ from "lodash";
 import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../types/collection-api";
 import { PersonSelectField } from "../..";
@@ -19,15 +19,19 @@ import {
   GeoreferenceVerificationStatus
 } from "../../../types/collection-api/resources/GeoReferenceAssertion";
 import { useRef, useState } from "react";
+import { FaStar, FaTrash } from "react-icons/fa";
+import styles from "./GeoReferencing.module.css";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
   assertion: GeoReferenceAssertion;
+  onRemove?: () => void;
 }
 
 export function GeoReferenceAssertionRow({
   index,
-  assertion
+  assertion,
+  onRemove
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
@@ -52,8 +56,8 @@ export function GeoReferenceAssertionRow({
       reservedAssertion.current[fieldName.replace(commonRoot, "")] = fieldValue;
   }
 
-  function onGeoReferencingImpossibleCheckBoxClick(
-    event,
+  function setGeoreferencingNotPossible(
+    notPossible: boolean,
     formik: FormikContextType<{}>
   ) {
     // On checked, set 3 fields editable, rest readonly; unchecked, all fields editable
@@ -65,7 +69,7 @@ export function GeoReferenceAssertionRow({
     const dwcGeodeticDatum = commonRoot + "dwcGeodeticDatum";
     const dwcGeoreferenceProtocol = commonRoot + "dwcGeoreferenceProtocol";
     const dwcGeoreferenceSources = commonRoot + "dwcGeoreferenceSources";
-    if (event.target.checked === true) {
+    if (notPossible) {
       // setFieldTouched is needed for any fields that previously has no value
       // but need to appear as readOnly after checkbox checked. To do this, needs
       // to simulate the field value is actually changed to trigger
@@ -127,6 +131,10 @@ export function GeoReferenceAssertionRow({
     formik.setFieldValue(`${assertionsPath}[${index}].isPrimary`, true);
   }
 
+  const statusName = commonRoot + "dwcGeoreferenceVerificationStatus";
+  const example = (value: string) =>
+    georeferenceDisabled ? undefined : formatMessage("exampleValue", { value });
+
   return (
     <div>
       <DinaFormSection
@@ -137,72 +145,82 @@ export function GeoReferenceAssertionRow({
         {readOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
-        {!readOnly && !isTemplate && (
-          <div className="mb-3">
-            <FormikButton
-              className="btn btn-primary primary-assertion-button"
-              buttonProps={(ctx) => {
-                const isPrimary =
-                  _.get(ctx.values, commonRoot + "isPrimary") ?? false;
-                return {
-                  disabled: isPrimary,
-                  children: isPrimary ? (
-                    <DinaMessage id="primary" />
-                  ) : (
-                    <DinaMessage id="makePrimary" />
-                  )
-                };
-              }}
-              onClick={(_, formik) => makePrimary(formik)}
-            />
-            <Tooltip id="primaryButton_tooltip" />
-          </div>
-        )}
-        <Field name={commonRoot + "dwcGeoreferenceVerificationStatus"}>
-          {() =>
-            readOnly && !georeferenceDisabled ? (
-              <></>
-            ) : (
-              <CheckBoxField
-                name={commonRoot + "dwcGeoreferenceVerificationStatus"}
-                onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-                disabled={readOnly}
-                customName="dwcGeoreferenceVerificationStatus"
-                type={readOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
-              />
-            )
-          }
-        </Field>
 
         <DinaFormSection horizontal={INLINE_LABEL_WIDTH} compact={true}>
+          {(!readOnly || georeferenceDisabled) && (
+            <FieldWrapper
+              name={statusName}
+              customName="dwcGeoreferenceVerificationStatus"
+              label={formatMessage("georeferencingStatus")}
+              readOnlyRender={(value) =>
+                formatMessage(value ? "notPossible" : "georeferenced")
+              }
+            >
+              {({ formik }) => (
+                <div className="btn-group" role="group">
+                  {[false, true].map((notPossible) => (
+                    <button
+                      key={String(notPossible)}
+                      type="button"
+                      aria-pressed={georeferenceDisabled === notPossible}
+                      className={`btn ${
+                        georeferenceDisabled === notPossible
+                          ? "btn-primary"
+                          : "btn-outline-primary"
+                      }`}
+                      onClick={() =>
+                        setGeoreferencingNotPossible(notPossible, formik)
+                      }
+                    >
+                      {formatMessage(
+                        notPossible ? "notPossible" : "georeferenced"
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </FieldWrapper>
+          )}
+
           <NumberField
             name={commonRoot + "dwcDecimalLatitude"}
             customName="dwcDecimalLatitude"
             className="dwcDecimalLatitude"
-            readOnly={georeferenceDisabled}
+            disabled={georeferenceDisabled}
+            placeholder={example("45.4215")}
+            unit="°"
             onChangeExternal={updateReservedAssertion}
             min={-90}
             max={90}
           />
-
           <NumberField
             name={commonRoot + "dwcDecimalLongitude"}
             customName="dwcDecimalLongitude"
             className="dwcDecimalLongitude"
-            readOnly={georeferenceDisabled}
+            disabled={georeferenceDisabled}
+            placeholder={example("-75.6972")}
+            unit="°"
             onChangeExternal={updateReservedAssertion}
             min={-180}
             max={180}
           />
-
           <NumberField
             name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
             tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_coordinate_uncertainty_in_meters"
             tooltipLinkText="fromDinaUserGuide"
             customName="dwcCoordinateUncertaintyInMeters"
             isInteger={true}
-            readOnly={georeferenceDisabled}
+            disabled={georeferenceDisabled}
+            unit="m"
             className="dwcCoordinateUncertaintyInMeters"
+            onChangeExternal={updateReservedAssertion}
+          />
+          <TextField
+            name={commonRoot + "dwcGeodeticDatum"}
+            className="dwcGeodeticDatum"
+            customName="dwcGeodeticDatum"
+            disabled={georeferenceDisabled}
+            placeholder={example("WGS84")}
             onChangeExternal={updateReservedAssertion}
           />
 
@@ -211,21 +229,11 @@ export function GeoReferenceAssertionRow({
             className="dwcGeoreferencedDate"
             label={formatMessage("georeferencedDateLabel")}
           />
-
-          <TextField
-            name={commonRoot + "dwcGeodeticDatum"}
-            className="dwcGeodeticDatum"
-            customName="dwcGeodeticDatum"
-            readOnly={georeferenceDisabled}
-            onChangeExternal={updateReservedAssertion}
-          />
-
           <TextField
             name={commonRoot + "literalGeoreferencedBy"}
             className="literalGeoreferencedBy"
             label={formatMessage("literalGeoreferencedByLabel")}
           />
-
           <PersonSelectField
             name={commonRoot + "georeferencedBy"}
             label={formatMessage("georeferencedByLabel")}
@@ -236,18 +244,16 @@ export function GeoReferenceAssertionRow({
             name={commonRoot + "dwcGeoreferenceProtocol"}
             className="dwcGeoreferenceProtocol"
             customName="dwcGeoreferenceProtocol"
-            readOnly={georeferenceDisabled}
+            disabled={georeferenceDisabled}
             onChangeExternal={updateReservedAssertion}
           />
-
           <TextField
             name={commonRoot + "dwcGeoreferenceSources"}
             className="dwcGeoreferenceSources"
             customName="dwcGeoreferenceSources"
-            readOnly={georeferenceDisabled}
+            disabled={georeferenceDisabled}
             onChangeExternal={updateReservedAssertion}
           />
-
           <TextField
             name={commonRoot + "dwcGeoreferenceRemarks"}
             multiLines={true}
@@ -255,6 +261,42 @@ export function GeoReferenceAssertionRow({
             customName="dwcGeoreferenceRemarks"
           />
         </DinaFormSection>
+
+        {!readOnly && !isTemplate && (
+          <div className="d-flex align-items-center justify-content-between border-top pt-3 mt-3">
+            <div className="d-flex align-items-center">
+              <FormikButton
+                className={`btn btn-outline-secondary primary-assertion-button ${styles.grayButton}`}
+                buttonProps={(ctx) => {
+                  const isPrimary =
+                    _.get(ctx.values, commonRoot + "isPrimary") ?? false;
+                  return {
+                    disabled: isPrimary,
+                    children: (
+                      <>
+                        <FaStar className="me-2" />
+                        <DinaMessage
+                          id={isPrimary ? "primary" : "makePrimary"}
+                        />
+                      </>
+                    )
+                  };
+                }}
+                onClick={(_, formik) => makePrimary(formik)}
+              />
+              <Tooltip id="primaryButton_tooltip" />
+            </div>
+            {onRemove && (
+              <FormikButton
+                className={`btn ${styles.removeButton}`}
+                onClick={onRemove}
+              >
+                <FaTrash className="me-2" />
+                <DinaMessage id="removeAssertionLabel" />
+              </FormikButton>
+            )}
+          </div>
+        )}
       </DinaFormSection>
     </div>
   );
