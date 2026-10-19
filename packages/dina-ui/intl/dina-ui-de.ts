@@ -887,6 +887,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   objectStoreDetailsTitle: "Details des Medienspeicher",
   objectStoreTitle: "Medienspeicher",
   objectSubtypeListTitle: "Mediensubtypen",
+  objectSubtypeName: "Name des Objektuntertyps",
   objectSubtypeTitle: "Mediensubtyp",
   objectsLabel: "Medienobjekte",
   openGeographySearchButtonLabel: "In Open Street Maps suchen",

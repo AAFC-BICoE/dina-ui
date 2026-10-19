@@ -975,6 +975,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectStoreDetailsTitle: "Object Store Details",
   objectStoreTitle: "Object Store",
   objectSubtypeListTitle: "Object Subtypes",
+  objectSubtypeName: "Object Subtype Name",
   objectSubtypeTitle: "Object Subtype",
   openGeographySearchButtonLabel: "Search On Open Street Maps",
   openLink: "Open Link",
