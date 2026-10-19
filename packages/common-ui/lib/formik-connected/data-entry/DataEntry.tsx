@@ -9,6 +9,7 @@ import {
 } from "@dina-ui/types/collection-api/resources/FieldExtension";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
+import { FaPlus } from "react-icons/fa";
 import {
   BulkEditTabContextI,
   FieldSet,
@@ -214,11 +215,12 @@ export function DataEntry({
     | undefined {
     return (legendElement) => {
       return (
-        <div className="d-flex align-items-center justify-content-between">
+        <div className="d-flex align-items-center justify-content-between legend-with-actions">
           {legendElement}
           {!readOnly && (
             <Button onClick={() => addBlock()} className="add-datablock">
-              <DinaMessage id="addCustomPlaceName" />
+              <FaPlus className="me-2" />
+              <DinaMessage id="addExtension" />
             </Button>
           )}
         </div>
@@ -236,7 +238,7 @@ export function DataEntry({
       className={className}
     >
       {
-        <div style={{ padding: 15 }}>
+        <div className="d-flex flex-column gap-3">
           {extensionValues
             ? Object.keys(extensionValues).map((blockKey) => {
                 return (

@@ -358,6 +358,54 @@ fieldset.clean-section {
   background-color: #d5dbe3;
 }
 
+/* A wrapped legend with actions (e.g. an "Add" button): legend, rule, then the actions. */
+.clean-section > .legend-wrapper > .legend-with-actions {
+  display: contents !important;
+}
+
+.clean-section > .legend-wrapper > .legend-with-actions > :not(legend) {
+  order: 1;
+}
+
+/* Light red button for removing a whole item, e.g. "Remove Extension". */
+.btn-remove-light {
+  color: #fff;
+  background-color: #ea868f;
+  border-color: #ea868f;
+}
+
+.btn-remove-light:hover,
+.btn-remove-light:focus {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+/* Gray text; the site-wide .btn-outline-secondary text is blue (wet-beow-bootstrap-4.css). */
+.btn-outline-secondary.btn-gray-text {
+  color: #495057;
+}
+
+.btn-outline-secondary.btn-gray-text:hover:not(:disabled) {
+  color: #fff;
+}
+
+/* Field extension rows: Type | Value | Unit | Remove. */
+.data-entry-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 160px 72px;
+  gap: 12px;
+  align-items: center;
+}
+
+.data-entry-grid > * {
+  min-width: 0;
+}
+
+.btn-link.data-entry-remove {
+  color: #0000cd;
+}
+
 .modal-header {
   justify-content: center;
 }

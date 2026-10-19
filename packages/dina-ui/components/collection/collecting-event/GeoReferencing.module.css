@@ -29,25 +29,3 @@
 :global(.badge).primaryBadge {
   background-color: #335075;
 }
-
-.removeButton {
-  color: #fff;
-  background-color: #ea868f;
-  border-color: #ea868f;
-}
-
-.removeButton:hover,
-.removeButton:focus {
-  color: #fff;
-  background-color: #dc3545;
-  border-color: #dc3545;
-}
-
-/* Beats the site-wide blue .btn-outline-secondary text colour (wet-beow-bootstrap-4.css). */
-.grayButton:global(.btn-outline-secondary) {
-  color: #495057;
-}
-
-.grayButton:global(.btn-outline-secondary):hover:not(:disabled) {
-  color: #fff;
-}

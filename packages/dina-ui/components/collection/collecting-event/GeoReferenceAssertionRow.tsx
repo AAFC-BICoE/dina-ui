@@ -20,7 +20,6 @@ import {
 } from "../../../types/collection-api/resources/GeoReferenceAssertion";
 import { useRef, useState } from "react";
 import { FaStar, FaTrash } from "react-icons/fa";
-import styles from "./GeoReferencing.module.css";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
@@ -266,7 +265,7 @@ export function GeoReferenceAssertionRow({
           <div className="d-flex align-items-center justify-content-between border-top pt-3 mt-3">
             <div className="d-flex align-items-center">
               <FormikButton
-                className={`btn btn-outline-secondary primary-assertion-button ${styles.grayButton}`}
+                className="btn btn-outline-secondary btn-gray-text primary-assertion-button"
                 buttonProps={(ctx) => {
                   const isPrimary =
                     _.get(ctx.values, commonRoot + "isPrimary") ?? false;
@@ -287,10 +286,7 @@ export function GeoReferenceAssertionRow({
               <Tooltip id="primaryButton_tooltip" />
             </div>
             {onRemove && (
-              <FormikButton
-                className={`btn ${styles.removeButton}`}
-                onClick={onRemove}
-              >
+              <FormikButton className="btn btn-remove-light" onClick={onRemove}>
                 <FaTrash className="me-2" />
                 <DinaMessage id="removeAssertionLabel" />
               </FormikButton>

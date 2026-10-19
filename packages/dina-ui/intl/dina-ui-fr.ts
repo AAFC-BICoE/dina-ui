@@ -172,8 +172,11 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   customPlaceName: "Nom de lieu personnalisé",
   dataComponents: "Sections",
   dataEntryLabel: "Saisie de données",
-  dataType: "Taper: ",
-  dataValue: "Valeur: ",
+  dataType: "Type",
+  dataValue: "Valeur",
+  addExtension: "Ajouter une extension",
+  removeExtension: "Supprimer l'extension",
+  addField: "Ajouter un champ",
   dataset: "Ensemble de données",
   datasetSearchTooltip:
     "Pour utiliser un ensemble de données différent du Catalogue de la vie.",
@@ -1009,7 +1012,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   typeNewTagOrSearchPreviousTags:
     "Entrer la nouvelle étiquette ou consulter les précédentes étiquettes",
   typeSpecimen: "Taper spécimen",
-  unit: "Unité: ",
+  unit: "Unité",
   unsavedChanges: "Modifications non sauvegardées apportées",
   unsetAsDefault: "Ne plus définir par défaut",
   unsupportedFileTypeError:

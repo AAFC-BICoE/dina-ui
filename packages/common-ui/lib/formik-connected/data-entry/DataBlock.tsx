@@ -1,7 +1,7 @@
 import { useFormikContext } from "formik";
 import _ from "lodash";
 import { useState } from "react";
-import Button from "react-bootstrap/Button";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import {
   CheckBoxField,
   CreatableSelectField,
@@ -96,6 +96,22 @@ export function DataBlock({
     return selectedExtensionFieldsOptions;
   }
 
+  const rowsPath = `${props.name}.rows`;
+  const usedTypes = _.compact(_.map(extensionKeys, (row) => row?.type));
+
+  function addRow() {
+    const rows = _.get(formik.values, rowsPath) ?? {};
+    let index = Object.keys(rows).length;
+    // Skip keys still in use after a middle row was removed:
+    while (`extensionField-${index}` in rows) {
+      index++;
+    }
+    formik.setFieldValue(rowsPath, {
+      ...rows,
+      [`extensionField-${index}`]: ""
+    });
+  }
+
   function onCreatableSelectFieldChange(value, oldValue) {
     if (isVocabularyBasedEnabledForBlock) {
       formik.setFieldValue(
@@ -108,53 +124,77 @@ export function DataBlock({
     }
   }
 
+  const rowKeys = Object.keys(extensionKeys ?? {});
+
   return (
-    <div>
-      {
-        <div className="border" style={{ padding: 15, marginBottom: "2rem" }}>
-          <div className="d-inline-flex align-items-center">
-            {blockOptions && (
-              <div style={{ width: "15rem" }}>
-                {blockAddable ? (
-                  <CreatableSelectField
-                    options={blockOptions}
-                    name={`${props.name}.select`}
-                    removeBottomMargin={true}
-                    removeLabel={true}
-                    onChange={onCreatableSelectFieldChange}
-                    disableTemplateCheckbox={true}
-                    filterValues={selectedBlockOptions}
-                    readOnlyBold={true}
-                  />
-                ) : (
-                  <SelectField
-                    options={blockOptions}
-                    name={`${props.name}.select`}
-                    removeBottomMargin={true}
-                    removeLabel={true}
-                    onChange={onBlockSelectChange}
-                    disableTemplateCheckbox={true}
-                    filterValues={selectedBlockOptions}
-                    readOnlyBold={true}
-                  />
-                )}
-              </div>
-            )}
-            {isVocabularyBasedEnabledForBlock && (
-              <CheckBoxField
-                className="hidden"
-                name={`${props.name}.vocabularyBased`}
+    <div className="border rounded">
+      <div className="d-flex align-items-center justify-content-between gap-3 px-3 py-2 bg-light border-bottom">
+        {blockOptions && (
+          <div style={{ width: 280 }}>
+            {blockAddable ? (
+              <CreatableSelectField
+                options={blockOptions}
+                name={`${props.name}.select`}
+                removeBottomMargin={true}
                 removeLabel={true}
+                onChange={onCreatableSelectFieldChange}
+                disableTemplateCheckbox={true}
+                filterValues={selectedBlockOptions}
+                readOnlyBold={true}
+              />
+            ) : (
+              <SelectField
+                options={blockOptions}
+                name={`${props.name}.select`}
+                removeBottomMargin={true}
+                removeLabel={true}
+                onChange={onBlockSelectChange}
+                disableTemplateCheckbox={true}
+                filterValues={selectedBlockOptions}
+                readOnlyBold={true}
               />
             )}
           </div>
-          {Object.keys(extensionKeys).map((extensionKey, rowIndex) => {
-            return (
+        )}
+        {isVocabularyBasedEnabledForBlock && (
+          <CheckBoxField
+            className="hidden"
+            name={`${props.name}.vocabularyBased`}
+            removeLabel={true}
+          />
+        )}
+        {!readOnly && (
+          <button
+            type="button"
+            className="btn btn-remove-light"
+            onClick={() => removeBlock?.(props.name)}
+          >
+            <FaTrash className="me-2" />
+            <DinaMessage id="removeExtension" />
+          </button>
+        )}
+      </div>
+      <div className="p-3">
+        {rowKeys.length ? (
+          <>
+            <div className="data-entry-grid mb-1 small fw-bold">
+              <div>
+                <DinaMessage id="dataType" />
+              </div>
+              <div>
+                <DinaMessage id="dataValue" />
+              </div>
+              <div>
+                <DinaMessage id="unit" />
+              </div>
+              <div />
+            </div>
+            {rowKeys.map((extensionKey, rowIndex) => (
               <DataRow
-                key={rowIndex}
-                showPlusIcon={true}
-                name={`${props.name}.rows.${extensionKey}`}
+                key={extensionKey}
+                name={`${rowsPath}.${extensionKey}`}
                 rowIndex={rowIndex}
+                usedTypes={usedTypes}
                 unitsOptions={unitsOptions}
                 typeOptions={typeOptions ?? dynamicSelectedTypeOptions}
                 readOnly={readOnly}
@@ -165,17 +205,25 @@ export function DataBlock({
                 }
                 disableClearButton={disableClearButton}
               />
-            );
-          })}
-          {!readOnly && (
-            <div className="d-flex align-items-center justify-content-between">
-              <Button onClick={() => removeBlock?.(props.name)}>
-                <DinaMessage id="deleteButtonText" />
-              </Button>
-            </div>
-          )}
-        </div>
-      }
+            ))}
+          </>
+        ) : (
+          <div className="text-muted mb-2">
+            <DinaMessage id="noRowsFound" />
+          </div>
+        )}
+        {!readOnly && (
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-secondary btn-gray-text"
+            onClick={addRow}
+            data-testid="add row button"
+          >
+            <FaPlus className="me-2" />
+            <DinaMessage id="addField" />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

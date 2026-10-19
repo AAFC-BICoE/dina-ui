@@ -153,7 +153,7 @@ export function GeoReferenceAssertionField({
                   ))}
                   {!readOnly && !isTemplate && (
                     <FormikButton
-                      className={`btn btn-outline-secondary ${styles.grayButton}`}
+                      className="btn btn-outline-secondary btn-gray-text"
                       onClick={addElement}
                     >
                       <FaPlus className="me-2" />

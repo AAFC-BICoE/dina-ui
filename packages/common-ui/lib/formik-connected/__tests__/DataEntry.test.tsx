@@ -1,5 +1,9 @@
 import { DinaForm } from "../DinaForm";
-import { clearAndType, mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  clearAndType,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { DataEntryField } from "../data-entry/DataEntryField";
 import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import { fireEvent, waitFor } from "@testing-library/react";
@@ -271,6 +275,75 @@ describe("DataEntry", () => {
             },
             select: "BLOCK_OPTION_2"
           }
+        }
+      });
+    });
+  });
+
+  it("Hides types already used in the block and keeps other rows when one is removed", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{
+          extensionValues: {
+            BLOCK_OPTION_1: {
+              select: "BLOCK_OPTION_1",
+              rows: {
+                "extensionField-0": { type: "TYPE_OPTION_1", value: "A" },
+                "extensionField-1": { type: "TYPE_OPTION_2", value: "B" }
+              }
+            }
+          }
+        }}
+        onSubmit={async ({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        <DataEntryField
+          legend={<DinaMessage id="fieldExtensions" />}
+          isVocabularyBasedEnabledForBlock={true}
+          isVocabularyBasedEnabledForType={true}
+          blockOptionsEndpoint={"collection-api/vocabulary2/protocolData"}
+          typeOptionsEndpoint={"collection-api/protocol-element"}
+          unitOptionsEndpoint={"collection-api/vocabulary2/unitsOfMeasurement"}
+          name="extensionValues"
+        />
+      </DinaForm>,
+      { apiContext }
+    );
+    await waitForLoadingToDisappear();
+
+    // Remove the first row, then add a new one:
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /^remove$/i })[0]
+    );
+    await userEvent.click(wrapper.getByTestId("add row button"));
+
+    // The new row doesn't offer the type the remaining row already uses:
+    const newTypeSelect = wrapper
+      .getAllByRole("combobox", {
+        name: /select\.\.\./i
+      })
+      .at(-2)!; // The new row's Type (its Unit select comes last).
+    await userEvent.type(newTypeSelect, "TYPE_OPTION");
+    expect(
+      wrapper.getByRole("option", { name: /type_option_1/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.queryByRole("option", { name: /type_option_2/i })
+    ).not.toBeInTheDocument();
+
+    // The new row gets a fresh key instead of overwriting "extensionField-1":
+    fireEvent.submit(wrapper.getByRole("group"));
+    await waitFor(() => {
+      expect(mockSubmit).lastCalledWith({
+        extensionValues: {
+          BLOCK_OPTION_1: expect.objectContaining({
+            rows: {
+              "extensionField-1": expect.objectContaining({
+                type: "TYPE_OPTION_2",
+                value: "B"
+              }),
+              "extensionField-2": ""
+            }
+          })
         }
       });
     });

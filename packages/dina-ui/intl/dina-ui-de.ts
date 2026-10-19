@@ -232,9 +232,12 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   dataPasteZone: "Daten-Einfügebereich",
   dataSourceHasNoTaxonData:
     "Diese Datenquelle liefert nur Namen. Übergeordnete taxonomische Daten sind nicht verfügbar.",
-  dataType: "Typ:",
+  dataType: "Typ",
   dataUnit: "Einheit:",
-  dataValue: "Wert:",
+  dataValue: "Wert",
+  addExtension: "Erweiterung hinzufügen",
+  removeExtension: "Erweiterung entfernen",
+  addField: "Feld hinzufügen",
   dataset: "Datensatz",
   datasetSearchTooltip:
     "Um einen anderen Datensatz aus dem Catalog of Life zu verwenden",
