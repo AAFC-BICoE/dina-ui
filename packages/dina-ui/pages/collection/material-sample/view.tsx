@@ -45,6 +45,7 @@ import { CitationsField } from "../../../components/collection/citations/Citatio
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
 import { MaterialSampleBadges } from "../../../components/collection/material-sample/MaterialSampleBadges";
+import { MaterialSampleHierarchySection } from "../../../components/collection/material-sample/MaterialSampleHierarchySection";
 import { ShowParentAttributesField } from "../../../components/collection/material-sample/ShowParentAttributesField";
 import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
@@ -306,6 +307,14 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 )}
 
                 <MaterialSampleIdentifiersSection />
+
+                {(!!materialSample.parentMaterialSample ||
+                  !!materialSample.materialSampleChildren?.length) && (
+                  <MaterialSampleHierarchySection
+                    key={materialSample.id}
+                    materialSample={materialSample}
+                  />
+                )}
 
                 {/* Custom Query View */}
                 <CustomQueryPageView

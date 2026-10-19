@@ -2,6 +2,9 @@ import { titleCell, descriptionCell, ListPageLayout } from "../..";
 import { mountWithAppContext } from "common-ui";
 import { ColumnDefinition } from "../QueryTable";
 import "@testing-library/jest-dom";
+import { fireEvent } from "@testing-library/react";
+
+const LONG_DESCRIPTION = "Long description ".repeat(10).trim();
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -49,6 +52,14 @@ const mockGet = jest.fn<any, any>(async (path) => {
             name: "noneProvided",
             multilingualTitle: {},
             multilingualDescription: {}
+          },
+          {
+            id: "0b8f7d2e-3c1a-4f5b-9e6d-2a7c8b9d0e1f",
+            name: "longDescription",
+            multilingualTitle: {},
+            multilingualDescription: {
+              descriptions: [{ lang: "en", desc: LONG_DESCRIPTION }]
+            }
           }
         ]
       };
@@ -121,5 +132,44 @@ describe("Multilingual-Cell components", () => {
         "table > tbody > tr:nth-child(4) > td:nth-child(3)"
       )
     ).toHaveTextContent("");
+  });
+
+  it("Truncates long values with a toggle to show the full text", async () => {
+    const wrapper = mountWithAppContext(
+      <ListPageLayout
+        filterAttributes={["name"]}
+        id="multilingual-cell-list-test"
+        queryTableProps={{
+          columns: [
+            "name",
+            descriptionCell(false, false, "multilingualDescription")
+          ],
+          path: "collection-api/entities"
+        }}
+      />,
+      { apiContext: mockApiCtx }
+    );
+
+    const showMore = await wrapper.findByRole("button", { name: "Show More" });
+    // Only the long description gets a toggle:
+    expect(wrapper.getAllByRole("button", { name: "Show More" })).toHaveLength(
+      1
+    );
+    expect(wrapper.queryByText(LONG_DESCRIPTION)).not.toBeInTheDocument();
+    expect(
+      wrapper.getByText(`${LONG_DESCRIPTION.slice(0, 100).trimEnd()}…`, {
+        exact: false
+      })
+    ).toBeInTheDocument();
+
+    fireEvent.click(showMore);
+    expect(
+      wrapper.getByText(LONG_DESCRIPTION, { exact: false })
+    ).toBeInTheDocument();
+
+    fireEvent.click(wrapper.getByRole("button", { name: "Show Less" }));
+    expect(
+      wrapper.getByRole("button", { name: "Show More" })
+    ).toBeInTheDocument();
   });
 });

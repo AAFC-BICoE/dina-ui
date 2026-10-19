@@ -203,6 +203,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   dinaManagementSectionTitle: "Gestion",
   disabledForChildMaterialSamples:
     "Table enfant désactivée pour les échantillons de matériau",
+  downloadFile: "Télécharger",
   dragDropInstructionsHeader: "Pour modifier l'ordre des attributs : ",
   dragDropKeyboardInstructions:
     "Utiliser le tabulateur pour accéder à l'attribut, puis appuyer sur la barre d'espacement pour le sélectionner. Utiliser les touches fléchées pour déplacer l'élément, puis appuyer sur la barre d'espacement pour le placer.",
@@ -572,6 +573,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   groupSearchPlaceholder: "Rechercher par code, chemin ou étiquette",
   groupsIBelongTo: "Mes groupes",
   hideSelectedOptions: "Masquer les sélectionnés",
+  hierarchyMoreLevels: "{count} de plus",
+  hierarchyOtherType: "Autre / aucun type",
+  hierarchyShowMoreLevels: "Afficher {count} niveaux de plus",
   groupsIDoNotBelongTo: "Autres groupes",
   hostOrganismLegend: "Organisme hôte",
   http403ForbiddenError: "Accès refusé",
@@ -627,6 +631,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Modèle de formulaire des échantillons de matériau",
   materialSampleFormTemplates:
     "Modèles de formulaire des échantillons de matériau",
+  materialSampleHierarchy: "Hiérarchie de l’échantillon de matériau",
   materialSampleInfo: "Info sur l'échantillon de matière",
   materialSampleListTitle: "Échantillons de matériaux",
   materialSampleManagedAttributes:
@@ -688,11 +693,13 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   mustBeValidIntegerValue: "Doit être une valeur entière valide.",
   myRoleInGroup: "Mon rôle",
   noChildren: "Aucune table enfant",
+  noDataComponent: "Aucun composant de données",
   noFileToDisplay: "Aucun fichier à afficher",
   noFiltersAvailable: "Aucun filtre disponible",
   noGroups: "Aucun groupe",
   noManagedAttributeValues: "Aucune valeur d’attribut géré.",
   noResultsFound: "Aucun résultat trouvé.",
+  noStorageUnit: "Aucune unité de stockage",
   noneTopLevel: "Aucun (niveau supérieur)",
   notEditableWhenThereAreChildStorageUnits:
     "Non modifiable lorsqu’il y a des unités de stockage enfant ",
@@ -869,8 +876,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   settingLabel: "Paramètres",
   shipmentAddress: "Adresse d'expédition",
   shipmentDetails: "Détails de l'expédition",
-  showLess: "Montrer moins",
-  showMore: "Montrer plus",
   showing: "Affiché",
   showingFilteredStorageUnits: "Afficher les unités de stockage filtrées",
   showingTopLevelStorageUnits:
@@ -962,6 +967,15 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   reindexFailed: "Échouée",
   tags: "Étiquettes",
   target: "Cible",
+  taxonomicHierarchy: "Hiérarchie taxonomique",
+  taxonomyHierarchyChartInstructions:
+    "Cliquer sur un nœud pour charger le rang taxonomique suivant; cliquer de nouveau pour le réduire.",
+  taxonomyHierarchyNodeRecords:
+    "{count} enregistrements · {percent} % du total",
+  taxonomyHierarchyRecordCount: "{total} déterminations trouvées",
+  taxonomyHierarchyRootTooltip: "Toutes les déterminations principales",
+  taxonomyHierarchySubtitle:
+    "Une vue agrégée en temps réel des hiérarchies taxonomiques appliquées à chaque détermination principale.",
   template: "Modèle",
   thisWillRemoveYourTemplate:
     "Cette opération supprimera les champs du modèle sélectionnés et les valeurs par défaut.",
