@@ -869,6 +869,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   noBulkEditFilesError:
     "Sie haben keine Dateien für die Massenbearbeitung hochgeladen. Gehen Sie zur Upload-Seite",
   noChildren: "keine Kindelemente",
+  noDataComponent: "Keine Datenkomponente",
   noFileToDisplay: "keine Datei zur Anzeige vorhanden",
   noGroups: "keine Gruppen",
   noManagedAttributeValues: "Keine Werte für Zusatzfelder vorhanden.",
@@ -1133,8 +1134,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   settingLabel: "Einstellungen",
   shipmentAddress: "Lieferadresse",
   shipmentDetails: "Lieferdetails",
-  showLess: "Weniger anzeigen",
-  showMore: "Mehr anzeigen",
   showParentAttributes: "Übergeordnete Materialprobe",
   showing: "Anzeigen",
   showingFilteredStorageUnits: "Gefilterte Lagerungseinheiten anzeigen",
