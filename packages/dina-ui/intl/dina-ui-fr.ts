@@ -964,6 +964,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   reindexNoSubmissions: "Aucune requête soumise pour l’instant.",
   reindexAccepted: "Acceptée",
   reindexFailed: "Échouée",
+  reindexUnconfirmed: "Non confirmée",
+  reindexTimedOut:
+    "L’API n’a pas répondu à temps. La réindexation est peut-être encore en cours, vérifiez les résultats de recherche avant de réessayer.",
   tags: "Étiquettes",
   target: "Cible",
   taxonomicHierarchy: "Hiérarchie taxonomique",
