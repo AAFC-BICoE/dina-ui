@@ -48,12 +48,12 @@ describe("ListPageLayout component", () => {
       wrapper.getByRole("button", { name: /filter list/i })
     );
 
-    // Requires an FIQL filter.
+    // Requires a filter.
     await waitFor(() => {
       expect(mockGet).lastCalledWith(
         expect.anything(),
         expect.objectContaining({
-          fiql: "name==*101F*"
+          filter: { name: { ILIKE: "%101F%" } }
         })
       );
     });
@@ -63,14 +63,11 @@ describe("ListPageLayout component", () => {
       wrapper.getByRole("button", { name: /reset filters/i })
     );
 
-    // Verify no FIQL filter property exists.
+    // Verify no filter property exists.
     await waitFor(() => {
-      expect(mockGet).lastCalledWith(
-        expect.anything(),
-        expect.not.objectContaining({
-          fiql: expect.anything()
-        })
-      );
+      const [, args] = mockGet.mock.lastCall;
+      expect(args).not.toHaveProperty("filter");
+      expect(args).not.toHaveProperty("fiql");
     });
   });
 
@@ -95,7 +92,7 @@ describe("ListPageLayout component", () => {
     // Click type header to trigger sort.
     await userEvent.click(wrapper.getByText("Type"));
 
-    // Requires an FIQL filter.
+    // No filter is sent.
     await waitFor(() => {
       expect(mockGet).lastCalledWith("pcrPrimer", {
         page: { limit: 25, offset: 0 },
@@ -129,14 +126,14 @@ describe("ListPageLayout component", () => {
     // Ensure additional filters are in request.
     await waitFor(() => {
       expect(mockGet).lastCalledWith("pcrPrimer", {
-        fiql: "attr1==a;attr2==b",
+        filter: { attr1: { EQ: "a" }, attr2: { EQ: "b" } },
         page: { limit: 25, offset: 0 },
         sort: "-createdOn"
       });
     });
   });
 
-  it("Uses fiql for additionalFilters when the parameter is set.", async () => {
+  it("Sends additionalFilters as the filter.", async () => {
     mountWithAppContext(
       <ListPageLayout
         id="test-layout"
@@ -156,14 +153,14 @@ describe("ListPageLayout component", () => {
     // Ensure additional filters are in request.
     await waitFor(() => {
       expect(mockGet).lastCalledWith("pcrPrimer", {
-        fiql: "group==testGroup",
+        filter: { group: { EQ: "testGroup" } },
         page: { limit: 25, offset: 0 },
         sort: "-createdOn"
       });
     });
   });
 
-  it("Uses fiql for filtering when the parameter is set.", async () => {
+  it("Sends the filter form's filters as the filter, without FIQL.", async () => {
     const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"
@@ -192,18 +189,18 @@ describe("ListPageLayout component", () => {
       wrapper.getByRole("button", { name: /filter list/i })
     );
 
-    // Requires an FIQL filter.
+    // Requires a filter.
     await waitFor(() => {
       expect(mockGet).lastCalledWith(
         expect.anything(),
         expect.objectContaining({
-          fiql: "name==*101F*"
+          filter: { name: { ILIKE: "%101F%" } }
         })
       );
 
-      // Verify only FIQL is used.
+      // Verify FIQL is not used.
       const [, args] = mockGet.mock.lastCall;
-      expect(args).not.toHaveProperty("filter");
+      expect(args).not.toHaveProperty("fiql");
     });
   });
 
@@ -251,9 +248,102 @@ describe("ListPageLayout component", () => {
       expect(mockGet).lastCalledWith(
         expect.anything(),
         expect.objectContaining({
-          fiql: "name==*101F*;(createdBy==me,restrictToCreatedBy==false)"
+          filter: {
+            name: { ILIKE: "%101F%" },
+            $or: [
+              { createdBy: { EQ: "me" } },
+              { restrictToCreatedBy: { EQ: false } }
+            ]
+          }
         })
       );
+    });
+  });
+
+  it("Combines the page's own filter with the filter form's filters.", async () => {
+    const wrapper = mountWithAppContext(
+      <ListPageLayout
+        id="test-layout"
+        filterAttributes={["name"]}
+        queryTableProps={{
+          columns: ["name", "type"],
+          path: "pcrPrimer",
+          filter: { batchType: "illumina_metagenomics" }
+        }}
+      />,
+      { apiContext: mockApiCtx }
+    );
+
+    // The page's filter is sent as it is until the list is filtered.
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("pcrPrimer", {
+        filter: { batchType: "illumina_metagenomics" },
+        page: { limit: 25, offset: 0 },
+        sort: "-createdOn"
+      });
+    });
+
+    await clearAndType(
+      wrapper.getByRole("textbox", { name: /filter value/i }),
+      "101F"
+    );
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /filter list/i })
+    );
+
+    // Both are sent in one filter: the page's filter is not dropped.
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("pcrPrimer", {
+        filter: {
+          name: { ILIKE: "%101F%" },
+          batchType: "illumina_metagenomics"
+        },
+        page: { limit: 25, offset: 0 },
+        sort: "-createdOn"
+      });
+    });
+  });
+
+  it("Sends a filter with an IS NOT partial match as FIQL, which the simple filter can't express.", async () => {
+    window.localStorage.setItem(
+      "test-layout_filterForm",
+      JSON.stringify({
+        filterBuilderModel: {
+          type: "FILTER_GROUP",
+          id: 1,
+          operator: "AND",
+          children: [
+            {
+              type: "FILTER_ROW",
+              id: 2,
+              attribute: "name",
+              predicate: "IS NOT",
+              searchType: "PARTIAL_MATCH",
+              value: "101F"
+            }
+          ]
+        }
+      })
+    );
+    mountWithAppContext(
+      <ListPageLayout
+        id="test-layout"
+        filterAttributes={["name"]}
+        queryTableProps={{
+          columns: ["name", "type"],
+          path: "pcrPrimer",
+          filter: { batchType: "illumina_metagenomics" }
+        }}
+      />,
+      { apiContext: mockApiCtx }
+    );
+
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("pcrPrimer", {
+        fiql: "name!=*101F*;batchType==illumina_metagenomics",
+        page: { limit: 25, offset: 0 },
+        sort: "-createdOn"
+      });
     });
   });
 });
