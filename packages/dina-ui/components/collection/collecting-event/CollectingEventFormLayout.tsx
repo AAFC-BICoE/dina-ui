@@ -52,7 +52,6 @@ import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
-import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 import { GeographyFormLayout } from "./GeographyFormLayout";
 import { SectionHeading } from "./SectionHeading";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
@@ -341,12 +340,11 @@ export function CollectingEventFormLayout({
                         jsonApiBackend={{
                           query: (searchValue, ctx) => ({
                             path: "collection-api/collecting-event",
-                            fiql: simpleSearchFilterToFiql(
+                            filter:
                               SimpleSearchFilterBuilder.create<CollectingEvent>()
                                 .searchFilter("dwcRecordedBy", searchValue)
                                 .whereProvided("group", "EQ", ctx.values.group)
                                 .build()
-                            )
                           }),
                           option: (collEvent) => collEvent?.dwcRecordedBy ?? ""
                         }}
@@ -662,12 +660,10 @@ export function CollectingEventFormLayout({
                 jsonApiBackend={{
                   query: (searchValue, ctx) => ({
                     path: "collection-api/collecting-event",
-                    fiql: simpleSearchFilterToFiql(
-                      SimpleSearchFilterBuilder.create<CollectingEvent>()
-                        .searchFilter("substrate", searchValue)
-                        .whereProvided("group", "EQ", ctx.values.group)
-                        .build()
-                    )
+                    filter: SimpleSearchFilterBuilder.create<CollectingEvent>()
+                      .searchFilter("substrate", searchValue)
+                      .whereProvided("group", "EQ", ctx.values.group)
+                      .build()
                   }),
                   option: (collEvent) => collEvent?.substrate ?? ""
                 }}
