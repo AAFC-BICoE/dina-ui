@@ -2,11 +2,9 @@ import { FilterParam } from "kitsu";
 import { ScopeOption, ScopeValues } from "../resource-select/ResourceScopes";
 
 /**
- * Supported filter operations matching the back-end "simple filter" operator names.
+ * Supported filter operations matching back-end simple filter operator names.
  *
- * `NOT_ILIKE` is the exception. It lacks a simple-filter equivalent and exists to support
- * "IS NOT partial match" in the UI. `simpleSearchFilterToFiql` makes it a negated wildcard match.
- * `simpleSearchFilterToQueryString` passes it unchanged for the server to intercept.
+ * `NOT_ILIKE` lacks a simple-filter equivalent and is converted to FIQL by `filterOrFiqlParams`.
  */
 export type FilterOperation =
   | "EQ"
@@ -66,6 +64,101 @@ export function isEmptyInList(op: string, value: unknown): boolean {
     op === "IN" &&
     (value === "" || (Array.isArray(value) && value.length === 0))
   );
+}
+
+/** Back-end filter grammar keywords that terminate unquoted values. */
+const FILTER_GRAMMAR_KEYWORDS = new Set([
+  "EQ",
+  "NEQ",
+  "GT",
+  "GOE",
+  "LT",
+  "LOE",
+  "LIKE",
+  "ILIKE",
+  "IN",
+  "limit",
+  "offset",
+  "fiql",
+  "optfields"
+]);
+
+/** Matches any filter grammar keyword substring. */
+const FILTER_GRAMMAR_KEYWORD = new RegExp(
+  [...FILTER_GRAMMAR_KEYWORDS].join("|")
+);
+
+/** Characters permitted in unquoted filter values. */
+const PLAIN_VALUE_CHARACTERS = /^[\p{L}0-9_\-.%/: ]+$/u;
+
+/** Options for {@link filterKeywordPositions}. */
+export interface FilterKeywordOptions {
+  /**
+   * Match keywords adjacent to `_`, `.`, or digits per legacy lexer rules.
+   * Defaults to true.
+   */
+  legacyLexer?: boolean;
+}
+
+/** Returns start positions of filter grammar keywords in value, sorted ascending. */
+export function filterKeywordPositions(
+  value: string,
+  { legacyLexer = true }: FilterKeywordOptions = {}
+): number[] {
+  // Fast path: skip scanning if no keyword substring exists.
+  if (!FILTER_GRAMMAR_KEYWORD.test(value)) {
+    return [];
+  }
+  const positions = new Set<number>();
+  // Word tokenization (strips leading digits and dots)
+  for (const run of value.matchAll(/[A-Za-z0-9_.]+/g)) {
+    const word = run[0].replace(/^[0-9.]+/, "");
+    if (FILTER_GRAMMAR_KEYWORDS.has(word)) {
+      positions.add((run.index ?? 0) + run[0].length - word.length);
+    }
+  }
+  // Legacy lexer word tokenization
+  if (legacyLexer) {
+    for (const run of value.matchAll(/[A-Za-z]+/g)) {
+      if (FILTER_GRAMMAR_KEYWORDS.has(run[0])) {
+        positions.add(run.index ?? 0);
+      }
+    }
+  }
+  return [...positions].sort((a, b) => a - b);
+}
+
+/**
+ * Returns true if the value can be sent unquoted in a simple filter.
+ * Requires allowed characters (`\p{L}`, digits, `_-.%/: `) and no filter keywords.
+ */
+export function isPlainFilterValue(
+  value: string,
+  options?: FilterKeywordOptions
+): boolean {
+  return (
+    PLAIN_VALUE_CHARACTERS.test(value) &&
+    !filterKeywordPositions(value, options).length
+  );
+}
+
+/**
+ * Formats values into a comma-separated `IN` list (`a,b`).
+ * Quotes non-plain values or values with surrounding whitespace (escaping `\` as `\\` and `"` as `_`).
+ * Omits empty, null, and undefined values.
+ */
+export function formatInList(
+  values: (SimpleSearchFilterValue | undefined)[]
+): string {
+  return values
+    .filter((value) => value !== null && value !== undefined && value !== "")
+    .map((value) => {
+      const text = String(value);
+      return isPlainFilterValue(text) && text.trim() === text
+        ? text
+        : `"${text.replace(/\\/g, "\\\\").replace(/"/g, "_")}"`;
+    })
+    .join(",");
 }
 
 /**

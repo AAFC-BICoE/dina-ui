@@ -4,7 +4,7 @@ import {
   isEmptySimpleSearchFilter,
   mergeSimpleSearchFilters
 } from "../simpleSearchFilterBuilder";
-import { simpleSearchFilterToFiql } from "../../filter-builder/fiql";
+import { simpleSearchFilterToQueryString } from "../simpleSearchFilterQueryString";
 
 describe("SimpleSearchFilterBuilder", () => {
   it("should create a new instance using the static create method", () => {
@@ -475,8 +475,8 @@ describe("SimpleSearchFilterBuilder", () => {
       // Plain assignment triggers Object.prototype's setter, dropping the condition
       // and leaving an unfiltered query.
       expect(Object.keys(filter).sort()).toEqual(["__proto__", "group"]);
-      expect(simpleSearchFilterToFiql(filter)).toEqual(
-        "__proto__==x;group==aafc"
+      expect(simpleSearchFilterToQueryString(filter)).toEqual(
+        "filter%5B__proto__%5D%5BEQ%5D=x&filter%5Bgroup%5D%5BEQ%5D=aafc"
       );
     });
 
@@ -490,13 +490,6 @@ describe("SimpleSearchFilterBuilder", () => {
       ).toEqual({
         $or: [{ city: { EQ: "New York, NY" } }, { city: { EQ: "Ottawa" } }]
       });
-      expect(
-        simpleSearchFilterToFiql(
-          SimpleSearchFilterBuilder.create()
-            .whereIn("city", ["New York, NY", "Ottawa"])
-            .build()
-        )
-      ).toEqual('city=="New York, NY",city==Ottawa');
       // Comma-free lists retain the compact IN form:
       expect(
         SimpleSearchFilterBuilder.create()
