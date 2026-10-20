@@ -23,6 +23,7 @@ import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import {
   DynamicFieldsMappingConfig,
+  ESIndexMapping,
   RelationshipAutocompleteField,
   TableColumn
 } from "../../../../common-ui/lib/list-page/types";
@@ -36,6 +37,29 @@ export const MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS: string[] = [
   "assemblages.",
   "projects.",
   "organism."
+];
+
+/**
+ * Columns only available when exporting. They are not in the index, the export api resolves them
+ * (e.g. collectors are only indexed as UUIDs, their names are fetched from the agent api).
+ */
+export const MATERIAL_SAMPLE_EXPORT_ONLY_COLUMNS: ESIndexMapping[] = [
+  {
+    label: "collectors",
+    value: "collectingEvent.collectors.displayName",
+    path: "attributes",
+    type: "text",
+    parentName: "collectingEvent",
+    parentType: "collecting-event",
+    parentPath: "included",
+    hideField: false,
+    distinctTerm: false,
+    keywordMultiFieldSupport: false,
+    keywordNumericSupport: false,
+    optimizedPrefix: false,
+    containsSupport: false,
+    endsWithSupport: false
+  }
 ];
 
 export interface SampleListLayoutProps {
