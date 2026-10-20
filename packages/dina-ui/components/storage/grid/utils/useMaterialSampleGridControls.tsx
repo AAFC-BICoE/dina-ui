@@ -4,8 +4,7 @@ import {
   SaveArgs,
   SimpleSearchFilterBuilder,
   useQuery,
-  useStringComparator,
-  simpleSearchFilterToFiql
+  useStringComparator
 } from "common-ui";
 import _ from "lodash";
 import { MaterialSample, StorageUnit } from "../../../../types/collection-api";
@@ -73,11 +72,9 @@ export function useMaterialSampleGridControls({
   const { loading: materialSamplesQueryLoading } = useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
-      fiql: simpleSearchFilterToFiql(
-        SimpleSearchFilterBuilder.create()
-          .where("storageUnitUsage.storageUnit.uuid", "EQ", storageUnit?.id)
-          .build()
-      ),
+      filter: SimpleSearchFilterBuilder.create()
+        .where("storageUnitUsage.storageUnit.uuid", "EQ", storageUnit?.id)
+        .build(),
       include: "storageUnitUsage",
       page: { limit: 1000 }
     },
