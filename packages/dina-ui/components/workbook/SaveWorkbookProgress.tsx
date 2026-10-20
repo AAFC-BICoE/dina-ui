@@ -19,7 +19,6 @@ import { delay } from "./utils/workbookMappingUtils";
 import { PersistedResource, KitsuResource } from "kitsu";
 import { MaterialSample } from "../../types/collection-api";
 import { ErrorBanner } from "../error/ErrorBanner";
-import { simpleSearchFilterToFiql } from "../../../common-ui/lib/filter-builder/fiql";
 import { deleteFromStorage } from "@rehooks/local-storage";
 import {
   BULK_ADD_FILES_KEY,
@@ -423,17 +422,14 @@ export function SaveWorkbookProgress({
                   <DinaMessage id="selectResourceAppendData" />
                 </b>
                 <QueryTable<any>
-                  fiql={simpleSearchFilterToFiql(
-                    SimpleSearchFilterBuilder.create<MaterialSample>()
-                      .where(
-                        "materialSampleName",
-                        "EQ",
-                        sameNameExistingResources.current?.[0]
-                          .materialSampleName
-                      )
-                      .where("group", "EQ", group)
-                      .build()
-                  )}
+                  filter={SimpleSearchFilterBuilder.create<MaterialSample>()
+                    .where(
+                      "materialSampleName",
+                      "EQ",
+                      sameNameExistingResources.current?.[0].materialSampleName
+                    )
+                    .where("group", "EQ", group)
+                    .build()}
                   path={"collection-api/material-sample"}
                   columns={multipleMatchingResourcesColumns}
                   defaultSort={[{ desc: true, id: "createdOn" }]}
@@ -446,16 +442,14 @@ export function SaveWorkbookProgress({
                   <DinaMessage id="selectParentMaterialSample" />
                 </b>
                 <QueryTable<any>
-                  fiql={simpleSearchFilterToFiql(
-                    SimpleSearchFilterBuilder.create<MaterialSample>()
-                      .where(
-                        "materialSampleName",
-                        "EQ",
-                        sameNameParentSamples.current?.[0].materialSampleName
-                      )
-                      .where("group", "EQ", group)
-                      .build()
-                  )}
+                  filter={SimpleSearchFilterBuilder.create<MaterialSample>()
+                    .where(
+                      "materialSampleName",
+                      "EQ",
+                      sameNameParentSamples.current?.[0].materialSampleName
+                    )
+                    .where("group", "EQ", group)
+                    .build()}
                   path={"collection-api/material-sample"}
                   columns={multipleMatchingResourcesColumns}
                   defaultSort={[{ desc: true, id: "createdOn" }]}
