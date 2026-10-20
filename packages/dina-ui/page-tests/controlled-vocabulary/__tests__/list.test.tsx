@@ -111,6 +111,17 @@ describe("Controlled vocabulary list page", () => {
         !isSidebarItemsRequest(path, params)
     );
     expect(tableRequests[tableRequests.length - 1][1].filter).toBeUndefined();
+
+    // The sidebar lists the managed attribute and system vocabularies.
+    expect(mockGet).toHaveBeenCalledWith(
+      "/collection-api/controlled-vocabulary",
+      {
+        page: { limit: 1000 },
+        filter: { type: { IN: "MANAGED_ATTRIBUTE,SYSTEM" } },
+        fields: { "controlled-vocabulary": "id,name,key,type,vocabClass" },
+        sort: "name"
+      }
+    );
   });
 
   it("Loads the sidebar items once and keeps the user's selection.", async () => {
