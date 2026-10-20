@@ -10,7 +10,6 @@ import {
 import { DeterminationField, ManagedAttributesEditor } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api";
-import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 /**
@@ -85,12 +84,10 @@ export function OrganismStateField({
             jsonApiBackend={{
               query: (search, ctx) => ({
                 path: "collection-api/organism",
-                fiql: simpleSearchFilterToFiql(
-                  SimpleSearchFilterBuilder.create<Organism>()
-                    .searchFilter("lifeStage", search)
-                    .whereProvided("group", "EQ", ctx.values.group)
-                    .build()
-                )
+                filter: SimpleSearchFilterBuilder.create<Organism>()
+                  .searchFilter("lifeStage", search)
+                  .whereProvided("group", "EQ", ctx.values.group)
+                  .build()
               }),
               option: (org) => org?.lifeStage
             }}
@@ -103,12 +100,10 @@ export function OrganismStateField({
             jsonApiBackend={{
               query: (search, ctx) => ({
                 path: "collection-api/organism",
-                fiql: simpleSearchFilterToFiql(
-                  SimpleSearchFilterBuilder.create<Organism>()
-                    .searchFilter("sex", search)
-                    .whereProvided("group", "EQ", ctx.values.group)
-                    .build()
-                )
+                filter: SimpleSearchFilterBuilder.create<Organism>()
+                  .searchFilter("sex", search)
+                  .whereProvided("group", "EQ", ctx.values.group)
+                  .build()
               }),
               option: (org) => org?.sex
             }}
