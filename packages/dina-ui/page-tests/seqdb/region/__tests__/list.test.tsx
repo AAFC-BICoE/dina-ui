@@ -62,7 +62,9 @@ describe("Region list page", () => {
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(
         "seqdb-api/region",
-        expect.objectContaining({ fiql: "name==*omni*" })
+        expect.objectContaining({
+          filter: { name: { ILIKE: "%omni%" } }
+        })
       );
       expect(wrapper.getByText(/test region 1/i)).toBeInTheDocument();
       expect(wrapper.getByText(/test region 2/i)).toBeInTheDocument();
