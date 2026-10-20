@@ -171,10 +171,18 @@ describe("ExportPage Component", () => {
         await waitForLoadingToDisappear();
 
         // Verify that the initial call was made to fetch saved export templates
+        // (public ones and the ones of the user's groups).
         await waitFor(() => {
           expect(mockGet).toHaveBeenCalledWith(
             "dina-export-api/data-export-template",
-            expect.any(Object)
+            {
+              filter: {
+                $or: [
+                  { publiclyReleasable: { EQ: true } },
+                  { group: { IN: "aafc,cnc" } }
+                ]
+              }
+            }
           );
         });
 
