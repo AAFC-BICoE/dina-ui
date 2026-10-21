@@ -1,35 +1,67 @@
+import { ESIndexMapping } from "common-ui/lib/list-page/types";
+import { generateBuilderConfig } from "common-ui/lib/list-page/query-builder/useQueryBuilderConfig";
 import {
-  normalizeDatasetExportQuery,
+  buildDatasetExportQuery,
   toDatasetExportSnapshot
 } from "../../../../components/collection/dataset/datasetExportUtils";
 import { Dataset } from "../../../../types/collection-api";
 
-describe("Dataset export request helpers", () => {
-  it("keeps nested search filters and excludes preview-only query options", () => {
-    const query = {
-      query: {
-        bool: {
-          must: [
-            {
-              nested: {
-                path: "included",
-                query: {
-                  term: { "included.attributes.name.keyword": "salmon" }
-                }
-              }
-            }
-          ]
-        }
-      },
-      from: 25,
-      size: 25,
-      sort: [{ createdOn: "desc" }],
-      _source: ["data.attributes.materialSampleName"]
-    };
+const INDEX_MAP: ESIndexMapping[] = [
+  {
+    label: "materialSampleName",
+    value: "data.attributes.materialSampleName",
+    type: "text",
+    path: "data.attributes",
+    hideField: false,
+    distinctTerm: false,
+    keywordMultiFieldSupport: true,
+    keywordNumericSupport: false,
+    optimizedPrefix: false,
+    containsSupport: false,
+    endsWithSupport: false
+  }
+];
 
-    expect(normalizeDatasetExportQuery(query)).toBe(
-      JSON.stringify({ query: query.query })
-    );
+const CONFIG = generateBuilderConfig(
+  INDEX_MAP,
+  "dina_material_sample_index",
+  (message: { id: string }) => message.id
+);
+
+const QUERY_TREE = JSON.stringify({
+  id: "group-id",
+  type: "group",
+  children1: [
+    {
+      type: "rule",
+      id: "rule-id",
+      properties: {
+        field: "data.attributes.materialSampleName",
+        operator: "exactMatch",
+        value: ["Salmon"],
+        valueSrc: ["value"],
+        valueType: ["text"],
+        valueError: []
+      }
+    }
+  ],
+  properties: { conjunction: "AND" }
+});
+
+describe("Dataset export request helpers", () => {
+  it("converts the stored query tree to the export service's query format", () => {
+    const query = buildDatasetExportQuery(QUERY_TREE, CONFIG);
+
+    expect(query).toBeDefined();
+    const parsed = JSON.parse(query!);
+    expect(parsed.query).toBeDefined();
+    expect(JSON.stringify(parsed.query)).toContain("Salmon");
+  });
+
+  it("returns undefined when the query or config is missing or invalid", () => {
+    expect(buildDatasetExportQuery(undefined, CONFIG)).toBeUndefined();
+    expect(buildDatasetExportQuery(QUERY_TREE, undefined)).toBeUndefined();
+    expect(buildDatasetExportQuery("not json", CONFIG)).toBeUndefined();
   });
 
   it("maps the saved dataset resource to the inline export metadata shape", () => {

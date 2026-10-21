@@ -689,19 +689,66 @@ describe("ExportPage Component", () => {
       );
     });
 
-    it("renders and handles File Name Alias Field selection properly", async () => {
-      // Override mockBulkGet with metadata that has an originalFilename
+    it("uses metadata UUIDs for external resources without file identifiers", async () => {
       mockBulkGet.mockImplementation(async (paths: string[]) => {
         if (paths[0]?.includes("metadata/")) {
           return paths.map((path: string) => {
-            const id = path.split("/").pop();
+            const id = path.match(/metadata\/([^?]+)/)?.[1];
             return {
-              id,
+              id: `metadata-${id}`,
               type: "metadata",
-              fileIdentifier: `file-${id}`,
+              isExternalResource: true,
+              resourceExternalURL: "file:///external/resource.jpg",
+              dcType: "IMAGE",
+              dcFormat: "image/jpeg",
+              fileExtension: ".jpg",
+              derivatives: [],
+              originalFilename: `external-${id}.jpg`
+            };
+          });
+        }
+        return [];
+      });
+
+      const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      await userEvent.click(wrapper.getByRole("radio", { name: /^objects/i }));
+      await waitForLoadingToDisappear();
+
+      await userEvent.click(
+        wrapper.getByRole("button", { name: "Export 2 Objects" })
+      );
+
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledWith(
+          [
+            {
+              resource: expect.objectContaining({
+                type: "object-export",
+                fileIdentifiers: ["metadata-obj-1", "metadata-obj-2"]
+              }),
+              type: "object-export"
+            }
+          ],
+          { apiBaseUrl: "/objectstore-api" }
+        );
+      });
+    });
+
+    it("uses metadata UUIDs for external resource filename aliases", async () => {
+      mockBulkGet.mockImplementation(async (paths: string[]) => {
+        if (paths[0]?.includes("metadata/")) {
+          return paths.map((path: string) => {
+            const id = path.match(/metadata\/([^?]+)/)?.[1];
+            return {
+              id: `metadata-${id}`,
+              type: "metadata",
+              isExternalResource: true,
+              resourceExternalURL: "file:///external/resource.jpg",
               dcType: "IMAGE",
               fileExtension: ".jpg",
-              originalFilename: `original-${id}.jpg`
+              originalFilename: `external-${id}.jpg`
             };
           });
         }
@@ -736,7 +783,11 @@ describe("ExportPage Component", () => {
             {
               resource: expect.objectContaining({
                 type: "object-export",
-                filenameAliases: expect.any(Object)
+                fileIdentifiers: ["metadata-obj-1", "metadata-obj-2"],
+                filenameAliases: {
+                  "metadata-obj-1": "external-obj-1.jpg",
+                  "metadata-obj-2": "external-obj-2.jpg"
+                }
               }),
               type: "object-export"
             }
