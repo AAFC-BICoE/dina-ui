@@ -21,12 +21,7 @@ const SPLIT_CONFIG_TABLE_COLUMNS: ColumnDefinition<any>[] = [
         original: { id, name }
       }
     }) => (
-      <Link
-        href={`/collection/split-configuration/view?id=${id}`}
-        legacyBehavior
-      >
-        {name}
-      </Link>
+      <Link href={`/collection/split-configuration/view?id=${id}`}>{name}</Link>
     ),
     accessorKey: "name",
     header: () => <FieldHeader name="name" />

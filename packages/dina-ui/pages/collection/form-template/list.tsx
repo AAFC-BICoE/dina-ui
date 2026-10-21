@@ -27,9 +27,7 @@ export default function MaterialSampleFormTemplateListPage() {
           original: { id, name }
         }
       }) => (
-        <Link href={`/collection/form-template/edit?id=${id}`} legacyBehavior>
-          {name}
-        </Link>
+        <Link href={`/collection/form-template/edit?id=${id}`}>{name}</Link>
       ),
       accessorKey: "name",
       header: () => <FieldHeader name="name" />

@@ -124,11 +124,7 @@ export default function GroupListPage() {
           row: {
             original: { id, name }
           }
-        }) => (
-          <Link href={`/group/view?id=${id}`} legacyBehavior>
-            {name}
-          </Link>
-        ),
+        }) => <Link href={`/group/view?id=${id}`}>{name}</Link>,
         accessorKey: "name"
       },
       {
