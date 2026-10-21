@@ -133,6 +133,11 @@ describe("Dataset form.", () => {
     });
     await clearAndType(titleInput, "Ants of Canada");
 
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
+
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await waitFor(() => {
@@ -172,6 +177,11 @@ describe("Dataset form.", () => {
       name: /keywords/i
     });
     await clearAndType(keywordsInput, "ants\nFormicidae");
+
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
 
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
@@ -227,6 +237,11 @@ describe("Dataset form.", () => {
       expect(section.querySelectorAll(".remove-row-button").length).toEqual(1);
     });
 
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
+
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await waitFor(() => {
@@ -253,6 +268,11 @@ describe("Dataset form.", () => {
       name: /english title/i
     });
     await clearAndType(titleInput, "Ants of Canada");
+
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
 
     // Open the licence picker and choose the second licence:
     await userEvent.click(
@@ -295,6 +315,11 @@ describe("Dataset form.", () => {
     );
 
     await wrapper.findByRole("textbox", { name: /english title/i });
+
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
 
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
@@ -353,6 +378,11 @@ describe("Dataset edit page.", () => {
     ).toBeInTheDocument();
 
     await clearAndType(versionInput, "2.0");
+
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
 
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
@@ -413,6 +443,11 @@ describe("Dataset edit page.", () => {
       name: /english title/i
     });
     await clearAndType(titleInput, "New Dataset");
+
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
 
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
