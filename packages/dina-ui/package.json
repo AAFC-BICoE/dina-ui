@@ -28,7 +28,6 @@
     "zod": "^3.11.6"
   },
   "devDependencies": {
-    "@faker-js/faker": "^7.6.0",
     "eslint-config-next": "16.3.5",
     "eslint-plugin-jest": "^29.12.1"
   }
