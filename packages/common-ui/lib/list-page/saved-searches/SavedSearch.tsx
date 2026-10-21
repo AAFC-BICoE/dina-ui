@@ -104,6 +104,13 @@ export interface SavedSearchProps {
   // Callback function to handle copying URL with query filters to clipboard
   onCopyToClipboard?: () => Promise<void>;
 
+  /**
+   * Whether to automatically load the user's default/last used saved search when
+   * this component loads. Set to false when the query tree is owned by a form, so
+   * a stored query isn't overwritten on load. Defaults to true.
+   */
+  autoLoadSavedSearch?: boolean;
+
   copiedToClipboard?: boolean;
 
   setCopiedToClipboard?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -143,6 +150,7 @@ export function SavedSearch({
   uniqueName,
   triggerSearch,
   onCopyToClipboard,
+  autoLoadSavedSearch = true,
   copiedToClipboard,
   setCopiedToClipboard
 }: SavedSearchProps) {
@@ -185,7 +193,8 @@ export function SavedSearch({
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
     performSubmit,
-    uniqueName
+    uniqueName,
+    disabled: !autoLoadSavedSearch
   });
 
   // Using the user preferences get the options and user preferences.
@@ -258,8 +267,16 @@ export function SavedSearch({
 
   // User Preferences has been loaded in and apply default loaded search:
   useEffect(() => {
-    // Do not load the saved search if the last search used was loaded in or there were changes
-    if (!userPreferences || defaultLoadedIn || changesMade) return;
+    // Do not load the saved search if the last search used was loaded in or there were changes.
+    // Also skip when the query tree is owned by a form (autoLoadSavedSearch is false).
+    if (
+      !userPreferences ||
+      defaultLoadedIn ||
+      changesMade ||
+      !autoLoadSavedSearch
+    ) {
+      return;
+    }
 
     // User preferences have been loaded in, we can now check for the default saved search if it
     // exists and pre-load it in.

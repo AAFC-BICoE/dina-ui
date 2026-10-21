@@ -1,4 +1,5 @@
 import { clearAndType, mountWithAppContext } from "common-ui";
+import { JsonTree } from "@react-awesome-query-builder/ui";
 import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
@@ -36,6 +37,39 @@ const TEST_DATASET_WITH_LICENSE: PersistedResource<Dataset> = {
   }
 };
 
+/** A curated query tree as it would come back from the API. */
+const CURATED_QUERY = {
+  id: "group-id",
+  type: "group",
+  children1: [
+    {
+      type: "rule",
+      id: "rule-id",
+      properties: {
+        field: "data.attributes.materialSampleName",
+        operator: "exactMatch",
+        value: ["Salmon"]
+      }
+    }
+  ],
+  properties: { conjunction: "AND" },
+  path: ["group-id"]
+} as unknown as JsonTree;
+
+const TEST_DATASET_MAPPING = {
+  data: {
+    attributes: [
+      {
+        name: "materialSampleName",
+        type: "text",
+        fields: ["keyword"],
+        path: "data.attributes"
+      }
+    ],
+    relationships: []
+  }
+};
+
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "user-api/group":
@@ -48,6 +82,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return params?.filter?.url
         ? { data: TEST_LICENSES.filter((it) => it.url === params.filter.url) }
         : { data: TEST_LICENSES };
+    case "search-api/search-ws/mapping":
+      return TEST_DATASET_MAPPING;
     default:
       return { data: [] };
   }
@@ -62,7 +98,7 @@ const mockSave = jest.fn(async (saves) =>
 
 const apiContext = {
   save: mockSave,
-  apiClient: { get: mockGet },
+  apiClient: { get: mockGet, axios: { get: mockGet } as any },
   bulkGet: jest.fn(async () => [])
 };
 
@@ -96,6 +132,11 @@ describe("Dataset form.", () => {
       name: /english title/i
     });
     await clearAndType(titleInput, "Ants of Canada");
+
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
 
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
@@ -136,6 +177,11 @@ describe("Dataset form.", () => {
       name: /keywords/i
     });
     await clearAndType(keywordsInput, "ants\nFormicidae");
+
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
 
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
@@ -191,6 +237,11 @@ describe("Dataset form.", () => {
       expect(section.querySelectorAll(".remove-row-button").length).toEqual(1);
     });
 
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
+
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await waitFor(() => {
@@ -218,6 +269,11 @@ describe("Dataset form.", () => {
     });
     await clearAndType(titleInput, "Ants of Canada");
 
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
+
     // Open the licence picker and choose the second licence:
     await userEvent.click(
       wrapper.getByRole("combobox", { name: /licen[cs]e/i })
@@ -236,6 +292,45 @@ describe("Dataset form.", () => {
                 licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
                 usageTerms: undefined
               }
+            }),
+            type: "dataset"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+    });
+  });
+
+  it("Saves an existing curated query back with the dataset", async () => {
+    const fetchedDataset: Dataset = {
+      id: "555",
+      type: "dataset",
+      multilingualTitle: { titles: [{ lang: "en", title: "Existing" }] },
+      query: JSON.stringify(CURATED_QUERY)
+    };
+
+    const wrapper = mountWithAppContext(
+      <DatasetForm fetchedDataset={fetchedDataset} onSaved={mockOnSaved} />,
+      { apiContext }
+    );
+
+    await wrapper.findByRole("textbox", { name: /english title/i });
+
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
+
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: expect.objectContaining({
+              id: "555",
+              type: "dataset",
+              query: JSON.stringify(CURATED_QUERY)
             }),
             type: "dataset"
           }
@@ -283,6 +378,11 @@ describe("Dataset edit page.", () => {
     ).toBeInTheDocument();
 
     await clearAndType(versionInput, "2.0");
+
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
 
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
@@ -343,6 +443,11 @@ describe("Dataset edit page.", () => {
       name: /english title/i
     });
     await clearAndType(titleInput, "New Dataset");
+
+    await clearAndType(
+      await wrapper.findByRole("textbox", { name: /export name/i }),
+      "Test export"
+    );
 
     fireEvent.submit(wrapper.container.querySelector("form")!);
 

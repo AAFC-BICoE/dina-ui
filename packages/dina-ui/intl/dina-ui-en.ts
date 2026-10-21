@@ -94,6 +94,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   datasetMethods: "Methods",
   datasetPersonnel: "Personnel",
   datasetProject: "Project",
+  datasetQuery: "Curated Query",
   datasetSearchPlaceholder: "Search by title or version",
   datasetTaxonomicCoverage: "Taxonomic Coverage",
   datasetTaxonomicCoverageItem: "Taxonomic Coverage",
@@ -567,6 +568,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_endEventDateTime_tooltip:
     "End Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_expeditionName: "Expedition name",
+  field_exportName: "Export Name",
   field_siteName: "Site name",
   field_familyNames: "Family Names",
   field_familyNames_tooltip: "Family name(s) including compound family names",

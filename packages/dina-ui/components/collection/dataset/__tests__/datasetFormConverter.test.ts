@@ -1,3 +1,4 @@
+import { JsonTree } from "@react-awesome-query-builder/ui";
 import { License } from "../../../../types/objectstore-api";
 import {
   convertDatasetToFormData,
@@ -12,6 +13,25 @@ const CC_BY: License = {
   titles: { en: "CC-BY", fr: "CC-BY (fr)" }
 };
 
+/** A curated query tree as it would come back from the API. */
+const CURATED_QUERY = {
+  id: "group-id",
+  type: "group",
+  children1: [
+    {
+      type: "rule",
+      id: "rule-id",
+      properties: {
+        field: "data.attributes.materialSampleName",
+        operator: "exactMatch",
+        value: ["Salmon"]
+      }
+    }
+  ],
+  properties: { conjunction: "AND" },
+  path: ["group-id"]
+} as unknown as JsonTree;
+
 const FULL_DATASET: DatasetWithLicense = {
   license: CC_BY,
   id: "123",
@@ -19,7 +39,9 @@ const FULL_DATASET: DatasetWithLicense = {
   group: "test-group",
   datasetVersion: "1.0",
   publicationDate: "2024-05-01",
+  exportName: "Ants of Canada export",
   datasetType: "DWCA",
+  query: JSON.stringify(CURATED_QUERY),
   multilingualTitle: {
     titles: [
       { lang: "en", title: "Ants of Canada" },
@@ -118,6 +140,15 @@ describe("datasetFormConverter", () => {
     // The client-only license field is dropped; usageRights is derived from it.
     const { license: _license, ...expected } = FULL_DATASET;
     expect(input).toEqual(expected);
+  });
+
+  it("Preserves the curated query tree unchanged", () => {
+    const formData = convertDatasetToFormData(FULL_DATASET);
+
+    expect(formData.query).toEqual(CURATED_QUERY);
+    expect(convertFormDataToDataset(formData).query).toEqual(
+      JSON.stringify(CURATED_QUERY)
+    );
   });
 
   it("Derives the licence name and URL from the selected License", () => {
