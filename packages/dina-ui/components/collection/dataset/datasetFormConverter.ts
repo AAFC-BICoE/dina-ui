@@ -1,3 +1,4 @@
+import type { JsonTree } from "@react-awesome-query-builder/ui";
 import { InputResource } from "kitsu";
 import _ from "lodash";
 import { AgentRole, Dataset } from "../../../types/collection-api";
@@ -7,10 +8,13 @@ import { License } from "../../../types/objectstore-api";
 export interface DatasetFormValues
   extends Omit<
     InputResource<Dataset>,
-    "multilingualTitle" | "multilingualDescription"
+    "multilingualTitle" | "multilingualDescription" | "query"
   > {
   multilingualTitle?: Record<string, string | undefined>;
   multilingualDescription?: Record<string, string | undefined>;
+
+  /** The curated query tree, serialized as JSON when saved. */
+  query?: JsonTree;
 
   /**
    * Client-side-only field holding the License resource picked in the dropdown.
@@ -31,6 +35,22 @@ function licenseNameOf(license: License): string {
   return (
     license.titles?.en ?? Object.values(license.titles ?? {})[0] ?? license.url
   );
+}
+
+/** The API transports the query as a JSON string; the form edits the tree. */
+function parseDatasetQuery(query?: unknown): JsonTree | undefined {
+  if (!query) {
+    return undefined;
+  }
+  // Tolerate a back-end that returns the parsed object instead of a string.
+  if (typeof query !== "string") {
+    return query as JsonTree;
+  }
+  try {
+    return JSON.parse(query) as JsonTree;
+  } catch {
+    return undefined;
+  }
 }
 
 /** Agents are stored as UUIDs but edited as Person objects. */
@@ -63,6 +83,8 @@ export function convertDatasetToFormData(
 
   return {
     ...dataset,
+    // The API stores the query as a JSON string; the form edits the tree.
+    query: parseDatasetQuery(dataset.query),
     // Convert the multilingual fields to the editable Dictionary format:
     multilingualTitle: _.fromPairs<string | undefined>(
       dataset.multilingualTitle?.titles?.map(({ title, lang }) => [
@@ -90,7 +112,7 @@ export function convertFormDataToDataset(
   values: DatasetFormValues
 ): InputResource<Dataset> {
   // The licence dropdown is the source of truth for the stored name and URL:
-  const { license, ...rest } = values;
+  const { license, query, ...rest } = values;
   const usageTerms = values.usageRights?.usageTerms;
   const usageRights =
     license || usageTerms
@@ -103,6 +125,8 @@ export function convertFormDataToDataset(
 
   return {
     ...rest,
+    // The API expects the query as a JSON string.
+    query: query ? JSON.stringify(query) : undefined,
     usageRights,
     // Convert the editable Dictionary format back to the stored format:
     multilingualTitle: {
@@ -123,5 +147,6 @@ export function convertFormDataToDataset(
           personnel: formDataToAgentRoles(values.project.personnel)
         }
       : undefined
-  };
+    // The query is opaque JSON to the API, so it isn't mapped to a resource link.
+  } as InputResource<Dataset>;
 }
