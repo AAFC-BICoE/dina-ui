@@ -2,6 +2,7 @@ import {
   BulkEditBadge,
   DateField,
   FormikButton,
+  INLINE_LABEL_WIDTH,
   NumberField,
   SelectField,
   StringToggleField,
@@ -38,7 +39,7 @@ export function ManagedAttributeFieldWithLabel(
   props: ManagedAttributeFieldWithLabelProps
 ) {
   const { attribute, valuesPath, onRemoveClick } = props;
-  const { readOnly, disableEditAllDelete } = useDinaFormContext();
+  const { readOnly, disableEditAllDelete, compact } = useDinaFormContext();
   const { locale, formatMessage } = useDinaIntl();
   const attributeKey = attribute.key;
   const attributePath = `${valuesPath}.${attributeKey}`;
@@ -61,10 +62,17 @@ export function ManagedAttributeFieldWithLabel(
   return (
     <label
       key={attributeKey}
-      className={`${attributeKey}-field col-sm-6 mb-3`}
+      className={`${attributeKey}-field ${
+        compact ? "col-12 mb-1 d-flex align-items-center" : "col-sm-6 mb-3"
+      }`}
       htmlFor="none"
     >
-      <div className="d-flex align-items-center mb-2">
+      <div
+        className={`d-flex align-items-center ${
+          compact ? "flex-shrink-0 pe-2" : "mb-2"
+        }`}
+        style={compact ? { width: `${INLINE_LABEL_WIDTH}em` } : undefined}
+      >
         <strong className="me-auto">
           {displayName}
           <Tooltip directText={tooltipText} />
@@ -96,7 +104,9 @@ export function ManagedAttributeFieldWithLabel(
           />
         )}
       </div>
-      <ManagedAttributeField {...props} />
+      <div className="flex-grow-1">
+        <ManagedAttributeField {...props} />
+      </div>
     </label>
   );
 }

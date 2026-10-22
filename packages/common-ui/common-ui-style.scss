@@ -100,7 +100,7 @@ h1, h2, h3, h4, h5, h6 {
   top: -1rem;
   background: white;
   z-index: 100;
-  margin-bottom: 20px; 
+  margin-bottom: 20px;
 }
 
 .offcanvas-end {
@@ -131,7 +131,7 @@ h1, h2, h3, h4, h5, h6 {
 .column-selector-apply-button {
   position: sticky;
   top: -1.25em;
-  left: -1.25em; 
+  left: -1.25em;
   background: white;
   padding-top: 5px;
 
@@ -302,8 +302,7 @@ input[id^="react-select"] {
 
 [id$="-component"],
 fieldset.card.border,
-#collectingDateLegend,
-#collectingAgentsLegend,
+#collectingEventAccessAndTags,
 #collectingEventAttachments {
   scroll-margin-top: 100px;
   outline: 3px solid transparent;
@@ -316,7 +315,90 @@ fieldset.card.border,
   outline-offset: 4px;
 }
 
-.number-range-fields-compact label.mb-2 {
+/* Inline layout: a borderless FieldSet with a small uppercase heading and a line after it.
+   Usage: <FieldSet className="clean-section" horizontal={INLINE_LABEL_WIDTH} compact={true}> */
+.clean-section {
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-bottom: 1rem !important;
+}
+
+fieldset.clean-section {
+  background-color: #fff !important;
+}
+
+.section-heading,
+.clean-section .legend-wrapper .fieldset-h2-adjustment {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #335075;
+}
+
+.clean-section .legend-wrapper .fieldset-h2-adjustment {
+  margin: 0 !important;
+}
+
+.section-heading,
+.clean-section > .legend-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.section-heading::after,
+.clean-section > .legend-wrapper::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  margin-top: -3px;
+  background-color: #d5dbe3;
+}
+
+/* Light red button for removing a whole item, e.g. "Remove Extension". */
+.btn-remove-light {
+  color: #fff;
+  background-color: #ea868f;
+  border-color: #ea868f;
+}
+
+.btn-remove-light:hover,
+.btn-remove-light:focus {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+/* Gray text; the site-wide .btn-outline-secondary text is blue (wet-beow-bootstrap-4.css). */
+.btn-outline-secondary.btn-gray-text {
+  color: #495057;
+}
+
+.btn-outline-secondary.btn-gray-text:hover:not(:disabled) {
+  color: #fff;
+}
+
+/* Field extension rows: Type | Value | Unit | Remove. */
+.data-entry-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 160px 72px;
+  gap: 12px;
+  align-items: center;
+}
+
+.data-entry-grid > * {
+  min-width: 0;
+}
+
+.btn-link.data-entry-remove {
+  color: #0000cd;
+}
+
+/* These inputs have no visible labels; drop FieldWrapper's label gap so they centre in their row. */
+.data-entry-block label.mb-2 {
   margin-bottom: 0 !important;
 }
 
@@ -325,7 +407,9 @@ fieldset.card.border,
 }
 
 /* Give the "Multiple Values" placeholders an italic font. */
-.has-multiple-values, .is-explicitly-cleared, .is-explicitly-deleted {
+.has-multiple-values,
+.is-explicitly-cleared,
+.is-explicitly-deleted {
   :placeholder-shown,
   .placeholder-text,
   .react-select__placeholder {
@@ -344,11 +428,11 @@ fieldset.card.border,
 }
 
 .field-label-empty {
-  color: #9ea4ab; 
+  color: #9ea4ab;
 }
 
 .tooltip-info-icon.tooltip-info-icon-empty {
-  color: #9ea4ab; 
+  color: #9ea4ab;
 }
 
 /* Highlight the Edit All tab's bulk-edited fields in green. */
@@ -624,14 +708,14 @@ input[type="number"]::-webkit-outer-spin-button {
  * React Select Styles
  */
 .ReactTable .-pagination .react-select__menu {
-  z-index: 3; 
+  z-index: 3;
 }
 
 /*
  * React Table Styles
  */
-.react-table-overflow .rt-td, 
-.react-table-overflow .rt-tbody, 
+.react-table-overflow .rt-td,
+.react-table-overflow .rt-tbody,
 .react-table-overflow .rt-table {
   overflow: visible !important;
 }
@@ -664,7 +748,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .ReactTable {
-  transition: all 0.5s ease-in-out; 
+  transition: all 0.5s ease-in-out;
 }
 
 .ReactTable.fullscreen-mode {
@@ -945,7 +1029,7 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   border: none !important;
-  
+
   pointer-events: none !important;
 }
 
