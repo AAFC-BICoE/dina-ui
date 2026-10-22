@@ -83,6 +83,11 @@ export const overrideRelationshipConfig: OverrideRelationshipConfig = {
     "attributes.geographicThesaurus.source": {
       fields: ["keyword"]
     }
+  },
+  organism: {
+    "attributes.determination.typeStatus": {
+      fields: ["keyword"]
+    }
   }
 };
 
