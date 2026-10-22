@@ -710,6 +710,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   objectStoreDetailsTitle: "Détails sur le stockage de l’objet",
   objectStoreTitle: "Dépôt d’objet",
   objectSubtypeListTitle: "Sous-types d’objet",
+  objectSubtypeName: "Nom du sous-type d’objet",
   objectSubtypeTitle: "Sous-type d’objet",
   openGeographySearchButtonLabel: "Recherche sur Open Street Maps",
   organism: "Organisme",

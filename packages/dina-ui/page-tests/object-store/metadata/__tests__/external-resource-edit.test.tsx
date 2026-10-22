@@ -25,6 +25,14 @@ const mockGet = jest.fn(async (path) => {
       return { data: TEST_ACSUBTYPE };
     case "objectstore-api/media-type":
       return { data: TEST_MEDIATYPE };
+    case "user-api/group":
+      return {
+        data: [
+          { id: "1", type: "group", name: "aafc", labels: { en: "AAFC" } },
+          { id: "2", type: "group", name: "cnc", labels: { en: "CNC" } },
+          { id: "3", type: "group", name: "testbucket" }
+        ]
+      };
   }
 });
 
@@ -57,6 +65,13 @@ const TEST_ACSUBTYPE: PersistedResource<ObjectSubtype>[] = [
     type: "object-subtype",
     uuid: "83efee8e-3091-4ae5-b55f-73589f8d586e",
     id: "1"
+  },
+  {
+    dcType: "DATASET",
+    acSubtype: "EXPORT TEMPLATE",
+    type: "object-subtype",
+    uuid: "e2389fdf-efaf-47d5-a7d8-cd346c207760",
+    id: "2"
   }
 ];
 
@@ -81,13 +96,18 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   id: "25f81de5-bbee-430c-b5fa-71986b70e612",
   type: "metadata",
   resourceExternalURL: "http://agr.gc.ca ",
+  dcFormat: "image/jpeg",
   acCaption: "test caption"
 };
 
 const mockSave = jest.fn();
 
 const apiContext: any = {
-  apiClient: { get: mockGet },
+  // Mock the search-api post (tag suggestions) so no real request leaves the test.
+  apiClient: {
+    get: mockGet,
+    axios: { post: jest.fn(async () => ({ data: {} })) }
+  },
   bulkGet: mockBulkGet,
   save: mockSave
 };
@@ -182,6 +202,119 @@ describe("Metadata external resource edit page.", () => {
     });
   });
 
+  it("Lets an admin without groups pick the bucket for a new external resource.", async () => {
+    mockUseRouter.mockReturnValue({
+      push: () => undefined,
+      query: { id: undefined }
+    });
+
+    const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
+      apiContext,
+      accountContext: { isAdmin: true, groupNames: [] }
+    });
+
+    // Wait for the group options to load, the select re-mounts once they arrive.
+    await waitFor(() =>
+      expect(mockGet).toHaveBeenCalledWith("user-api/group", expect.anything())
+    );
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /group select/i })
+    );
+    await userEvent.click(await wrapper.findByRole("option", { name: "CNC" }));
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /media format/i })
+    );
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /image\/jpeg/i })
+    );
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /resource external url/i }),
+      "http://agr.gc.ca"
+    );
+
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(mockSave).toBeCalledWith(
+        [
+          {
+            resource: expect.objectContaining({ bucket: "cnc" }),
+            type: "metadata"
+          }
+        ],
+        { apiBaseUrl: "/objectstore-api" }
+      );
+    });
+  });
+
+  it("Clears the object subtype when the stored object type changes.", async () => {
+    mockUseRouter.mockReturnValue({
+      push: () => undefined,
+      query: { id: undefined }
+    });
+
+    const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
+      apiContext
+    });
+
+    // The subtype can't be picked until a stored object type is selected:
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelector(
+          ".acSubtype-field .react-select--is-disabled"
+        )
+      ).toBeInTheDocument()
+    );
+
+    // Pick a Dataset subtype:
+    await userEvent.click(
+      await wrapper.findByRole("combobox", { name: /stored object type/i })
+    );
+    await userEvent.click(wrapper.getByRole("option", { name: "Dataset" }));
+    expect(
+      wrapper.container.querySelector(
+        ".acSubtype-field .react-select--is-disabled"
+      )
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /object subtype/i })
+    );
+    await userEvent.click(
+      await wrapper.findByRole("option", { name: "EXPORT TEMPLATE" })
+    );
+
+    // The subtype search is filtered by the selected stored object type:
+    expect(mockGet).toHaveBeenCalledWith(
+      "objectstore-api/object-subtype",
+      expect.objectContaining({
+        filter: { dcType: { EQ: "DATASET" } }
+      })
+    );
+
+    // Switch to Image, the Dataset subtype no longer applies:
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /stored object type/i })
+    );
+    await userEvent.click(wrapper.getByRole("option", { name: "Image" }));
+
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /media format/i })
+    );
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /image\/jpeg/i })
+    );
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /resource external url/i }),
+      "http://agr.gc.ca"
+    );
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => expect(mockSave).toHaveBeenCalled());
+    const [[[{ resource }]]] = mockSave.mock.calls;
+    expect(resource.dcType).toEqual("IMAGE");
+    expect(resource.acSubtype).toBeUndefined();
+  });
+
   it("Lets you edit an existing external resource metadata.", async () => {
     mockSave.mockImplementation((args) => args.map(({ resource }) => resource));
     mockUseRouter.mockReturnValue({
@@ -207,6 +340,13 @@ describe("Metadata external resource edit page.", () => {
           name: /stored object type image/i
         })
       ).toBeInTheDocument();
+
+      // The group is shown but can't be changed on edit:
+      expect(
+        wrapper.container.querySelector(
+          ".bucket-field .react-select--is-disabled"
+        )
+      ).toHaveTextContent("testbucket");
     });
 
     // Set new values:
