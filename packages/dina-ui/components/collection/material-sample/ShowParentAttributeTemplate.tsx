@@ -161,7 +161,7 @@ export function ShowParentAttributeTemplate({
     () => ({
       placeholder: (provided, _) => ({
         ...provided,
-        color: "rgb(87,120,94)"
+        color: "#5c5c5c"
       }),
       menu: (base) => ({ ...base, zIndex: 1050 }),
       menuPortal: (base) => ({ ...base, zIndex: 9999 }),

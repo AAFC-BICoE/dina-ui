@@ -1,5 +1,6 @@
 import {
   DinaFormSection,
+  DinaFormSectionProps,
   ResourceSelectField,
   SimpleSearchFilterBuilder,
   Tooltip,
@@ -13,7 +14,7 @@ import Link from "next/link";
 export interface ProjectSelectSectionProps {
   resourcePath?: string;
   classNames?: string;
-  horizontal?: boolean | [number, number] | "flex" | number;
+  horizontal?: DinaFormSectionProps["horizontal"];
 }
 
 export function ProjectSelectSection({
@@ -42,7 +43,7 @@ export function ProjectSelectSection({
 export interface ProjectSelectFieldProps {
   resourcePath?: string;
   className?: string;
-  horizontal?: boolean | [number, number] | "flex" | number;
+  horizontal?: DinaFormSectionProps["horizontal"];
 }
 
 export function ProjectsSelectField({

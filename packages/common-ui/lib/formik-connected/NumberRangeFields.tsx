@@ -3,7 +3,7 @@ import { useFormikContext } from "formik";
 import _ from "lodash";
 import { useIntl } from "react-intl";
 import { CommonMessage, Tooltip } from "..";
-import { useDinaFormContext } from "./DinaForm";
+import { INLINE_LABEL_WIDTH, useDinaFormContext } from "./DinaForm";
 import { EmptyFieldValue } from "./FieldView";
 import { MetersField } from "./MetersField";
 import { useMemo } from "react";
@@ -12,17 +12,21 @@ export interface NumberRangeFieldsProps {
   /** Min and max field names. */
   names: [string, string];
   labelMsg: React.JSX.Element;
-  compact?: boolean;
 }
 
 export function NumberRangeFields({
   names: [minName, maxName],
-  labelMsg,
-  compact = false
+  labelMsg
 }: NumberRangeFieldsProps) {
   const { formatMessage } = useIntl();
-  const { readOnly, isTemplate, formTemplate, componentName, sectionName } =
-    useDinaFormContext();
+  const {
+    readOnly,
+    isTemplate,
+    formTemplate,
+    componentName,
+    sectionName,
+    compact
+  } = useDinaFormContext();
 
   /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
   const disabledByFormTemplate: {
@@ -108,8 +112,11 @@ export function NumberRangeFields({
 
   if (compact) {
     return (
-      <div className="d-flex align-items-center mb-1">
-        <div className="flex-shrink-0" style={{ width: "18em" }}>
+      <div className="d-flex align-items-center mb-1 inline-field-spacing">
+        <div
+          className="flex-shrink-0"
+          style={{ width: `${INLINE_LABEL_WIDTH}em` }}
+        >
           <strong className={classNames(isEmptyValue && "field-label-empty")}>
             {labelMsg}
           </strong>
@@ -119,7 +126,7 @@ export function NumberRangeFields({
           />
         </div>
 
-        <div className="flex-grow-1 number-range-fields-compact">{fields}</div>
+        <div className="flex-grow-1">{fields}</div>
       </div>
     );
   }
