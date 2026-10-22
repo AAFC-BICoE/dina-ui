@@ -136,7 +136,12 @@ function SkipLinks() {
 
 function FeedbackButton() {
   return (
-    <Link href="/feedback" role="button" className="btn btn-link px-0">
+    <Link
+      href="/feedback"
+      role="button"
+      tabIndex={0}
+      className="px-0 btn btn-link"
+    >
       <DinaMessage id="feedbackButtonText" />
     </Link>
   );
