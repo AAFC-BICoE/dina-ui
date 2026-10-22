@@ -5,6 +5,7 @@ import {
   DinaFormSection,
   FieldSet,
   FieldSpy,
+  INLINE_LABEL_WIDTH,
   TextField,
   ToggleField,
   useDinaFormContext
@@ -45,69 +46,63 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
       legend={<DinaMessage id="materialSampleInfo" />}
       componentName={MATERIAL_SAMPLE_INFO_COMPONENT_NAME}
       sectionName="material-sample-info-section"
+      horizontal={INLINE_LABEL_WIDTH}
+      compact={true}
     >
-      <div className="row">
-        <div className="col-md-6">
-          <ControlledVocabularySelectField
-            name="materialSampleType"
-            query={() => ({
-              path: "collection-api/vocabulary2/materialSampleType"
-            })}
-          />
-          {!readOnly ? (
-            <AutoSuggestTextField<Vocabulary>
-              name="materialSampleState"
-              jsonApiBackend={{
-                query: () => ({
-                  path: "collection-api/vocabulary2/materialSampleState"
-                }),
-                option: (vocabElement) =>
-                  _.compact(
-                    vocabElement?.vocabularyElements?.map(
-                      (it) =>
-                        _.find(
-                          it?.multilingualTitle?.titles || [],
-                          (item) => item.lang === locale
-                        )?.title ||
-                        it.name ||
-                        ""
-                    ) ?? []
-                  )
-              }}
-              blankSearchBackend={"json-api"}
-              onChangeExternal={onMaterialSampleStateChanged}
-            />
-          ) : (
-            <MaterialSampleStateReadOnlyRender removeLabel={false} />
-          )}
-        </div>
-        <div className="col-md-6">
-          {!isTemplate && (
-            <ToggleField
-              name="isBaseForSplitByType"
-              disableTemplateCheckbox={true}
-            />
-          )}
-          <TextField name="materialSampleRemarks" multiLines={true} />
-        </div>
-      </div>
+      <ControlledVocabularySelectField
+        name="materialSampleType"
+        query={() => ({
+          path: "collection-api/vocabulary2/materialSampleType"
+        })}
+      />
+      {!readOnly ? (
+        <AutoSuggestTextField<Vocabulary>
+          name="materialSampleState"
+          jsonApiBackend={{
+            query: () => ({
+              path: "collection-api/vocabulary2/materialSampleState"
+            }),
+            option: (vocabElement) =>
+              _.compact(
+                vocabElement?.vocabularyElements?.map(
+                  (it) =>
+                    _.find(
+                      it?.multilingualTitle?.titles || [],
+                      (item) => item.lang === locale
+                    )?.title ||
+                    it.name ||
+                    ""
+                ) ?? []
+              )
+          }}
+          blankSearchBackend={"json-api"}
+          onChangeExternal={onMaterialSampleStateChanged}
+        />
+      ) : (
+        <MaterialSampleStateReadOnlyRender removeLabel={false} />
+      )}
+      {!isTemplate && (
+        <ToggleField
+          name="isBaseForSplitByType"
+          disableTemplateCheckbox={true}
+        />
+      )}
+      <TextField name="materialSampleRemarks" multiLines={true} />
       {!readOnly && (
         <FieldSpy fieldName="materialSampleState">
           {(materialSampleState) =>
             materialSampleState ? (
-              <div className="row">
+              <>
                 <DateField
-                  className="col-md-6"
                   name="stateChangedOn"
                   label={formatMessage("date")}
                 />
                 <TextField
-                  className="col-md-6"
                   name="stateChangeRemarks"
                   multiLines={true}
                   label={formatMessage("additionalRemarks")}
                 />
-              </div>
+              </>
             ) : null
           }
         </FieldSpy>

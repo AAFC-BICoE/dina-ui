@@ -1,6 +1,6 @@
 import { FormikContextType } from "formik";
 import Switch from "react-switch";
-import { FieldWrapper, FieldWrapperProps } from "..";
+import { FieldWrapper, FieldWrapperProps, useDinaFormContext } from "..";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 
 export interface ToggleFieldProps extends FieldWrapperProps {
@@ -14,6 +14,8 @@ export function ToggleField({
   disableSwitch,
   ...props
 }: ToggleFieldProps) {
+  const { compact } = useDinaFormContext();
+
   return (
     <FieldWrapper
       {...props}
@@ -23,14 +25,21 @@ export function ToggleField({
       disableLabelClick={true}
     >
       {({ value, setValue, formik }) => (
-        <Switch
-          disabled={disableSwitch}
-          checked={!!value}
-          onChange={(checked) => {
-            setValue(checked);
-            onChangeExternal?.(checked, formik);
-          }}
-        />
+        <div
+          className="d-flex align-items-center"
+          style={
+            compact ? { minHeight: "calc(1.5em + 0.75rem + 2px)" } : undefined
+          }
+        >
+          <Switch
+            disabled={disableSwitch}
+            checked={!!value}
+            onChange={(checked) => {
+              setValue(checked);
+              onChangeExternal?.(checked, formik);
+            }}
+          />
+        </div>
       )}
     </FieldWrapper>
   );

@@ -112,7 +112,7 @@ export function NumberRangeFields({
 
   if (compact) {
     return (
-      <div className="d-flex align-items-center mb-1">
+      <div className="d-flex align-items-center mb-1 inline-field-spacing">
         <div
           className="flex-shrink-0"
           style={{ width: `${INLINE_LABEL_WIDTH}em` }}

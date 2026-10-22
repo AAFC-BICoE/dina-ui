@@ -364,7 +364,8 @@ function LabelWrapper({
             isTemplate && `col-sm-${horizontal ? "11" : "10"}`,
             !isTemplate && (!horizontal || _.isNumber(horizontal)) && "w-100",
             !isTemplate && fixedLabelWidth && "d-flex",
-            !removeBottomMargin && (compact ? "mb-1" : "mb-3")
+            !removeBottomMargin &&
+              (compact ? "mb-1 inline-field-spacing" : "mb-3")
           )}
           htmlFor={disableLabelClick ? "none" : undefined}
         >
