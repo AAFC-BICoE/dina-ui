@@ -65,6 +65,13 @@ const TEST_ACSUBTYPE: PersistedResource<ObjectSubtype>[] = [
     type: "object-subtype",
     uuid: "83efee8e-3091-4ae5-b55f-73589f8d586e",
     id: "1"
+  },
+  {
+    dcType: "DATASET",
+    acSubtype: "EXPORT TEMPLATE",
+    type: "object-subtype",
+    uuid: "e2389fdf-efaf-47d5-a7d8-cd346c207760",
+    id: "2"
   }
 ];
 
@@ -238,6 +245,74 @@ describe("Metadata external resource edit page.", () => {
         { apiBaseUrl: "/objectstore-api" }
       );
     });
+  });
+
+  it("Clears the object subtype when the stored object type changes.", async () => {
+    mockUseRouter.mockReturnValue({
+      push: () => undefined,
+      query: { id: undefined }
+    });
+
+    const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
+      apiContext
+    });
+
+    // The subtype can't be picked until a stored object type is selected:
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelector(
+          ".acSubtype-field .react-select--is-disabled"
+        )
+      ).toBeInTheDocument()
+    );
+
+    // Pick a Dataset subtype:
+    await userEvent.click(
+      await wrapper.findByRole("combobox", { name: /stored object type/i })
+    );
+    await userEvent.click(wrapper.getByRole("option", { name: "Dataset" }));
+    expect(
+      wrapper.container.querySelector(
+        ".acSubtype-field .react-select--is-disabled"
+      )
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /object subtype/i })
+    );
+    await userEvent.click(
+      await wrapper.findByRole("option", { name: "EXPORT TEMPLATE" })
+    );
+
+    // The subtype search is filtered by the selected stored object type:
+    expect(mockGet).toHaveBeenCalledWith(
+      "objectstore-api/object-subtype",
+      expect.objectContaining({
+        filter: { dcType: { EQ: "DATASET" } }
+      })
+    );
+
+    // Switch to Image, the Dataset subtype no longer applies:
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /stored object type/i })
+    );
+    await userEvent.click(wrapper.getByRole("option", { name: "Image" }));
+
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /media format/i })
+    );
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /image\/jpeg/i })
+    );
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /resource external url/i }),
+      "http://agr.gc.ca"
+    );
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => expect(mockSave).toHaveBeenCalled());
+    const [[[{ resource }]]] = mockSave.mock.calls;
+    expect(resource.dcType).toEqual("IMAGE");
+    expect(resource.acSubtype).toBeUndefined();
   });
 
   it("Lets you edit an existing external resource metadata.", async () => {

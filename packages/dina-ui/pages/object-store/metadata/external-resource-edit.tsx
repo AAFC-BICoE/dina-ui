@@ -37,8 +37,9 @@ import {
   Metadata,
   ObjectSubtype
 } from "../../../types/objectstore-api";
-import { DCTYPE_OPTIONS, ORIENTATION_OPTIONS } from "../metadata/edit";
+import { ORIENTATION_OPTIONS } from "../metadata/edit";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
+import { DcTypeSelectorComponent } from "../../../components/object-store/metadata/MetadataForm";
 import { InputResource } from "kitsu";
 import _ from "lodash";
 import { useRef } from "react";
@@ -304,11 +305,7 @@ function ExternalResourceMetadataForm({
           />
         </div>
         <div className="row">
-          <SelectField
-            className="col-md-6"
-            name="dcType"
-            options={DCTYPE_OPTIONS}
-          />
+          <DcTypeSelectorComponent />
           <Field name="dcType">
             {({ field: { value: dcType } }) => (
               <ResourceSelectField<ObjectSubtype>
@@ -325,6 +322,8 @@ function ExternalResourceMetadataForm({
                 }
                 model="objectstore-api/object-subtype"
                 optionLabel={(ost) => ost.acSubtype}
+                // Subtypes depend on the stored object type, pick that first:
+                isDisabled={!dcType}
               />
             )}
           </Field>
