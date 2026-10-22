@@ -49,8 +49,6 @@
   "resolutions": {
     "minimist": "^1.2.6",
     "@types/react": "19.2.17",
-    "follow-redirects": "^1.15.4",
-    "axios": "1.18.1",
     "**/bodybuilder/lodash.unset": "^4.18.0"
   },
   "lint-staged": {
