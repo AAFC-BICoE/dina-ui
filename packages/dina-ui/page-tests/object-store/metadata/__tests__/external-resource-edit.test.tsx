@@ -25,6 +25,14 @@ const mockGet = jest.fn(async (path) => {
       return { data: TEST_ACSUBTYPE };
     case "objectstore-api/media-type":
       return { data: TEST_MEDIATYPE };
+    case "user-api/group":
+      return {
+        data: [
+          { id: "1", type: "group", name: "aafc", labels: { en: "AAFC" } },
+          { id: "2", type: "group", name: "cnc", labels: { en: "CNC" } },
+          { id: "3", type: "group", name: "testbucket" }
+        ]
+      };
   }
 });
 
@@ -81,13 +89,18 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   id: "25f81de5-bbee-430c-b5fa-71986b70e612",
   type: "metadata",
   resourceExternalURL: "http://agr.gc.ca ",
+  dcFormat: "image/jpeg",
   acCaption: "test caption"
 };
 
 const mockSave = jest.fn();
 
 const apiContext: any = {
-  apiClient: { get: mockGet },
+  // Mock the search-api post (tag suggestions) so no real request leaves the test.
+  apiClient: {
+    get: mockGet,
+    axios: { post: jest.fn(async () => ({ data: {} })) }
+  },
   bulkGet: mockBulkGet,
   save: mockSave
 };
@@ -182,6 +195,51 @@ describe("Metadata external resource edit page.", () => {
     });
   });
 
+  it("Lets an admin without groups pick the bucket for a new external resource.", async () => {
+    mockUseRouter.mockReturnValue({
+      push: () => undefined,
+      query: { id: undefined }
+    });
+
+    const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
+      apiContext,
+      accountContext: { isAdmin: true, groupNames: [] }
+    });
+
+    // Wait for the group options to load, the select re-mounts once they arrive.
+    await waitFor(() =>
+      expect(mockGet).toHaveBeenCalledWith("user-api/group", expect.anything())
+    );
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /group select/i })
+    );
+    await userEvent.click(await wrapper.findByRole("option", { name: "CNC" }));
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /media format/i })
+    );
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /image\/jpeg/i })
+    );
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /resource external url/i }),
+      "http://agr.gc.ca"
+    );
+
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(mockSave).toBeCalledWith(
+        [
+          {
+            resource: expect.objectContaining({ bucket: "cnc" }),
+            type: "metadata"
+          }
+        ],
+        { apiBaseUrl: "/objectstore-api" }
+      );
+    });
+  });
+
   it("Lets you edit an existing external resource metadata.", async () => {
     mockSave.mockImplementation((args) => args.map(({ resource }) => resource));
     mockUseRouter.mockReturnValue({
@@ -207,6 +265,13 @@ describe("Metadata external resource edit page.", () => {
           name: /stored object type image/i
         })
       ).toBeInTheDocument();
+
+      // The group is shown but can't be changed on edit:
+      expect(
+        wrapper.container.querySelector(
+          ".bucket-field .react-select--is-disabled"
+        )
+      ).toHaveTextContent("testbucket");
     });
 
     // Set new values:

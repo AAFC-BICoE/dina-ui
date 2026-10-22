@@ -22,6 +22,7 @@ import { NextRouter, useRouter } from "next/router";
 import { Field } from "formik";
 import {
   Footer,
+  GroupSelectField,
   Head,
   Nav,
   NotPubliclyReleasableWarning,
@@ -157,7 +158,8 @@ function ExternalResourceMetadataForm({
             }
           : null
       }
-    : {};
+    : // Default to the user's first group, users without a group (e.g. dina-admin) must pick one:
+      { bucket: groupNames?.[0] };
 
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
@@ -256,6 +258,18 @@ function ExternalResourceMetadataForm({
       />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
+          {/* The bucket is the record's group, so it's only picked on create. */}
+          <GroupSelectField
+            className="col-md-6"
+            name="bucket"
+            label={formatMessage("group")}
+            enableStoredDefaultGroup={true}
+            requiredField={true}
+            hideWithOnlyOneGroup={!metadata?.id}
+            selectProps={{ isDisabled: !!metadata?.id }}
+          />
+        </div>
+        <div className="row">
           <TextField className="col-md-6" name="filename" />
           <TextField
             className="col-md-6"
@@ -266,6 +280,7 @@ function ExternalResourceMetadataForm({
             className="col-md-6"
             name="resourceExternalURL"
             label={formatMessage("metadataResourceExternalURLLabel")}
+            requiredField={true}
           />
           <ResourceSelectField<MediaType>
             name="dcFormat"
@@ -279,6 +294,7 @@ function ExternalResourceMetadataForm({
             optionLabel={(format) => format.mediaType}
             removeDefaultSort={true}
             omitNullOption={true}
+            requiredField={true}
           />
           <TextField className="col-md-6" name="acCaption" />
           <DateField
