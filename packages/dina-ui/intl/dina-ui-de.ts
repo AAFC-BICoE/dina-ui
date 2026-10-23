@@ -883,7 +883,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   numberOfAttachments: "{totalAttachments} Anhänge",
   objectListTitle: "Gespeicherte Medienobjekte",
   objectStoreDataUnavailable:
-    "Die Daten der gelagerten Objekte sind nicht verfügbar",
+    "Die Anhänge können derzeit nicht geladen werden. Bitte versuchen Sie es später erneut.",
   objectStoreDetailsTitle: "Details des Medienspeicher",
   objectStoreTitle: "Medienspeicher",
   objectSubtypeListTitle: "Mediensubtypen",

@@ -971,7 +971,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   notPubliclyReleasable: "Not Publicly Releasable",
   publiclyReleasable: "Publicly Releasable",
   objectListTitle: "Stored Objects",
-  objectStoreDataUnavailable: "Object Store data unavailable",
+  objectStoreDataUnavailable:
+    "Attachments could not be loaded right now. Please try again later.",
   objectStoreDetailsTitle: "Object Store Details",
   objectStoreTitle: "Object Store",
   objectSubtypeListTitle: "Object Subtypes",

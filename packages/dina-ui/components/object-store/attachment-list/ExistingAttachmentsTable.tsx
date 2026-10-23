@@ -25,6 +25,7 @@ import {
   FaUnlink
 } from "react-icons/fa";
 import React from "react";
+import { FaTriangleExclamation } from "react-icons/fa6";
 
 export interface ExistingAttachmentsTableProps {
   metadatas: ResourceIdentifierObject[];
@@ -232,7 +233,12 @@ export function ExistingAttachmentsTable({
 
   // A failed metadata request means the object-store is unavailable.
   if (objectStoreError) {
-    return <DinaMessage id="objectStoreDataUnavailable" />;
+    return (
+      <span className="text-danger">
+        <FaTriangleExclamation className="me-2" />
+        <DinaMessage id="objectStoreDataUnavailable" />
+      </span>
+    );
   }
 
   return (

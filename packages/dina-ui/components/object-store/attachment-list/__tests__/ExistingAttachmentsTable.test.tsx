@@ -163,14 +163,15 @@ describe("ExistingAttachmentsTable component", () => {
       {
         apiContext: {
           ...apiContext,
-          bulkGet: jest.fn().mockRejectedValue(new Error("Network Error"))
+          // bulkGet resolves failed loads as undefined when the object store is down.
+          bulkGet: jest.fn(async (paths) => paths.map(() => undefined))
         }
       }
     );
 
     await waitFor(() => {
       expect(
-        wrapper.getByText(/object store data unavailable/i)
+        wrapper.getByText(/attachments could not be loaded right now/i)
       ).toBeInTheDocument();
     });
   });

@@ -81,5 +81,16 @@ export function useBulkGet<TData extends KitsuResource>({
   const data = fetchResponse?.fetchedWithoutNulls;
   const dataWithNullForMissing = fetchResponse?.fetchedWithNulls;
 
-  return { data, dataWithNullForMissing, error, loading: isValidating };
+  // bulkGet resolves failed loads as undefined instead of rejecting (e.g. the service is down).
+  const allFailed =
+    !!dataWithNullForMissing?.length &&
+    dataWithNullForMissing.every((resource) => resource === undefined);
+
+  return {
+    data,
+    dataWithNullForMissing,
+    error:
+      error ?? (allFailed ? new Error("Failed to load resources") : undefined),
+    loading: isValidating
+  };
 }
