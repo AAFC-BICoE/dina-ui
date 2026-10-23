@@ -10,8 +10,7 @@ import {
   Tooltip,
   useBulkGet,
   useDinaFormContext,
-  useModal,
-  useQuery
+  useModal
 } from "common-ui";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import _ from "lodash";
@@ -128,12 +127,12 @@ export function AttachmentsEditor({
   const { formatMessage } = useDinaIntl();
   const { closeModal } = useModal();
 
-  // Just check if the object-store is up:
-  const { error: objectStoreError } = useQuery<[]>({
-    path: "objectstore-api/metadata"
-  });
-
-  const { data: metadatas, loading } = useBulkGet<Metadata>({
+  // A failed metadata request means the object-store is unavailable.
+  const {
+    data: metadatas,
+    error: objectStoreError,
+    loading
+  } = useBulkGet<Metadata>({
     ids: value.map((it) => it.id),
     listPath: "objectstore-api/metadata?include=derivatives"
   });

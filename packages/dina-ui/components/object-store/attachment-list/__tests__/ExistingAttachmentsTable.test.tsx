@@ -155,6 +155,26 @@ describe("ExistingAttachmentsTable component", () => {
     });
   });
 
+  it("Shows the object store unavailable message when the metadata request fails", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <ExistingAttachmentsTable metadatas={METADATA_FILES} />
+      </DinaForm>,
+      {
+        apiContext: {
+          ...apiContext,
+          bulkGet: jest.fn().mockRejectedValue(new Error("Network Error"))
+        }
+      }
+    );
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/object store data unavailable/i)
+      ).toBeInTheDocument();
+    });
+  });
+
   it("Lets you bulk edit attachment Metadatas.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
