@@ -32,4 +32,17 @@ describe("Index page", () => {
       wrapper.getByRole("heading", { name: /configuration/i })
     ).toBeInTheDocument();
   });
+
+  it("Links to the Reindex Documents page for admins only.", () => {
+    const admin = mountWithAppContext(<IndexPage />, {
+      accountContext: { isAdmin: true }
+    });
+    expect(admin.getByText("Reindex Documents")).toBeInTheDocument();
+    admin.unmount();
+
+    const user = mountWithAppContext(<IndexPage />, {
+      accountContext: { isAdmin: false }
+    });
+    expect(user.queryByText("Reindex Documents")).toBeNull();
+  });
 });

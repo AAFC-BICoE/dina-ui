@@ -1692,6 +1692,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   reindexNoSubmissions: "No requests submitted yet.",
   reindexAccepted: "Accepted",
   reindexFailed: "Failed",
+  reindexUnconfirmed: "Unconfirmed",
+  reindexTimedOut:
+    "The API did not respond in time. Reindexing may still be running, check the search results before trying again.",
   code: "Code",
   siteMap: "Site Map",
   siteCoordinates: "Site Coordinates",
