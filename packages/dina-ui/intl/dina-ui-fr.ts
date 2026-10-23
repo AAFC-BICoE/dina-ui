@@ -706,7 +706,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   publiclyReleasable: "Diffusion publique",
   objectListTitle: "Objets stockés",
   objectStoreDataUnavailable:
-    "Les données du stockage de l’objet ne sont pas disponibles",
+    "Les pièces jointes ne peuvent pas être chargées pour le moment. Veuillez réessayer plus tard.",
   objectStoreDetailsTitle: "Détails sur le stockage de l’objet",
   objectStoreTitle: "Dépôt d’objet",
   objectSubtypeListTitle: "Sous-types d’objet",

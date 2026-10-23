@@ -25,6 +25,7 @@ import {
   FaUnlink
 } from "react-icons/fa";
 import React from "react";
+import { FaTriangleExclamation } from "react-icons/fa6";
 
 export interface ExistingAttachmentsTableProps {
   metadatas: ResourceIdentifierObject[];
@@ -191,11 +192,14 @@ export function ExistingAttachmentsTable({
     closeMetadataEditorModal();
   }
 
-  const { dataWithNullForMissing: metadataObjects, loading } =
-    useBulkGet<Metadata>({
-      ids: metadatas.filter((m) => m).map((m) => m?.id),
-      listPath: "objectstore-api/metadata?include=derivatives"
-    });
+  const {
+    dataWithNullForMissing: metadataObjects,
+    error: objectStoreError,
+    loading
+  } = useBulkGet<Metadata>({
+    ids: metadatas.filter((m) => m).map((m) => m?.id),
+    listPath: "objectstore-api/metadata?include=derivatives"
+  });
 
   const processedMetadatas = useMemo(() => {
     if (loading || !metadataObjects) {
@@ -226,6 +230,16 @@ export function ExistingAttachmentsTable({
       return result;
     });
   }, [metadataObjects, loading, metadatas]);
+
+  // A failed metadata request means the object-store is unavailable.
+  if (objectStoreError) {
+    return (
+      <span className="text-danger">
+        <FaTriangleExclamation className="me-2" />
+        <DinaMessage id="objectStoreDataUnavailable" />
+      </span>
+    );
+  }
 
   return (
     <DinaForm<AttachmentsTableFormValues>

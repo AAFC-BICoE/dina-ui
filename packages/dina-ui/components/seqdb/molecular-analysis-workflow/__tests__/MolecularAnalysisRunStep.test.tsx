@@ -147,22 +147,15 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       }
     }
 
-    case "seqdb-api/molecular-analysis-run-item/" +
-      TEST_QUALITY_CONTROL_RUN_ITEMS[1].id:
-      return { data: TEST_QUALITY_CONTROL_RUN_ITEMS[1] };
-
-    case "seqdb-api/molecular-analysis-result/" +
-      TEST_MOLECULAR_ANALYSIS_RESULT.id:
-      return { data: TEST_MOLECULAR_ANALYSIS_RESULT };
-
     case "seqdb-api/quality-control": {
-      const runItemUuid = params.filter?.["molecularAnalysisRunItem.uuid"]?.EQ;
-      switch (runItemUuid) {
-        case "2a3b15ce-6781-466b-bc1e-49e35af3df58":
-          return { data: TEST_QUALITY_CONTROL_1 };
-        case "e9e39b72-ece7-454b-893a-2fc2d075e7b7":
-          return { data: TEST_QUALITY_CONTROL_2 };
-      }
+      const runItemUuids: string[] =
+        params.filter?.["molecularAnalysisRunItem.uuid"]?.IN?.split(",") ?? [];
+      return {
+        data: [...TEST_QUALITY_CONTROL_1, ...TEST_QUALITY_CONTROL_2].filter(
+          (qualityControl) =>
+            runItemUuids.includes(qualityControl.molecularAnalysisRunItem!.id!)
+        )
+      };
     }
 
     case "seqdb-api/vocabulary/qualityControlType":
@@ -220,6 +213,12 @@ const mockBulkGet = jest.fn(async (paths) => {
         return TEST_MATERIAL_SAMPLE_SUMMARY[1];
       case "/material-sample-summary/" + TEST_MATERIAL_SAMPLE_SUMMARY[2].id:
         return TEST_MATERIAL_SAMPLE_SUMMARY[2];
+
+      // Quality control results
+      case "/molecular-analysis-result/" +
+        TEST_MOLECULAR_ANALYSIS_RESULT.id +
+        "?include=attachments":
+        return TEST_MOLECULAR_ANALYSIS_RESULT;
 
       // Attachments
       case "metadata/" + TEST_METADATA_1.id + "?include=derivatives":
@@ -397,6 +396,60 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         name: /sequencing run attachments \(1\)/i
       })
     ).toBeInTheDocument();
+  });
+
+  it("Loads quality controls and their attachments using batched requests", async () => {
+    mountWithAppContext(
+      <TestComponent
+        molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+
+    // One request for all of the quality controls, instead of one per run item.
+    expect(
+      mockGet.mock.calls.filter(
+        ([path]) => path === "seqdb-api/quality-control"
+      )
+    ).toEqual([
+      [
+        "seqdb-api/quality-control",
+        {
+          filter: {
+            "molecularAnalysisRunItem.uuid": {
+              IN: TEST_QUALITY_CONTROL_RUN_ITEMS.map((item) => item.id).join(
+                ","
+              )
+            }
+          },
+          include: "molecularAnalysisRunItem",
+          page: { limit: 1000 }
+        }
+      ]
+    ]);
+
+    // Results are included with the run items, so no individual run item or result requests.
+    expect(
+      mockGet.mock.calls.filter(([path]) =>
+        /molecular-analysis-(run-item|result)\//.test(path)
+      )
+    ).toEqual([]);
+
+    // Results and the attachment metadatas are each loaded with one bulk request.
+    expect(mockBulkGet).toHaveBeenCalledWith(
+      [
+        "/molecular-analysis-result/" +
+          TEST_MOLECULAR_ANALYSIS_RESULT.id +
+          "?include=attachments"
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
+    expect(mockBulkGet).toHaveBeenCalledWith(
+      ["metadata/" + TEST_METADATA_1.id, "metadata/" + TEST_METADATA_2.id],
+      { apiBaseUrl: "/objectstore-api", returnNullForMissingResource: true }
+    );
   });
 
   it("Multiple runs exist for one seq-batch, display warning to user", async () => {

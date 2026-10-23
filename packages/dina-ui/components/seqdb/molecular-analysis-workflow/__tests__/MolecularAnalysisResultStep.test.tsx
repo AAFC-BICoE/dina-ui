@@ -67,14 +67,13 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: [] };
 
     case "seqdb-api/quality-control":
-      // Return specific QC items based on run item UUID
-      if (filterIncludes(params, TEST_QUALITY_CONTROL_RUN_ITEMS[0].id)) {
-        return { data: TEST_QUALITY_CONTROL_1 };
-      }
-      if (filterIncludes(params, TEST_QUALITY_CONTROL_RUN_ITEMS[1].id)) {
-        return { data: TEST_QUALITY_CONTROL_2 };
-      }
-      return { data: [] };
+      // Return the QC items for the requested run item UUIDs
+      return {
+        data: [...TEST_QUALITY_CONTROL_1, ...TEST_QUALITY_CONTROL_2].filter(
+          (qualityControl) =>
+            filterIncludes(params, qualityControl.molecularAnalysisRunItem!.id!)
+        )
+      };
 
     case "seqdb-api/vocabulary/qualityControlType":
       return { data: TEST_QUALITY_CONTROL_TYPES };
@@ -158,6 +157,9 @@ const mockBulkGet = jest.fn(async (paths) => {
     }
 
     // QC Results (if any exist in the mock data chain)
+    if (path.includes(TEST_MOLECULAR_ANALYSIS_RESULT.id)) {
+      return TEST_MOLECULAR_ANALYSIS_RESULT;
+    }
     if (path.includes("molecular-analysis-result")) {
       return { id: "result-1", attachments: [] };
     }
@@ -227,6 +229,82 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       // Check for Run Item Names (from TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN)
       expect(
         wrapper.getByRole("cell", { name: /provided run item name/i })
+      ).toBeInTheDocument();
+    });
+
+    it("Loads the attachments for every run item result in one bulk request", async () => {
+      const RESULT_1 = {
+        id: "result-batch-1",
+        type: "molecular-analysis-result",
+        attachments: [{ id: TEST_METADATA_3.id, type: "metadata" }]
+      };
+      const RESULT_2 = {
+        id: "result-batch-2",
+        type: "molecular-analysis-result",
+        attachments: [{ id: TEST_METADATA_4.id, type: "metadata" }]
+      };
+      const GENERIC_ITEMS = [RESULT_1, RESULT_2].map((result, index) => ({
+        id: `generic-item-batch-${index}`,
+        type: "generic-molecular-analysis-item",
+        genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+        materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[index],
+        molecularAnalysisRunItem: {
+          id: `run-item-batch-${index}`,
+          type: "molecular-analysis-run-item",
+          name: `Batch run item ${index}`,
+          usageType:
+            MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+          result,
+          run: TEST_MOLECULAR_ANALYSIS_RUN
+        }
+      }));
+
+      const mockGetWithResults = jest.fn<any, any>(async (path, params) => {
+        if (path === "/seqdb-api/generic-molecular-analysis-item") {
+          return { data: GENERIC_ITEMS };
+        }
+        return mockGet(path, params);
+      });
+      const mockBulkGetWithResults = jest.fn(async (paths) => {
+        const results = await mockBulkGet(paths);
+        return results.map((result, index) => {
+          if (paths[index].includes(RESULT_1.id)) return RESULT_1;
+          if (paths[index].includes(RESULT_2.id)) return RESULT_2;
+          return result;
+        });
+      });
+
+      const wrapper = mountWithAppContext(<TestComponentWrapper />, {
+        apiContext: {
+          apiClient: {
+            get: mockGetWithResults,
+            axios: { get: mockGetWithResults }
+          },
+          bulkGet: mockBulkGetWithResults,
+          save: mockSave
+        }
+      } as any);
+      await waitForLoadingToDisappear();
+
+      // Both results are loaded together, then all of their attachments together.
+      expect(mockBulkGetWithResults).toHaveBeenCalledWith(
+        [
+          `/molecular-analysis-result/${RESULT_1.id}?include=attachments`,
+          `/molecular-analysis-result/${RESULT_2.id}?include=attachments`
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+      expect(mockBulkGetWithResults).toHaveBeenCalledWith(
+        ["metadata/" + TEST_METADATA_3.id, "metadata/" + TEST_METADATA_4.id],
+        { apiBaseUrl: "/objectstore-api", returnNullForMissingResource: true }
+      );
+
+      // Each attachment is displayed on its own run item.
+      expect(
+        wrapper.getByRole("link", { name: /germany\.jpg/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: /denmark\.jpg/i })
       ).toBeInTheDocument();
     });
 
@@ -373,6 +451,8 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
 
           // Handle Result (Bulk get is used for generic item results)
           if (path.includes(RESULT_WITH_ISSUES.id)) return RESULT_WITH_ISSUES;
+          if (path.includes(TEST_MOLECULAR_ANALYSIS_RESULT.id))
+            return TEST_MOLECULAR_ANALYSIS_RESULT;
 
           // Fallback for standard items needed for the table row
           if (path.includes(TEST_MATERIAL_SAMPLE_SUMMARY[0].id))
@@ -457,6 +537,8 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const mockBulkGetWithResult = jest.fn(async (paths) => {
         return paths.map((path) => {
           if (path.includes(RESULT_TO_DETACH.id)) return RESULT_TO_DETACH;
+          if (path.includes(TEST_MOLECULAR_ANALYSIS_RESULT.id))
+            return TEST_MOLECULAR_ANALYSIS_RESULT;
           if (path.includes(TEST_MATERIAL_SAMPLE_SUMMARY[0].id))
             return TEST_MATERIAL_SAMPLE_SUMMARY[0];
           if (path.includes(STORAGE_UNIT_USAGE_1.id!))
@@ -587,6 +669,8 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
 
           // Handle Result (Bulk get is used for generic item results)
           if (path.includes(RESULT_WITH_ISSUES.id)) return RESULT_WITH_ISSUES;
+          if (path.includes(TEST_MOLECULAR_ANALYSIS_RESULT.id))
+            return TEST_MOLECULAR_ANALYSIS_RESULT;
 
           // Fallback for standard items needed for the table row
           if (path.includes(TEST_MATERIAL_SAMPLE_SUMMARY[0].id))
@@ -731,6 +815,8 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
           if (path.includes(DELETED_METADATA_ID)) return null;
           if (path.includes(LOADING_ISSUE_METADATA_ID)) return undefined;
           if (path.includes(RESULT_WITH_ISSUES.id)) return RESULT_WITH_ISSUES;
+          if (path.includes(TEST_MOLECULAR_ANALYSIS_RESULT.id))
+            return TEST_MOLECULAR_ANALYSIS_RESULT;
           if (path.includes(TEST_MATERIAL_SAMPLE_SUMMARY[0].id))
             return TEST_MATERIAL_SAMPLE_SUMMARY[0];
           if (path.includes(STORAGE_UNIT_USAGE_1.id!))
@@ -942,13 +1028,6 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
         ) {
           return { data: [QC_WITH_ISSUES] };
         }
-        if (
-          path ===
-          `seqdb-api/molecular-analysis-result/${RESULT_WITH_ISSUES.id}`
-        ) {
-          return { data: RESULT_WITH_ISSUES };
-        }
-
         return mockGet(path, params);
       });
 
@@ -958,6 +1037,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
           const path = paths[index];
           if (path.includes(DELETED_METADATA_ID)) return null;
           if (path.includes(LOADING_ISSUE_METADATA_ID)) return undefined;
+          if (path.includes(RESULT_WITH_ISSUES.id)) return RESULT_WITH_ISSUES;
           return result;
         });
       });
@@ -1079,13 +1159,6 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
         ) {
           return { data: [QC_WITH_ISSUES] };
         }
-        if (
-          path ===
-          `seqdb-api/molecular-analysis-result/${RESULT_WITH_ISSUES.id}`
-        ) {
-          return { data: RESULT_WITH_ISSUES };
-        }
-
         return mockGet(path, params);
       });
 
@@ -1095,6 +1168,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
           const path = paths[index];
           if (path.includes(DELETED_METADATA_ID)) return null;
           if (path.includes(LOADING_ISSUE_METADATA_ID)) return undefined;
+          if (path.includes(RESULT_WITH_ISSUES.id)) return RESULT_WITH_ISSUES;
           return result;
         });
       });
@@ -1222,13 +1296,6 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
         ) {
           return { data: [QC_WITH_ISSUES] };
         }
-        if (
-          path ===
-          `seqdb-api/molecular-analysis-result/${RESULT_WITH_ISSUES.id}`
-        ) {
-          return { data: RESULT_WITH_ISSUES };
-        }
-
         return mockGet(path, params);
       });
 
@@ -1238,6 +1305,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
           const path = paths[index];
           if (path.includes(DELETED_METADATA_ID)) return null;
           if (path.includes(LOADING_ISSUE_METADATA_ID)) return undefined;
+          if (path.includes(RESULT_WITH_ISSUES.id)) return RESULT_WITH_ISSUES;
           return result;
         });
       });

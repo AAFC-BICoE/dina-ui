@@ -68,18 +68,29 @@ export function useBulkGet<TData extends KitsuResource>({
   const queryKey = JSON.stringify({ ids, disabled });
   const cacheId = useMemo(() => uuidv4(), [queryKey]);
 
-  const { data: fetchResponse, isValidating } = useSWR(
-    [cacheId],
-    fetchResources,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
+  const {
+    data: fetchResponse,
+    error,
+    isValidating
+  } = useSWR([cacheId], fetchResources, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
+  });
 
   const data = fetchResponse?.fetchedWithoutNulls;
   const dataWithNullForMissing = fetchResponse?.fetchedWithNulls;
 
-  return { data, dataWithNullForMissing, loading: isValidating };
+  // bulkGet resolves failed loads as undefined instead of rejecting (e.g. the service is down).
+  const allFailed =
+    !!dataWithNullForMissing?.length &&
+    dataWithNullForMissing.every((resource) => resource === undefined);
+
+  return {
+    data,
+    dataWithNullForMissing,
+    error:
+      error ?? (allFailed ? new Error("Failed to load resources") : undefined),
+    loading: isValidating
+  };
 }
