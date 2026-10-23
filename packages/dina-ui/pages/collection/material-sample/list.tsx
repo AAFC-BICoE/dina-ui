@@ -77,10 +77,7 @@ export const getColumnDefinition: () => ColumnDefinition<MaterialSample>[] =
           }
         }) =>
           collection?.id ? (
-            <Link
-              href={`/collection/collection/view?id=${collection?.id}`}
-              legacyBehavior
-            >
+            <Link href={`/collection/collection/view?id=${collection?.id}`}>
               {collection?.name}
             </Link>
           ) : null,

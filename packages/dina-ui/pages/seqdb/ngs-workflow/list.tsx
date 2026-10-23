@@ -24,9 +24,7 @@ const TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/seqdb/ngs-workflow/run?batchId=${id}`} legacyBehavior>
-        {name || id}
-      </Link>
+      <Link href={`/seqdb/ngs-workflow/run?batchId=${id}`}>{name || id}</Link>
     ),
     accessorKey: "name",
     header: () => <SeqdbMessage id="name" />

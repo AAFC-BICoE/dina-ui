@@ -24,11 +24,7 @@ const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
       row: {
         original: { id, name }
       }
-    }) => (
-      <Link href={`/collection/protocol/view?id=${id}`} legacyBehavior>
-        {name}
-      </Link>
-    ),
+    }) => <Link href={`/collection/protocol/view?id=${id}`}>{name}</Link>,
     accessorKey: "name"
   },
   {
