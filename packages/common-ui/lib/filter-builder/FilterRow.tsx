@@ -93,7 +93,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     const customStyle: any = {
       multiValueLabel: (base) => ({ ...base, cursor: "move" }),
-      placeholder: (base) => ({ ...base, color: "rgb(87,120,94)" }),
+      placeholder: (base) => ({ ...base, color: "#5c5c5c" }),
       option: (_, state) => ({
         ...{
           backgroundColor:
@@ -258,7 +258,9 @@ export class FilterRow extends React.Component<FilterRowProps> {
   };
 
   private onValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.model.value = (e.target as HTMLTextAreaElement | HTMLInputElement).value;
+    this.props.model.value = (
+      e.target as HTMLTextAreaElement | HTMLInputElement
+    ).value;
     this.props?.onModelChange?.(this.props.model);
     this.props.onChange();
     this.forceUpdate();

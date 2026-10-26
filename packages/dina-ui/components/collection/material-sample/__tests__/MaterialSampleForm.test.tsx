@@ -813,6 +813,67 @@ describe("Material Sample Edit Page", () => {
     ]);
   });
 
+  it("Lets the collecting event tabs be changed with the arrow keys.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tab", { name: /create new/i })
+      ).toBeInTheDocument()
+    );
+
+    const createNewTab = wrapper.getByRole("tab", { name: /create new/i });
+    await userEvent.click(createNewTab);
+    await userEvent.keyboard("{ArrowRight}");
+
+    const linkExistingTab = wrapper.getByRole("tab", {
+      name: /link existing/i
+    });
+    await waitFor(() =>
+      expect(linkExistingTab).toHaveAttribute("aria-selected", "true")
+    );
+    expect(linkExistingTab).toHaveFocus();
+    // Only the selected tab is in the Tab order:
+    expect(createNewTab).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("Keeps the sidebar sub-links in sync with the collecting event cards on the page.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tab", { name: /create new/i })
+      ).toBeInTheDocument()
+    );
+    const identifiersLink = () =>
+      wrapper.container.querySelector('.sub-nav-list a[href="#identifiers"]');
+
+    await waitFor(() => expect(identifiersLink()).toBeInTheDocument());
+
+    // Take the card out and put it back without React re-rendering the sidebar
+    // (like a tab switch or async load elsewhere on the page):
+    const card = document.getElementById("identifiers")!;
+    const parent = card.parentNode!;
+    const nextSibling = card.nextSibling;
+    card.remove();
+    await waitFor(() => expect(identifiersLink()).not.toBeInTheDocument());
+
+    parent.insertBefore(card, nextSibling);
+    await waitFor(() => expect(identifiersLink()).toBeInTheDocument());
+  });
+
   it("Discards create-new collecting event changes and links to existing collecting event when toggled back.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm

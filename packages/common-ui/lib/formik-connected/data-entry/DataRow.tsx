@@ -11,7 +11,6 @@ import {
 } from "common-ui";
 import { useFormikContext } from "formik";
 import _ from "lodash";
-import { FaMinus, FaPlus } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { useEffect, useState } from "react";
 
@@ -26,7 +25,8 @@ export function getFieldName(
 export interface DataRowProps {
   name: string;
   rowIndex: number;
-  showPlusIcon?: boolean;
+  /** Types already used by other rows in the same block, hidden from the type options. */
+  usedTypes?: string[];
   unitsOptions?: any[];
   typeOptions?: any[];
   readOnly?: boolean;
@@ -39,7 +39,7 @@ export interface DataRowProps {
 export function DataRow({
   rowIndex,
   name,
-  showPlusIcon,
+  usedTypes,
   unitsOptions,
   typeOptions,
   readOnly,
@@ -93,13 +93,6 @@ export function DataRow({
 
   const rowsPath = name.substring(0, name.lastIndexOf("."));
   const currentRows = _.get(formik.values, rowsPath);
-  function addRow() {
-    const newRows = {
-      ...currentRows,
-      [`extensionField-${Object.keys(currentRows).length}`]: ""
-    };
-    formik.setFieldValue(rowsPath, newRows);
-  }
   function removeRow() {
     const rowName = name.split(".").at(-1);
     if (rowName) {
@@ -111,9 +104,8 @@ export function DataRow({
   const valueInputProps = {
     name: valueTextFieldName,
     removeBottomMargin: true,
-    label: <DinaMessage id="dataValue" />,
+    removeLabel: true,
     disableTemplateCheckbox: true,
-    hideLabel: rowIndex !== 0,
     disableClearButton: disableClearButton
   };
 
@@ -133,147 +125,101 @@ export function DataRow({
       <TextField {...valueInputProps} />
     );
 
-  return (
-    <div className="d-flex">
-      <div style={{ width: "15rem" }}>
-        {typesAddable ? (
-          <CreatableSelectField
-            options={typeOptions}
-            name={typeSelectFieldName}
-            label={<DinaMessage id="dataType" />}
-            removeBottomMargin={true}
-            disableTemplateCheckbox={true}
-            onChange={onCreatableSelectFieldChange}
-            hideLabel={rowIndex !== 0}
-            readOnlyBold={true}
-          />
-        ) : (
-          <div className="d-flex flex-row align-items-center">
-            <div style={{ width: "15rem" }}>
-              <SelectField
-                options={typeOptions}
-                name={typeSelectFieldName}
-                label={<DinaMessage id="dataType" />}
-                removeBottomMargin={true}
-                disableTemplateCheckbox={true}
-                hideLabel={rowIndex !== 0}
-                readOnlyBold={true}
-                onChange={onTypeSelectFieldChange}
-              />
-            </div>
+  const labelProps = {
+    removeBottomMargin: true,
+    removeLabel: true,
+    disableTemplateCheckbox: true
+  };
 
-            <FieldSpy fieldName={typeSelectFieldName}>
-              {(value) => (
-                <>
-                  {value && typeOptions ? (
-                    <div
-                      style={{
-                        marginTop: rowIndex === 0 ? "1.4rem" : "0rem"
-                      }}
-                    >
-                      <Tooltip
-                        directText={
-                          _.find(
-                            typeOptions,
-                            (item) => item.value === value
-                          )?.descriptions?.find((desc) => desc.lang === locale)
-                            ?.desc
-                        }
-                        placement={"right"}
-                      />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                </>
-              )}
-            </FieldSpy>
-          </div>
-        )}
-      </div>
-      <div style={{ width: "15rem", marginLeft: "3rem" }}>
-        {valueInputField}
-      </div>
-      {unitsOptions ? (
-        <div style={{ width: "15rem", marginLeft: "3rem" }}>
-          {unitsAddable ? (
+  return (
+    <div className="data-entry-grid mb-2">
+      <div className="d-flex align-items-center gap-2">
+        <div className={readOnly ? undefined : "flex-grow-1"}>
+          {typesAddable ? (
             <CreatableSelectField
-              options={unitsOptions}
-              name={unitSelectFieldName}
-              removeBottomMargin={true}
-              label={<DinaMessage id="dataUnit" />}
-              disableTemplateCheckbox={true}
-              hideLabel={rowIndex !== 0}
+              {...labelProps}
+              options={typeOptions}
+              name={typeSelectFieldName}
+              onChange={onCreatableSelectFieldChange}
+              filterValues={usedTypes}
+              readOnlyBold={true}
             />
           ) : (
             <SelectField
-              options={unitsOptions}
-              name={unitSelectFieldName}
-              removeBottomMargin={true}
-              label={<DinaMessage id="dataUnit" />}
-              disableTemplateCheckbox={true}
-              hideLabel={rowIndex !== 0}
+              {...labelProps}
+              options={typeOptions}
+              name={typeSelectFieldName}
+              filterValues={usedTypes}
+              readOnlyBold={true}
+              onChange={onTypeSelectFieldChange}
             />
           )}
         </div>
-      ) : (
-        <div style={{ width: "15rem", marginLeft: "3rem" }}>
+        {!typesAddable && (
+          <FieldSpy fieldName={typeSelectFieldName}>
+            {(value) =>
+              value && typeOptions ? (
+                <Tooltip
+                  directText={
+                    _.find(
+                      typeOptions,
+                      (item) => item.value === value
+                    )?.descriptions?.find((desc) => desc.lang === locale)?.desc
+                  }
+                  placement={"right"}
+                  disableSpanMargin={true}
+                />
+              ) : null
+            }
+          </FieldSpy>
+        )}
+      </div>
+      <div>{valueInputField}</div>
+      <div>
+        {unitsOptions ? (
+          unitsAddable ? (
+            <CreatableSelectField
+              {...labelProps}
+              options={unitsOptions}
+              name={unitSelectFieldName}
+            />
+          ) : (
+            <SelectField
+              {...labelProps}
+              options={unitsOptions}
+              name={unitSelectFieldName}
+            />
+          )
+        ) : (
+          // Field extension types have one fixed unit, shown here but not editable.
           <TextField
+            {...labelProps}
             name={unitSelectFieldName}
-            removeBottomMargin={true}
-            label={<DinaMessage id="dataUnit" />}
-            disableTemplateCheckbox={true}
-            hideLabel={rowIndex !== 0}
-            readOnly={true}
+            disabled={true}
             placeholder={selectedType?.unit ?? ""}
             disableClearButton={disableClearButton}
           />
-        </div>
-      )}
-      {isVocabularyBasedEnabledForType && (
-        <CheckBoxField
-          className="hidden"
-          name={vocabularyBasedFieldName}
-          removeLabel={true}
-        />
-      )}
-      {!readOnly && (
-        <div
-          style={{
-            cursor: "pointer",
-            marginTop: rowIndex === 0 ? "2rem" : "0.6rem"
-          }}
-        >
-          {rowIndex === 0 && showPlusIcon ? (
-            <>
-              {
-                <FaPlus
-                  className="ms-1"
-                  onClick={addRow}
-                  size="2em"
-                  name={getFieldName(name, "addRow", rowIndex)}
-                  onMouseOver={(event) =>
-                    (event.currentTarget.style.color = "blue")
-                  }
-                  onMouseOut={(event) => (event.currentTarget.style.color = "")}
-                  data-testid="add row button"
-                />
-              }
-            </>
-          ) : (
-            <FaMinus
-              className="ms-1"
-              onClick={removeRow}
-              size="2em"
-              name={getFieldName(name, "removeRow", rowIndex)}
-              onMouseOver={(event) =>
-                (event.currentTarget.style.color = "blue")
-              }
-              onMouseOut={(event) => (event.currentTarget.style.color = "")}
-            />
-          )}
-        </div>
-      )}
+        )}
+      </div>
+      <div>
+        {isVocabularyBasedEnabledForType && (
+          <CheckBoxField
+            className="hidden"
+            name={vocabularyBasedFieldName}
+            removeLabel={true}
+          />
+        )}
+        {!readOnly && (
+          <button
+            type="button"
+            className="btn btn-link p-0 data-entry-remove"
+            onClick={removeRow}
+            name={getFieldName(name, "removeRow", rowIndex)}
+          >
+            <DinaMessage id="remove" />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

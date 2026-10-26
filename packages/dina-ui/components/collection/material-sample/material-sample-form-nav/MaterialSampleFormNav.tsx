@@ -160,15 +160,12 @@ const SECTION_SUB_LINKS: Partial<Record<string, SubNavLink[]>> = {
     }
   ],
   [COLLECTING_EVENT_COMPONENT_NAME]: [
+    {
+      id: "collectingEventAccessAndTags",
+      msg: <DinaMessage id="accessAndTags" />
+    },
     { id: "identifiers", msg: <DinaMessage id="identifiers" /> },
-    {
-      id: "collectingDateLegend",
-      msg: <DinaMessage id="collectingDateLegend" />
-    },
-    {
-      id: "collectingAgentsLegend",
-      msg: <DinaMessage id="collectingAgentsLegend" />
-    },
+    { id: "collecting", msg: <DinaMessage id="collecting" /> },
     {
       id: "verbatimLabelLegend",
       msg: <DinaMessage id="verbatimLabelLegend" />
@@ -245,6 +242,24 @@ export function MaterialSampleFormNav({
     onChangeNavOrder?.(items);
   }, [items]);
 
+  // Sub-link cards come and go without re-rendering the nav (tabs, form templates, toggled sections),
+  // so watch the page and only link to the cards that are rendered.
+  const [renderedSubLinkIds, setRenderedSubLinkIds] = useState<string[]>([]);
+  useEffect(() => {
+    function updateRenderedSubLinks() {
+      const ids = SUB_SCROLL_TARGET_IDS.filter((subId) =>
+        document.getElementById(subId)
+      );
+      setRenderedSubLinkIds((previous) =>
+        previous.join() === ids.join() ? previous : ids
+      );
+    }
+    updateRenderedSubLinks();
+    const observer = new MutationObserver(updateRenderedSubLinks);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
@@ -274,6 +289,7 @@ export function MaterialSampleFormNav({
                       id={section.id}
                       key={section.id}
                       section={section}
+                      renderedSubLinkIds={renderedSubLinkIds}
                       disableRemovePrompt={disableRemovePrompt}
                       disableSwitch={
                         section.id === COLLECTING_EVENT_COMPONENT_NAME &&
@@ -294,6 +310,8 @@ export function MaterialSampleFormNav({
 interface NavItemProps {
   id: string;
   section: ScrollTarget;
+  /** Ids of the sub-link cards currently on the page. */
+  renderedSubLinkIds: string[];
   disableRemovePrompt?: boolean;
   disableSwitch?: boolean;
 }
@@ -301,6 +319,7 @@ interface NavItemProps {
 const DataComponentNavItem = ({
   id,
   section,
+  renderedSubLinkIds,
   disableRemovePrompt,
   disableSwitch
 }: NavItemProps) => {
@@ -359,16 +378,6 @@ const DataComponentNavItem = ({
 
   const subLinks = SECTION_SUB_LINKS[section.id];
 
-  // Cards can be missing (e.g. hidden by a form template), so only link to the ones rendered.
-  const [renderedSubLinkIds, setRenderedSubLinkIds] = useState<string[]>([]);
-  useEffect(() => {
-    const ids = (subLinks ?? [])
-      .filter((subLink) => document.getElementById(subLink.id))
-      .map((subLink) => subLink.id);
-    setRenderedSubLinkIds((previous) =>
-      previous.join() === ids.join() ? previous : ids
-    );
-  });
   const visibleSubLinks = subLinks?.filter((subLink) =>
     renderedSubLinkIds.includes(subLink.id)
   );

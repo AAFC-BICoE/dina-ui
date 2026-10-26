@@ -55,6 +55,9 @@ export interface AttachmentsFieldProps {
 
   hideCard?: boolean;
 
+  /** Extra classes for the surrounding FieldSet, e.g. "clean-section". */
+  className?: string;
+
   wrapContent?: (content: ReactNode) => ReactNode;
 }
 
@@ -119,6 +122,7 @@ export function AttachmentsEditor({
   hideAttachmentForm,
   hideTitle,
   hideCard,
+  className,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true },
   wrapContent = (content) => content,
   name
@@ -238,6 +242,7 @@ export function AttachmentsEditor({
       }
       fieldName={name}
       removePadding={hideCard ?? false}
+      className={className}
     >
       {loading ? (
         <LoadingSpinner loading={true} />
