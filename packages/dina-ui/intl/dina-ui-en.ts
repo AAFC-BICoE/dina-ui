@@ -24,6 +24,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addExistingStorageUnitAsChild: "Add Existing Storage Unit",
   addExistingStorageUnitAsChild_tooltip:
     "Add an existing storage unit as a child of this storage unit.",
+  addExternalResource: "Add External Resource",
   addExternalResourceTitle: "Add New External Resource",
   addFilesButton: "Add Files",
   addFilterTooltip:
