@@ -1,7 +1,6 @@
 import { LoadingSpinner } from "common-ui";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import { v4 as uuidv4 } from "uuid";
 import {
   ClassificationItem,
   ClassificationItemWithId,
@@ -27,14 +26,14 @@ export function ClassificationField({
   if (pathArray && rankArray) {
     for (let i = 0; i < pathArray.length; i++) {
       initClassifications.push({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         classificationPath: pathArray[i],
         classificationRanks: rankArray[i]
       });
     }
   } else {
     initClassifications.push({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       classificationRanks: undefined,
       classificationPath: undefined
     });
@@ -70,7 +69,7 @@ export function ClassificationField({
       ...manualClassificationItems,
       ...[
         {
-          id: uuidv4(),
+          id: crypto.randomUUID(),
           classificationPath: undefined,
           classificationRanks: undefined
         }

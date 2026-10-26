@@ -1,7 +1,6 @@
 import { KitsuResource, PersistedResource } from "kitsu";
 import useSWR from "swr";
 import { useMemo } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useApiClient } from "..";
 
 export interface UseBulkGetParams {
@@ -66,7 +65,7 @@ export function useBulkGet<TData extends KitsuResource>({
 
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
   const queryKey = JSON.stringify({ ids, disabled });
-  const cacheId = useMemo(() => uuidv4(), [queryKey]);
+  const cacheId = useMemo(() => crypto.randomUUID(), [queryKey]);
 
   const {
     data: fetchResponse,

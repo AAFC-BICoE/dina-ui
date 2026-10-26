@@ -8,7 +8,6 @@ import {
 import _ from "lodash";
 import { useContext, useDebugValue, useMemo, ReactElement } from "react";
 import useSWR from "swr";
-import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { ApiClientContext } from "./ApiClientContext";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
@@ -142,7 +141,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   const queryKey = JSON.stringify({ querySpec, disabled, deps });
 
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
-  const cacheId = useMemo(() => uuidv4(), [queryKey]);
+  const cacheId = useMemo(() => crypto.randomUUID(), [queryKey]);
 
   const {
     data: apiResponse,
