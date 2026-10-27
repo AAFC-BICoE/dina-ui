@@ -21,7 +21,6 @@ import { MaterialSampleStateReadOnlyRender } from "../MaterialSampleStateWarning
 import _ from "lodash";
 import classNames from "classnames";
 import { useState } from "react";
-import { FaCircleInfo } from "react-icons/fa6";
 import styles from "./MaterialSampleInfoSection.module.css";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
@@ -167,8 +166,6 @@ const SPLIT_EXAMPLES = {
   ]
 } as const;
 
-type InfoState = "closed" | "open" | "pinned";
-
 /** Where split names start from: this sample (isBaseForSplitByType) or a parent of another type. */
 function SplitNamesStartFromField() {
   const { formatMessage } = useDinaIntl();
@@ -187,11 +184,8 @@ function SplitNamesStartFromField() {
     }
   ];
 
-  // Kept here rather than in each panel so only one is open at a time.
-  const [openInfo, setOpenInfo] = useState<{
-    value: boolean;
-    state: InfoState;
-  }>({ value: false, state: "closed" });
+  // The option whose info panel is showing, so only one shows at a time.
+  const [infoFor, setInfoFor] = useState<boolean | null>(null);
 
   return (
     <FieldWrapper
@@ -209,10 +203,27 @@ function SplitNamesStartFromField() {
           role="radiogroup"
           aria-label={formatMessage("field_isBaseForSplitByType")}
         >
-          {options.map((option) => {
+          {options.map((option, index) => {
             const selected = !!value === option.value;
+            const panelId = `split-option-info-${option.value}`;
+            const showInfo = () => setInfoFor(option.value);
+            const hideInfo = () =>
+              setInfoFor((current) =>
+                current === option.value ? null : current
+              );
             return (
-              <div key={String(option.value)} className={styles.optionRow}>
+              // Hovering or focusing an option, or its panel, shows what it means.
+              <div
+                key={String(option.value)}
+                className={styles.optionRow}
+                onMouseEnter={showInfo}
+                onMouseLeave={hideInfo}
+                onFocus={showInfo}
+                onBlur={hideInfo}
+                onKeyDown={(event) =>
+                  event.key === "Escape" && setInfoFor(null)
+                }
+              >
                 <div
                   className={classNames(
                     styles.splitOption,
@@ -227,28 +238,21 @@ function SplitNamesStartFromField() {
                     checked={selected}
                     onChange={() => setValue(option.value)}
                     aria-label={option.label}
+                    aria-describedby={panelId}
                   />
                   <span>{option.label}</span>
                 </div>
-                <SplitOptionInfo
+                <SplitOptionInfoPanel
                   {...option}
-                  panelId={`split-option-info-${option.value}`}
-                  state={
-                    openInfo.value === option.value ? openInfo.state : "closed"
-                  }
-                  setState={(state) =>
-                    // Closing another option's panel (e.g. Escape on this icon) leaves the open one alone.
-                    setOpenInfo((current) =>
-                      state === "closed" && current.value !== option.value
-                        ? current
-                        : { value: option.value, state }
-                    )
-                  }
+                  id={panelId}
+                  hidden={infoFor !== option.value}
+                  // The right-hand option's panel lines up with its right edge to stay on the page.
+                  alignEnd={index === 1}
                 />
               </div>
             );
           })}
-          <div className="small text-muted">
+          <div className={classNames("small text-muted", styles.splitHelp)}>
             {formatMessage("splitNamesStartFromHelp")}
           </div>
         </div>
@@ -257,76 +261,55 @@ function SplitNamesStartFromField() {
   );
 }
 
-interface SplitOptionInfoProps {
+interface SplitOptionInfoPanelProps {
+  id: string;
   label: string;
   rule: string;
   example: (typeof SPLIT_EXAMPLES)[keyof typeof SPLIT_EXAMPLES];
-  panelId: string;
-  state: InfoState;
-  setState: (next: InfoState) => void;
+  hidden: boolean;
+  alignEnd: boolean;
 }
 
 /**
- * Info icon beside a split option. Hover or focus opens its panel and a click pins it open.
- * It sits outside the option card, so it never changes the selection.
+ * Explains a split option with an example hierarchy. It stays in the page while hidden so
+ * the option's aria-describedby can still read it.
  */
-function SplitOptionInfo({
+function SplitOptionInfoPanel({
+  id,
   label,
   rule,
   example,
-  panelId,
-  state,
-  setState
-}: SplitOptionInfoProps) {
+  hidden,
+  alignEnd
+}: SplitOptionInfoPanelProps) {
   const { formatMessage } = useDinaIntl();
-  const open = () => state === "closed" && setState("open");
-  const closeUnlessPinned = () => state === "open" && setState("closed");
 
   return (
-    // Wraps the panel too, so moving the pointer onto the panel keeps it open.
-    <span onMouseEnter={open} onMouseLeave={closeUnlessPinned}>
-      <button
-        type="button"
-        className={styles.infoButton}
-        aria-label={formatMessage("splitOptionInfo", { option: label })}
-        aria-expanded={state !== "closed"}
-        aria-controls={panelId}
-        onFocus={open}
-        onBlur={closeUnlessPinned}
-        onClick={() => setState(state === "pinned" ? "closed" : "pinned")}
-        onKeyDown={(event) => {
-          if (event.key === "Escape") {
-            setState("closed");
-          }
-        }}
-      >
-        <FaCircleInfo size={15} />
-      </button>
-      {state !== "closed" && (
-        <div id={panelId} role="tooltip" className={styles.infoPanel}>
-          <strong>{label}</strong>
-          <div className={styles.infoRule}>{rule}</div>
-          <div className={styles.diagram}>
-            {example.map((row) => (
-              <div
-                key={row.id}
-                className={classNames(styles.diagramRow, styles[row.role])}
-                style={{ marginLeft: row.depth * 22 }}
-              >
-                <span className={styles.rowId}>{row.id}</span>
-                <span className={styles.rowType}>
-                  {formatMessage(row.type)}
-                </span>
-                <span className={styles.pill}>{formatMessage(row.tag)}</span>
-              </div>
-            ))}
+    <div
+      id={id}
+      role="tooltip"
+      hidden={hidden}
+      className={classNames(styles.infoPanel, alignEnd && styles.alignEnd)}
+    >
+      <strong>{label}</strong>
+      <div className={styles.infoRule}>{rule}</div>
+      <div className={styles.diagram}>
+        {example.map((row) => (
+          <div
+            key={row.id}
+            className={classNames(styles.diagramRow, styles[row.role])}
+            style={{ marginLeft: row.depth * 22 }}
+          >
+            <span className={styles.rowId}>{row.id}</span>
+            <span className={styles.rowType}>{formatMessage(row.type)}</span>
+            <span className={styles.pill}>{formatMessage(row.tag)}</span>
           </div>
-          <div className={styles.infoFooter}>
-            {formatMessage("splitExampleFooter")}
-          </div>
-        </div>
-      )}
-    </span>
+        ))}
+      </div>
+      <div className={styles.infoFooter}>
+        {formatMessage("splitExampleFooter")}
+      </div>
+    </div>
   );
 }
 

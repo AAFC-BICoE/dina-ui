@@ -177,7 +177,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Les nouveaux enfants sont nommés à partir de l’ancêtre le plus proche ayant un type d’échantillon différent.",
   splitNamesFromThisSampleRule:
     "Aucun ancêtre n’a un type d’échantillon différent ; l’échantillon pour lequel ce paramètre est activé sert donc de base.",
-  splitOptionInfo: "À propos : {option}",
   splitExampleWholeOrganism: "Organisme entier",
   splitExampleOrganismPart: "Partie d’organisme",
   splitExampleBaseName: "Nom de base",

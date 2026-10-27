@@ -606,7 +606,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "New children are named from the nearest ancestor that has a different sample type.",
   splitNamesFromThisSampleRule:
     "No ancestor has a different sample type, so the sample with this setting turned on is used as the base.",
-  splitOptionInfo: "About: {option}",
   splitExampleWholeOrganism: "Whole Organism",
   splitExampleOrganismPart: "Organism Part",
   splitExampleBaseName: "Base name",

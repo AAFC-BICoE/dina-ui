@@ -7,10 +7,15 @@
   padding-top: 0.6rem;
 }
 
+/* Options sit side by side, and stack when there isn't room for both. */
 .splitOptions {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.splitHelp {
+  flex-basis: 100%;
 }
 
 .splitOption {
@@ -36,21 +41,11 @@
   border-color: #335075;
 }
 
-/* Info icon and panel beside each option. */
+/* An option card and the info panel shown while it is hovered or focused. */
 .optionRow {
   position: relative;
+  flex: 1 1 14rem;
   display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.infoButton {
-  display: flex;
-  padding: 4px;
-  color: #335075;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
 }
 
 .infoPanel {
@@ -70,6 +65,11 @@
   border: 1px solid #dee2e6;
   border-radius: 0.5rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.infoPanel.alignEnd {
+  left: auto;
+  right: 0;
 }
 
 .infoRule {
