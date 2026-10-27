@@ -385,7 +385,7 @@ function configDefaults(subject: string | undefined): NavigationCard[] {
   ];
 }
 
-function managementDefaults(isAdmin?: boolean): NavigationCard[] {
+export function managementDefaults(isAdmin?: boolean): NavigationCard[] {
   return [
     {
       id: "groups",

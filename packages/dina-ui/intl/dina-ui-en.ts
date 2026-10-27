@@ -995,10 +995,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   notPubliclyReleasable: "Not Publicly Releasable",
   publiclyReleasable: "Publicly Releasable",
   objectListTitle: "Stored Objects",
-  objectStoreDataUnavailable: "Object Store data unavailable",
+  objectStoreDataUnavailable:
+    "Attachments could not be loaded right now. Please try again later.",
   objectStoreDetailsTitle: "Object Store Details",
   objectStoreTitle: "Object Store",
   objectSubtypeListTitle: "Object Subtypes",
+  objectSubtypeName: "Object Subtype Name",
   objectSubtypeTitle: "Object Subtype",
   openGeographySearchButtonLabel: "Search On Open Street Maps",
   openLink: "Open Link",
@@ -1715,6 +1717,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   reindexNoSubmissions: "No requests submitted yet.",
   reindexAccepted: "Accepted",
   reindexFailed: "Failed",
+  reindexUnconfirmed: "Unconfirmed",
+  reindexTimedOut:
+    "The API did not respond in time. Reindexing may still be running, check the search results before trying again.",
   code: "Code",
   siteMap: "Site Map",
   siteCoordinates: "Site Coordinates",

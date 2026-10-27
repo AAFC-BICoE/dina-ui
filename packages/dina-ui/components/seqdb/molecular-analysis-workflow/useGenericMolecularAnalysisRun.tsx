@@ -357,50 +357,21 @@ export function useGenericMolecularAnalysisRun({
               molecularAnalysisResultPaths,
               { apiBaseUrl: "/seqdb-api" }
             );
-          if (molecularAnalysisResultQuery.length > 0) {
-            for (const molecularAnalysisResult of molecularAnalysisResultQuery) {
-              const originalAttachments =
-                molecularAnalysisResult?.attachments || [];
-
-              // Fetch attachment metadatas
-              const resultAttachmentsQuery = await bulkGet<Metadata>(
-                originalAttachments.map(
-                  (attachment) => `metadata/${attachment?.id}`
-                ),
-                {
-                  apiBaseUrl: "/objectstore-api",
-                  returnNullForMissingResource: true
-                }
-              );
-
-              // Parse and assign attachments with handling for deleted/missing metadata
-              (molecularAnalysisResult as any).attachments =
-                resultAttachmentsQuery.map((result, index) => {
-                  const original = originalAttachments[index];
-
-                  // Handle Deleted (null)
-                  if (result === null) {
-                    return {
-                      id: original?.id,
-                      type: original?.type, // Assuming 'type' exists on the original object
-                      issue: "deleted"
-                    };
-                  }
-
-                  // Handle Missing/Error (undefined)
-                  if (result === undefined) {
-                    return {
-                      id: original?.id,
-                      type: original?.type,
-                      issue: "loadingIssue"
-                    };
-                  }
-
-                  // Return the successfully fetched metadata
-                  return result;
-                });
+          const resultAttachments = await loadAttachmentMetadatas(
+            molecularAnalysisResultQuery.map(
+              (molecularAnalysisResult) =>
+                (molecularAnalysisResult?.attachments ??
+                  []) as ResourceIdentifierObject[]
+            )
+          );
+          molecularAnalysisResultQuery.forEach(
+            (molecularAnalysisResult, index) => {
+              if (molecularAnalysisResult) {
+                (molecularAnalysisResult as any).attachments =
+                  resultAttachments[index];
+              }
             }
-          }
+          );
 
           return sequencingRunItem.map((runItem) => {
             const queryMolecularAnalysisResult =
@@ -620,126 +591,139 @@ export function useGenericMolecularAnalysisRun({
     }
   }
 
+  /**
+   * Loads the metadata for every attachment list in a single bulk request. Deleted (null) and
+   * failed (undefined) metadata are replaced with an issue marker so they can be displayed.
+   *
+   * @returns the processed attachments, in the same shape as the provided lists.
+   */
+  async function loadAttachmentMetadatas(
+    attachmentLists: ResourceIdentifierObject[][]
+  ): Promise<ResourceIdentifierObject[][]> {
+    const allAttachments = attachmentLists.flat();
+    const attachmentMetadatas = await bulkGet<Metadata, true>(
+      allAttachments.map((attachment) => `metadata/${attachment?.id}`),
+      {
+        apiBaseUrl: "/objectstore-api",
+        returnNullForMissingResource: true
+      }
+    );
+
+    const processedAttachments = attachmentMetadatas.map((result, index) => {
+      const original = allAttachments[index];
+      if (result === null) {
+        return { id: original?.id, type: original?.type, issue: "deleted" };
+      }
+      if (result === undefined) {
+        return {
+          id: original?.id,
+          type: original?.type,
+          issue: "loadingIssue"
+        };
+      }
+      return result;
+    }) as ResourceIdentifierObject[];
+
+    // Split the flat list back into one list per original attachment list.
+    let offset = 0;
+    return attachmentLists.map((list) =>
+      processedAttachments.slice(offset, (offset += list.length))
+    );
+  }
+
   async function retrieveQualityControls(run: MolecularAnalysisRun) {
     // Only perform the request if a sequencing run exists.
-    if (run?.id) {
-      const qualityControlItemQuery = await apiClient.get(
-        `seqdb-api/molecular-analysis-run-item`,
-        {
-          filter: {
-            "run.uuid": { EQ: run?.id },
-            usageType: {
-              EQ: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
-            }
-          }
-        }
-      );
-
-      if (
-        qualityControlItemQuery &&
-        (qualityControlItemQuery as any)?.data?.length > 0
-      ) {
-        const newQualityControls: QualityControlWithAttachment[] = [];
-
-        // Go through each quality control run item and then we do a query for each quality control.
-        const qualityControlRunItems = (qualityControlItemQuery as any)?.data;
-        for (const item of qualityControlRunItems) {
-          const qualityControlQuery = await apiClient.get<QualityControl>(
-            `seqdb-api/quality-control`,
-            {
-              filter: {
-                "molecularAnalysisRunItem.uuid": { EQ: item?.id }
-              },
-              include: "molecularAnalysisRunItem"
-            }
-          );
-
-          const qualityControlFound = qualityControlQuery
-            ?.data?.[0] as QualityControlWithAttachment;
-          if (qualityControlFound) {
-            // Fetch result for the molecularAnalysisRunItem separately since multi-level includes are not supported.
-            // Only fetch the run item if it does not already contain a result with an id/uuid.
-            const existingRunItem =
-              qualityControlFound.molecularAnalysisRunItem as any | undefined;
-            const hasExistingResult = !!(
-              existingRunItem?.result &&
-              ((existingRunItem.result as any).id ||
-                (existingRunItem.result as any).uuid)
-            );
-
-            if (
-              qualityControlFound.molecularAnalysisRunItem?.id &&
-              !hasExistingResult
-            ) {
-              const runItemResp = await apiClient.get<MolecularAnalysisRunItem>(
-                `seqdb-api/molecular-analysis-run-item/${qualityControlFound.molecularAnalysisRunItem.id}`,
-                {
-                  include: "result"
-                }
-              );
-              qualityControlFound.molecularAnalysisRunItem = runItemResp.data;
-            }
-
-            // If a result exists, we need to perform a get request to retrieve the metadata to be displayed.
-            let attachments: ResourceIdentifierObject[] = [];
-            if (qualityControlFound.molecularAnalysisRunItem?.result?.id) {
-              const molecularAnalysisResultQuery =
-                await apiClient.get<MolecularAnalysisResult>(
-                  `seqdb-api/molecular-analysis-result/${qualityControlFound.molecularAnalysisRunItem?.result?.id}`,
-                  {
-                    include: "attachments"
-                  }
-                );
-              if (molecularAnalysisResultQuery?.data?.attachments) {
-                attachments = molecularAnalysisResultQuery.data
-                  .attachments as ResourceIdentifierObject[];
-              }
-            }
-
-            const attachmentMetadatas = await bulkGet<Metadata>(
-              attachments.map((attachment) => `metadata/${attachment.id}`),
-              {
-                apiBaseUrl: "objectstore-api",
-                returnNullForMissingResource: true
-              }
-            );
-
-            // Map the results to handle null (deleted) and undefined (missing)
-            const processedAttachments = attachmentMetadatas.map(
-              (result, index) => {
-                const original = attachments[index];
-
-                if (result === null) {
-                  return {
-                    id: original.id,
-                    type: original.type,
-                    issue: "deleted"
-                  };
-                }
-
-                if (result === undefined) {
-                  return {
-                    id: original.id,
-                    type: original.type,
-                    issue: "loadingIssue"
-                  };
-                }
-
-                return result;
-              }
-            );
-
-            newQualityControls.push({
-              ...qualityControlFound,
-              attachments: processedAttachments as ResourceIdentifierObject[]
-            });
-          }
-        }
-
-        setQualityControls(newQualityControls);
-        setLoadedQualityControls(newQualityControls);
-      }
+    if (!run?.id) {
+      return;
     }
+
+    // Results are included here since multi-level includes are not supported on the quality control query.
+    const qualityControlItemQuery = await apiClient.get<
+      MolecularAnalysisRunItem[]
+    >(`seqdb-api/molecular-analysis-run-item`, {
+      filter: {
+        "run.uuid": { EQ: run?.id },
+        usageType: {
+          EQ: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+        }
+      },
+      include: "result",
+      page: { limit: 1000 }
+    });
+    const qualityControlRunItems = qualityControlItemQuery?.data ?? [];
+    if (qualityControlRunItems.length === 0) {
+      return;
+    }
+
+    // Load all of the quality controls for the run items at once.
+    const qualityControlQuery = await apiClient.get<QualityControl[]>(
+      `seqdb-api/quality-control`,
+      {
+        filter: SimpleSearchFilterBuilder.create<any>()
+          .where(
+            "molecularAnalysisRunItem.uuid",
+            "IN",
+            qualityControlRunItems.map((item) => item.id).join(",")
+          )
+          .build(),
+        include: "molecularAnalysisRunItem",
+        page: { limit: 1000 }
+      }
+    );
+    const qualityControlByRunItemId = new Map(
+      (qualityControlQuery?.data ?? []).map((qualityControl) => [
+        qualityControl.molecularAnalysisRunItem?.id,
+        qualityControl
+      ])
+    );
+
+    // Keep the run item order, skipping run items without a quality control.
+    const qualityControlsFound = qualityControlRunItems.flatMap((runItem) => {
+      const qualityControl = qualityControlByRunItemId.get(runItem.id);
+      return qualityControl
+        ? [{ ...qualityControl, molecularAnalysisRunItem: runItem }]
+        : [];
+    });
+
+    // Retrieve the results with their attachments, then the attachment metadatas to be displayed.
+    const resultIds = qualityControlsFound
+      .map(
+        (qualityControl) => qualityControl.molecularAnalysisRunItem?.result?.id
+      )
+      .filter((id): id is string => !!id);
+    const molecularAnalysisResults = await bulkGet<MolecularAnalysisResult>(
+      resultIds.map(
+        (resultId) =>
+          `/molecular-analysis-result/${resultId}?include=attachments`
+      ),
+      { apiBaseUrl: "/seqdb-api" }
+    );
+    const attachmentsByResultId = new Map<
+      string | undefined,
+      ResourceIdentifierObject[]
+    >(
+      molecularAnalysisResults.map((result) => [
+        result?.id,
+        (result?.attachments ?? []) as ResourceIdentifierObject[]
+      ])
+    );
+    const qualityControlAttachments = await loadAttachmentMetadatas(
+      qualityControlsFound.map(
+        (qualityControl) =>
+          attachmentsByResultId.get(
+            qualityControl.molecularAnalysisRunItem?.result?.id
+          ) ?? []
+      )
+    );
+
+    const newQualityControls: QualityControlWithAttachment[] =
+      qualityControlsFound.map((qualityControl, index) => ({
+        ...(qualityControl as QualityControlWithAttachment),
+        attachments: qualityControlAttachments[index]
+      }));
+
+    setQualityControls(newQualityControls);
+    setLoadedQualityControls(newQualityControls);
   }
 
   /**

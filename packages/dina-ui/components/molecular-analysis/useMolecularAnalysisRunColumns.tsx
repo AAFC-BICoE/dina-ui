@@ -226,7 +226,10 @@ export function useMolecularAnalysisRunColumns({
             value={original.molecularAnalysisRunItem?.name}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               if (original.materialSampleId) {
-                handleNameChange(original.materialSampleId, (event.target as HTMLTextAreaElement | HTMLInputElement).value);
+                handleNameChange(
+                  original.materialSampleId,
+                  (event.target as HTMLTextAreaElement | HTMLInputElement).value
+                );
               }
             }}
           />
@@ -333,11 +336,14 @@ export function useMolecularAnalysisRunColumns({
                       molecularAnalysisRunItemNames;
                     if (
                       original?.materialSampleSummary?.id &&
-                      (event.target as HTMLTextAreaElement | HTMLInputElement).value
+                      (event.target as HTMLTextAreaElement | HTMLInputElement)
+                        .value
                     ) {
                       molecularAnalysisRunItemNamesMap[
                         original?.materialSampleSummary?.id
-                      ] = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
+                      ] = (
+                        event.target as HTMLTextAreaElement | HTMLInputElement
+                      ).value;
                     }
                     return molecularAnalysisRunItemNamesMap;
                   }
@@ -398,10 +404,7 @@ export function useMolecularAnalysisRunColumns({
 
             return (
               <React.Fragment key={attachment.id}>
-                <Link
-                  href={`/object-store/object/view?id=${attachment.id}`}
-                  legacyBehavior
-                >
+                <Link href={`/object-store/object/view?id=${attachment.id}`}>
                   {attachment.originalFilename}
                 </Link>
                 {index < attachments.length - 1 && ", "}
@@ -725,10 +728,7 @@ export function useMolecularAnalysisRunColumns({
 
           return (
             <React.Fragment key={attachment.id}>
-              <Link
-                href={`/object-store/object/view?id=${attachment.id}`}
-                legacyBehavior
-              >
+              <Link href={`/object-store/object/view?id=${attachment.id}`}>
                 {(attachment as any)?.originalFilename}
               </Link>
               {index < attachments.length - 1 && ", "}

@@ -24,7 +24,7 @@ const TABLE_COLUMNS: ColumnDefinition<LibraryPool>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/seqdb/ngs-workflow-pooling/run?id=${id}`} legacyBehavior>
+      <Link href={`/seqdb/ngs-workflow-pooling/run?id=${id}`}>
         {name || id}
       </Link>
     ),
