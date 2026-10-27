@@ -87,6 +87,9 @@ export function ControlledVocabularySelectField(
                 onChange={onChange}
                 options={options}
                 placeholder={formatMessage("typeHereToSearch")}
+                styles={{
+                  placeholder: (base) => ({ ...base, color: "#5c5c5c" })
+                }}
                 value={selectedValue}
                 isMulti={isMulti}
                 isDisabled={disabled}

@@ -500,9 +500,9 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_includeQualityControls:
     "Qualitätskontrollen und Leerproben einbeziehen",
   field_includesBarcode: "Beinhaltet Barcode",
-  field_isBaseForSplitByType: "Als Basisname für Aufteilung verwenden",
-  field_isBaseForSplitByType_tooltip:
-    "Wenn aktiviert und Typ-basierte Aufteilungskonfigurationen verwendet werden, wird diese Materialprobe zur Identifikatorableitung genutzt, sofern Eltern keine anderen Typen enthalten.",
+  field_isBaseForSplitByType: "Aufteilungsnamen beginnen bei",
+  splitNamesFromParent: "Elternprobe eines anderen Typs",
+  splitNamesFromThisSample: "Diese Probe",
   field_isFiledAs_tooltip:
     "Diese Bestimmung als abgelegt markieren. Nur eine Bestimmung kann als abgelegt markiert werden.",
   field_isInseperable: "Inhalt zusammen halten",

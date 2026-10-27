@@ -597,9 +597,23 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_isPrimary_tooltip:
     "Make this determination the primary data point when exported. Only one determination can be primary",
   field_isRestricted: "Is Restricted",
-  field_isBaseForSplitByType: "Use As Base Name For Split",
-  field_isBaseForSplitByType_tooltip:
-    "When enabled and using type based Split Configurations, if no parents contain a different Material Sample Type then this Material Sample will be used to derive the identifier from.",
+  field_isBaseForSplitByType: "Split Names Start From",
+  splitNamesFromParent: "Parent of another type",
+  splitNamesFromThisSample: "This sample",
+  splitNamesStartFromHelp:
+    "This setting is only relevant when using a Material Sample Type split strategy.",
+  splitNamesFromParentRule:
+    "New children are named from the nearest ancestor that has a different sample type.",
+  splitNamesFromThisSampleRule:
+    "No ancestor has a different sample type, so the sample with this setting turned on is used as the base.",
+  splitExampleWholeOrganism: "Whole Organism",
+  splitExampleOrganismPart: "Organism Part",
+  splitExampleBaseName: "Base name",
+  splitExampleBeingSplit: "Being split",
+  splitExampleBaseNameBeingSplit: "Base name · being split",
+  splitExampleNew: "New",
+  splitExampleFooter:
+    "Sample IDs and types are examples. Actual names depend on the split configuration selected.",
   field_isolatedBy: "Isolated By",
   field_isolatedOn: "Isolated On",
   field_isolationRemarks: "Isolation Remarks",

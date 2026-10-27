@@ -168,6 +168,23 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Créer un échantillon à l'aide d'un modèle de formulaire",
   createSavedSearch: "Créer une recherche sauvegardée",
   createSplitWorkflow: "Créer un fractionnement",
+  field_isBaseForSplitByType: "Noms du fractionnement à partir de",
+  splitNamesFromParent: "Parent d’un autre type",
+  splitNamesFromThisSample: "Cet échantillon",
+  splitNamesStartFromHelp:
+    "Ce paramètre ne s’applique que lors de l’utilisation d’une stratégie de fractionnement par type d’échantillon de matériel.",
+  splitNamesFromParentRule:
+    "Les nouveaux enfants sont nommés à partir de l’ancêtre le plus proche ayant un type d’échantillon différent.",
+  splitNamesFromThisSampleRule:
+    "Aucun ancêtre n’a un type d’échantillon différent ; l’échantillon pour lequel ce paramètre est activé sert donc de base.",
+  splitExampleWholeOrganism: "Organisme entier",
+  splitExampleOrganismPart: "Partie d’organisme",
+  splitExampleBaseName: "Nom de base",
+  splitExampleBeingSplit: "En fractionnement",
+  splitExampleBaseNameBeingSplit: "Nom de base · en fractionnement",
+  splitExampleNew: "Nouveau",
+  splitExampleFooter:
+    "Les identifiants et types d’échantillons sont des exemples. Les noms réels dépendent de la configuration de fractionnement choisie.",
   createStorage: "Créer un espace d'entreposage",
   customPlaceName: "Nom de lieu personnalisé",
   dataComponents: "Sections",
