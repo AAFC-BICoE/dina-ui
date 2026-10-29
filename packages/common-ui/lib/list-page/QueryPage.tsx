@@ -37,11 +37,9 @@ import { CommonMessage } from "../intl/common-ui-intl";
 import {
   AttachSelectedButton,
   AttachSelectedButtonProps,
-  BulkDeleteButton,
+  BulkActionsDropdown,
   BulkDeleteButtonProps,
-  BulkEditButton,
-  BulkSplitButton,
-  DataExportButton
+  SelectedCountText
 } from "../list-page-layout/bulk-buttons";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { MultiSortTooltip } from "./MultiSortTooltip";
@@ -1350,29 +1348,41 @@ export function QueryPage<TData extends KitsuResource>({
                           nonExportableColumns={nonExportableColumns}
                         />
                       )}
-                      {bulkEditPath && (
-                        <BulkEditButton
-                          pathname={bulkEditPath}
-                          singleEditPathName={singleEditPath}
-                        />
-                      )}
-                      {bulkDeleteButtonProps && (
-                        <BulkDeleteButton {...bulkDeleteButtonProps} />
-                      )}
-                      {dataExportProps && (
-                        <DataExportButton
-                          pathname={dataExportProps.dataExportPath}
-                          entityLink={dataExportProps.entityLink}
-                          totalRecords={totalRecords}
-                          query={elasticSearchQuery}
-                          uniqueName={uniqueName}
-                          columns={columns}
-                          dynamicFieldMapping={dynamicFieldMapping}
+                      {(bulkEditPath ||
+                        bulkDeleteButtonProps ||
+                        dataExportProps ||
+                        bulkSplitPath) && (
+                        <BulkActionsDropdown
                           indexName={indexName}
+                          edit={
+                            bulkEditPath
+                              ? {
+                                  pathname: bulkEditPath,
+                                  singleEditPathName: singleEditPath
+                                }
+                              : undefined
+                          }
+                          split={
+                            bulkSplitPath
+                              ? { pathname: bulkSplitPath }
+                              : undefined
+                          }
+                          dataExport={
+                            dataExportProps
+                              ? {
+                                  pathname: dataExportProps.dataExportPath,
+                                  entityLink: dataExportProps.entityLink,
+                                  totalRecords,
+                                  query: elasticSearchQuery,
+                                  uniqueName,
+                                  columns,
+                                  dynamicFieldMapping,
+                                  indexName
+                                }
+                              : undefined
+                          }
+                          del={bulkDeleteButtonProps}
                         />
-                      )}
-                      {bulkSplitPath && (
-                        <BulkSplitButton pathname={bulkSplitPath} />
                       )}
                       {attachSelectedButtonsProps && (
                         <AttachSelectedButton {...attachSelectedButtonsProps} />
@@ -1427,6 +1437,9 @@ export function QueryPage<TData extends KitsuResource>({
                             values={{ totalCount: formatNumber(totalRecords) }}
                           />
                         )}
+                        {!loading &&
+                          !columnSelectorLoading &&
+                          !selectionMode && <SelectedCountText />}
                       </span>
 
                       {/* Multi sort tooltip - Only shown if it's possible to sort */}

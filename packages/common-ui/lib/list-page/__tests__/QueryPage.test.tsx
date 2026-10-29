@@ -120,7 +120,10 @@ describe("QueryPage test", () => {
       })
     );
 
-    // Click the Bulk Delete button
+    // Click the Bulk Delete button (inside the Actions dropdown)
+    await userEvent.click(
+      wrapper.container.querySelector(".bulk-actions-dropdown button")!
+    );
     await userEvent.click(
       wrapper.getByRole("button", {
         name: /delete selected/i
