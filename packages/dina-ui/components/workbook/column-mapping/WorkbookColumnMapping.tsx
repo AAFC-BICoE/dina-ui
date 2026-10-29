@@ -129,7 +129,8 @@ export function WorkbookColumnMapping({
     relationshipMapping,
     resolveColumnMappingAndRelationshipMapping,
     getResourceSelectField,
-    getRelationshipValues
+    getRelationshipValues,
+    taxonomicRanks
   } = useColumnMapping();
 
   const { allowAppendData, fieldColumnLocaleId } =
@@ -1047,6 +1048,7 @@ export function WorkbookColumnMapping({
                       columnName={columnName}
                       columnIndex={index}
                       fieldOptions={fieldOptions}
+                      taxonomicRanks={taxonomicRanks}
                       onFieldMappingChange={onFieldMappingChange}
                       key={index}
                       type={type}

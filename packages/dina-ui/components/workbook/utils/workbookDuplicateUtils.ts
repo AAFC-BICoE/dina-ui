@@ -1,4 +1,7 @@
 import Kitsu from "kitsu";
+import _ from "lodash";
+import { SimpleSearchFilterBuilder } from "../../../../common-ui/lib";
+import { MaterialSample } from "../../../types/collection-api";
 import { RelationshipMapping } from "../types/Workbook";
 
 export interface DuplicatePrimaryId {
@@ -75,32 +78,61 @@ export async function checkServerDuplicatePrimaryIds(
   apiClient: Kitsu,
   entries: DuplicatePrimaryId[]
 ): Promise<DuplicatePrimaryId[]> {
-  return Promise.all(
-    entries.map(async (entry) => {
-      if (!entry.collectionUuid) {
-        return entry;
-      }
+  // One request per collection and chunk of 100 names instead of one per row.
+  // Commas are the IN separator, so names containing one are looked up individually with EQ.
+  const existing = new Set<string>();
+  const failed = new Set<string>();
+  const byCollection = _.groupBy(
+    entries.filter((entry) => entry.collectionUuid),
+    (entry) => entry.collectionUuid
+  );
 
-      const path = `collection-api/material-sample?filter[materialSampleName][EQ]=${encodeURIComponent(
-        entry.materialSampleName
-      )}&filter[collection.uuid][EQ]=${encodeURIComponent(
-        entry.collectionUuid
-      )}`;
-
-      try {
-        const response = await apiClient.get<unknown[]>(path, {
-          page: { limit: 1 }
-        });
-        return { ...entry, serverDuplicate: response.data.length > 0 };
-      } catch (error) {
-        console.error(
-          `Error checking server duplicate for ${entry.materialSampleName}/${entry.collectionName}:`,
-          error
-        );
-        return entry;
-      }
+  await Promise.all(
+    Object.entries(byCollection).flatMap(([collectionUuid, group]) => {
+      const [commaNames, plainNames] = _.partition(
+        _.uniq(group.map((entry) => entry.materialSampleName)),
+        (name) => name.includes(",")
+      );
+      return [
+        ..._.chunk(plainNames, 100),
+        ...commaNames.map((name) => [name])
+      ].map(async (names) => {
+        try {
+          const response = await apiClient.get<MaterialSample[]>(
+            "collection-api/material-sample",
+            {
+              filter: SimpleSearchFilterBuilder.create<MaterialSample>()
+                .where("collection.uuid" as any, "EQ", collectionUuid)
+                .where(
+                  "materialSampleName",
+                  names.length === 1 ? "EQ" : "IN",
+                  names.length === 1 ? names[0] : names
+                )
+                .build(),
+              fields: { "material-sample": "materialSampleName" },
+              page: { limit: 1000 }
+            }
+          );
+          response.data.forEach((sample) =>
+            existing.add(`${collectionUuid}/${sample.materialSampleName}`)
+          );
+        } catch (error) {
+          console.error(
+            `Error checking server duplicates for collection ${collectionUuid}:`,
+            error
+          );
+          names.forEach((name) => failed.add(`${collectionUuid}/${name}`));
+        }
+      });
     })
   );
+
+  return entries.map((entry) => {
+    const key = `${entry.collectionUuid}/${entry.materialSampleName}`;
+    return !entry.collectionUuid || failed.has(key)
+      ? entry
+      : { ...entry, serverDuplicate: existing.has(key) };
+  });
 }
 
 export function getDuplicateRowNumbers(

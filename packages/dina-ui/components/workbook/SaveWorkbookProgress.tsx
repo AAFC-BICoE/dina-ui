@@ -95,10 +95,11 @@ export function SaveWorkbookProgress({
     finishSavingWorkbook(sourceSetValue ?? "", resourcesUpdatedCount.current);
   };
 
-  const { linkRelationshipAttribute } = useWorkbookConverter(
-    FieldMappingConfig,
-    workbookResources?.[0].type || "material-sample"
-  );
+  const { linkRelationshipAttribute, saveWithPendingCreates } =
+    useWorkbookConverter(
+      FieldMappingConfig,
+      workbookResources?.[0].type || "material-sample"
+    );
 
   useEffect(() => {
     const handleWindowClose = (e) => {
@@ -176,15 +177,17 @@ export function SaveWorkbookProgress({
         // If handler says to pause, save what we have and pause
         if (result.shouldPause) {
           if (chunkedResources.slice(0, i - 1).length > 0) {
-            const savedSoFar = await save(
-              chunkedResources.slice(0, i - 1).map(
-                (item) =>
-                  ({
-                    resource: item,
-                    type
-                  } as any)
-              ),
-              { apiBaseUrl }
+            const savedSoFar = await saveWithPendingCreates(() =>
+              save(
+                chunkedResources.slice(0, i - 1).map(
+                  (item) =>
+                    ({
+                      resource: item,
+                      type
+                    } as any)
+                ),
+                { apiBaseUrl }
+              )
             );
             setSavedResources([...savedResources, ...savedSoFar]);
             setNow(progressInternal - 1);
@@ -200,22 +203,23 @@ export function SaveWorkbookProgress({
         userSelectedSameNameParentSample.current = undefined;
       }
 
-      const savedArgs = await save(
-        chunkedResources.map(
-          (item) =>
-            ({
-              resource: item,
-              type
-            } as any)
-        ),
-        { apiBaseUrl }
+      const savedArgs = await saveWithPendingCreates(() =>
+        save(
+          chunkedResources.map(
+            (item) =>
+              ({
+                resource: item,
+                type
+              } as any)
+          ),
+          { apiBaseUrl }
+        )
       );
       setSavedResources([...savedResources, ...savedArgs]);
     }
 
-    // Split big array into small chunks, which chunk size is 5.
-    // Save very 5 records once.
-    const chunkSize = 5;
+    // Split big array into chunks and save each chunk with a few bulk requests.
+    const chunkSize = 30;
     for (
       let i = now;
       i < workbookResources.length && statusRef.current === "SAVING";
@@ -258,60 +262,66 @@ export function SaveWorkbookProgress({
       return;
     }
 
-    const fetchedMaterialSamples = await apiClient.get<MaterialSample[]>(
-      "/collection-api/material-sample",
-      {
-        include: "collectingEvent,organism,storageUnitUsage",
-        filter: SimpleSearchFilterBuilder.create<MaterialSample>()
-          .where("sourceSet", "EQ", sourceSet.current)
-          .build()
-      }
-    );
+    // Delete page by page, the next page then holds what is left.
+    const pageSize = 1000;
+    let fetchedMaterialSamples;
+    do {
+      fetchedMaterialSamples = await apiClient.get<MaterialSample[]>(
+        "/collection-api/material-sample",
+        {
+          include: "collectingEvent,organism,storageUnitUsage",
+          filter: SimpleSearchFilterBuilder.create<MaterialSample>()
+            .where("sourceSet", "EQ", sourceSet.current)
+            .build(),
+          page: { limit: pageSize }
+        }
+      );
 
-    // Retrieve all the IDs of everything that should be deleted that was created with the workbook uploader.
-    const materialSampleIds = fetchedMaterialSamples?.data
-      .map((materialSample) => materialSample.id)
-      .filter((id): id is string => Boolean(id));
+      // Retrieve all the IDs of everything that should be deleted that was created with the workbook uploader.
+      const materialSampleIds = fetchedMaterialSamples?.data
+        .map((materialSample) => materialSample.id)
+        .filter((id): id is string => Boolean(id));
 
-    const collectingEventIds = fetchedMaterialSamples?.data
-      .map((materialSample) => materialSample.collectingEvent?.id)
-      .filter((id): id is string => Boolean(id));
+      const collectingEventIds = fetchedMaterialSamples?.data
+        .map((materialSample) => materialSample.collectingEvent?.id)
+        .filter((id): id is string => Boolean(id));
 
-    const organismIds = fetchedMaterialSamples?.data
-      .flatMap((materialSample) => materialSample.organism ?? [])
-      .map((organism) => organism?.id)
-      .filter((id): id is string => Boolean(id));
+      const organismIds = fetchedMaterialSamples?.data
+        .flatMap((materialSample) => materialSample.organism ?? [])
+        .map((organism) => organism?.id)
+        .filter((id): id is string => Boolean(id));
 
-    const storageUnitUsageIds = fetchedMaterialSamples?.data
-      .map((materialSample) => materialSample.storageUnitUsage?.id)
-      .filter((id): id is string => Boolean(id));
+      const storageUnitUsageIds = fetchedMaterialSamples?.data
+        .map((materialSample) => materialSample.storageUnitUsage?.id)
+        .filter((id): id is string => Boolean(id));
 
-    if (apiBaseUrl) {
-      if (materialSampleIds?.length) {
-        await bulkDeleteResources(materialSampleIds, {
-          apiBaseUrl,
-          resourceType: "material-sample"
-        });
+      if (apiBaseUrl) {
+        if (materialSampleIds?.length) {
+          await bulkDeleteResources(materialSampleIds, {
+            apiBaseUrl,
+            resourceType: "material-sample"
+          });
+        }
+        if (collectingEventIds?.length) {
+          await bulkDeleteResources(collectingEventIds, {
+            apiBaseUrl,
+            resourceType: "collecting-event"
+          });
+        }
+        if (organismIds?.length) {
+          await bulkDeleteResources(organismIds, {
+            apiBaseUrl,
+            resourceType: "organism"
+          });
+        }
+        if (storageUnitUsageIds?.length) {
+          await bulkDeleteResources(storageUnitUsageIds, {
+            apiBaseUrl,
+            resourceType: "storage-unit-usage"
+          });
+        }
       }
-      if (collectingEventIds?.length) {
-        await bulkDeleteResources(collectingEventIds, {
-          apiBaseUrl,
-          resourceType: "collecting-event"
-        });
-      }
-      if (organismIds?.length) {
-        await bulkDeleteResources(organismIds, {
-          apiBaseUrl,
-          resourceType: "organism"
-        });
-      }
-      if (storageUnitUsageIds?.length) {
-        await bulkDeleteResources(storageUnitUsageIds, {
-          apiBaseUrl,
-          resourceType: "storage-unit-usage"
-        });
-      }
-    }
+    } while (apiBaseUrl && fetchedMaterialSamples?.data?.length === pageSize);
 
     onWorkbookFailed?.();
   }
