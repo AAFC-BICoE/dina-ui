@@ -30,7 +30,14 @@ export function MaterialSampleBreadCrumb({
 
   const displayName = materialSample.materialSampleName ?? materialSample.id;
   const organismCount = materialSample.organism?.filter(Boolean).length ?? 0;
+  const singleOrganism =
+    organismCount === 1 ? materialSample.organism?.find(Boolean) : undefined;
 
+  const primaryDetermination = singleOrganism?.determination?.find(
+    (determination) => determination?.isPrimary
+  );
+
+  const scientificName = primaryDetermination?.scientificName;
   const determinationCount =
     materialSample.organism?.reduce(
       (total, organism) => total + (organism?.determination?.length ?? 0),
@@ -55,27 +62,31 @@ export function MaterialSampleBreadCrumb({
   return (
     <>
       {/* Current Material Sample Name */}
-      <h2
-        id="wb-cont"
-        className="d-flex justify-content-between align-items-end mb-0"
-        style={{ fontSize: "1.4rem" }}
-      >
-        <strong>
-          {!disableLastLink ? (
-            <Link
-              href={`/collection/material-sample/view?id=${materialSample.id}`}
-            >
-              {displayName}
-            </Link>
-          ) : (
-            <div className="d-inline-flex flex-row align-items-center">
-              <span>{displayName}</span>
-            </div>
-          )}
-        </strong>
+      <div className="d-flex flex-wrap align-items-end column-gap-3 row-gap-2">
+        <h2
+          id="wb-cont"
+          className="mb-0"
+          style={{
+            fontSize: "1.4rem"
+          }}
+        >
+          <strong>
+            {!disableLastLink ? (
+              <Link
+                href={`/collection/material-sample/view?id=${materialSample.id}`}
+              >
+                {displayName}
+              </Link>
+            ) : (
+              <div className="d-inline-flex flex-row align-items-center">
+                <span>{displayName}</span>
+              </div>
+            )}
+          </strong>
+        </h2>
         {enableGroupSelectField &&
           (!readOnly ? (
-            <h6 className="col-md-6 align-self-end mb-0">
+            <div className="col-md-6 align-self-end mb-0">
               <DinaFormSection horizontal={"flex"}>
                 <GroupSelectField
                   disableTemplateCheckbox={true}
@@ -86,7 +97,7 @@ export function MaterialSampleBreadCrumb({
                   styles={customStyle}
                 />
               </DinaFormSection>
-            </h6>
+            </div>
           ) : (
             <div className="d-inline-flex flex-row align-self-end">
               <div className="header-group-text">
@@ -95,7 +106,22 @@ export function MaterialSampleBreadCrumb({
               <NotPubliclyReleasableWarning />
             </div>
           ))}
-      </h2>
+        {scientificName && (
+          <div
+            className="fst-italic fw-medium mt-1 ms-auto"
+            style={{
+              fontSize: "1.1rem",
+              lineHeight: 1.4,
+              overflowWrap: "anywhere",
+              whiteSpace: "normal",
+              minWidth: 0,
+              maxWidth: "100%"
+            }}
+          >
+            {scientificName}
+          </div>
+        )}
+      </div>
       <div className="d-flex align-items-center gap-3 text-muted mt-1 mb-0">
         {collectionName && (
           <span

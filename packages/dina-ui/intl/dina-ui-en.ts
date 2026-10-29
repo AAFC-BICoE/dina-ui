@@ -1185,6 +1185,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedSearchOverwriteExisting:
     'There is currently already a saved search named "{savedSearchName}". Creating this saved search will overwrite the existing saved search.',
   scheduledActions: "Scheduled Actions",
+  addClassificationRank: "Add classification rank",
+  removeClassificationRank: "Remove classification rank",
+  enterClassificationManually: "Enter classification manually",
   scientificNameSearch: "Classification",
   manual: "Manual",
   searchButton: "Search",

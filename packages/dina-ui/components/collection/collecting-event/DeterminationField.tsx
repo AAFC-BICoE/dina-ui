@@ -114,6 +114,7 @@ export function DeterminationField({
       <TabbedArrayField<Determination>
         legend={<DinaMessage id="determinations" />}
         name={determinationsPath}
+        className="clean-section"
         typeName={formatMessage("determination")}
         sectionId={id}
         initialIndex={initialIndex}
@@ -155,32 +156,34 @@ export function DeterminationField({
           return (
             <div className="row">
               {!readOnly && !isTemplate && (
-                <div className="d-flex gap-4">
-                  <ToggleField
-                    className="primary-determination-button"
-                    {...fieldProps("isPrimary")}
-                    onChangeExternal={(checked, formik) => {
-                      if (checked) {
-                        makePrimary(formik, index);
-                      }
-                    }}
-                  />
-                  <ToggleField
-                    className="filed-as-button"
-                    {...fieldProps("isFiledAs")}
-                    onChangeExternal={(checked, formik) => {
-                      if (checked) {
-                        makeFiledAs(formik, index);
-                      }
-                    }}
-                  />
-                </div>
+                <DinaFormSection horizontal="flex" compact={true}>
+                  <div className="d-flex align-items-center gap-4 determination-toggles">
+                    <ToggleField
+                      className="primary-determination-button"
+                      {...fieldProps("isPrimary")}
+                      onChangeExternal={(checked, formik) => {
+                        if (checked) {
+                          makePrimary(formik, index);
+                        }
+                      }}
+                    />
+                    <ToggleField
+                      className="filed-as-button"
+                      {...fieldProps("isFiledAs")}
+                      onChangeExternal={(checked, formik) => {
+                        if (checked) {
+                          makeFiledAs(formik, index);
+                        }
+                      }}
+                    />
+                  </div>
+                </DinaFormSection>
               )}
-              <div className="col-md-6">
+              <div className="col-12">
                 <FieldSet
                   legend={<DinaMessage id="verbatimDeterminationLegend" />}
                   id={navId("verbatim-determination")}
-                  className="non-strip"
+                  className="non-strip clean-section mt-4"
                   componentName={ORGANISMS_COMPONENT_NAME}
                   sectionName="organism-verbatim-determination-section"
                 >
@@ -212,7 +215,7 @@ export function DeterminationField({
                 <FieldSet
                   legend={<DinaMessage id="typeSpecimen" />}
                   id={navId("type-specimen")}
-                  className="non-strip"
+                  className="non-strip clean-section"
                   componentName={ORGANISMS_COMPONENT_NAME}
                   sectionName="organism-type-specimen-section"
                 >
@@ -236,11 +239,11 @@ export function DeterminationField({
                   />
                 </FieldSet>
               </div>
-              <div className="col-md-6">
+              <div className="col-12">
                 <FieldSet
                   legend={<DinaMessage id="determination" />}
                   id={navId("determination")}
-                  className="non-strip"
+                  className="non-strip clean-section"
                   componentName={ORGANISMS_COMPONENT_NAME}
                   sectionName="organism-determination-section"
                 >
@@ -337,7 +340,7 @@ export function DeterminationField({
                           legend: (
                             <DinaMessage id="determinationManagedAttributes" />
                           ),
-                          className: "non-strip",
+                          className: "non-strip clean-section",
                           sectionName: "organism-managed-attributes-section"
                         }}
                         managedAttributeOrderFieldName="determinationManagedAttributesOrder"
@@ -361,7 +364,7 @@ export function DeterminationField({
                           <DinaMessage id="determinationManagedAttributes" />
                         ),
                         id: navId("determination-managed-attributes"),
-                        className: "non-strip",
+                        className: "non-strip clean-section",
                         sectionName: "organism-managed-attributes-section"
                       }}
                       managedAttributeOrderFieldName="determinationManagedAttributesOrder"

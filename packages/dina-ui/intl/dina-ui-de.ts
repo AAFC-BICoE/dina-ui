@@ -1111,6 +1111,9 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   savedSearchOverwriteExisting:
     "Es existiert bereits eine gespeicherte Suche mit dem Namen „{savedSearchName}“. Das Erstellen dieser Suche überschreibt die bestehende.",
   scheduledActions: "geplante Aktionen",
+  addClassificationRank: "Klassifikationsrang hinzufügen",
+  removeClassificationRank: "Klassifikationsrang entfernen",
+  enterClassificationManually: "Klassifikation manuell eingeben",
   scientificNameSearch: "Suche in den wissenschaftlichen Namen",
   searchButton: "Suche",
   searchOnCOL: "Suche im Catalogue of Life",
