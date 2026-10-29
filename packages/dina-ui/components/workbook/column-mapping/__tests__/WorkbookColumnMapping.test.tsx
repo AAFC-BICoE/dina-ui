@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { mountWithAppContext } from "common-ui";
 import { useEffect } from "react";
 import "@testing-library/jest-dom";
+import { COLLECTION_OTHER_IDENTIFIERS_ID } from "../../../controlled-vocabulary/controlledVocabularyItemUtils";
 import db from "../../WorkbookDB";
 import {
   useWorkbookContext,
@@ -63,9 +64,18 @@ const MANAGED_ATTRIBUTES = [
   }
 ];
 
+const IDENTIFIERS = [
+  {
+    id: "tube-id",
+    type: "controlled-vocabulary-item",
+    name: "Tube ID",
+    key: "tube_id"
+  }
+];
+
 let existingMaterialSampleNames: string[] = [];
 
-const mockGet = jest.fn(async (path: string, _params?: any) => {
+const mockGet = jest.fn(async (path: string, params?: any) => {
   if (
     path.includes("resource-name-identifier") &&
     path.includes("filter[type][EQ]=collection")
@@ -76,7 +86,10 @@ const mockGet = jest.fn(async (path: string, _params?: any) => {
     return { data: PERSONS };
   }
   if (path === "collection-api/controlled-vocabulary-item") {
-    return { data: MANAGED_ATTRIBUTES };
+    const isIdentifierQuery = JSON.stringify(params?.filter).includes(
+      COLLECTION_OTHER_IDENTIFIERS_ID
+    );
+    return { data: isIdentifierQuery ? IDENTIFIERS : MANAGED_ATTRIBUTES };
   }
   if (path === "collection-api/material-sample") {
     return {
@@ -221,6 +234,33 @@ describe("WorkbookColumnMapping", () => {
       ).toBeInTheDocument();
     });
 
+    it.each([
+      [
+        "with the generated column path",
+        "Collection Name",
+        ["collection.name"]
+      ],
+      ["without a generated column path", "collection.name", undefined]
+    ])(
+      "shows the spreadsheet header %s",
+      async (_description, header, originalColumns) => {
+        await renderColumnMapping({
+          0: {
+            sheetName: "Sheet1",
+            originalColumns,
+            rows: [
+              { rowNumber: 0, content: [header] },
+              { rowNumber: 1, content: ["Spreadsheet Collection"] }
+            ]
+          }
+        });
+
+        const row = await findRelationshipRow("Spreadsheet Collection");
+        expect(within(row).getByText(header)).toBeInTheDocument();
+        expect(within(row).queryByText("collection_name")).toBeNull();
+      }
+    );
+
     it("keeps a column mapping that was selected manually", async () => {
       await renderColumnMapping(
         createCollectionSpreadsheet("Owning Collection")
@@ -285,6 +325,30 @@ describe("WorkbookColumnMapping", () => {
         );
       }
     );
+  });
+
+  describe("other identifiers", () => {
+    it("automatically selects an other identifier by the header's name", async () => {
+      await renderColumnMapping({
+        0: {
+          sheetName: "Sheet1",
+          originalColumns: ["managedAttributes.tube_id"],
+          rows: [
+            { rowNumber: 0, content: ["Tube ID"] },
+            { rowNumber: 1, content: ["M_MMK2_h_0"] }
+          ]
+        }
+      });
+
+      const mappingRow = await findColumnMappingRow("Tube ID");
+      await waitFor(() =>
+        expect(
+          Array.from(mappingRow.querySelectorAll("[class*='singleValue']")).map(
+            (value) => value.textContent
+          )
+        ).toEqual(["Other Identifiers", "Tube ID"])
+      );
+    });
   });
 
   describe("multiple agents in a cell", () => {

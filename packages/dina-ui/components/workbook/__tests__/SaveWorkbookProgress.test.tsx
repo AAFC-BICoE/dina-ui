@@ -147,7 +147,8 @@ describe("SaveWorkbookProgress", () => {
     expect(mockOnWorkbookFailed).not.toHaveBeenCalled();
   });
 
-  it("Deletes created material-sample, collecting-event, organism, and storage-unit-usage records when cleaning up failed import", async () => {
+  // Saves one chunk, fails the next, then clicks "Delete Failed Import".
+  async function failImportAndClickDelete() {
     (WorkbookProvider.useWorkbookContext as jest.Mock).mockImplementation(
       () => {
         const [status, setStatus] = React.useState<string>("SAVING");
@@ -211,6 +212,10 @@ describe("SaveWorkbookProgress", () => {
     });
 
     await userEvent.click(deleteButton);
+  }
+
+  it("Deletes created material-sample, collecting-event, organism, and storage-unit-usage records when cleaning up failed import", async () => {
+    await failImportAndClickDelete();
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(
@@ -252,5 +257,33 @@ describe("SaveWorkbookProgress", () => {
         resourceType: "storage-unit-usage"
       }
     );
+  });
+
+  it("Deletes every page of the records created before the import failed", async () => {
+    const samples = (from: number, count: number) =>
+      Array.from({ length: count }, (_, i) => ({
+        id: `mat-sample-${from + i}`,
+        type: "material-sample"
+      }));
+    const pages = [samples(0, 1000), samples(1000, 3)];
+    mockGet.mockImplementation(async (_path: string, options?: any) => ({
+      data: options?.include?.includes("collectingEvent")
+        ? pages.shift() ?? []
+        : []
+    }));
+
+    await failImportAndClickDelete();
+
+    await waitFor(() => expect(mockOnWorkbookFailed).toHaveBeenCalled());
+    const cleanupQueries = mockGet.mock.calls.filter(([, options]) =>
+      options?.include?.includes("collectingEvent")
+    );
+    expect(cleanupQueries).toHaveLength(2);
+    for (const [, options] of cleanupQueries) {
+      expect(options.page).toEqual({ limit: 1000 });
+    }
+    expect(
+      mockBulkDeleteResources.mock.calls.map(([ids]) => ids.length)
+    ).toEqual([1000, 3]);
   });
 });
