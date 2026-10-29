@@ -43,6 +43,26 @@ const PERSONS = [
   }
 ];
 
+const MANAGED_ATTRIBUTES = [
+  {
+    id: "incubation-date",
+    type: "controlled-vocabulary-item",
+    name: "Incubation Date",
+    key: "incubation_date",
+    dinaComponent: "PREPARATION",
+    vocabularyElementType: "DATE"
+  },
+  {
+    id: "inoculation-date",
+    type: "controlled-vocabulary-item",
+    name: "Inoculation Date",
+    // The generated key differs from the column path (inoculation_date).
+    key: "inoculation_date_date",
+    dinaComponent: "PREPARATION",
+    vocabularyElementType: "DATE"
+  }
+];
+
 let existingMaterialSampleNames: string[] = [];
 
 const mockGet = jest.fn(async (path: string, _params?: any) => {
@@ -54,6 +74,9 @@ const mockGet = jest.fn(async (path: string, _params?: any) => {
   }
   if (path === "agent-api/person") {
     return { data: PERSONS };
+  }
+  if (path === "collection-api/controlled-vocabulary-item") {
+    return { data: MANAGED_ATTRIBUTES };
   }
   if (path === "collection-api/material-sample") {
     return {
@@ -232,6 +255,36 @@ describe("WorkbookColumnMapping", () => {
         getSelectedValue(await findColumnMappingRow("Owning Collection"))
       ).toEqual("Name");
     });
+  });
+
+  describe("managed attributes", () => {
+    it.each([
+      ["Incubation Date", "incubation_date"],
+      ["Inoculation Date", "inoculation_date"]
+    ])(
+      "automatically selects the %s preparation managed attribute",
+      async (header, key) => {
+        await renderColumnMapping({
+          0: {
+            sheetName: "Sheet1",
+            originalColumns: [`preparationManagedAttributes.${key}`],
+            rows: [
+              { rowNumber: 0, content: [header] },
+              { rowNumber: 1, content: ["2019-09-24"] }
+            ]
+          }
+        });
+
+        const mappingRow = await findColumnMappingRow(header);
+        await waitFor(() =>
+          expect(
+            Array.from(
+              mappingRow.querySelectorAll("[class*='singleValue']")
+            ).map((value) => value.textContent)
+          ).toEqual(["Preparation Managed Attributes", header])
+        );
+      }
+    );
   });
 
   describe("multiple agents in a cell", () => {

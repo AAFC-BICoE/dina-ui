@@ -45,7 +45,7 @@ export function useWorkbookConverter(
   mappingConfig: FieldMappingConfigType,
   entityName: string
 ) {
-  const { apiClient, save } = useApiClient();
+  const { apiClient, save, bulkDeleteResources } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
   const FIELD_TO_VOCAB_ELEMS_MAP = useMemo(() => {
@@ -400,7 +400,7 @@ export function useWorkbookConverter(
     }
   }
 
-  // New related records are queued and created together by flushPendingCreates.
+  // New related records are queued and created together by saveWithPendingCreates.
   const pendingCreates = useRef<
     {
       resource: any;
@@ -410,25 +410,46 @@ export function useWorkbookConverter(
     }[]
   >([]);
 
-  /** Returns the relationship value, its id is filled in by flushPendingCreates. */
+  /** Returns the relationship value, its id is filled in by saveWithPendingCreates. */
   function queueCreate(resource: any, type: string, apiBaseUrl: string) {
     const created = { id: "", type };
     pendingCreates.current.push({ resource, type, apiBaseUrl, created });
     return created;
   }
 
-  async function flushPendingCreates() {
+  /**
+   * Creates the queued records, then runs saveResources to save the resources that link to them.
+   * If anything fails, the records created here are deleted again so they are not left orphaned.
+   */
+  async function saveWithPendingCreates<T>(
+    saveResources: () => Promise<T>
+  ): Promise<T> {
     const queued = pendingCreates.current;
     pendingCreates.current = [];
-    // A bulk request takes one resource type, sent in the order each type was first queued.
-    const groups = _.groupBy(queued, (q) => `${q.apiBaseUrl}/${q.type}`);
-    for (const group of Object.values(groups)) {
-      const saved = await save(
-        group.map(({ resource, type }) => ({ resource, type })),
-        { apiBaseUrl: group[0].apiBaseUrl }
-      );
-      // The relationships hold these objects, so they pick up the new ids.
-      group.forEach(({ created }, i) => (created.id = saved[i].id));
+    const createdGroups: { apiBaseUrl: string; type: string; ids: string[] }[] =
+      [];
+    try {
+      // A bulk request takes one resource type, sent in the order each type was first queued.
+      const groups = _.groupBy(queued, (q) => `${q.apiBaseUrl}/${q.type}`);
+      for (const group of Object.values(groups)) {
+        const { apiBaseUrl, type } = group[0];
+        const saved = await save(
+          group.map(({ resource }) => ({ resource, type })),
+          { apiBaseUrl }
+        );
+        // The relationships hold these objects, so they pick up the new ids.
+        group.forEach(({ created }, i) => (created.id = saved[i].id));
+        createdGroups.push({ apiBaseUrl, type, ids: saved.map((r) => r.id) });
+      }
+      return await saveResources();
+    } catch (error) {
+      for (const { apiBaseUrl, type, ids } of createdGroups.reverse()) {
+        await bulkDeleteResources(ids, {
+          apiBaseUrl,
+          resourceType: type
+        }).catch(console.error);
+      }
+      throw error;
     }
   }
 
@@ -864,7 +885,7 @@ export function useWorkbookConverter(
 
   return {
     linkRelationshipAttribute,
-    flushPendingCreates,
+    saveWithPendingCreates,
     searchColumnMap,
     convertWorkbook,
     flattenedConfig,

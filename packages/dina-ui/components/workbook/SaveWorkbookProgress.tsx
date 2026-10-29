@@ -95,7 +95,7 @@ export function SaveWorkbookProgress({
     finishSavingWorkbook(sourceSetValue ?? "", resourcesUpdatedCount.current);
   };
 
-  const { linkRelationshipAttribute, flushPendingCreates } =
+  const { linkRelationshipAttribute, saveWithPendingCreates } =
     useWorkbookConverter(
       FieldMappingConfig,
       workbookResources?.[0].type || "material-sample"
@@ -177,16 +177,17 @@ export function SaveWorkbookProgress({
         // If handler says to pause, save what we have and pause
         if (result.shouldPause) {
           if (chunkedResources.slice(0, i - 1).length > 0) {
-            await flushPendingCreates();
-            const savedSoFar = await save(
-              chunkedResources.slice(0, i - 1).map(
-                (item) =>
-                  ({
-                    resource: item,
-                    type
-                  } as any)
-              ),
-              { apiBaseUrl }
+            const savedSoFar = await saveWithPendingCreates(() =>
+              save(
+                chunkedResources.slice(0, i - 1).map(
+                  (item) =>
+                    ({
+                      resource: item,
+                      type
+                    } as any)
+                ),
+                { apiBaseUrl }
+              )
             );
             setSavedResources([...savedResources, ...savedSoFar]);
             setNow(progressInternal - 1);
@@ -202,16 +203,17 @@ export function SaveWorkbookProgress({
         userSelectedSameNameParentSample.current = undefined;
       }
 
-      await flushPendingCreates();
-      const savedArgs = await save(
-        chunkedResources.map(
-          (item) =>
-            ({
-              resource: item,
-              type
-            } as any)
-        ),
-        { apiBaseUrl }
+      const savedArgs = await saveWithPendingCreates(() =>
+        save(
+          chunkedResources.map(
+            (item) =>
+              ({
+                resource: item,
+                type
+              } as any)
+          ),
+          { apiBaseUrl }
+        )
       );
       setSavedResources([...savedResources, ...savedArgs]);
     }

@@ -480,7 +480,7 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute, flushPendingCreates } =
+    const { linkRelationshipAttribute, saveWithPendingCreates } =
       getWorkbookConverter(mockConfig, "mockEntity");
     const mockResource: any = {
       attr1: 123,
@@ -583,7 +583,7 @@ describe("useWorkbookConverters", () => {
         "group1"
       );
     }
-    await flushPendingCreates();
+    await saveWithPendingCreates(async () => undefined);
     expect(mockResource).toEqual({
       attr1: 123,
       attr2: "abc",
@@ -624,7 +624,7 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute, flushPendingCreates } =
+    const { linkRelationshipAttribute, saveWithPendingCreates } =
       getWorkbookConverter(mockConfig, "mockEntity");
     const mockResource: any = {
       attr1: 123,
@@ -729,7 +729,7 @@ describe("useWorkbookConverters", () => {
       );
     }
     // Both new records have the same type, so they are created in one request.
-    await flushPendingCreates();
+    await saveWithPendingCreates(async () => undefined);
     expect(mockSave).toHaveBeenCalledTimes(1);
     expect(mockSave).toHaveBeenCalledWith(
       [
@@ -767,7 +767,7 @@ describe("useWorkbookConverters", () => {
     });
   });
 
-  it("flushPendingCreates sends one request per resource type", async () => {
+  it("saveWithPendingCreates sends one request per resource type", async () => {
     const mockSave = jest.fn(async (args: any[]) =>
       args.map((arg, i) => ({ id: `${arg.type}-${i}`, type: arg.type }))
     );
@@ -775,7 +775,7 @@ describe("useWorkbookConverters", () => {
       apiClient: { get: jest.fn().mockResolvedValue({}) } as any,
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute, flushPendingCreates } =
+    const { linkRelationshipAttribute, saveWithPendingCreates } =
       getWorkbookConverter(mockConfig, "mockEntity");
     const createConfig = (type: string) => ({
       baseApiPath: "fake-api",
@@ -793,7 +793,7 @@ describe("useWorkbookConverters", () => {
     for (const key of Object.keys(mockResource)) {
       await linkRelationshipAttribute(mockResource, {}, key, "group1");
     }
-    await flushPendingCreates();
+    await saveWithPendingCreates(async () => undefined);
 
     expect(mockSave).toHaveBeenCalledTimes(2);
     expect(mockResource.relationships).toEqual({
@@ -804,6 +804,92 @@ describe("useWorkbookConverters", () => {
     expect(
       mockSave.mock.calls.map(([args]) => args.map((a) => a.type))
     ).toEqual([["type-a", "type-a"], ["type-b"]]);
+  });
+
+  describe("saveWithPendingCreates cleanup", () => {
+    const createConfig = (type: string) => ({
+      baseApiPath: "fake-api",
+      hasGroup: true,
+      linkOrCreateSetting: LinkOrCreateSetting.CREATE,
+      type
+    });
+
+    // Queues two "type-a" records and one "type-b" record.
+    async function setup(mockSave: jest.Mock) {
+      const mockBulkDelete = jest.fn().mockResolvedValue({});
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: { get: jest.fn().mockResolvedValue({}) } as any,
+        save: mockSave,
+        bulkDeleteResources: mockBulkDelete
+      } as any);
+      const { linkRelationshipAttribute, saveWithPendingCreates } =
+        getWorkbookConverter(mockConfig, "mockEntity");
+      const mockResource: any = {
+        relationshipConfig: createConfig("mock-resource"),
+        a: { name: "a", relationshipConfig: createConfig("type-a") },
+        b: { name: "b", relationshipConfig: createConfig("type-b") },
+        c: { name: "c", relationshipConfig: createConfig("type-a") }
+      };
+      for (const key of Object.keys(mockResource)) {
+        await linkRelationshipAttribute(mockResource, {}, key, "group1");
+      }
+      return { saveWithPendingCreates, mockBulkDelete };
+    }
+
+    const createdIds = async (args: any[]) =>
+      args.map((arg, i) => ({ id: `${arg.type}-${i}`, type: arg.type }));
+
+    it("keeps the created records and returns the result when saving succeeds", async () => {
+      const { saveWithPendingCreates, mockBulkDelete } = await setup(
+        jest.fn(createdIds)
+      );
+
+      await expect(
+        saveWithPendingCreates(async () => "saved")
+      ).resolves.toEqual("saved");
+      expect(mockBulkDelete).not.toHaveBeenCalled();
+    });
+
+    it("deletes the created records when saving the resources that link to them fails", async () => {
+      const { saveWithPendingCreates, mockBulkDelete } = await setup(
+        jest.fn(createdIds)
+      );
+
+      await expect(
+        saveWithPendingCreates(async () => {
+          throw new Error("save failed");
+        })
+      ).rejects.toThrow("save failed");
+
+      expect(mockBulkDelete.mock.calls).toEqual([
+        [["type-b-0"], { apiBaseUrl: "fake-api", resourceType: "type-b" }],
+        [
+          ["type-a-0", "type-a-1"],
+          { apiBaseUrl: "fake-api", resourceType: "type-a" }
+        ]
+      ]);
+    });
+
+    it("deletes the records created so far when a later create fails", async () => {
+      const mockSave = jest
+        .fn()
+        .mockImplementationOnce(createdIds)
+        .mockRejectedValueOnce(new Error("create failed"));
+      const { saveWithPendingCreates, mockBulkDelete } = await setup(mockSave);
+      const saveResources = jest.fn();
+
+      await expect(saveWithPendingCreates(saveResources)).rejects.toThrow(
+        "create failed"
+      );
+
+      expect(saveResources).not.toHaveBeenCalled();
+      expect(mockBulkDelete.mock.calls).toEqual([
+        [
+          ["type-a-0", "type-a-1"],
+          { apiBaseUrl: "fake-api", resourceType: "type-a" }
+        ]
+      ]);
+    });
   });
 
   it("convertWorkbook", () => {

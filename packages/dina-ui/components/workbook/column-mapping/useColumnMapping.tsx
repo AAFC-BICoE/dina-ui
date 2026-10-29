@@ -640,21 +640,28 @@ export function useColumnMapping() {
       const columnHeaderValue =
         columnHeader.originalColumn ?? columnHeader.columnHeader;
       const fieldPath = findMatchField(columnHeader, newFieldOptions, type);
-      if (fieldPath === undefined || fieldPath.endsWith("managedAttributes")) {
+      if (
+        fieldPath === undefined ||
+        // Also matches preparationManagedAttributes.
+        fieldPath.toLowerCase().endsWith("managedattributes")
+      ) {
         // check if the columnHeaderValue is one of managedAttributes
         const targetManagedAttr =
           findManagedAttributeMatchFromTemplate(columnHeaderValue) ??
-          managedAttributes.find(
-            (item) =>
-              item.name.toLowerCase().trim() ===
-              columnHeaderValue.toLowerCase().trim()
+          // The key can differ from the generated column path, so also match the header's name.
+          managedAttributes.find((item) =>
+            [columnHeaderValue, columnHeader.columnHeader].some(
+              (header) =>
+                item.name.toLowerCase().trim() === header.toLowerCase().trim()
+            )
           );
 
-        // check if the columnHeaderValue is one of identifiers
-        const identifierTargetAttr = identifiers.find(
-          (item) =>
-            item.name.toLowerCase().trim() ===
-            columnHeaderValue.toLowerCase().trim()
+        // check if the columnHeaderValue or the header's name is one of identifiers
+        const identifierTargetAttr = identifiers.find((item) =>
+          [columnHeaderValue, columnHeader.columnHeader].some(
+            (header) =>
+              item.name.toLowerCase().trim() === header.toLowerCase().trim()
+          )
         );
 
         // check if the columnHeaderValue is one of taxonomicRankss
