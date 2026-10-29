@@ -155,7 +155,10 @@ describe("SaveWorkbookProgress", () => {
         const [error, setError] = React.useState<any>(undefined);
 
         return {
-          workbookResources: baseWorkbookResources,
+          // More than one chunk (30) so the second chunk can fail after the first was saved.
+          workbookResources: Array.from({ length: 51 }, () => ({
+            ...baseWorkbookResources[0]
+          })),
           progress,
           group: "test-group",
           type: "material-sample",

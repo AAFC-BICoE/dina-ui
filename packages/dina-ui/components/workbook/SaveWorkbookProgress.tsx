@@ -95,10 +95,11 @@ export function SaveWorkbookProgress({
     finishSavingWorkbook(sourceSetValue ?? "", resourcesUpdatedCount.current);
   };
 
-  const { linkRelationshipAttribute } = useWorkbookConverter(
-    FieldMappingConfig,
-    workbookResources?.[0].type || "material-sample"
-  );
+  const { linkRelationshipAttribute, flushPendingCreates } =
+    useWorkbookConverter(
+      FieldMappingConfig,
+      workbookResources?.[0].type || "material-sample"
+    );
 
   useEffect(() => {
     const handleWindowClose = (e) => {
@@ -176,6 +177,7 @@ export function SaveWorkbookProgress({
         // If handler says to pause, save what we have and pause
         if (result.shouldPause) {
           if (chunkedResources.slice(0, i - 1).length > 0) {
+            await flushPendingCreates();
             const savedSoFar = await save(
               chunkedResources.slice(0, i - 1).map(
                 (item) =>
@@ -200,6 +202,7 @@ export function SaveWorkbookProgress({
         userSelectedSameNameParentSample.current = undefined;
       }
 
+      await flushPendingCreates();
       const savedArgs = await save(
         chunkedResources.map(
           (item) =>
@@ -213,9 +216,8 @@ export function SaveWorkbookProgress({
       setSavedResources([...savedResources, ...savedArgs]);
     }
 
-    // Split big array into small chunks, which chunk size is 5.
-    // Save very 5 records once.
-    const chunkSize = 5;
+    // Split big array into chunks and save each chunk with a few bulk requests.
+    const chunkSize = 30;
     for (
       let i = now;
       i < workbookResources.length && statusRef.current === "SAVING";

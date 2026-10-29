@@ -1,7 +1,7 @@
 import { useApiClient } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
 import _ from "lodash";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import {
   convertDateTime,
   FieldMappingConfigType,
@@ -400,6 +400,38 @@ export function useWorkbookConverter(
     }
   }
 
+  // New related records are queued and created together by flushPendingCreates.
+  const pendingCreates = useRef<
+    {
+      resource: any;
+      type: string;
+      apiBaseUrl: string;
+      created: { id: string; type: string };
+    }[]
+  >([]);
+
+  /** Returns the relationship value, its id is filled in by flushPendingCreates. */
+  function queueCreate(resource: any, type: string, apiBaseUrl: string) {
+    const created = { id: "", type };
+    pendingCreates.current.push({ resource, type, apiBaseUrl, created });
+    return created;
+  }
+
+  async function flushPendingCreates() {
+    const queued = pendingCreates.current;
+    pendingCreates.current = [];
+    // A bulk request takes one resource type, sent in the order each type was first queued.
+    const groups = _.groupBy(queued, (q) => `${q.apiBaseUrl}/${q.type}`);
+    for (const group of Object.values(groups)) {
+      const saved = await save(
+        group.map(({ resource, type }) => ({ resource, type })),
+        { apiBaseUrl: group[0].apiBaseUrl }
+      );
+      // The relationships hold these objects, so they pick up the new ids.
+      group.forEach(({ created }, i) => (created.id = saved[i].id));
+    }
+  }
+
   function addNewValueToWorkbookColumnMap(
     fieldPath: string,
     value: any,
@@ -574,24 +606,17 @@ export function useWorkbookConverter(
           }
           _.unset(value, "relationshipConfig");
 
-          const newCreatedValue = await save(
-            [
-              {
-                resource: value,
-                type: relationshipConfig.type
-              }
-            ],
-            { apiBaseUrl: relationshipConfig.baseApiPath }
-          ).then((response) => {
-            const newVal = _.pick(response[0], ["id", "type"]);
-            addNewValueToWorkbookColumnMap(
-              fieldPath,
-              value,
-              newVal,
-              workbookColumnMap
-            );
-            return newVal;
-          });
+          const newCreatedValue = queueCreate(
+            value,
+            relationshipConfig.type,
+            relationshipConfig.baseApiPath
+          );
+          addNewValueToWorkbookColumnMap(
+            fieldPath,
+            value,
+            newCreatedValue,
+            workbookColumnMap
+          );
           if (!resource.relationships) {
             resource.relationships = {};
           }
@@ -738,24 +763,17 @@ export function useWorkbookConverter(
             }
 
             _.unset(valueInArray, "relationshipConfig");
-            const newCreatedValue = await save(
-              [
-                {
-                  resource: valueInArray,
-                  type: relationshipConfig.type
-                }
-              ],
-              { apiBaseUrl: relationshipConfig.baseApiPath }
-            ).then((response) => {
-              const newVal = _.pick(response[0], ["id", "type"]);
-              addNewValueToWorkbookColumnMap(
-                fieldPath,
-                valueInArray,
-                newVal,
-                workbookColumnMap
-              );
-              return newVal;
-            });
+            const newCreatedValue = queueCreate(
+              valueInArray,
+              relationshipConfig.type,
+              relationshipConfig.baseApiPath
+            );
+            addNewValueToWorkbookColumnMap(
+              fieldPath,
+              valueInArray,
+              newCreatedValue,
+              workbookColumnMap
+            );
             if (newCreatedValue) {
               valuesForRelationship.push(newCreatedValue);
             }
@@ -846,6 +864,7 @@ export function useWorkbookConverter(
 
   return {
     linkRelationshipAttribute,
+    flushPendingCreates,
     searchColumnMap,
     convertWorkbook,
     flattenedConfig,
