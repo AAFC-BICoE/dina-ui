@@ -15,11 +15,13 @@ import { StorageUnit } from "../../../types/collection-api";
 import { writeStorage } from "@rehooks/local-storage";
 import PageLayout from "../../../components/page/PageLayout";
 
-export function useStorageUnit(id?: string) {
+export function useStorageUnit(id?: string, includeAttachment = true) {
   return useQuery<StorageUnit>(
     {
       path: `collection-api/storage-unit/${id}`,
-      include: "storageUnitType,parentStorageUnit,attachment",
+      include: `storageUnitType,parentStorageUnit${
+        includeAttachment ? ",attachment" : ""
+      }`,
       optfields: {
         "storage-unit": "hierarchy"
       }
