@@ -9,12 +9,14 @@ import {
 import "@testing-library/jest-dom";
 import { waitFor } from "@testing-library/react";
 import {
+  DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY,
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   OBJECT_EXPORT_IDS_KEY
 } from "common-ui";
 import userEvent from "@testing-library/user-event";
 import ExportPage from "@dina-ui/pages/export/data-export/export";
+import { dynamicFieldMappingForMaterialSample } from "@dina-ui/pages/collection/material-sample/list";
 
 const MOCK_TEMPLATES = [
   {
@@ -628,6 +630,165 @@ describe("ExportPage Component", () => {
           ],
           { apiBaseUrl: "/dina-export-api" }
         );
+      });
+    });
+
+    describe("Export only columns (Collecting Event - Collectors)", () => {
+      /** Dynamic field mapping provided by the material sample list page, includes the collectors search field. */
+      function setListPageDynamicFieldMapping() {
+        window.localStorage.setItem(
+          `material-sample-list_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`,
+          JSON.stringify(dynamicFieldMappingForMaterialSample)
+        );
+      }
+
+      it("Only lists the exportable collectors column, not the collectors search field", async () => {
+        setListPageDynamicFieldMapping();
+        const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+        await waitForLoadingToDisappear();
+
+        await userEvent.click(
+          wrapper.getByText("Select a field to add as a column...")
+        );
+
+        expect(await wrapper.findAllByText("Collectors")).toHaveLength(1);
+      });
+
+      it("Removes a previously saved collectors search field from the export request", async () => {
+        setListPageDynamicFieldMapping();
+        mockGet.mockImplementation(async (path) => {
+          if (path.includes("search-api/search-ws/mapping")) {
+            return MATERIAL_SAMPLE_MAPPING;
+          }
+          if (path === "dina-export-api/data-export-template") {
+            return {
+              data: [
+                {
+                  ...MOCK_TEMPLATES[0],
+                  schema: {
+                    "material-sample": {
+                      columns: [
+                        "materialSampleName",
+                        "_relationshipAutocomplete_collectingEventCollectors"
+                      ],
+                      aliases: ["alias1", "collectors"]
+                    }
+                  }
+                }
+              ]
+            };
+          }
+          return { data: [] };
+        });
+
+        const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+        await waitForLoadingToDisappear();
+
+        await selectDropdownOption(
+          wrapper,
+          /select export template/i,
+          "Material Sample Demo"
+        );
+        await waitForLoadingToDisappear();
+
+        await userEvent.click(
+          wrapper.getByRole("button", { name: "Export 5 Records" })
+        );
+
+        await waitFor(() => {
+          expect(mockSave).toHaveBeenCalledWith(
+            [
+              {
+                resource: expect.objectContaining({
+                  schema: {
+                    "material-sample": {
+                      columns: ["materialSampleName"],
+                      aliases: ["alias1"]
+                    }
+                  }
+                }),
+                type: "data-export"
+              }
+            ],
+            { apiBaseUrl: "/dina-export-api" }
+          );
+        });
+      });
+
+      it("Lists collectors as an exportable column", async () => {
+        const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+        await waitForLoadingToDisappear();
+
+        // Open the add new column dropdown.
+        await userEvent.click(
+          wrapper.getByText("Select a field to add as a column...")
+        );
+
+        // Collectors are not in the index, the export api resolves them.
+        expect(await wrapper.findByText("Collectors")).toBeInTheDocument();
+      });
+
+      it("Exports the collectors display names from a template", async () => {
+        mockGet.mockImplementation(async (path) => {
+          if (path.includes("search-api/search-ws/mapping")) {
+            return MATERIAL_SAMPLE_MAPPING;
+          }
+          if (path === "dina-export-api/data-export-template") {
+            return {
+              data: [
+                {
+                  ...MOCK_TEMPLATES[0],
+                  schema: {
+                    "material-sample": {
+                      columns: [
+                        "materialSampleName",
+                        "collectingEvent.collectors.displayName"
+                      ],
+                      aliases: ["alias1", "collectors"]
+                    }
+                  }
+                }
+              ]
+            };
+          }
+          return { data: [] };
+        });
+
+        const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+        await waitForLoadingToDisappear();
+
+        await selectDropdownOption(
+          wrapper,
+          /select export template/i,
+          "Material Sample Demo"
+        );
+        await waitForLoadingToDisappear();
+
+        await userEvent.click(
+          wrapper.getByRole("button", { name: "Export 5 Records" })
+        );
+
+        await waitFor(() => {
+          expect(mockSave).toHaveBeenCalledWith(
+            [
+              {
+                resource: expect.objectContaining({
+                  schema: {
+                    "material-sample": {
+                      columns: [
+                        "materialSampleName",
+                        "collectingEvent.collectors.displayName"
+                      ],
+                      aliases: ["alias1", "collectors"]
+                    }
+                  }
+                }),
+                type: "data-export"
+              }
+            ],
+            { apiBaseUrl: "/dina-export-api" }
+          );
+        });
       });
     });
   });
