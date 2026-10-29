@@ -1260,3 +1260,8 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
 .export-image-processing .react-select__control--is-disabled {
   background-color: #e9ecef;
 }
+
+/* Faint divider between the rows of the bulk Actions menu. */
+.bulk-actions-rows > * + * {
+  border-top: 1px solid var(--bs-light);
+}

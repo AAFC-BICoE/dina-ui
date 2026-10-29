@@ -223,6 +223,18 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   topMatches: "Top Matches",
   permissionError:
     "You don't have permissions to delete all of these selected records.",
+  checkingPermissions: "Checking permissions…",
+  noEditPermission:
+    "You don't have permission to edit records in these groups: {groups}.",
+  noDeletePermission:
+    "You don't have permission to delete records in these groups: {groups}.",
+  onSelected: "On selected",
+  onSelectedCount: "On {count} selected",
+  onAllMatched: "On all {total} matched",
+  actionsOnSelected: "Actions on {count} selected",
+  tableSelectedSuffix: " · {count} selected",
+  exportSelectedButtonText: "Export Selected",
+  exportAllMatching: "Export All Matching",
   deleteSuccess: "Successfully deleted {count} records.",
   noData: "No Data",
   listView: "List",

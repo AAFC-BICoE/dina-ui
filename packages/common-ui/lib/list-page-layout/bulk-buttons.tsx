@@ -1,5 +1,5 @@
 import { writeStorage } from "@rehooks/local-storage";
-import { FormikContextType } from "formik";
+import { FormikContextType, useFormikContext } from "formik";
 import _ from "lodash";
 import { useRouter } from "next/router";
 import {
@@ -8,6 +8,8 @@ import {
   DinaForm,
   FormikButton,
   SubmitButton,
+  Tooltip,
+  useAccount,
   useApiClient,
   useModal
 } from "..";
@@ -15,6 +17,7 @@ import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-sear
 import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 import { KitsuResource } from "kitsu";
 import { useSessionStorage } from "usehooks-ts";
+import { useIntl } from "react-intl";
 import { MdEdit } from "react-icons/md";
 import {
   FaCheck,
@@ -24,16 +27,267 @@ import {
 } from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
 import { TbArrowsSplit2 } from "react-icons/tb";
-import { useState } from "react";
-import { FaPaperclip } from "react-icons/fa6";
+import { ReactNode, useEffect, useState } from "react";
+import { Dropdown } from "react-bootstrap";
+import {
+  FaBolt,
+  FaChevronDown,
+  FaChevronUp,
+  FaPaperclip
+} from "react-icons/fa6";
+
+/** Ids ticked in the table. */
+const selectedIds = (
+  itemIdsToSelect: BulkSelectableFormValues["itemIdsToSelect"]
+) => _.keys(_.pickBy(itemIdsToSelect));
 
 /** Common button props for the bulk edit/delete buttons */
-function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
+function bulkButtonProps(
+  ctx: FormikContextType<BulkSelectableFormValues>,
+  forceDisabled?: boolean
+) {
   // Disable the button if none are selected:
   const disabled =
+    forceDisabled ||
     !ctx.values.itemIdsToSelect ||
     !_.compact(Object.values(ctx.values.itemIdsToSelect)).length;
-  return { disabled };
+  return { disabled, "aria-disabled": disabled };
+}
+
+const NO_DENIED = { update: [] as string[], delete: [] as string[] };
+
+/**
+ * While the menu is open, finds the distinct groups of the selected records and asks the API which
+ * of them the user may not update/delete. Group is the only thing permissions depend on for list
+ * pages, so that is one check per group rather than per record. Admins are always allowed.
+ */
+function useSelectionPermissions(
+  enabled: boolean,
+  ids: string[],
+  indexName?: string,
+  target?: { apiBaseUrl: string; typeName: string }
+) {
+  const { apiClient } = useApiClient();
+  const { isAdmin } = useAccount();
+  const [state, setState] = useState({ loading: false, denied: NO_DENIED });
+  const key = ids.join(",");
+
+  useEffect(() => {
+    if (!enabled || isAdmin || !ids.length || !indexName || !target) {
+      setState({ loading: false, denied: NO_DENIED });
+      return;
+    }
+    let cancelled = false;
+    setState({ loading: true, denied: NO_DENIED });
+    (async () => {
+      try {
+        // Aggregation returns only the distinct groups, however many records are selected:
+        const { data } = await apiClient.axios.post(
+          "search-api/search-ws/search",
+          {
+            ...uuidQuery(ids),
+            size: 0,
+            aggs: {
+              groups: { terms: { field: "data.attributes.group", size: 100 } }
+            }
+          },
+          { params: { indexName } }
+        );
+        const groups: string[] = _.compact(
+          _.values(data?.aggregations)[0]?.buckets?.map((bucket) => bucket.key)
+        );
+        const granted = await Promise.all(
+          groups.map(async (group) => {
+            const res = await apiClient.axios.post(
+              `${target.apiBaseUrl}/permission-check`,
+              { data: { type: target.typeName, attributes: { group } } }
+            );
+            return [
+              group,
+              res.data?.data?.attributes?.permissions ?? []
+            ] as const;
+          })
+        );
+        const lacking = (permission: string) =>
+          granted.filter(([, p]) => !p.includes(permission)).map(([g]) => g);
+        if (!cancelled) {
+          setState({
+            loading: false,
+            denied: { update: lacking("update"), delete: lacking("delete") }
+          });
+        }
+      } catch (e) {
+        // The API still enforces permissions on save, so don't block the menu on a failed check.
+        console.warn(e);
+        if (!cancelled) {
+          setState({ loading: false, denied: NO_DENIED });
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [enabled, isAdmin, key, indexName, target?.apiBaseUrl, target?.typeName]);
+
+  return state;
+}
+
+export interface BulkActionsDropdownProps<TData extends KitsuResource> {
+  /** Search index used to look up the selected records' groups for the permission check. */
+  indexName?: string;
+  edit?: BulkEditButtonProps;
+  split?: BulkSplitButtonProps;
+  dataExport?: DataExportButtonProps<TData>;
+  del?: BulkDeleteButtonProps;
+}
+
+/** Single menu holding the bulk edit/split/export/delete buttons. */
+export function BulkActionsDropdown<TData extends KitsuResource>({
+  indexName,
+  edit,
+  split,
+  dataExport,
+  del
+}: BulkActionsDropdownProps<TData>) {
+  const { values } = useFormikContext<BulkSelectableFormValues>();
+  const { formatMessage } = useIntl();
+  const [open, setOpen] = useState(false);
+  const ids = selectedIds(values.itemIdsToSelect);
+  const count = ids.length;
+  const { loading, denied } = useSelectionPermissions(
+    open,
+    ids,
+    indexName,
+    del
+  );
+
+  // Tooltip shown on rows that need a permission the user lacks:
+  const warning = (kind: "update" | "delete", id: string) =>
+    denied[kind].length
+      ? { id, intlValues: { groups: denied[kind].join(", ") } }
+      : undefined;
+  const editWarning = warning("update", "noEditPermission");
+  const deleteWarning = warning("delete", "noDeletePermission");
+  const withWarning = (
+    button: ReactNode,
+    tooltip?: { id: string; intlValues: Record<string, string> }
+  ) =>
+    tooltip ? (
+      <div className="position-relative">
+        {button}
+        <span className="position-absolute top-50 end-0 translate-middle-y me-3">
+          <Tooltip
+            {...tooltip}
+            placement="left"
+            disableSpanMargin
+            visibleElement={<FaExclamationTriangle className="text-warning" />}
+          />
+        </span>
+      </div>
+    ) : (
+      button
+    );
+  const Chevron = open ? FaChevronUp : FaChevronDown;
+  const itemClass = "dropdown-item d-flex align-items-center fw-bold py-2";
+  const groupLabelClass = "px-3 pt-2 pb-1 small fw-bold text-uppercase";
+
+  return (
+    <Dropdown className="bulk-actions-dropdown" show={open} onToggle={setOpen}>
+      <Dropdown.Toggle variant="primary" bsPrefix="actions-toggle">
+        <FaBolt className="me-2" />
+        {count ? (
+          <CommonMessage id="actionsOnSelected" values={{ count }} />
+        ) : (
+          <CommonMessage id="actions" />
+        )}
+        <Chevron className="ms-2" />
+      </Dropdown.Toggle>
+      <Dropdown.Menu
+        align="end"
+        renderOnMount
+        className="py-0"
+        style={{ width: "340px" }}
+      >
+        {/* Clicking an action closes the menu. */}
+        <div onClick={() => setOpen(false)}>
+          <div className={`${groupLabelClass} text-muted`}>
+            {count ? (
+              <CommonMessage id="onSelectedCount" values={{ count }} />
+            ) : (
+              <CommonMessage id="onSelected" />
+            )}
+            {loading && (
+              <Tooltip
+                id="checkingPermissions"
+                placement="left"
+                disableSpanMargin
+                className="ms-2"
+                visibleElement={
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-label={formatMessage({ id: "checkingPermissions" })}
+                  />
+                }
+              />
+            )}
+          </div>
+          <div className="bulk-actions-rows">
+            {edit &&
+              withWarning(
+                <BulkEditButton
+                  {...edit}
+                  className={itemClass}
+                  disabled={loading || !!editWarning}
+                />,
+                editWarning
+              )}
+            {split && <BulkSplitButton {...split} className={itemClass} />}
+            {dataExport && (
+              <DataExportButton {...dataExport} className={itemClass} />
+            )}
+            {del &&
+              withWarning(
+                <BulkDeleteButton
+                  {...del}
+                  className={`${itemClass} ${
+                    count && !loading && !deleteWarning ? "text-danger" : ""
+                  }`}
+                  disabled={loading || !!deleteWarning}
+                />,
+                deleteWarning
+              )}
+          </div>
+          {dataExport && (
+            <div className="border-top">
+              <div className={`${groupLabelClass} text-muted`}>
+                <CommonMessage
+                  id="onAllMatched"
+                  values={{ total: dataExport.totalRecords.toLocaleString() }}
+                />
+              </div>
+              <DataExportButton
+                {...dataExport}
+                exportAll
+                className={itemClass}
+              />
+            </div>
+          )}
+        </div>
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+}
+
+/** Suffix for the total matched records line. */
+export function SelectedCountText() {
+  const { values } = useFormikContext<BulkSelectableFormValues>();
+  return (
+    <CommonMessage
+      id="tableSelectedSuffix"
+      values={{ count: selectedIds(values.itemIdsToSelect).length }}
+    />
+  );
 }
 
 export interface AttachSelectedButtonProps {
@@ -61,6 +315,10 @@ export function AttachSelectedButton({
 }
 
 export interface BulkDeleteButtonProps {
+  /** Overrides the default button styling, e.g. to render as a dropdown item. */
+  className?: string;
+  /** Force the button disabled, e.g. while permissions are being checked. */
+  disabled?: boolean;
   typeName: string;
   apiBaseUrl: string;
   beforeDelete?: (resourceIds: string[]) => Promise<any>;
@@ -71,6 +329,8 @@ export interface BulkDeleteButtonProps {
 }
 
 export function BulkDeleteButton({
+  className = "btn btn-danger",
+  disabled,
   apiBaseUrl,
   typeName,
   beforeDelete,
@@ -80,8 +340,8 @@ export function BulkDeleteButton({
 
   return (
     <FormikButton
-      buttonProps={bulkButtonProps}
-      className="btn btn-danger bulk-delete-button"
+      buttonProps={(ctx) => bulkButtonProps(ctx, disabled)}
+      className={`${className} bulk-delete-button`}
       onClick={(values: BulkSelectableFormValues) => {
         const resourceIds = _.toPairs(values.itemIdsToSelect)
           .filter((pair) => pair[1])
@@ -298,6 +558,10 @@ export interface BulkEditButtonProps {
   /** Where to perform the request for the bulk edit. */
   pathname: string;
   singleEditPathName?: string;
+  /** Overrides the default button styling, e.g. to render as a dropdown item. */
+  className?: string;
+  /** Force the button disabled, e.g. while permissions are being checked. */
+  disabled?: boolean;
 }
 
 /**
@@ -309,14 +573,16 @@ export const BULK_EDIT_IDS_KEY = "bulkEditIds";
 
 export function BulkEditButton({
   pathname,
-  singleEditPathName
+  singleEditPathName,
+  className = "btn btn-primary",
+  disabled
 }: BulkEditButtonProps) {
   const router = useRouter();
 
   return (
     <FormikButton
-      buttonProps={bulkButtonProps}
-      className="btn btn-primary bulk-edit-button"
+      buttonProps={(ctx) => bulkButtonProps(ctx, disabled)}
+      className={`${className} bulk-edit-button`}
       onClick={async (values: BulkSelectableFormValues) => {
         const ids = _.toPairs(values.itemIdsToSelect)
           .filter((pair) => pair[1])
@@ -346,6 +612,9 @@ export interface DataExportButtonProps<TData extends KitsuResource> {
   dynamicFieldMapping: DynamicFieldsMappingConfig | undefined;
   indexName: string;
   entityLink: string;
+  className?: string;
+  /** Export every matching record, ignoring the current selection. */
+  exportAll?: boolean;
 }
 
 /**
@@ -367,7 +636,9 @@ export function DataExportButton<TData extends KitsuResource>({
   columns,
   dynamicFieldMapping,
   indexName,
-  entityLink
+  entityLink,
+  className = "btn btn-primary",
+  exportAll
 }: DataExportButtonProps<TData>) {
   const router = useRouter();
   const [_exportObjectIds, setExportObjectIds] = useSessionStorage<string[]>(
@@ -380,12 +651,17 @@ export function DataExportButton<TData extends KitsuResource>({
   );
   return (
     <FormikButton
-      buttonProps={(_ctx) => ({ disabled: totalRecords === 0 })}
-      className="btn btn-primary"
+      buttonProps={(ctx) => {
+        const disabled =
+          totalRecords === 0 ||
+          (!exportAll && !selectedIds(ctx.values.itemIdsToSelect).length);
+        return { disabled, "aria-disabled": disabled };
+      }}
+      className={className}
       onClick={async (values: BulkSelectableFormValues) => {
-        const selectedResourceIds: string[] = values.itemIdsToSelect
-          ? Object.keys(values.itemIdsToSelect)
-          : [];
+        const selectedResourceIds = exportAll
+          ? []
+          : selectedIds(values.itemIdsToSelect);
         const selectedIdsQuery = uuidQuery(selectedResourceIds);
         setExportObjectIds(selectedResourceIds);
         writeStorage<any>(
@@ -416,7 +692,9 @@ export function DataExportButton<TData extends KitsuResource>({
       }}
     >
       <FiDownload className="me-2" />
-      <CommonMessage id="exportButtonText" />
+      <CommonMessage
+        id={exportAll ? "exportAllMatching" : "exportSelectedButtonText"}
+      />
     </FormikButton>
   );
 }
@@ -426,6 +704,7 @@ export interface BulkSplitButtonProps {
    * Page where the bulk split is being performed.
    */
   pathname: string;
+  className?: string;
 }
 
 /**
@@ -433,13 +712,16 @@ export interface BulkSplitButtonProps {
  */
 export const BULK_SPLIT_IDS = "";
 
-export function BulkSplitButton({ pathname }: BulkSplitButtonProps) {
+export function BulkSplitButton({
+  pathname,
+  className = "btn btn-primary"
+}: BulkSplitButtonProps) {
   const router = useRouter();
 
   return (
     <FormikButton
       buttonProps={bulkButtonProps}
-      className="btn btn-primary bulk-split-button"
+      className={`${className} bulk-split-button`}
       onClick={async (values: BulkSelectableFormValues) => {
         const ids = _.toPairs(values.itemIdsToSelect)
           .filter((pair) => pair[1])
