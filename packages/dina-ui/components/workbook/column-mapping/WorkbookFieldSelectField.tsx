@@ -14,7 +14,6 @@ import {
 } from "../../../types/collection-api";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
 import { WorkbookColumnMappingFields } from "./WorkbookColumnMapping";
-import { useColumnMapping } from "./useColumnMapping";
 import {
   COLLECTION_MANAGED_ATTRIBUTE_ID,
   COLLECTION_OTHER_IDENTIFIERS_ID,
@@ -32,6 +31,7 @@ export interface WorkbookFieldSelectFieldProps {
       parentPath: string;
     }[];
   }[];
+  taxonomicRanks: VocabularyElement[];
   disabled: boolean;
   onFieldChanged?: (newFieldPath) => void;
   type: string;
@@ -40,12 +40,12 @@ export interface WorkbookFieldSelectFieldProps {
 export function WorkbookFieldSelectField({
   columnIndex,
   fieldOptions,
+  taxonomicRanks,
   disabled = false,
   onFieldChanged,
   type
 }: WorkbookFieldSelectFieldProps) {
   const { locale, formatMessage } = useDinaIntl();
-  const { taxonomicRanks } = useColumnMapping();
   // Custom styling to indent the group option menus.
   const customStyles = useMemo(
     () => ({

@@ -12,6 +12,7 @@ import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ControlledVocabularyItem,
   ManagedAttribute,
+  MaterialSample,
   Vocabulary,
   VocabularyElement
 } from "../../../types/collection-api";
@@ -807,27 +808,49 @@ export function useColumnMapping() {
       const colIndex = spreadsheetHeaders?.indexOf(columnHeader) ?? -1;
 
       if (colIndex > -1) {
-        for (let i = 1; i < spreadsheetData[sheet].rows.length; i++) {
-          const parentValue = spreadsheetData[sheet].rows[i].content[colIndex];
-          if (parentValue) {
-            const response = await apiClient.get<ResourceNameIdentifier[]>(
-              `/collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=material-sample&filter[name][EQ]=${parentValue}`,
-              {
-                page: { limit: 1 }
-              }
-            );
-            if (response && response.data.length > 0) {
-              valueMapping[parentValue] = { id: response.data[0].id, type };
-
-              if (response.data.length > 1) {
-                multipleValueMappings[parentValue] = response.data.map(
-                  (resource) => ({
-                    id: resource.id,
-                    type
-                  })
-                );
-              }
-            }
+        const parentValues = _.uniq(
+          spreadsheetData[sheet].rows
+            .slice(1)
+            .map((row) => row.content[colIndex])
+            .filter(Boolean)
+        );
+        // Commas are the IN separator, so names containing one are looked up individually.
+        const [commaValues, batchValues] = _.partition(parentValues, (value) =>
+          value.includes(",")
+        );
+        const lookups = [
+          ..._.chunk(batchValues, 100).map((chunk) =>
+            apiClient.get<MaterialSample[]>("collection-api/material-sample", {
+              filter: SimpleSearchFilterBuilder.create<MaterialSample>()
+                .where("group", "EQ", groupName)
+                .where("materialSampleName", "IN", chunk)
+                .build(),
+              fields: { "material-sample": "materialSampleName" },
+              page: { limit: 1000 }
+            })
+          ),
+          ...commaValues.map((value) =>
+            apiClient.get<MaterialSample[]>("collection-api/material-sample", {
+              filter: SimpleSearchFilterBuilder.create<MaterialSample>()
+                .where("group", "EQ", groupName)
+                .where("materialSampleName", "EQ", value)
+                .build(),
+              fields: { "material-sample": "materialSampleName" },
+              page: { limit: 1000 }
+            })
+          )
+        ];
+        const matches = _.groupBy(
+          (await Promise.all(lookups)).flatMap((response) => response.data),
+          (sample) => sample.materialSampleName
+        );
+        for (const [parentValue, found] of Object.entries(matches)) {
+          valueMapping[parentValue] = { id: found[0].id, type };
+          if (found.length > 1) {
+            multipleValueMappings[parentValue] = found.map((resource) => ({
+              id: resource.id,
+              type
+            }));
           }
         }
       }

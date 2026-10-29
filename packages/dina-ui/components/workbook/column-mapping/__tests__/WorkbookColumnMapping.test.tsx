@@ -45,7 +45,7 @@ const PERSONS = [
 
 let existingMaterialSampleNames: string[] = [];
 
-const mockGet = jest.fn(async (path: string) => {
+const mockGet = jest.fn(async (path: string, _params?: any) => {
   if (
     path.includes("resource-name-identifier") &&
     path.includes("filter[type][EQ]=collection")
@@ -55,12 +55,13 @@ const mockGet = jest.fn(async (path: string) => {
   if (path === "agent-api/person") {
     return { data: PERSONS };
   }
-  if (path.startsWith("collection-api/material-sample?")) {
-    const exists = existingMaterialSampleNames.some((name) =>
-      path.includes(`filter[materialSampleName][EQ]=${name}&`)
-    );
+  if (path === "collection-api/material-sample") {
     return {
-      data: exists ? [{ id: "existing", type: "material-sample" }] : []
+      data: existingMaterialSampleNames.map((name) => ({
+        id: "existing",
+        type: "material-sample",
+        materialSampleName: name
+      }))
     };
   }
   return { data: [] };
@@ -578,8 +579,8 @@ describe("WorkbookColumnMapping", () => {
       const resources = await waitForSavedResources();
       expect(resources).toHaveLength(1);
       expect(
-        mockGet.mock.calls.some(([path]) =>
-          path.startsWith("collection-api/material-sample?")
+        mockGet.mock.calls.some(
+          ([path]) => path === "collection-api/material-sample"
         )
       ).toBe(false);
     });

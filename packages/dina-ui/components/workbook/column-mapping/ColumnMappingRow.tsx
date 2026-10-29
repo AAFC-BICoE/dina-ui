@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { CheckBoxField, FieldSpy } from "../../../../common-ui/lib";
 import { WorkbookFieldSelectField } from "./WorkbookFieldSelectField";
 import { WorkbookColumnInfo } from "../utils/workbookMappingUtils";
+import { VocabularyElement } from "../../../types/collection-api";
 
 export interface ColumnMappingRowProps {
   columnName: WorkbookColumnInfo;
@@ -15,6 +16,7 @@ export interface ColumnMappingRowProps {
       parentPath: string;
     }[];
   }[];
+  taxonomicRanks: VocabularyElement[];
   onFieldMappingChange: (columnName: WorkbookColumnInfo, newFieldPath) => void;
   type: string;
 }
@@ -23,6 +25,7 @@ export function ColumnMappingRow({
   columnName,
   columnIndex,
   fieldOptions,
+  taxonomicRanks,
   onFieldMappingChange,
   type
 }: ColumnMappingRowProps) {
@@ -41,6 +44,7 @@ export function ColumnMappingRow({
             <WorkbookFieldSelectField
               columnIndex={columnIndex}
               fieldOptions={fieldOptions}
+              taxonomicRanks={taxonomicRanks}
               disabled={isSkipped ?? false}
               onFieldChanged={onFieldChanged}
               type={type}
