@@ -34,6 +34,7 @@ import {
   validateSavedSearchVerison
 } from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useSessionStorage } from "usehooks-ts";
+import { useRouter } from "next/router";
 import { useLocalStorage } from "@rehooks/local-storage";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 
@@ -149,6 +150,7 @@ export function SavedSearch({
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
   const { subject } = useAccount();
+  const router = useRouter();
 
   // Users saved preferences.
   const [userPreferences, setUserPreferences] = useState<UserPreference>();
@@ -260,6 +262,12 @@ export function SavedSearch({
   useEffect(() => {
     // Do not load the saved search if the last search used was loaded in or there were changes
     if (!userPreferences || defaultLoadedIn || changesMade) return;
+
+    // A query in the URL takes precedence over the default or last used search.
+    if (router?.query?.queryTree) {
+      setDefaultLoadedIn(true);
+      return;
+    }
 
     // User preferences have been loaded in, we can now check for the default saved search if it
     // exists and pre-load it in.

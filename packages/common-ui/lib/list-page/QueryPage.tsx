@@ -486,6 +486,9 @@ export function QueryPage<TData extends KitsuResource>({
     latestQueryBuilderTree.current = queryBuilderTree;
   }, [queryBuilderTree]);
 
+  // Id of the latest search request, used to ignore responses of older searches that arrive late.
+  const latestSearchId = useRef(0);
+
   // The submitted query builder tree. If this changes, a search should be performed.
   const [submittedQueryBuilderTree, setSubmittedQueryBuilderTree] =
     useState<ImmutableTree>(defaultQueryTree());
@@ -676,11 +679,14 @@ export function QueryPage<TData extends KitsuResource>({
     if (isActionTriggeredQuery.current === true) {
       isActionTriggeredQuery.current = false;
       setLoading(true);
+      const searchId = ++latestSearchId.current;
+      const isLatestSearch = () => searchId === latestSearchId.current;
 
       // Fetch data using elastic search.
       // The included section will be transformed from an array to an object with the type name for each relationship.
       elasticSearchRequest(queryDSL)
         .then((result) => {
+          if (!isLatestSearch()) return;
           const processedResult = processResults(result);
           const correctInvalidPageOffset = (recordCount: number) => {
             if (pageSize === 0 || pageOffset < recordCount) {
@@ -706,6 +712,7 @@ export function QueryPage<TData extends KitsuResource>({
           if (result?.total.value === MAX_COUNT_SIZE) {
             elasticSearchCountRequest(queryDSL)
               .then((countResult) => {
+                if (!isLatestSearch()) return;
                 setTotalRecords(countResult);
                 if (correctInvalidPageOffset(countResult)) {
                   return;
@@ -732,8 +739,8 @@ export function QueryPage<TData extends KitsuResource>({
           setError(elasticSearchError);
         })
         .finally(() => {
-          // No matter the end result, loading should stop.
-          setLoading(false);
+          // No matter the end result, loading should stop (a newer search keeps it loading).
+          if (isLatestSearch()) setLoading(false);
         });
     }
   }, [
