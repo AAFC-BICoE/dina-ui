@@ -534,6 +534,7 @@ export default function QueryRowManagedAttributeSearch({
           minMenuHeight={600}
           menuPortalTarget={document.body}
           styles={{
+            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
             menu: (base) => ({
               ...base,
               zIndex: 9999
