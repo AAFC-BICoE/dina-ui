@@ -2,6 +2,7 @@ import { ClassificationItem } from "packages/dina-ui/types/collection-api";
 import { useState } from "react";
 import { FaMinus } from "react-icons/fa";
 import Select from "react-select";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export interface ClassificationInputRowProps {
   rowIndex: number;
@@ -62,20 +63,17 @@ export function ClassificationInputRow({
           onChange={internalOnPathChange}
         />
       </div>
-      <div
-        style={{
-          cursor: "pointer",
-          marginTop: "0.3rem",
-          maxWidth: "2.5rem"
-        }}
-      >
-        <FaMinus
-          className="ms-2"
+      <div className="ms-2 d-flex align-items-center">
+        <button
+          type="button"
+          className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2"
           onClick={() => onDeleteRow(rowIndex)}
-          size="2em"
-          onMouseOver={(event) => (event.currentTarget.style.color = "blue")}
-          onMouseOut={(event) => (event.currentTarget.style.color = "")}
-        />
+          aria-label={`Remove classification rank ${rowIndex + 1}`}
+          title="Remove classification rank"
+        >
+          <FaMinus size="0.85em" />
+          <DinaMessage id="removeClassificationRank" />
+        </button>
       </div>
     </div>
   );
