@@ -122,6 +122,8 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     refreshButtonText: "Actualiser",
     remarks: "Remarques",
     remove: "Retirer",
+    removeValue: "Retirer {value}",
+    typeAndPressEnter: "Tapez puis appuyez sur Entrée",
     requiredField: "Champ requis",
     resetButtonText: "Réinitialiser",
     resetFilters: "Réinitialiser les filtres ",

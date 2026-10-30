@@ -342,6 +342,11 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dwcGeoreferenceVerificationStatus: "Géoréférencement impossible",
   field_dwcMunicipality: "Municipalité",
   field_dwcOtherCatalogNumbers: "Autres numéros de catalogues",
+  nextAvailable: "Prochain disponible",
+  assignedOnSave: "Attribué à l’enregistrement",
+  setCollectionToUseNextAvailable:
+    "Définissez une collection pour utiliser Prochain disponible.",
+  identifierTypePlaceholder: "Type...",
   field_dwcOtherRecordNumbers: "Autres numéros de mentions",
   field_dwcRecordNumber: "Numéro du collecteur",
   field_dwcRecordNumber_tooltip:

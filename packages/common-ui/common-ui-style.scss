@@ -381,6 +381,52 @@ fieldset.clean-section {
   color: #fff;
 }
 
+/* Pill-shaped values (Chip / ChipsArrayField). */
+.dina-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  font-size: 0.875rem;
+  color: #335075;
+  background-color: color-mix(in srgb, #335075 12%, white);
+  border-radius: 50rem;
+}
+
+.dina-chip-remove {
+  display: flex;
+  margin-right: -4px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+.chips-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 4px 8px;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+}
+
+.chips-input:focus-within {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.chips-input-draft {
+  flex: 1;
+  min-width: 140px;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
 /* Field extension rows: Type | Value | Unit | Remove. */
 .data-entry-grid {
   display: grid;
