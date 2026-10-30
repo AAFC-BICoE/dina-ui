@@ -26,6 +26,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addExistingStorageUnitAsChild_tooltip:
     "Fügen Sie diesem Lagerraum eine bereits vorhandene Lagereinheit als untergeordnete Lagereinheit hinzu.",
   addExpeditionTitle: "Expedition hinzufügen",
+  addExternalResource: "Externe Ressource hinzufügen",
   addExternalResourceTitle: "Neue externe Ressource hinzufügen",
   addFilesButton: "Datei hinzufügen",
   addGroup: "Gruppe hinzufügen",
