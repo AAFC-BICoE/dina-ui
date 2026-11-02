@@ -2,6 +2,7 @@ import classNames from "classnames";
 import {
   AssociatedMaterialSampleSearchBoxField,
   DinaFormSection,
+  INLINE_LABEL_WIDTH,
   MaterialSampleSearchHelper,
   TextField
 } from "common-ui";
@@ -38,7 +39,7 @@ export function MaterialSampleAssociationsField({
       })}
       name={fieldName}
       sectionId="associations-tabs"
-      className={classNames(className, "non-strip")}
+      className={classNames(className, "non-strip clean-section mt-4")}
       // Wrap in the bulk edit tab warning in case this is bulk edit mode:
       wrapContent={(content) => (
         <BulkEditTabWarning
@@ -115,29 +116,30 @@ function AssociationTabPanel({ fieldProps, index }: TabPanelCtx<Association>) {
     <DinaFormSection
       componentName={ASSOCIATIONS_COMPONENT_NAME}
       sectionName="associations-material-sample-section"
+      horizontal={INLINE_LABEL_WIDTH}
+      compact={true}
     >
-      <div className="row">
-        <div className="col-sm-6">
-          <div className="association-type">
-            <VocabularySelectField
-              {...fieldProps("associationType")}
-              canAdd={false}
-              path="collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=association_type"
-            />
-          </div>
-          <div className="associated-sample">
-            <AssociatedMaterialSampleSearchBoxField
-              showSearchBtn={showSearchBtn}
-              onRemoveEntry={resetSearchState}
-              onSearchClicked={() => setShowSearch(true)}
-              props={fieldProps("associatedSample")}
-            />
-          </div>
+      <div className="d-flex flex-column">
+        <div className="association-type">
+          <VocabularySelectField
+            {...fieldProps("associationType")}
+            canAdd={false}
+            path="collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=association_type"
+          />
         </div>
-        <div className="col-sm-6">
-          <TextField {...fieldProps("remarks")} multiLines={true} />
+
+        <div className="associated-sample">
+          <AssociatedMaterialSampleSearchBoxField
+            showSearchBtn={showSearchBtn}
+            onRemoveEntry={resetSearchState}
+            onSearchClicked={() => setShowSearch(true)}
+            props={fieldProps("associatedSample")}
+          />
         </div>
+
+        <TextField {...fieldProps("remarks")} multiLines={true} />
       </div>
+
       <MaterialSampleSearchHelper
         fieldName={fieldProps("associatedSample").name}
         showSearch={showSearch}
