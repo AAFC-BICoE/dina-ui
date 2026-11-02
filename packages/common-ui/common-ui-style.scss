@@ -256,6 +256,22 @@ input[id^="react-select"] {
   color: #fff;
 }
 
+.material-sample-nav .empty-sections {
+  border-top: var(--border-width, 1px) solid var(--border-subtle, #dee2e6);
+  margin-top: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+.material-sample-nav .nav-item-badge {
+  background-color: #335075;
+  color: #fff;
+}
+
+.material-sample-nav .list-group-item.active .nav-item-badge {
+  background-color: #fff;
+  color: #335075;
+}
+
 .material-sample-nav .list-group-item.active .react-switch-bg {
   background: #fff !important;
 }

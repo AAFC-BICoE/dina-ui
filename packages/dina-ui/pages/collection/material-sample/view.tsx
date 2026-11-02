@@ -74,7 +74,7 @@ import {
   WORKFLOWS_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { Row } from "@tanstack/react-table";
-import { CSSProperties } from "react";
+import { CSSProperties, useState } from "react";
 import { dynamicFieldMappingForMaterialSample } from "./list";
 import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { FaRegClock } from "react-icons/fa";
@@ -173,6 +173,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const [childrenQueryOption] = useLocalStorage<string>(
     "material-sample-children-custom-query-page-option"
   );
+
+  // Row count of whichever children query (direct children or culture strains) is showing.
+  const [childrenCount, setChildrenCount] = useState(0);
 
   const rowStyling = (row: Row<any>): CSSProperties | undefined => {
     if (row?.original?.data?.attributes?.materialSampleState) {
@@ -290,7 +293,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           !!materialSample.parentMaterialSample ||
           !!materialSample.materialSampleChildren?.length;
 
-        // [section id, label, has data]. Sections without data are listed but disabled.
+        // [section id, label, has data or item count]. Sections without data are listed but disabled.
         const scrollTargets: ScrollTarget[] = (
           [
             [IDENTIFIER_COMPONENT_NAME, "identifiers", true],
@@ -304,7 +307,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               childrenQueryOption === "cultureStrains"
                 ? "childCultureStrains"
                 : "childMaterialSamples",
-              true
+              // Always enabled: the dropdown can switch to a query that has results.
+              childrenCount || true
             ],
             [MATERIAL_SAMPLE_INFO_COMPONENT_NAME, "materialSampleInfo", true],
             [
@@ -313,7 +317,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               !!colEventQuery.response?.data
             ],
             [PREPARATIONS_COMPONENT_NAME, "preparations", hasPreparations],
-            [ORGANISMS_COMPONENT_NAME, "organisms", !!hasOrganism],
+            [
+              ORGANISMS_COMPONENT_NAME,
+              "organisms",
+              materialSample.organism?.filter((org) => !_.isEmpty(org))
+                .length ?? 0
+            ],
             [
               ASSOCIATIONS_COMPONENT_NAME,
               "associationsLegend",
@@ -323,17 +332,17 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             [
               SCHEDULED_ACTIONS_COMPONENT_NAME,
               "scheduledActions",
-              !!materialSample.scheduledActions?.length
+              materialSample.scheduledActions?.length ?? 0
             ],
             [
               CITATIONS_COMPONENT_NAME,
               "citations",
-              !!materialSample.citations?.length
+              materialSample.citations?.length ?? 0
             ],
             [
               TRANSACTIONS_COMPONENT_NAME,
               "transactions",
-              !!transactionElasticQuery?.response?.data?.hits?.hits?.length
+              transactionElasticQuery?.response?.data?.hits?.total?.value ?? 0
             ],
             [
               FIELD_EXTENSIONS_COMPONENT_NAME,
@@ -343,18 +352,19 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             [
               MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
               "materialSampleAttachments",
-              !!materialSample.attachment?.length
+              materialSample.attachment?.length ?? 0
             ],
             [
               WORKFLOWS_COMPONENT_NAME,
               "workflowsLegend",
-              !!materialSample.workflows?.length
+              materialSample.workflows?.length ?? 0
             ]
           ] as const
-        ).map(([sectionId, labelKey, hasData]) => ({
+        ).map(([sectionId, labelKey, value]) => ({
           id: sectionId,
           msg: <DinaMessage id={labelKey} />,
-          disabled: !hasData
+          disabled: !value,
+          badge: typeof value === "number" ? value : undefined
         }));
 
         return (
@@ -374,7 +384,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {buttonBar}
               <main className="container-fluid centered d-md-flex">
                 <div className="material-sample-nav-column mt-3">
-                  <MaterialSampleFormNav scrollTargets={scrollTargets} />
+                  <MaterialSampleFormNav
+                    scrollTargets={scrollTargets}
+                    collapseEmptySections={true}
+                  />
                 </div>
                 <div className="flex-grow-1 container-fluid">
                   {/* Material Sample Hierarchy */}
@@ -458,6 +471,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       enableColumnSelector={true}
                       mandatoryDisplayedColumns={["materialSampleName"]}
                       excludedRelationshipTypes={["collecting-event"]}
+                      onTotalRecordsChange={setChildrenCount}
                     />
                   </div>
 

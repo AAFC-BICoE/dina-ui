@@ -26,6 +26,8 @@ import {
   FaBoxArchive,
   FaBug,
   FaCalendarDays,
+  FaChevronDown,
+  FaChevronUp,
   FaCircleInfo,
   FaDiagramProject,
   FaDna,
@@ -80,6 +82,9 @@ export interface MaterialSampleFormNavProps {
    * navigation.
    */
   onChangeNavOrder?: (newOrder: string[] | null) => void;
+
+  /** List disabled (empty) sections last, behind a show/hide toggle. Used on the view page. */
+  collapseEmptySections?: boolean;
 }
 
 // Don't render the scroll-spy component during tests because it only works in the browser.
@@ -98,6 +103,8 @@ function setFormSectionHovered(targetId: string, hovered: boolean) {
 export interface ScrollTarget {
   id: string;
   msg: string | React.JSX.Element;
+  /** Item count shown at the end of the row. Hidden when 0 or undefined. */
+  badge?: number;
   className?: string;
   disabled?: boolean;
   setEnabled?: (val: boolean) => void;
@@ -207,8 +214,17 @@ export function MaterialSampleFormNav({
   scrollTargets: sortedScrollTargets,
   disableRemovePrompt,
   disableCollectingEventSwitch,
-  onChangeNavOrder
+  onChangeNavOrder,
+  collapseEmptySections
 }: MaterialSampleFormNavProps) {
+  const [showEmptySections, setShowEmptySections] = useState(false);
+  const emptySections = collapseEmptySections
+    ? sortedScrollTargets.filter((it) => it.disabled)
+    : [];
+  const listedSections = collapseEmptySections
+    ? sortedScrollTargets.filter((it) => !it.disabled)
+    : sortedScrollTargets;
+
   const [items, setItems] = useState(sortedScrollTargets.map((it) => it.id));
 
   // Stable arrays, so the scroll spy only re-runs when the ids actually change.
@@ -252,6 +268,20 @@ export function MaterialSampleFormNav({
     return () => observer.disconnect();
   }, []);
 
+  const renderItem = (section: ScrollTarget) => (
+    <DataComponentNavItem
+      id={section.id}
+      key={section.id}
+      section={section}
+      renderedSubLinkIds={renderedSubLinkIds}
+      disableRemovePrompt={disableRemovePrompt}
+      disableSwitch={
+        section.id === COLLECTING_EVENT_COMPONENT_NAME &&
+        disableCollectingEventSwitch
+      }
+    />
+  );
+
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
@@ -276,21 +306,38 @@ export function MaterialSampleFormNav({
               {/* Display each row of the data components. */}
               <div className="list-group">
                 <SortableNavGroup>
-                  {sortedScrollTargets.map((section) => (
-                    <DataComponentNavItem
-                      id={section.id}
-                      key={section.id}
-                      section={section}
-                      renderedSubLinkIds={renderedSubLinkIds}
-                      disableRemovePrompt={disableRemovePrompt}
-                      disableSwitch={
-                        section.id === COLLECTING_EVENT_COMPONENT_NAME &&
-                        disableCollectingEventSwitch
-                      }
-                    />
-                  ))}
+                  {listedSections.map(renderItem)}
                 </SortableNavGroup>
               </div>
+              {emptySections.length > 0 && (
+                <div className="empty-sections">
+                  <button
+                    type="button"
+                    className="btn btn-link btn-sm px-2"
+                    aria-expanded={showEmptySections}
+                    onClick={() => setShowEmptySections(!showEmptySections)}
+                  >
+                    {showEmptySections ? (
+                      <FaChevronUp className="me-1" />
+                    ) : (
+                      <FaChevronDown className="me-1" />
+                    )}
+                    <DinaMessage
+                      id={
+                        showEmptySections
+                          ? "hideEmptySections"
+                          : "showEmptySections"
+                      }
+                      values={{ count: emptySections.length }}
+                    />
+                  </button>
+                  {showEmptySections && (
+                    <SortableNavGroup>
+                      {emptySections.map(renderItem)}
+                    </SortableNavGroup>
+                  )}
+                </div>
+              )}
             </nav>
           </ScrollSpyNav>
         </div>
@@ -398,6 +445,11 @@ const DataComponentNavItem = ({
           {SectionIcon && <SectionIcon className="nav-item-icon" />}
           {section.msg}
         </Tag>
+        {!!section.badge && (
+          <span className="badge rounded-pill nav-item-badge">
+            {section.badge}
+          </span>
+        )}
         {section.setEnabled &&
           (disableSwitch ? (
             <Tooltip
