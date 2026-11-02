@@ -1,3 +1,4 @@
+import { SEQDB_MOLECULAR_ANALYSIS_TYPE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   ButtonBar,
   ColumnDefinition,
@@ -35,7 +36,7 @@ export default function MolecularAnalysisWorkflowListPage() {
   const { formatMessage } = useDinaIntl();
 
   const { vocabOptions, loading } = useVocabularyOptions({
-    path: "seqdb-api/vocabulary/molecularAnalysisType"
+    path: `seqdb-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${SEQDB_MOLECULAR_ANALYSIS_TYPE_ID}`
   });
 
   const { handleDeleteMolecularAnalysisWorkflows, reloadResource } =
