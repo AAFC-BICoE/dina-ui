@@ -293,6 +293,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           !!materialSample.parentMaterialSample ||
           !!materialSample.materialSampleChildren?.length;
 
+        // These sections are hidden on the page when empty (the nav still lists them as empty).
+        const transactionCount =
+          transactionElasticQuery?.response?.data?.hits?.total?.value ?? 0;
+        const hasFieldExtensions = !_.isEmpty(materialSample.extensionValues);
+        const attachmentCount = materialSample.attachment?.length ?? 0;
+        const workflowCount = materialSample.workflows?.length ?? 0;
+
         // [section id, label, has data or item count]. Sections without data are listed but disabled.
         const scrollTargets: ScrollTarget[] = (
           [
@@ -339,26 +346,18 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               "citations",
               materialSample.citations?.length ?? 0
             ],
-            [
-              TRANSACTIONS_COMPONENT_NAME,
-              "transactions",
-              transactionElasticQuery?.response?.data?.hits?.total?.value ?? 0
-            ],
+            [TRANSACTIONS_COMPONENT_NAME, "transactions", transactionCount],
             [
               FIELD_EXTENSIONS_COMPONENT_NAME,
               "fieldExtensions",
-              !_.isEmpty(materialSample.extensionValues)
+              hasFieldExtensions
             ],
             [
               MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
               "materialSampleAttachments",
-              materialSample.attachment?.length ?? 0
+              attachmentCount
             ],
-            [
-              WORKFLOWS_COMPONENT_NAME,
-              "workflowsLegend",
-              materialSample.workflows?.length ?? 0
-            ]
+            [WORKFLOWS_COMPONENT_NAME, "workflowsLegend", workflowCount]
           ] as const
         ).map(([sectionId, labelKey, value]) => ({
           id: sectionId,
@@ -588,45 +587,53 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     <ScheduledActionsField />
                   )}
                   {!!materialSample?.citations?.length && <CitationsField />}
-                  <div id={FIELD_EXTENSIONS_COMPONENT_NAME}>
-                    <DataEntryViewer
-                      name={"extensionValues"}
-                      legend={
-                        <DinaMessage id="materialSampleFieldExtensions" />
-                      }
-                      extensionValues={materialSample.extensionValues}
-                      disableDinaForm={true}
-                      blockOptionsEndpoint={`collection-api/extension`}
-                      blockOptionsFilter={{
-                        "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
-                      }}
-                    />
-                  </div>
-                  <div id={TRANSACTIONS_COMPONENT_NAME}>
-                    <CollapsibleSection
-                      id="transactions"
-                      headerKey="transactions"
-                    >
-                      <MaterialSampleTransactionList
-                        transactionQueryDSL={transactionQueryDSL}
+                  {hasFieldExtensions && (
+                    <div id={FIELD_EXTENSIONS_COMPONENT_NAME}>
+                      <DataEntryViewer
+                        name={"extensionValues"}
+                        legend={
+                          <DinaMessage id="materialSampleFieldExtensions" />
+                        }
+                        extensionValues={materialSample.extensionValues}
+                        disableDinaForm={true}
+                        blockOptionsEndpoint={`collection-api/extension`}
+                        blockOptionsFilter={{
+                          "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
+                        }}
                       />
-                    </CollapsibleSection>
-                  </div>
+                    </div>
+                  )}
+                  {!!transactionCount && (
+                    <div id={TRANSACTIONS_COMPONENT_NAME}>
+                      <CollapsibleSection
+                        id="transactions"
+                        headerKey="transactions"
+                      >
+                        <MaterialSampleTransactionList
+                          transactionQueryDSL={transactionQueryDSL}
+                        />
+                      </CollapsibleSection>
+                    </div>
+                  )}
 
-                  <div
-                    id={MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME}
-                    className="mb-3"
-                  >
-                    <AttachmentReadOnlySection
-                      name="attachment"
-                      detachTotalSelected={true}
-                      title={<DinaMessage id="materialSampleAttachments" />}
+                  {!!attachmentCount && (
+                    <div
+                      id={MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME}
+                      className="mb-3"
+                    >
+                      <AttachmentReadOnlySection
+                        name="attachment"
+                        detachTotalSelected={true}
+                        title={<DinaMessage id="materialSampleAttachments" />}
+                      />
+                    </div>
+                  )}
+
+                  {!!workflowCount && (
+                    <MaterialSampleWorkflows
+                      workflows={materialSample?.workflows}
                     />
-                  </div>
-
-                  <MaterialSampleWorkflows
-                    workflows={materialSample?.workflows}
-                  />
+                  )}
                 </div>
               </main>
             </DinaForm>
