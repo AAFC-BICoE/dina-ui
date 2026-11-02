@@ -30,7 +30,14 @@ export function MaterialSampleBreadCrumb({
 
   const displayName = materialSample.materialSampleName ?? materialSample.id;
   const organismCount = materialSample.organism?.filter(Boolean).length ?? 0;
+  const singleOrganism =
+    organismCount === 1 ? materialSample.organism?.find(Boolean) : undefined;
 
+  const primaryDetermination = singleOrganism?.determination?.find(
+    (determination) => determination?.isPrimary
+  );
+
+  const scientificName = primaryDetermination?.scientificName;
   const determinationCount =
     materialSample.organism?.reduce(
       (total, organism) => total + (organism?.determination?.length ?? 0),
@@ -55,69 +62,95 @@ export function MaterialSampleBreadCrumb({
   return (
     <>
       {/* Current Material Sample Name */}
-      <h2
-        id="wb-cont"
-        className="d-flex justify-content-between align-items-end mb-0"
-        style={{ fontSize: "1.4rem" }}
-      >
-        <strong>
-          {!disableLastLink ? (
-            <Link
-              href={`/collection/material-sample/view?id=${materialSample.id}`}
+      <div className="d-flex justify-content-between align-items-start column-gap-3">
+        <div className="flex-grow-1" style={{ minWidth: 0 }}>
+          <h2
+            id="wb-cont"
+            className="mb-0"
+            style={{
+              fontSize: "1.4rem"
+            }}
+          >
+            <strong>
+              {!disableLastLink ? (
+                <Link
+                  href={`/collection/material-sample/view?id=${materialSample.id}`}
+                >
+                  {displayName}
+                </Link>
+              ) : (
+                <div className="d-inline-flex flex-row align-items-center">
+                  <span>{displayName}</span>
+                </div>
+              )}
+            </strong>
+          </h2>
+          <div className="d-flex align-items-center gap-3 text-muted mt-1 mb-0">
+            {collectionName && (
+              <span
+                className="text-uppercase fw-semibold"
+                style={{ letterSpacing: "0.08em" }}
+              >
+                {collectionName}
+              </span>
+            )}
+
+            {collectionName && <span className="text-secondary">|</span>}
+
+            <span className="fst-italic">
+              {organismCount} {organismCount === 1 ? "organism" : "organisms"}
+            </span>
+
+            <span className="text-secondary">|</span>
+
+            <span className="fst-italic">
+              {determinationCount}{" "}
+              {determinationCount === 1 ? "determination" : "determinations"}
+            </span>
+          </div>
+        </div>
+        <div className="col-md-6 d-flex flex-column align-items-end mt-4">
+          {enableGroupSelectField &&
+            (!readOnly ? (
+              <div className="w-100 mb-0">
+                <DinaFormSection horizontal={"flex"}>
+                  <GroupSelectField
+                    disableTemplateCheckbox={true}
+                    name="group"
+                    enableStoredDefaultGroup={enableStoredDefaultGroup}
+                    readOnlyHideLabel={true}
+                    removeBottomMargin={true}
+                    styles={customStyle}
+                  />
+                </DinaFormSection>
+              </div>
+            ) : (
+              <div
+                className="d-inline-flex flex-row"
+                style={{ fontSize: "1.4rem" }}
+              >
+                <div className="header-group-text">
+                  <GroupLabel groupName={materialSample?.group} />
+                </div>
+                <NotPubliclyReleasableWarning />
+              </div>
+            ))}
+          {scientificName && (
+            <div
+              className="fw-medium text-end"
+              style={{
+                fontSize: "1.1rem",
+                lineHeight: 1.4,
+                overflowWrap: "anywhere",
+                whiteSpace: "normal",
+                minWidth: 0,
+                maxWidth: "100%"
+              }}
             >
-              {displayName}
-            </Link>
-          ) : (
-            <div className="d-inline-flex flex-row align-items-center">
-              <span>{displayName}</span>
+              {scientificName}
             </div>
           )}
-        </strong>
-        {enableGroupSelectField &&
-          (!readOnly ? (
-            <h6 className="col-md-6 align-self-end mb-0">
-              <DinaFormSection horizontal={"flex"}>
-                <GroupSelectField
-                  disableTemplateCheckbox={true}
-                  name="group"
-                  enableStoredDefaultGroup={enableStoredDefaultGroup}
-                  readOnlyHideLabel={true}
-                  removeBottomMargin={true}
-                  styles={customStyle}
-                />
-              </DinaFormSection>
-            </h6>
-          ) : (
-            <div className="d-inline-flex flex-row align-self-end">
-              <div className="header-group-text">
-                <GroupLabel groupName={materialSample?.group} />
-              </div>
-              <NotPubliclyReleasableWarning />
-            </div>
-          ))}
-      </h2>
-      <div className="d-flex align-items-center gap-3 text-muted mt-1 mb-0">
-        {collectionName && (
-          <span
-            className="text-uppercase fw-semibold"
-            style={{ letterSpacing: "0.08em" }}
-          >
-            {collectionName}
-          </span>
-        )}
-
-        {collectionName && <span className="text-secondary">|</span>}
-
-        <span className="fst-italic">
-          {organismCount} {organismCount === 1 ? "organism" : "organisms"}
-        </span>
-
-        <span className="text-secondary">|</span>
-
-        <span className="fst-italic">
-          {determinationCount}{" "}
-          {determinationCount === 1 ? "determination" : "determinations"}
-        </span>
+        </div>
       </div>
       {/* Material Sample Parents */}
       {parentPath.length !== 0 && (
