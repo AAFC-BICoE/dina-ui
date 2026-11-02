@@ -27,6 +27,8 @@ import {
   FaBug,
   FaCalendarDays,
   FaCircleInfo,
+  FaDiagramProject,
+  FaDna,
   FaFingerprint,
   FaFlask,
   FaLink,
@@ -35,6 +37,8 @@ import {
   FaPaperclip,
   FaPuzzlePiece,
   FaQuoteRight,
+  FaRightLeft,
+  FaSitemap,
   FaSliders
 } from "react-icons/fa6";
 import { IconType } from "react-icons";
@@ -48,21 +52,22 @@ import {
   IDENTIFIER_COMPONENT_NAME,
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+  MATERIAL_SAMPLE_CHILDREN_COMPONENT_NAME,
+  MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME,
   MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
   ORGANISMS_COMPONENT_NAME,
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  STORAGE_COMPONENT_NAME,
+  TRANSACTIONS_COMPONENT_NAME,
+  WORKFLOWS_COMPONENT_NAME
 } from "../../../../types/collection-api";
-import { useMaterialSampleSave } from "../useMaterialSample";
-import { useMaterialSampleSectionOrder } from "./useMaterialSampleSectionOrder";
 import { NativeScrollSpyNav } from "./NativeScrollSpyNav";
 
 export interface MaterialSampleFormNavProps {
-  dataComponentState: ReturnType<
-    typeof useMaterialSampleSave
-  >["dataComponentState"];
+  /** Sections to list, in order. On the edit page these come from useMaterialSampleSectionOrder. */
+  scrollTargets: ScrollTarget[];
 
   /** Disabled the Are You Sure modal when toggling a data component off. */
   disableRemovePrompt?: boolean;
@@ -71,20 +76,10 @@ export interface MaterialSampleFormNavProps {
   disableCollectingEventSwitch?: boolean;
 
   /**
-   * The current order that should be applied. This should come from a form template.
-   */
-  navOrder?: string[] | null;
-
-  /**
    * This should only be used when editing a form template. Returns the new order of the
    * navigation.
    */
   onChangeNavOrder?: (newOrder: string[] | null) => void;
-
-  /**
-   * Are we currently editing a form template?
-   */
-  isTemplate: boolean;
 }
 
 // Don't render the scroll-spy component during tests because it only works in the browser.
@@ -128,7 +123,12 @@ export const SECTION_ICONS: Record<string, IconType> = {
   [CITATIONS_COMPONENT_NAME]: FaQuoteRight,
   [FIELD_EXTENSIONS_COMPONENT_NAME]: FaPuzzlePiece,
   [MANAGED_ATTRIBUTES_COMPONENT_NAME]: FaSliders,
-  [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: FaPaperclip
+  [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: FaPaperclip,
+  [WORKFLOWS_COMPONENT_NAME]: FaDna,
+  // View page only:
+  [MATERIAL_SAMPLE_CHILDREN_COMPONENT_NAME]: FaSitemap,
+  [MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME]: FaDiagramProject,
+  [TRANSACTIONS_COMPONENT_NAME]: FaRightLeft
 };
 
 /** Sub-links shown under a top-level nav item while it's the active scroll target. */
@@ -204,19 +204,11 @@ const SUB_SCROLL_TARGET_IDS = Object.values(SECTION_SUB_LINKS).flatMap(
 
 /** Form navigation and toggles to enable/disable form sections. */
 export function MaterialSampleFormNav({
-  dataComponentState,
+  scrollTargets: sortedScrollTargets,
   disableRemovePrompt,
   disableCollectingEventSwitch,
-  navOrder,
-  onChangeNavOrder,
-  isTemplate
+  onChangeNavOrder
 }: MaterialSampleFormNavProps) {
-  const { sortedScrollTargets } = useMaterialSampleSectionOrder({
-    dataComponentState,
-    navOrder,
-    isTemplate
-  });
-
   const [items, setItems] = useState(sortedScrollTargets.map((it) => it.id));
 
   // Stable arrays, so the scroll spy only re-runs when the ids actually change.

@@ -24,6 +24,11 @@ export const MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME: string =
 export const FIELD_EXTENSIONS_COMPONENT_NAME: string =
   "field-extensions-component";
 
+// Sections that only exist on the Material Sample View page:
+export const MATERIAL_SAMPLE_CHILDREN_COMPONENT_NAME = "children-component";
+export const MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME = "hierarchy-component";
+export const TRANSACTIONS_COMPONENT_NAME = "transactions-component";
+
 /**
  * All Material Sample form data component in order.
  * This array is the source of truth for the section ID names and their order.

@@ -35,6 +35,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { getLinkedMaterialSamplesHref } from "../collecting-event/CollectingEventEditAlert";
 import { getCollectingEventName } from "../collecting-event/getCollectingEventName";
 import { SECTION_ICONS } from "./material-sample-form-nav/MaterialSampleFormNav";
+import { useMaterialSampleSectionOrder } from "./material-sample-form-nav/useMaterialSampleSectionOrder";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
@@ -229,6 +230,12 @@ export function MaterialSampleForm({
   } = materialSampleSaveHook ?? materialSampleSaveResponse;
 
   const copyFromNextSample = useCopyToNextSample();
+
+  const { sortedScrollTargets } = useMaterialSampleSectionOrder({
+    dataComponentState,
+    navOrder,
+    isTemplate: isTemplate ?? false
+  });
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
@@ -492,15 +499,13 @@ export function MaterialSampleForm({
         <div className="material-sample-nav-column">
           {(!isOffScreen || !reduceRendering) && (
             <MaterialSampleFormNav
-              dataComponentState={dataComponentState}
+              scrollTargets={sortedScrollTargets}
               disableRemovePrompt={disableNavRemovePrompt}
               disableCollectingEventSwitch={
                 disableCollectingEventSwitch ||
                 initialValues.parentMaterialSample !== undefined
               }
-              navOrder={navOrder}
               onChangeNavOrder={onChangeNavOrder}
-              isTemplate={isTemplate ?? false}
             />
           )}
         </div>

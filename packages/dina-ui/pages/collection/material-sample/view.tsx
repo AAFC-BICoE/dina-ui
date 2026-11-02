@@ -39,7 +39,9 @@ import {
   useMaterialSampleFormTemplateSelectState,
   useMaterialSampleQuery,
   withOrganismEditorValues,
-  MaterialSampleWorkflows
+  MaterialSampleWorkflows,
+  MaterialSampleFormNav,
+  ScrollTarget
 } from "../../../components";
 import { CitationsField } from "../../../components/collection/citations/CitationsField";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
@@ -53,15 +55,30 @@ import { AttachmentReadOnlySection } from "../../../components/object-store/atta
 import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  ASSOCIATIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
+  FIELD_EXTENSIONS_COMPONENT_NAME,
+  IDENTIFIER_COMPONENT_NAME,
+  MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+  MATERIAL_SAMPLE_CHILDREN_COMPONENT_NAME,
+  MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
   MaterialSample,
-  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
+  ORGANISMS_COMPONENT_NAME,
+  PREPARATIONS_COMPONENT_NAME,
+  SCHEDULED_ACTIONS_COMPONENT_NAME,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME,
+  TRANSACTIONS_COMPONENT_NAME,
+  WORKFLOWS_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { Row } from "@tanstack/react-table";
 import { CSSProperties } from "react";
 import { dynamicFieldMappingForMaterialSample } from "./list";
 import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { FaRegClock } from "react-icons/fa";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -151,6 +168,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     setSampleFormTemplateUUID,
     visibleManagedAttributeKeys
   } = useMaterialSampleFormTemplateSelectState({});
+
+  // Same key the children CustomQueryPageView saves its dropdown to, so the nav label matches it.
+  const [childrenQueryOption] = useLocalStorage<string>(
+    "material-sample-children-custom-query-page-option"
+  );
 
   const rowStyling = (row: Row<any>): CSSProperties | undefined => {
     if (row?.original?.data?.attributes?.materialSampleState) {
@@ -264,6 +286,77 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             )?.visible) ??
           false;
 
+        const hasHierarchy =
+          !!materialSample.parentMaterialSample ||
+          !!materialSample.materialSampleChildren?.length;
+
+        // [section id, label, has data]. Sections without data are listed but disabled.
+        const scrollTargets: ScrollTarget[] = (
+          [
+            [IDENTIFIER_COMPONENT_NAME, "identifiers", true],
+            [
+              MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME,
+              "materialSampleHierarchy",
+              hasHierarchy
+            ],
+            [
+              MATERIAL_SAMPLE_CHILDREN_COMPONENT_NAME,
+              childrenQueryOption === "cultureStrains"
+                ? "childCultureStrains"
+                : "childMaterialSamples",
+              true
+            ],
+            [MATERIAL_SAMPLE_INFO_COMPONENT_NAME, "materialSampleInfo", true],
+            [
+              COLLECTING_EVENT_COMPONENT_NAME,
+              "collectingEvent",
+              !!colEventQuery.response?.data
+            ],
+            [PREPARATIONS_COMPONENT_NAME, "preparations", hasPreparations],
+            [ORGANISMS_COMPONENT_NAME, "organisms", !!hasOrganism],
+            [
+              ASSOCIATIONS_COMPONENT_NAME,
+              "associationsLegend",
+              hasAssociations
+            ],
+            [STORAGE_COMPONENT_NAME, "storage", !!materialSample.storageUnit],
+            [
+              SCHEDULED_ACTIONS_COMPONENT_NAME,
+              "scheduledActions",
+              !!materialSample.scheduledActions?.length
+            ],
+            [
+              CITATIONS_COMPONENT_NAME,
+              "citations",
+              !!materialSample.citations?.length
+            ],
+            [
+              TRANSACTIONS_COMPONENT_NAME,
+              "transactions",
+              !!transactionElasticQuery?.response?.data?.hits?.hits?.length
+            ],
+            [
+              FIELD_EXTENSIONS_COMPONENT_NAME,
+              "fieldExtensions",
+              !_.isEmpty(materialSample.extensionValues)
+            ],
+            [
+              MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+              "materialSampleAttachments",
+              !!materialSample.attachment?.length
+            ],
+            [
+              WORKFLOWS_COMPONENT_NAME,
+              "workflowsLegend",
+              !!materialSample.workflows?.length
+            ]
+          ] as const
+        ).map(([sectionId, labelKey, hasData]) => ({
+          id: sectionId,
+          msg: <DinaMessage id={labelKey} />,
+          disabled: !hasData
+        }));
+
         return (
           <>
             <Head
@@ -279,215 +372,248 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               formTemplate={sampleFormTemplate}
             >
               {buttonBar}
-              <main className="container-fluid centered">
-                {/* Material Sample Hierarchy */}
-                <MaterialSampleBreadCrumb
-                  materialSample={materialSample}
-                  disableLastLink={true}
-                  enableGroupSelectField={true}
-                />
-
-                {/* Material Sample Badges */}
-                <MaterialSampleBadges
-                  transactionElasticQuery={transactionElasticQuery}
-                />
-
-                {hasShowParentAttributes && (
-                  <ShowParentAttributesField
-                    id={id}
-                    isTemplate={false}
-                    attrList={
-                      sampleFormTemplate?.components?.find(
-                        (comp) =>
-                          comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
-                      )?.sections?.[0].items?.[0].defaultValue
-                    }
+              <main className="container-fluid centered d-md-flex">
+                <div className="material-sample-nav-column mt-3">
+                  <MaterialSampleFormNav scrollTargets={scrollTargets} />
+                </div>
+                <div className="flex-grow-1 container-fluid">
+                  {/* Material Sample Hierarchy */}
+                  <MaterialSampleBreadCrumb
                     materialSample={materialSample}
+                    disableLastLink={true}
+                    enableGroupSelectField={true}
                   />
-                )}
 
-                <MaterialSampleIdentifiersSection />
-
-                {(!!materialSample.parentMaterialSample ||
-                  !!materialSample.materialSampleChildren?.length) && (
-                  <MaterialSampleHierarchySection
-                    key={materialSample.id}
-                    materialSample={materialSample}
+                  {/* Material Sample Badges */}
+                  <MaterialSampleBadges
+                    transactionElasticQuery={transactionElasticQuery}
                   />
-                )}
 
-                {/* Custom Query View */}
-                <CustomQueryPageView
-                  rowStyling={rowStyling}
-                  indexName="dina_material_sample_index"
-                  columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
-                  uniqueName="material-sample-children"
-                  customQueryOptions={[
-                    {
-                      value: "materialSampleChildren",
-                      labelKey: "childMaterialSamples",
-                      customElasticSearch:
-                        generateDirectMaterialSampleChildrenTree(id ?? "")
-                    },
-                    {
-                      value: "cultureStrains",
-                      labelKey: "childCultureStrains",
-                      customElasticSearch:
-                        materialSampleCultureStrainChildrenQuery(
-                          materialSample?.hierarchy?.reduce((prev, current) =>
-                            (prev?.rank ?? 0) > (current?.rank ?? 0)
-                              ? prev
-                              : current
-                          )?.uuid ?? ""
-                        )
-                    }
-                  ]}
-                  reactTableProps={{
-                    showPagination: false,
-                    enableSorting: true,
-                    enableMultiSort: true
-                  }}
-                  defaultPageSize={500}
-                  defaultSort={[
-                    { id: "data.attributes.materialSampleName", desc: false }
-                  ]}
-                  dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
-                  enableColumnSelector={true}
-                  mandatoryDisplayedColumns={["materialSampleName"]}
-                  excludedRelationshipTypes={["collecting-event"]}
-                />
+                  {hasShowParentAttributes && (
+                    <ShowParentAttributesField
+                      id={id}
+                      isTemplate={false}
+                      attrList={
+                        sampleFormTemplate?.components?.find(
+                          (comp) =>
+                            comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
+                        )?.sections?.[0].items?.[0].defaultValue
+                      }
+                      materialSample={materialSample}
+                    />
+                  )}
 
-                <MaterialSampleInfoSection />
-                <MaterialSampleInfoManagedAttributes
-                  visibleManagedAttributeKeys={visibleManagedAttributeKeys}
-                />
-                {withResponse(colEventQuery, ({ data: colEvent }) => {
-                  function legendWrapper():
-                    | ((legendElement: React.JSX.Element) => React.JSX.Element)
-                    | undefined {
-                    return (legendElement) => {
-                      return (
-                        <div className="d-flex align-items-center justify-content-between">
-                          {legendElement}
-                          <Link
-                            href={`/collection/collecting-event/view?id=${colEvent.id}`}
-                          >
-                            <DinaMessage id="detailsPageLink" />
-                          </Link>
-                        </div>
-                      );
-                    };
-                  }
-                  return (
-                    <FieldSet
-                      legend={<DinaMessage id="collectingEvent" />}
-                      wrapLegend={legendWrapper()}
-                      componentName={COLLECTING_EVENT_COMPONENT_NAME}
-                    >
-                      {materialSample.parentMaterialSample && (
-                        <div
-                          style={{
-                            marginLeft: "16px"
-                          }}
-                        >
-                          <DinaMessage
-                            id="fromParent"
-                            values={{ parentLink: collectingEventParentLink }}
-                          />
-                        </div>
-                      )}
-                      <DinaForm
-                        initialValues={colEvent}
-                        readOnly={true}
-                        formTemplate={sampleFormTemplate}
-                      >
-                        <CollectingEventFormLayout />
-                      </DinaForm>
-                    </FieldSet>
-                  );
-                })}
-                {hasPreparations && (
-                  <PreparationField
-                    visibleManagedAttributeKeys={
-                      visibleManagedAttributeKeys?.preparations
-                    }
-                  />
-                )}
-                {hasOrganism && (
-                  <OrganismsField
-                    name="organism"
-                    visibleManagedAttributeKeys={
-                      visibleManagedAttributeKeys?.determination
-                    }
-                  />
-                )}
-                {hasInheritedDetermination && (
-                  <div className="row">
-                    <div className="col-md-6">
-                      <InheritedDeterminationSection
+                  <MaterialSampleIdentifiersSection />
+
+                  {hasHierarchy && (
+                    <div id={MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME}>
+                      <MaterialSampleHierarchySection
+                        key={materialSample.id}
                         materialSample={materialSample}
                       />
                     </div>
+                  )}
+
+                  {/* Custom Query View */}
+                  <div id={MATERIAL_SAMPLE_CHILDREN_COMPONENT_NAME}>
+                    <CustomQueryPageView
+                      rowStyling={rowStyling}
+                      indexName="dina_material_sample_index"
+                      columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
+                      uniqueName="material-sample-children"
+                      customQueryOptions={[
+                        {
+                          value: "materialSampleChildren",
+                          labelKey: "childMaterialSamples",
+                          customElasticSearch:
+                            generateDirectMaterialSampleChildrenTree(id ?? "")
+                        },
+                        {
+                          value: "cultureStrains",
+                          labelKey: "childCultureStrains",
+                          customElasticSearch:
+                            materialSampleCultureStrainChildrenQuery(
+                              materialSample?.hierarchy?.reduce(
+                                (prev, current) =>
+                                  (prev?.rank ?? 0) > (current?.rank ?? 0)
+                                    ? prev
+                                    : current
+                              )?.uuid ?? ""
+                            )
+                        }
+                      ]}
+                      reactTableProps={{
+                        showPagination: false,
+                        enableSorting: true,
+                        enableMultiSort: true
+                      }}
+                      defaultPageSize={500}
+                      defaultSort={[
+                        {
+                          id: "data.attributes.materialSampleName",
+                          desc: false
+                        }
+                      ]}
+                      dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
+                      enableColumnSelector={true}
+                      mandatoryDisplayedColumns={["materialSampleName"]}
+                      excludedRelationshipTypes={["collecting-event"]}
+                    />
                   </div>
-                )}
-                {hasAssociations && <AssociationsField />}
-                {materialSample.storageUnit && (
-                  <FieldSet legend={<DinaMessage id="storage" />}>
-                    <div className="mb-3 d-flex flex-row">
+
+                  <MaterialSampleInfoSection
+                    id={MATERIAL_SAMPLE_INFO_COMPONENT_NAME}
+                  />
+                  <MaterialSampleInfoManagedAttributes
+                    visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+                  />
+                  {withResponse(colEventQuery, ({ data: colEvent }) => {
+                    function legendWrapper():
+                      | ((
+                          legendElement: React.JSX.Element
+                        ) => React.JSX.Element)
+                      | undefined {
+                      return (legendElement) => {
+                        return (
+                          <div className="d-flex align-items-center justify-content-between">
+                            {legendElement}
+                            <Link
+                              href={`/collection/collecting-event/view?id=${colEvent.id}`}
+                            >
+                              <DinaMessage id="detailsPageLink" />
+                            </Link>
+                          </div>
+                        );
+                      };
+                    }
+                    return (
+                      <FieldSet
+                        id={COLLECTING_EVENT_COMPONENT_NAME}
+                        legend={<DinaMessage id="collectingEvent" />}
+                        wrapLegend={legendWrapper()}
+                        componentName={COLLECTING_EVENT_COMPONENT_NAME}
+                      >
+                        {materialSample.parentMaterialSample && (
+                          <div
+                            style={{
+                              marginLeft: "16px"
+                            }}
+                          >
+                            <DinaMessage
+                              id="fromParent"
+                              values={{ parentLink: collectingEventParentLink }}
+                            />
+                          </div>
+                        )}
+                        <DinaForm
+                          initialValues={colEvent}
+                          readOnly={true}
+                          formTemplate={sampleFormTemplate}
+                        >
+                          <CollectingEventFormLayout />
+                        </DinaForm>
+                      </FieldSet>
+                    );
+                  })}
+                  {hasPreparations && (
+                    <PreparationField
+                      visibleManagedAttributeKeys={
+                        visibleManagedAttributeKeys?.preparations
+                      }
+                    />
+                  )}
+                  {hasOrganism && (
+                    <OrganismsField
+                      id={ORGANISMS_COMPONENT_NAME}
+                      name="organism"
+                      visibleManagedAttributeKeys={
+                        visibleManagedAttributeKeys?.determination
+                      }
+                    />
+                  )}
+                  {hasInheritedDetermination && (
+                    <div className="row">
                       <div className="col-md-6">
-                        <StorageLinkerField
-                          name="storageUnit"
-                          targetType="material-sample"
+                        <InheritedDeterminationSection
+                          materialSample={materialSample}
                         />
                       </div>
-                      {materialSample.storageUnit.parentStorageUnit && (
+                    </div>
+                  )}
+                  {hasAssociations && <AssociationsField />}
+                  {materialSample.storageUnit && (
+                    <FieldSet
+                      id={STORAGE_COMPONENT_NAME}
+                      legend={<DinaMessage id="storage" />}
+                    >
+                      <div className="mb-3 d-flex flex-row">
                         <div className="col-md-6">
                           <StorageLinkerField
-                            name="storageUnit.parentStorageUnit"
+                            name="storageUnit"
                             targetType="material-sample"
-                            customName={formatMessage(
-                              "field_parentStorageUnit"
-                            )}
-                            currentStorageUnitUUID={
-                              materialSample.storageUnit.parentStorageUnit.id
-                            }
                           />
                         </div>
-                      )}
-                    </div>
-                  </FieldSet>
-                )}
-                {!!materialSample?.scheduledActions?.length && (
-                  <ScheduledActionsField />
-                )}
-                {!!materialSample?.citations?.length && <CitationsField />}
-                <DataEntryViewer
-                  name={"extensionValues"}
-                  legend={<DinaMessage id="materialSampleFieldExtensions" />}
-                  extensionValues={materialSample.extensionValues}
-                  disableDinaForm={true}
-                  blockOptionsEndpoint={`collection-api/extension`}
-                  blockOptionsFilter={{
-                    "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
-                  }}
-                />
-                <CollapsibleSection id="transactions" headerKey="transactions">
-                  <MaterialSampleTransactionList
-                    transactionQueryDSL={transactionQueryDSL}
-                  />
-                </CollapsibleSection>
+                        {materialSample.storageUnit.parentStorageUnit && (
+                          <div className="col-md-6">
+                            <StorageLinkerField
+                              name="storageUnit.parentStorageUnit"
+                              targetType="material-sample"
+                              customName={formatMessage(
+                                "field_parentStorageUnit"
+                              )}
+                              currentStorageUnitUUID={
+                                materialSample.storageUnit.parentStorageUnit.id
+                              }
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </FieldSet>
+                  )}
+                  {!!materialSample?.scheduledActions?.length && (
+                    <ScheduledActionsField />
+                  )}
+                  {!!materialSample?.citations?.length && <CitationsField />}
+                  <div id={FIELD_EXTENSIONS_COMPONENT_NAME}>
+                    <DataEntryViewer
+                      name={"extensionValues"}
+                      legend={
+                        <DinaMessage id="materialSampleFieldExtensions" />
+                      }
+                      extensionValues={materialSample.extensionValues}
+                      disableDinaForm={true}
+                      blockOptionsEndpoint={`collection-api/extension`}
+                      blockOptionsFilter={{
+                        "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
+                      }}
+                    />
+                  </div>
+                  <div id={TRANSACTIONS_COMPONENT_NAME}>
+                    <CollapsibleSection
+                      id="transactions"
+                      headerKey="transactions"
+                    >
+                      <MaterialSampleTransactionList
+                        transactionQueryDSL={transactionQueryDSL}
+                      />
+                    </CollapsibleSection>
+                  </div>
 
-                <div className="mb-3">
-                  <AttachmentReadOnlySection
-                    name="attachment"
-                    detachTotalSelected={true}
-                    title={<DinaMessage id="materialSampleAttachments" />}
+                  <div
+                    id={MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME}
+                    className="mb-3"
+                  >
+                    <AttachmentReadOnlySection
+                      name="attachment"
+                      detachTotalSelected={true}
+                      title={<DinaMessage id="materialSampleAttachments" />}
+                    />
+                  </div>
+
+                  <MaterialSampleWorkflows
+                    workflows={materialSample?.workflows}
                   />
                 </div>
-
-                <MaterialSampleWorkflows
-                  workflows={materialSample?.workflows}
-                />
               </main>
             </DinaForm>
           </>
