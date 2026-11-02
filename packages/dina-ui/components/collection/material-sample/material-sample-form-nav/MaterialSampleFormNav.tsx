@@ -386,7 +386,7 @@ const DataComponentNavItem = ({
           "list-group-item d-flex gap-2 align-items-center"
         )}
         key={section.id}
-        style={{ ...style, height: "3rem", zIndex: 1030 }}
+        style={{ ...style, zIndex: 1030 }}
       >
         {isTemplate && <NavSortHandle {...listeners} isDragging={isDragging} />}
         <Tag
