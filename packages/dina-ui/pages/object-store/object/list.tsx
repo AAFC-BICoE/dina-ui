@@ -1,4 +1,5 @@
 import {
+  ButtonBar,
   dateCell,
   FieldHeader,
   LoadingSpinner,
@@ -20,7 +21,7 @@ import { MetadataPreview } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import { FaFileArrowUp } from "react-icons/fa6";
+import { FaFileArrowUp, FaLink } from "react-icons/fa6";
 
 export const OBJECT_STORE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
@@ -211,25 +212,27 @@ export default function MetadataListPage() {
   return (
     <div>
       <Head title={formatMessage("objectListTitle")} />
-      <Nav />
-      <main className="large-container-fluid">
-        <div className="list-inline">
-          <div className="list-inline-item">
-            <h1 id="wb-cont">
-              <DinaMessage id="objectListTitle" />
-            </h1>
-          </div>
-          <div className="list-inline-item"></div>
-          <div className="list-inline-item float-end">
-            <Link
-              href="/object-store/upload"
-              className="btn btn-primary ms-auto"
-            >
-              <FaFileArrowUp className="me-2" />
-              <DinaMessage id="uploadPageTitle" />
-            </Link>
-          </div>
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="col-md-12 d-flex gap-2">
+          <div className="ms-auto" />
+          <Link
+            href="/object-store/metadata/external-resource-edit"
+            className="btn btn-primary"
+          >
+            <FaLink className="me-2" />
+            <DinaMessage id="addExternalResource" />
+          </Link>
+          <Link href="/object-store/upload" className="btn btn-primary">
+            <FaFileArrowUp className="me-2" />
+            <DinaMessage id="uploadPageTitle" />
+          </Link>
         </div>
+      </ButtonBar>
+      <main className="container-fluid">
+        <h1 id="wb-cont">
+          <DinaMessage id="objectListTitle" />
+        </h1>
         <div className="row">
           <div className={`table-section col-${tableSectionWidth}`}>
             <div className="split-page-panel">

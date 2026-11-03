@@ -232,6 +232,73 @@ describe("QueryPage test", () => {
     }
   });
 
+  it("Ignores the response of an older search that arrives after a newer one", async () => {
+    const searchPath = "search-api/search-ws/search";
+    const managedAttribute = {
+      id: "8504783b-cf16-4702-b2fe-88c2db2ee475",
+      type: "controlled-vocabulary-item",
+      name: "Field Number",
+      key: "field_number",
+      group: "other-group",
+      vocabularyElementType: "STRING",
+      acceptedValues: null
+    };
+    let searchCount = 0;
+    mockPost.mockReset();
+    mockPost.mockImplementation(async (path) => {
+      if (path !== searchPath) {
+        return mockResponses[path];
+      }
+      // The first (unfiltered) search is slow, so its response arrives after the filtered one.
+      if (searchCount++ === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return mockResponses[searchPath];
+      }
+      return {
+        data: { hits: { total: { relation: "eq", value: 0 }, hits: [] } }
+      };
+    });
+    mockGet.mockImplementation(async (path, params) => {
+      if (params?.filter?.uuid?.EQ === managedAttribute.id) {
+        return { data: [managedAttribute] };
+      }
+      return mockResponses[path] ?? { data: [] };
+    });
+    mockRouter.query = {
+      queryTree: JSON.stringify({
+        c: "a",
+        p: [
+          {
+            f: "data.attributes.managedAttributes",
+            o: "exactMatch",
+            v: "F-043134",
+            t: "managedAttribute",
+            d: managedAttribute.id
+          }
+        ]
+      })
+    };
+
+    try {
+      const wrapper = mountWithAppContext(
+        <DinaForm initialValues={{}}>
+          <MaterialSampleListPage />
+        </DinaForm>,
+        testCtx
+      );
+      await waitFor(() => expect(searchCount).toBeGreaterThan(1));
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      expect(wrapper.queryByText("Sample 1")).not.toBeInTheDocument();
+    } finally {
+      mockRouter.query = {};
+      mockPost.mockImplementation(async (path) => mockResponses[path]);
+      mockGet.mockImplementation(
+        async (path) => mockResponses[path] ?? { data: [] }
+      );
+    }
+  });
+
   describe("QueryPage Tab Functionality", () => {
     const COLUMNS = [
       {

@@ -228,6 +228,17 @@ describe("Metadata List Page", () => {
     });
   });
 
+  it("Renders the upload and add external resource buttons.", async () => {
+    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
+
+    expect(
+      wrapper.getByRole("link", { name: /upload files/i })
+    ).toHaveAttribute("href", "/object-store/upload");
+    expect(
+      wrapper.getByRole("link", { name: /add external resource/i })
+    ).toHaveAttribute("href", "/object-store/metadata/external-resource-edit");
+  });
+
   it("Provides a toggle to see the gallery view.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 

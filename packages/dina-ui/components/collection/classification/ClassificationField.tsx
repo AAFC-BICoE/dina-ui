@@ -8,6 +8,7 @@ import {
 } from "../../../types/collection-api";
 import useVocabularyOptions from "../useVocabularyOptions";
 import { ClassificationInputRow } from "./ClassificationInputRow";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export interface IClassificationFieldProps {
   onChange?: (
@@ -141,32 +142,21 @@ export function ClassificationField({
   }
 
   return (
-    <div className="card card-body">
+    <div className="w-100">
       <div className="d-flex flex-column gap align-items-center">
         {loading ? (
           <LoadingSpinner loading={loading} />
         ) : (
           <>
-            <div className="d-flex w-100 my-1">
-              <div className="w-100" />
-              <div className="w-100 ms-2" />
-              <div
-                style={{
-                  cursor: "pointer",
-                  marginTop: "0.3rem",
-                  maxWidth: "2.5rem"
-                }}
+            <div className="d-flex justify-content-end w-100 mb-2">
+              <button
+                type="button"
+                className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2"
+                onClick={onAddRow}
               >
-                <FaPlus
-                  className="ms-2"
-                  onClick={onAddRow}
-                  size="2em"
-                  onMouseOver={(event) =>
-                    (event.currentTarget.style.color = "blue")
-                  }
-                  onMouseOut={(event) => (event.currentTarget.style.color = "")}
-                />
-              </div>
+                <FaPlus size="0.85em" />
+                <DinaMessage id="addClassificationRank" />
+              </button>
             </div>
             {manualClassificationItems.map((item, idxKey) => {
               const newOptions = getRankOptions(idxKey);

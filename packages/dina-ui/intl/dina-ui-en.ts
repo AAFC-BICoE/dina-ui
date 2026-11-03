@@ -25,6 +25,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addExistingStorageUnitAsChild: "Add Existing Storage Unit",
   addExistingStorageUnitAsChild_tooltip:
     "Add an existing storage unit as a child of this storage unit.",
+  addExternalResource: "Add External Resource",
   addExternalResourceTitle: "Add New External Resource",
   addFilesButton: "Add Files",
   addFilterTooltip:
@@ -1185,6 +1186,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedSearchOverwriteExisting:
     'There is currently already a saved search named "{savedSearchName}". Creating this saved search will overwrite the existing saved search.',
   scheduledActions: "Scheduled Actions",
+  addClassificationRank: "Add classification rank",
+  removeClassificationRank: "Remove classification rank",
+  enterClassificationManually: "Enter classification manually",
   scientificNameSearch: "Classification",
   manual: "Manual",
   searchButton: "Search",
