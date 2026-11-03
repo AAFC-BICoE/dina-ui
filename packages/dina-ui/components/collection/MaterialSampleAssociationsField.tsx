@@ -33,6 +33,7 @@ export function MaterialSampleAssociationsField({
   return (
     <TabbedArrayField<Association>
       legend={<DinaMessage id="materialSampleAssociationLegend" />}
+      compact={true}
       typeName={formatMessage("association")}
       makeNewElement={() => ({
         type: "association"
