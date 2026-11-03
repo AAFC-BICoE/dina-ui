@@ -322,7 +322,7 @@ function TagSelectInner({
 
   const customStyle: any = {
     multiValueLabel: (base) => ({ ...base, cursor: "move" }),
-    placeholder: (base) => ({ ...base, color: "rgb(87,120,94)" }),
+    placeholder: (base) => ({ ...base, color: "#5c5c5c" }),
     control: (base) => ({
       ...base,
       ...(invalid && {

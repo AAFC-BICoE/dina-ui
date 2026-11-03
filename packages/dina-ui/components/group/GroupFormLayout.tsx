@@ -52,7 +52,7 @@ export function GroupFormLayout() {
     if (curr.username) {
       acc[curr.username] = ({ row: { original } }) => {
         return original?.value?.id ? (
-          <Link href={`/person/view?id=${original?.value?.id}`} legacyBehavior>
+          <Link href={`/person/view?id=${original?.value?.id}`}>
             {original?.value?.displayName}
           </Link>
         ) : (

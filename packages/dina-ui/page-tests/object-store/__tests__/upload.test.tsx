@@ -355,4 +355,26 @@ describe("Upload page", () => {
       wrapper.getByText(/user must belong to a group/i)
     ).toBeInTheDocument();
   });
+
+  it("Shows the group dropdown to an admin without groups", async () => {
+    const mockGet = jest.fn(async () => ({
+      data: [{ id: "1", type: "group", name: "cnc", labels: {} }]
+    }));
+    const wrapper = mountWithAppContext(<UploadPage />, {
+      apiContext: {
+        apiClient: { get: mockGet }
+      } as any,
+      accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [], isAdmin: true }
+    });
+
+    expect(wrapper.queryByText(/user must belong to a group/i)).toBeNull();
+    // The select re-mounts once the groups load:
+    await waitFor(() => expect(mockGet).toHaveBeenCalled());
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /group select/i })
+    );
+    expect(
+      await wrapper.findByRole("option", { name: "cnc" })
+    ).toBeInTheDocument();
+  });
 });

@@ -52,7 +52,10 @@ import { FaFileExport, FaHistory, FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
-import { MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS } from "../../collection/material-sample/list";
+import {
+  MATERIAL_SAMPLE_EXPORT_ONLY_COLUMNS,
+  MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS
+} from "../../collection/material-sample/list";
 import { OBJECT_STORE_NON_EXPORTABLE_COLUMNS } from "../../object-store/object/list";
 import useSavedExports, { VISIBILITY_OPTIONS } from "./useSavedExports";
 import { ExportPopup } from "@dina-ui/components/export/ExportPopup";
@@ -99,6 +102,10 @@ const IMAGE_TYPES: ExportImageType[] = [
 const NON_EXPORTABLE_COLUMNS_MAP: { [key: string]: string[] } = {
   ["dina_material_sample_index"]: MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS,
   ["dina_object_store_index"]: OBJECT_STORE_NON_EXPORTABLE_COLUMNS
+};
+
+const EXPORT_ONLY_COLUMNS_MAP: { [key: string]: ESIndexMapping[] } = {
+  ["dina_material_sample_index"]: MATERIAL_SAMPLE_EXPORT_ONLY_COLUMNS
 };
 
 /**
@@ -254,6 +261,13 @@ export default function ExportPage<TData extends KitsuResource>() {
       distinctTerm: false,
       optimizedPrefix: false
     } as ESIndexMapping);
+  }
+
+  // Columns resolved by the export api that are not in the index (e.g. collectors).
+  for (const column of EXPORT_ONLY_COLUMNS_MAP[indexName] ?? []) {
+    if (indexMap && !indexMap.find((im) => im.value === column.value)) {
+      indexMap.push(column);
+    }
   }
 
   async function fetchObjectMetadatas() {

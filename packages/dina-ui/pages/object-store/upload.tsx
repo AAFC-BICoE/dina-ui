@@ -39,7 +39,7 @@ export interface OnSubmitValues {
 export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
-  const { initialized: accountInitialized, groupNames } = useAccount();
+  const { initialized: accountInitialized, groupNames, isAdmin } = useAccount();
   const { uploadFiles } = useFileUpload();
   const { openModal } = useModal();
   const { apiClient } = useApiClient();
@@ -203,7 +203,8 @@ export default function UploadPage() {
         <h1 id="wb-cont">
           <DinaMessage id="uploadPageTitle" />
         </h1>
-        {!accountInitialized || !groupNames?.length ? (
+        {/* Admins can pick any group, even without belonging to one. */}
+        {!accountInitialized || (!groupNames?.length && !isAdmin) ? (
           <div className="alert alert-warning no-group-alert">
             <DinaMessage id="userMustBelongToGroup" />
           </div>

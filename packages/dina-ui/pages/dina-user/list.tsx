@@ -173,9 +173,7 @@ function GroupRolesList({
             className="d-flex align-items-center flex-wrap gap-2"
           >
             {group?.id ? (
-              <Link href={`/group/view?id=${group.id}`} legacyBehavior>
-                {label}
-              </Link>
+              <Link href={`/group/view?id=${group.id}`}>{label}</Link>
             ) : (
               <span>{label}</span>
             )}
@@ -210,11 +208,7 @@ export default function DinaUserListPage() {
           row: {
             original: { id, username }
           }
-        }) => (
-          <Link href={`/dina-user/view?id=${id}`} legacyBehavior>
-            {username}
-          </Link>
-        )
+        }) => <Link href={`/dina-user/view?id=${id}`}>{username}</Link>
       },
       {
         id: "name",
@@ -248,7 +242,7 @@ export default function DinaUserListPage() {
           }
         }) =>
           agent?.id ? (
-            <Link href={`/person/view?id=${agent.id}`} legacyBehavior>
+            <Link href={`/person/view?id=${agent.id}`}>
               {agent.displayName}
             </Link>
           ) : (

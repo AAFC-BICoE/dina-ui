@@ -10,6 +10,7 @@ import {
   DinaFormContext,
   DinaFormSection,
   FieldSet,
+  INLINE_LABEL_WIDTH,
   LoadingSpinner,
   SubmitButton
 } from "common-ui";
@@ -525,7 +526,7 @@ export function MaterialSampleForm({
                   <div className="col-md-12">
                     {!isTemplate && (
                       <div className="mb-2">
-                        <DinaFormSection horizontal={18}>
+                        <DinaFormSection horizontal={INLINE_LABEL_WIDTH}>
                           <GroupSelectField
                             disableTemplateCheckbox={true}
                             name="group"
@@ -544,32 +545,32 @@ export function MaterialSampleForm({
 
                     <CollectionSelectSection
                       resourcePath="collection-api/collection"
-                      horizontal={18}
+                      horizontal={INLINE_LABEL_WIDTH}
                     />
                     <ProjectSelectSection
                       resourcePath="collection-api/project"
-                      horizontal={18}
+                      horizontal={INLINE_LABEL_WIDTH}
                     />
                     <ParentSelectSection
                       enableCollectingEvent={
                         dataComponentState.enableCollectingEvent
                       }
-                      horizontal={18}
+                      horizontal={INLINE_LABEL_WIDTH}
                     />
                     <AssemblageSelectSection
                       resourcePath="collection-api/assemblage"
-                      horizontal={18}
+                      horizontal={INLINE_LABEL_WIDTH}
                     />
                     <div className={`mb-2 ${styles.releasableFields}`}>
                       <NotPubliclyReleasableSection
                         defaultToNotReleasable={defaultToNotReleasable}
-                        horizontal={18}
+                        horizontal={INLINE_LABEL_WIDTH}
                       />
                     </div>
                     <TagsAndRestrictionsSection
                       resourcePath="collection-api/material-sample"
                       indexName="dina_material_sample_index"
-                      horizontal={18}
+                      horizontal={INLINE_LABEL_WIDTH}
                     />
                   </div>
                 </div>

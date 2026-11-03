@@ -110,6 +110,7 @@ async function mountTree() {
     testCtx
   );
   await screen.findByText("4 determinations found");
+  await waitFor(() => getChart(result.container));
   return result;
 }
 

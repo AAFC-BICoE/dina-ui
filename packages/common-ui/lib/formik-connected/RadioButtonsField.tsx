@@ -1,6 +1,5 @@
 import { ReactNode, useMemo, Fragment } from "react";
 import { useIntl } from "react-intl";
-import { v4 as uuidv4 } from "uuid";
 import { FieldWrapper, FieldWrapperProps, Tooltip } from "..";
 
 export interface RadioFieldProps<T> extends FieldWrapperProps {
@@ -26,7 +25,7 @@ export function RadioButtonsField<T = any>({
 }: RadioFieldProps<T>) {
   const { messages } = useIntl();
 
-  const radioIdPrefix = useMemo(() => uuidv4() as string, []);
+  const radioIdPrefix = useMemo(() => crypto.randomUUID(), []);
 
   return (
     <FieldWrapper disableLabelClick={true} {...props}>

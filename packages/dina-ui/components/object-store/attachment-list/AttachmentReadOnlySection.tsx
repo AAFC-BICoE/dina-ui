@@ -1,7 +1,7 @@
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ExistingAttachmentsTable } from "./ExistingAttachmentsTable";
 import { ReactNode, useState } from "react";
-import { FieldSet, useQuery, FieldSpy } from "common-ui";
+import { FieldSet, FieldSpy } from "common-ui";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import _ from "lodash";
 
@@ -19,12 +19,6 @@ export function AttachmentReadOnlySection({
 }: AttachmentReadOnlySectionProps) {
   // JSX key to reload the child components after editing Metadatas.
   const [lastSave, setLastSave] = useState<number>();
-
-  // Just check if the object-store is up:
-  const { error } = useQuery<[]>(
-    { path: "objectstore-api/metadata" },
-    { deps: [lastSave] }
-  );
 
   return (
     <FieldSpy fieldName={name}>
@@ -45,15 +39,11 @@ export function AttachmentReadOnlySection({
               </>
             }
           >
-            {error ? (
-              <DinaMessage id="objectStoreDataUnavailable" />
-            ) : (
-              <ExistingAttachmentsTable
-                metadatas={metadatas}
-                onMetadatasEdited={() => setLastSave(Date.now())}
-                detachTotalSelected={detachTotalSelected}
-              />
-            )}
+            <ExistingAttachmentsTable
+              metadatas={metadatas}
+              onMetadatasEdited={() => setLastSave(Date.now())}
+              detachTotalSelected={detachTotalSelected}
+            />
           </FieldSet>
         );
       }}

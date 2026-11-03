@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { mountWithAppContext } from "common-ui";
 import { useEffect } from "react";
 import "@testing-library/jest-dom";
+import { COLLECTION_OTHER_IDENTIFIERS_ID } from "../../../controlled-vocabulary/controlledVocabularyItemUtils";
 import db from "../../WorkbookDB";
 import {
   useWorkbookContext,
@@ -43,9 +44,38 @@ const PERSONS = [
   }
 ];
 
+const MANAGED_ATTRIBUTES = [
+  {
+    id: "incubation-date",
+    type: "controlled-vocabulary-item",
+    name: "Incubation Date",
+    key: "incubation_date",
+    dinaComponent: "PREPARATION",
+    vocabularyElementType: "DATE"
+  },
+  {
+    id: "inoculation-date",
+    type: "controlled-vocabulary-item",
+    name: "Inoculation Date",
+    // The generated key differs from the column path (inoculation_date).
+    key: "inoculation_date_date",
+    dinaComponent: "PREPARATION",
+    vocabularyElementType: "DATE"
+  }
+];
+
+const IDENTIFIERS = [
+  {
+    id: "tube-id",
+    type: "controlled-vocabulary-item",
+    name: "Tube ID",
+    key: "tube_id"
+  }
+];
+
 let existingMaterialSampleNames: string[] = [];
 
-const mockGet = jest.fn(async (path: string) => {
+const mockGet = jest.fn(async (path: string, params?: any) => {
   if (
     path.includes("resource-name-identifier") &&
     path.includes("filter[type][EQ]=collection")
@@ -55,12 +85,19 @@ const mockGet = jest.fn(async (path: string) => {
   if (path === "agent-api/person") {
     return { data: PERSONS };
   }
-  if (path.startsWith("collection-api/material-sample?")) {
-    const exists = existingMaterialSampleNames.some((name) =>
-      path.includes(`filter[materialSampleName][EQ]=${name}&`)
+  if (path === "collection-api/controlled-vocabulary-item") {
+    const isIdentifierQuery = JSON.stringify(params?.filter).includes(
+      COLLECTION_OTHER_IDENTIFIERS_ID
     );
+    return { data: isIdentifierQuery ? IDENTIFIERS : MANAGED_ATTRIBUTES };
+  }
+  if (path === "collection-api/material-sample") {
     return {
-      data: exists ? [{ id: "existing", type: "material-sample" }] : []
+      data: existingMaterialSampleNames.map((name) => ({
+        id: "existing",
+        type: "material-sample",
+        materialSampleName: name
+      }))
     };
   }
   return { data: [] };
@@ -197,6 +234,33 @@ describe("WorkbookColumnMapping", () => {
       ).toBeInTheDocument();
     });
 
+    it.each([
+      [
+        "with the generated column path",
+        "Collection Name",
+        ["collection.name"]
+      ],
+      ["without a generated column path", "collection.name", undefined]
+    ])(
+      "shows the spreadsheet header %s",
+      async (_description, header, originalColumns) => {
+        await renderColumnMapping({
+          0: {
+            sheetName: "Sheet1",
+            originalColumns,
+            rows: [
+              { rowNumber: 0, content: [header] },
+              { rowNumber: 1, content: ["Spreadsheet Collection"] }
+            ]
+          }
+        });
+
+        const row = await findRelationshipRow("Spreadsheet Collection");
+        expect(within(row).getByText(header)).toBeInTheDocument();
+        expect(within(row).queryByText("collection_name")).toBeNull();
+      }
+    );
+
     it("keeps a column mapping that was selected manually", async () => {
       await renderColumnMapping(
         createCollectionSpreadsheet("Owning Collection")
@@ -230,6 +294,60 @@ describe("WorkbookColumnMapping", () => {
       expect(
         getSelectedValue(await findColumnMappingRow("Owning Collection"))
       ).toEqual("Name");
+    });
+  });
+
+  describe("managed attributes", () => {
+    it.each([
+      ["Incubation Date", "incubation_date"],
+      ["Inoculation Date", "inoculation_date"]
+    ])(
+      "automatically selects the %s preparation managed attribute",
+      async (header, key) => {
+        await renderColumnMapping({
+          0: {
+            sheetName: "Sheet1",
+            originalColumns: [`preparationManagedAttributes.${key}`],
+            rows: [
+              { rowNumber: 0, content: [header] },
+              { rowNumber: 1, content: ["2019-09-24"] }
+            ]
+          }
+        });
+
+        const mappingRow = await findColumnMappingRow(header);
+        await waitFor(() =>
+          expect(
+            Array.from(
+              mappingRow.querySelectorAll("[class*='singleValue']")
+            ).map((value) => value.textContent)
+          ).toEqual(["Preparation Managed Attributes", header])
+        );
+      }
+    );
+  });
+
+  describe("other identifiers", () => {
+    it("automatically selects an other identifier by the header's name", async () => {
+      await renderColumnMapping({
+        0: {
+          sheetName: "Sheet1",
+          originalColumns: ["managedAttributes.tube_id"],
+          rows: [
+            { rowNumber: 0, content: ["Tube ID"] },
+            { rowNumber: 1, content: ["M_MMK2_h_0"] }
+          ]
+        }
+      });
+
+      const mappingRow = await findColumnMappingRow("Tube ID");
+      await waitFor(() =>
+        expect(
+          Array.from(mappingRow.querySelectorAll("[class*='singleValue']")).map(
+            (value) => value.textContent
+          )
+        ).toEqual(["Other Identifiers", "Tube ID"])
+      );
     });
   });
 
@@ -578,8 +696,8 @@ describe("WorkbookColumnMapping", () => {
       const resources = await waitForSavedResources();
       expect(resources).toHaveLength(1);
       expect(
-        mockGet.mock.calls.some(([path]) =>
-          path.startsWith("collection-api/material-sample?")
+        mockGet.mock.calls.some(
+          ([path]) => path === "collection-api/material-sample"
         )
       ).toBe(false);
     });

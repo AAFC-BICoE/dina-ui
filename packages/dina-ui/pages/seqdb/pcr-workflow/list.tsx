@@ -24,7 +24,7 @@ const TABLE_COLUMNS: ColumnDefinition<PcrBatch>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/seqdb/pcr-workflow/run?pcrBatchId=${id}`} legacyBehavior>
+      <Link href={`/seqdb/pcr-workflow/run?pcrBatchId=${id}`}>
         {name || id}
       </Link>
     ),

@@ -34,7 +34,7 @@ import MetadataBadges from "./MetadataBadges";
 import { OBJECT_STORE_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 // When the acDcType is changed, the acSubType needs to be cleared
-const DcTypeSelectorComponent = connect(({ formik }) => {
+export const DcTypeSelectorComponent = connect(({ formik }) => {
   const { setFieldValue } = formik;
 
   return (
@@ -152,6 +152,8 @@ export function MetadataForm({
                 }
                 model="objectstore-api/object-subtype"
                 optionLabel={(ost) => ost.acSubtype}
+                // Subtypes depend on the stored object type, pick that first:
+                isDisabled={!dcType}
                 onChange={(selected) => {
                   // Normalize: when cleared or when <None> is selected, store null
                   const normalized =

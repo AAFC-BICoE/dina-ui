@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "common-ui";
+import { DinaForm, DinaFormSection, mountWithAppContext } from "common-ui";
 import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { ControlledVocabularyViewer } from "../ControlledVocabularyViewer";
@@ -238,5 +238,25 @@ describe("ControlledVocabularyViewer", () => {
       const tooltipRedundant = fields[1].querySelector(".tooltip-info-icon");
       expect(tooltipRedundant).not.toBeInTheDocument();
     });
+  });
+
+  it("Renders entries inline, one per row, inside a compact form section", async () => {
+    const { getByText, container } = mountWithAppContext(
+      <DinaForm initialValues={{}} readOnly={true}>
+        <DinaFormSection compact={true}>
+          <ControlledVocabularyViewer
+            values={{ attribute_1: "value-one" }}
+            baseApi={TEST_BASE_API}
+            dinaComponent={TEST_DINA_COMPONENT}
+            controlledVocabularyUUID={TEST_CV_UUID}
+          />
+        </DinaFormSection>
+      </DinaForm>,
+      { apiContext }
+    );
+
+    await waitFor(() => expect(getByText("value-one")).toBeInTheDocument());
+    expect(container.querySelector(".col-md-6")).toBeNull();
+    expect(container.querySelector(".attribute_1-field")).toHaveClass("d-flex");
   });
 });

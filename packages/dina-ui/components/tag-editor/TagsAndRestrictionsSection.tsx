@@ -1,4 +1,8 @@
-import { DinaFormSection, useDinaFormContext } from "common-ui";
+import {
+  DinaFormSection,
+  DinaFormSectionProps,
+  useDinaFormContext
+} from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
 import { AiFillTags } from "react-icons/ai";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -17,7 +21,7 @@ export interface TagsAndRestrictionsSection {
   tagIncludedType?: string;
   groupSelectorName?: string;
   indexName?: string;
-  horizontal?: boolean | [number, number] | "flex" | number;
+  horizontal?: DinaFormSectionProps["horizontal"];
 }
 
 export function TagsAndRestrictionsSection({

@@ -228,8 +228,14 @@ function LabelWrapper({
   },
   children
 }: PropsWithChildren<FieldWrapperInternalProps>) {
-  const { horizontal, isTemplate, componentName, sectionName, readOnly } =
-    useDinaFormContext();
+  const {
+    horizontal,
+    compact,
+    isTemplate,
+    componentName,
+    sectionName,
+    readOnly
+  } = useDinaFormContext();
 
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
@@ -281,7 +287,8 @@ function LabelWrapper({
         (isTemplate ? ["col-sm-12", "col-sm-12"] : [])
       : ["label-col", "field-col"];
 
-  const [labelStyle, valueStyle] = _.isNumber(horizontal)
+  const fixedLabelWidth = _.isNumber(horizontal) && !removeLabel;
+  const [labelStyle, valueStyle] = fixedLabelWidth
     ? [
         { display: "inline-block", width: `${horizontal}em` },
         { display: "inline-block", width: `calc(100% - ${horizontal}em)` }
@@ -356,8 +363,8 @@ function LabelWrapper({
             (horizontal === true || _.isArray(horizontal)) && "row",
             isTemplate && `col-sm-${horizontal ? "11" : "10"}`,
             !isTemplate && (!horizontal || _.isNumber(horizontal)) && "w-100",
-            !isTemplate && _.isNumber(horizontal) && "d-flex",
-            !removeBottomMargin && "mb-3"
+            !isTemplate && fixedLabelWidth && "d-flex",
+            !removeBottomMargin && (compact ? "mb-1" : "mb-3")
           )}
           htmlFor={disableLabelClick ? "none" : undefined}
         >

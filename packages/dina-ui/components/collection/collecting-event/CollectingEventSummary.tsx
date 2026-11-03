@@ -1,8 +1,7 @@
 import { Children, isValidElement, ReactNode } from "react";
-import { useDinaFormContext } from "common-ui";
+import { SectionHeading, useDinaFormContext } from "common-ui";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import { PersonSelectField } from "../../resource-select-fields/resource-select-fields";
-import { SectionHeading } from "./SectionHeading";
 
 interface SummaryRowProps {
   label: string;

@@ -18,9 +18,7 @@ const PREPARATION_TYPE_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/collection/preparation-type/view?id=${id}`} legacyBehavior>
-        {name}
-      </Link>
+      <Link href={`/collection/preparation-type/view?id=${id}`}>{name}</Link>
     ),
     accessorKey: "name"
   },

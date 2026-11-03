@@ -25,7 +25,7 @@ const TABLE_COLUMNS: ColumnDefinition<SeqBatch>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/seqdb/seq-workflow/run?seqBatchId=${id}`} legacyBehavior>
+      <Link href={`/seqdb/seq-workflow/run?seqBatchId=${id}`}>
         {name || id}
       </Link>
     ),

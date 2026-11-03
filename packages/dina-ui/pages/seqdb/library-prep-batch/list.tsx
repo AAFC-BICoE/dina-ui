@@ -25,9 +25,7 @@ const TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/seqdb/library-prep-batch/view?id=${id}`} legacyBehavior>
-        {name || id}
-      </Link>
+      <Link href={`/seqdb/library-prep-batch/view?id=${id}`}>{name || id}</Link>
     ),
     accessorKey: "name"
   },

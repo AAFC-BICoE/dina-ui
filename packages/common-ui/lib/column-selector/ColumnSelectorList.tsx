@@ -28,7 +28,8 @@ import { ESIndexMapping, TableColumn } from "../list-page/types";
 import { ColumnItem } from "./ColumnItem";
 import {
   generateColumnDefinition,
-  generateColumnPath
+  generateColumnPath,
+  isColumnSelectable
 } from "./ColumnSelectorUtils";
 import QueryRowClassificationSearch, {
   ClassificationSearchStates
@@ -335,6 +336,11 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   const indexMappingFiltered = useMemo(() => {
     if (indexMapping) {
       return indexMapping.filter((mapping) => {
+        // Query builder only fields cannot be displayed or exported as columns.
+        if (!isColumnSelectable(mapping)) {
+          return false;
+        }
+
         // Check if it's already been used, does not need to shown again since they are already displaying it.
         const alreadyUsed = displayedColumns?.find((column) => {
           // Check if it's a nested field or normal field:

@@ -30,6 +30,8 @@ export interface TextFieldProps extends FieldWrapperProps {
   ) => void;
   multipleValueClearIcon?: boolean;
   clearType?: ClearType;
+  /** Unit shown in a block attached to the right of the input, e.g. "m". */
+  unit?: string;
 }
 
 /**
@@ -49,6 +51,7 @@ export function TextField(props: TextFieldProps) {
     noSpace,
     disableClearButton,
     clearType = ClearType.EmptyString,
+    unit,
     ...fieldWrapperProps
   } = props;
 
@@ -96,27 +99,39 @@ export function TextField(props: TextFieldProps) {
             { "is-invalid": invalid },
             inputPropsExternal?.className
           ),
-          onChange: (event) => onChangeInternal((event.target as HTMLTextAreaElement | HTMLInputElement).value),
+          onChange: (event) =>
+            onChangeInternal(
+              (event.target as HTMLTextAreaElement | HTMLInputElement).value
+            ),
           value: value || "",
           readOnly,
           disabled: isDisabled,
           onKeyDown
         };
 
+        const input =
+          customInput?.(inputPropsInternal, formik) ??
+          (multiLines ? (
+            <TextareaAutosize
+              minRows={
+                (inputPropsExternal as TextareaHTMLAttributes<any>)?.rows || 2
+              }
+              {...(inputPropsInternal as TextareaAutosizeProps)}
+            />
+          ) : (
+            <input type="text" {...inputPropsInternal} />
+          ));
+
         return (
           <div className="d-flex align-items-center gap-2">
-            {customInput?.(inputPropsInternal, formik) ??
-              (multiLines ? (
-                <TextareaAutosize
-                  minRows={
-                    (inputPropsExternal as TextareaHTMLAttributes<any>)?.rows ||
-                    2
-                  }
-                  {...(inputPropsInternal as TextareaAutosizeProps)}
-                />
-              ) : (
-                <input type="text" {...inputPropsInternal} />
-              ))}
+            {unit ? (
+              <div className="input-group">
+                {input}
+                <span className="input-group-text">{unit}</span>
+              </div>
+            ) : (
+              input
+            )}
             {bulkTab &&
               !bulkTab?.isExplicitlyDeleted &&
               !disableClearButton && (

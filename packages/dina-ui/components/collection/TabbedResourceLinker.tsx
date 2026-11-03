@@ -19,7 +19,7 @@ import {
   Dispatch,
   SetStateAction
 } from "react";
-import { Nav } from "react-bootstrap";
+import { Nav, TabContainer } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FaLink, FaUnlink } from "react-icons/fa";
 import {
@@ -260,28 +260,24 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   const activeIndex = Math.min(selectedIndex, Math.max(tabs.length - 1, 0));
   const activeTab = tabs[activeIndex]?.key;
 
+  // TabContainer gives the tabs arrow-key navigation, roving tabindex and tab/panel ids.
+  const tabsId = `${fieldSetId}-tabs`;
+  const tabPanelProps = {
+    role: "tabpanel",
+    id: `${tabsId}-tabpane-${activeIndex}`,
+    "aria-labelledby": `${tabsId}-tab-${activeIndex}`
+  };
+
   const tabStrip =
     !unlinkCollectingEvent && tabs.length > 0 ? (
-      <Nav
-        variant="tabs"
-        role="tablist"
-        className={styles.headerTabs}
-        activeKey={String(activeIndex)}
-        onSelect={(key) => {
-          const index = Number(key);
-          setSelectedIndex(index);
-          onTabSelect?.(index);
-        }}
-      >
+      <Nav variant="tabs" role="tablist" className={styles.headerTabs}>
         {tabs.map((tab, index) => (
           <Nav.Item key={tab.key} role="presentation">
             <Nav.Link
               as="button"
               type="button"
-              role="tab"
               eventKey={String(index)}
               disabled={tab.disabled}
-              aria-selected={index === activeIndex}
             >
               {tab.icon}
               <span className="ms-2">{tab.label}</span>
@@ -292,163 +288,173 @@ export function TabbedResourceLinker<T extends KitsuResource>({
     ) : null;
 
   return (
-    <FieldSet
-      id={fieldSetId}
-      className={styles.linkerFieldSet}
-      legend={
-        <div className={classNames(bulkCtx && "has-bulk-edit-value")}>
-          <div className="field-label">{legend}</div>
-        </div>
-      }
-      wrapLegend={(legendElement) => (
-        <>
-          {legendElement}
-          {tabStrip}
-        </>
-      )}
+    <TabContainer
+      id={tabsId}
+      activeKey={String(activeIndex)}
+      onSelect={(key) => {
+        const index = Number(key);
+        setSelectedIndex(index);
+        onTabSelect?.(index);
+      }}
     >
-      {/* Alert banner displayed after unlinking, informing the user that changes apply on save */}
-      {unlinkCollectingEvent && (
-        <div
-          className="alert alert-warning d-flex align-items-center gap-2 mb-3"
-          role="alert"
-        >
-          <FaTriangleExclamation className="flex-shrink-0" />
-          <span>
-            <DinaMessage id="unlinkAllNotice" />
-          </span>
-        </div>
-      )}
+      <FieldSet
+        id={fieldSetId}
+        className={styles.linkerFieldSet}
+        legend={
+          <div className={classNames(bulkCtx && "has-bulk-edit-value")}>
+            <div className="field-label">{legend}</div>
+          </div>
+        }
+        wrapLegend={(legendElement) => (
+          <>
+            {legendElement}
+            {tabStrip}
+          </>
+        )}
+      >
+        {/* Alert banner displayed after unlinking, informing the user that changes apply on save */}
+        {unlinkCollectingEvent && (
+          <div
+            className="alert alert-warning d-flex align-items-center gap-2 mb-3"
+            role="alert"
+          >
+            <FaTriangleExclamation className="flex-shrink-0" />
+            <span>
+              <DinaMessage id="unlinkAllNotice" />
+            </span>
+          </div>
+        )}
 
-      {!unlinkCollectingEvent && activeTab === "linked" && (
-        <div role="tabpanel">
-          {hasMixedValues && !overrideCollectingEvent ? (
-            <div
-              className="alert alert-info d-flex align-items-center justify-content-between gap-2 mb-0"
-              role="alert"
-            >
-              <div className="d-flex align-items-center gap-2">
-                <FaCircleInfo className="flex-shrink-0" />
-                <span>
-                  <DinaMessage id="mixedCollectingEventAttached" />
-                </span>
+        {!unlinkCollectingEvent && activeTab === "linked" && (
+          <div {...tabPanelProps}>
+            {hasMixedValues && !overrideCollectingEvent ? (
+              <div
+                className="alert alert-info d-flex align-items-center justify-content-between gap-2 mb-0"
+                role="alert"
+              >
+                <div className="d-flex align-items-center gap-2">
+                  <FaCircleInfo className="flex-shrink-0" />
+                  <span>
+                    <DinaMessage id="mixedCollectingEventAttached" />
+                  </span>
+                </div>
+                {!disableLinkerTab && (
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm text-nowrap"
+                    onClick={() => confirmUnlink()}
+                  >
+                    <FaUnlink className="me-2" />
+                    <DinaMessage id="unlinkAll" />
+                  </button>
+                )}
               </div>
-              {!disableLinkerTab && (
-                <button
-                  type="button"
-                  className="btn btn-danger btn-sm text-nowrap"
-                  onClick={() => confirmUnlink()}
-                >
-                  <FaUnlink className="me-2" />
-                  <DinaMessage id="unlinkAll" />
-                </button>
-              )}
-            </div>
-          ) : (
-            resourceId &&
-            withResponse(resourceQuery, ({ data: linkedResource }) => {
-              const activeResource =
-                (linkedResource as PersistedResource<T>) || defaultValue;
-              const isReadOnlyMode =
-                isTemplate ||
-                disableLinkerTab ||
-                isBulkEditAllTab ||
-                overrideCollectingEvent;
-              const summary = getSummary?.(activeResource);
+            ) : (
+              resourceId &&
+              withResponse(resourceQuery, ({ data: linkedResource }) => {
+                const activeResource =
+                  (linkedResource as PersistedResource<T>) || defaultValue;
+                const isReadOnlyMode =
+                  isTemplate ||
+                  disableLinkerTab ||
+                  isBulkEditAllTab ||
+                  overrideCollectingEvent;
+                const summary = getSummary?.(activeResource);
 
-              return (
-                <>
-                  <LinkedResourceSummary
-                    name={summary?.name}
-                    date={summary?.date}
-                    usageCount={usageCount}
-                    usageHref={usageHref}
-                    readOnlyLink={readOnlyLink}
-                    resourceId={resourceId}
-                    disableUnlink={disableLinkerTab}
-                    onUnlink={() => confirmUnlink()}
-                    bulkEditView={Boolean(hasSameValue && hideCreateNewTab)}
-                  />
+                return (
+                  <>
+                    <LinkedResourceSummary
+                      name={summary?.name}
+                      date={summary?.date}
+                      usageCount={usageCount}
+                      usageHref={usageHref}
+                      readOnlyLink={readOnlyLink}
+                      resourceId={resourceId}
+                      disableUnlink={disableLinkerTab}
+                      onUnlink={() => confirmUnlink()}
+                      bulkEditView={Boolean(hasSameValue && hideCreateNewTab)}
+                    />
 
-                  {/* Show info alert when all bulk-edited samples share the same event */}
-                  {hasSameValue &&
-                    hideCreateNewTab &&
-                    !overrideCollectingEvent && (
+                    {/* Show info alert when all bulk-edited samples share the same event */}
+                    {hasSameValue &&
+                      hideCreateNewTab &&
+                      !overrideCollectingEvent && (
+                        <div
+                          className="alert alert-info d-flex align-items-center gap-2 py-2 px-3 mb-3"
+                          role="alert"
+                        >
+                          <FaCircleInfo className="flex-shrink-0" />
+                          <span>
+                            <DinaMessage id="sameCollectingEventAttached" />
+                          </span>
+                        </div>
+                      )}
+
+                    {/* Show alert indicating that the following collecting event will override once saved */}
+                    {overrideCollectingEvent && (
                       <div
-                        className="alert alert-info d-flex align-items-center gap-2 py-2 px-3 mb-3"
+                        className="alert alert-success d-flex align-items-center gap-2 py-2 px-3 mb-3"
                         role="alert"
                       >
-                        <FaCircleInfo className="flex-shrink-0" />
+                        <FaCheck className="flex-shrink-0" />
                         <span>
-                          <DinaMessage id="sameCollectingEventAttached" />
+                          <DinaMessage
+                            id={
+                              hideCreateNewTab
+                                ? "overrideCollectingEventBulk"
+                                : "overrideCollectingEvent"
+                            }
+                          />
                         </span>
                       </div>
                     )}
 
-                  {/* Show alert indicating that the following collecting event will override once saved */}
-                  {overrideCollectingEvent && (
-                    <div
-                      className="alert alert-success d-flex align-items-center gap-2 py-2 px-3 mb-3"
-                      role="alert"
-                    >
-                      <FaCheck className="flex-shrink-0" />
-                      <span>
-                        <DinaMessage
-                          id={
-                            hideCreateNewTab
-                              ? "overrideCollectingEventBulk"
-                              : "overrideCollectingEvent"
-                          }
-                        />
-                      </span>
-                    </div>
-                  )}
+                    {isReadOnlyMode ? (
+                      <div>{nestedForm(activeResource, true)}</div>
+                    ) : (
+                      nestedForm(activeResource, false)
+                    )}
+                  </>
+                );
+              })
+            )}
+          </div>
+        )}
 
-                  {isReadOnlyMode ? (
-                    <div>{nestedForm(activeResource, true)}</div>
-                  ) : (
-                    nestedForm(activeResource, false)
-                  )}
-                </>
-              );
-            })
-          )}
-        </div>
-      )}
+        {!unlinkCollectingEvent && activeTab === "create" && (
+          <div {...tabPanelProps}>
+            {hasAttachedResource && (
+              <div
+                className="alert alert-warning d-flex align-items-center gap-2 mb-3"
+                role="alert"
+              >
+                <FaTriangleExclamation className="flex-shrink-0" />
+                <span>
+                  <DinaMessage id="createNewLinkNotice" />
+                </span>
+              </div>
+            )}
+            {nestedForm(undefined, false)}
+          </div>
+        )}
 
-      {!unlinkCollectingEvent && activeTab === "create" && (
-        <div role="tabpanel">
-          {hasAttachedResource && (
-            <div
-              className="alert alert-warning d-flex align-items-center gap-2 mb-3"
-              role="alert"
-            >
-              <FaTriangleExclamation className="flex-shrink-0" />
-              <span>
-                <DinaMessage id="createNewLinkNotice" />
-              </span>
-            </div>
-          )}
-          {nestedForm(undefined, false)}
-        </div>
-      )}
-
-      {!unlinkCollectingEvent && activeTab === "linker" && (
-        <div role="tabpanel">
-          {hasAttachedResource && (
-            <div
-              className="alert alert-warning d-flex align-items-center gap-2 mb-3"
-              role="alert"
-            >
-              <FaTriangleExclamation className="flex-shrink-0" />
-              <span>
-                <DinaMessage id="replaceExistingLinkNotice" />
-              </span>
-            </div>
-          )}
-          {linkerTabContent}
-        </div>
-      )}
-    </FieldSet>
+        {!unlinkCollectingEvent && activeTab === "linker" && (
+          <div {...tabPanelProps}>
+            {hasAttachedResource && (
+              <div
+                className="alert alert-warning d-flex align-items-center gap-2 mb-3"
+                role="alert"
+              >
+                <FaTriangleExclamation className="flex-shrink-0" />
+                <span>
+                  <DinaMessage id="replaceExistingLinkNotice" />
+                </span>
+              </div>
+            )}
+            {linkerTabContent}
+          </div>
+        )}
+      </FieldSet>
+    </TabContainer>
   );
 }

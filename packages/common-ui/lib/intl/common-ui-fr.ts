@@ -7,6 +7,18 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     ISNOT: "N’EST PAS",
     OR: "OU",
     actions: "Actions",
+    checkingPermissions: "Vérification des permissions…",
+    noEditPermission:
+      "Vous n'avez pas la permission de modifier les enregistrements de ces groupes : {groups}.",
+    noDeletePermission:
+      "Vous n'avez pas la permission de supprimer les enregistrements de ces groupes : {groups}.",
+    onSelected: "Sur la sélection",
+    onSelectedCount: "Sur {count} sélectionné(s)",
+    onAllMatched: "Sur les {total} résultats",
+    actionsOnSelected: "Actions sur {count} sélectionné(s)",
+    exportSelectedButtonText: "Exporter la sélection",
+    exportAllMatching: "Exporter tous les résultats",
+    tableSelectedSuffix: " · {count} sélectionné(s)",
     add: "Ajouter",
     addNew: "Ajouter nouveau",
     agricultureCanada: "Agriculture et Agroalimentaire Canada",

@@ -255,6 +255,25 @@ export function parseRelationshipNameFromType(
   return undefined;
 }
 
+/**
+ * Field types that only exist for the query builder (searching) and have no column
+ * representation, so they cannot be displayed or exported.
+ *
+ * For example, "relationshipAutocomplete" (Collecting Event - Collectors) only stores the related
+ * UUIDs in the index, generating a column for it would export an unknown path.
+ */
+const QUERY_BUILDER_ONLY_FIELD_TYPES: string[] = ["relationshipAutocomplete"];
+
+/**
+ * Checks if an index mapping can be used as a column (list page or export).
+ *
+ * @param indexMapping The index mapping to check.
+ * @returns true if the index mapping can be added as a column.
+ */
+export function isColumnSelectable(indexMapping: ESIndexMapping): boolean {
+  return !QUERY_BUILDER_ONLY_FIELD_TYPES.includes(indexMapping.type);
+}
+
 export interface GenerateColumnDefinitionProps<TData extends KitsuResource> {
   /** The index mapping for the field to be added. */
   indexMappings: ESIndexMapping[];
@@ -289,6 +308,11 @@ export async function generateColumnDefinition<TData extends KitsuResource>({
   const indexMapping = indexMappings.find(
     (mapping) => mapping.label === path || mapping.value === path
   );
+
+  // Query builder only fields cannot be columns (e.g. previously saved columns).
+  if (indexMapping && !isColumnSelectable(indexMapping)) {
+    return undefined;
+  }
 
   // Check if it's a dynamic field if it could not be found directly in the index mapping.
   if (!indexMapping || indexMapping?.dynamicField) {

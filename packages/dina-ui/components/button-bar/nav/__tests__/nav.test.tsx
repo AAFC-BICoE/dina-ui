@@ -44,4 +44,24 @@ describe("Nav component", () => {
       wrapper.queryByRole("menuitem", { name: "Managed Attributes" })
     ).toBeNull();
   });
+
+  it("Links to the Reindex Documents page from the Management menu for admins.", async () => {
+    const wrapper = mountWithAppContext(<Nav />, {
+      accountContext: { authenticated: true, isAdmin: true, roles: [] }
+    });
+
+    await userEvent.hover(wrapper.getByRole("button", { name: "Management" }));
+
+    expect(
+      wrapper.getByRole("menuitem", { name: "Reindex Documents" })
+    ).toHaveAttribute("href", "/admin/reindex");
+  });
+
+  it("Hides the Reindex Documents link from non-admins.", () => {
+    const wrapper = mountWithAppContext(<Nav />, {
+      accountContext: { authenticated: true, isAdmin: false, roles: [] }
+    });
+
+    expect(wrapper.queryByText("Reindex Documents")).toBeNull();
+  });
 });

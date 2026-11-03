@@ -1,5 +1,12 @@
 import { ControlledVocabularyItem } from "@dina-ui/types/collection-api";
-import { DinaForm, FieldView, LoadingSpinner } from "common-ui";
+import {
+  DinaForm,
+  DinaFormContext,
+  FieldView,
+  INLINE_LABEL_WIDTH,
+  LoadingSpinner
+} from "common-ui";
+import { useContext } from "react";
 import {
   getManagedAttributeTitle,
   getManagedAttributeTooltipText
@@ -44,6 +51,8 @@ export function ControlledVocabularyViewer({
   controlledVocabularyUUID
 }: ControlledVocabularyViewerProps) {
   const { locale, formatMessage } = useDinaIntl();
+  // The nested DinaForm resets the context, so carry over the inline layout of the surrounding section:
+  const compact = useContext(DinaFormContext)?.compact;
 
   const keys = values ? Object.keys(values) : [];
 
@@ -98,12 +107,16 @@ export function ControlledVocabularyViewer({
   );
 
   return (
-    <DinaForm initialValues={initialValues}>
-      <div className="row g-3">
+    <DinaForm
+      initialValues={initialValues}
+      horizontal={compact && INLINE_LABEL_WIDTH}
+      compact={compact}
+    >
+      <div className={compact ? "row" : "row g-3"}>
         {sortedEntries.map((item) => (
           <FieldView
             key={item.key}
-            className="col-12 col-md-6"
+            className={compact ? "col-12" : "col-12 col-md-6"}
             name={item.key}
             customName={item.label}
             tooltipOverride={item.tooltipText}

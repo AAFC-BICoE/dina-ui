@@ -5,6 +5,8 @@ import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useWorkbookContext } from "../WorkbookProvider";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
+import { getRelationshipMappingKey } from "../utils/workbookDuplicateUtils";
+import { getColumnHeaders } from "../utils/workbookMappingUtils";
 
 export interface RelationshipFieldMappingProps {
   onChangeRelatedRecord: (
@@ -35,8 +37,13 @@ export function RelationshipFieldMapping({
   getResourceSelectField,
   getRelationshipValues
 }: RelationshipFieldMappingProps) {
-  const { columnUniqueValues, relationshipMapping, workbookColumnMap, sheet } =
-    useWorkbookContext();
+  const {
+    columnUniqueValues,
+    relationshipMapping,
+    workbookColumnMap,
+    sheet,
+    spreadsheetData
+  } = useWorkbookContext();
 
   const { setFieldValue, values } = useFormikContext();
 
@@ -44,6 +51,20 @@ export function RelationshipFieldMapping({
   useEffect(() => {
     setFieldValue("relationshipMapping", relationshipMapping);
   }, [relationshipMapping]);
+
+  // The mapping is keyed by the generated column path, show the header as it is in the Column Mapping.
+  const headerNames = useMemo(
+    () =>
+      Object.fromEntries(
+        (getColumnHeaders(spreadsheetData, sheet) ?? []).map((header) => [
+          getRelationshipMappingKey(
+            header.originalColumn ?? header.columnHeader
+          ),
+          header.columnHeader
+        ])
+      ),
+    [spreadsheetData, sheet]
+  );
 
   // Do not display skipped records on the relationship mapping section, this array contains the path and if it's skipped.
   const skippedRecords = useMemo(() => {
@@ -119,7 +140,9 @@ export function RelationshipFieldMapping({
                 className={`row${index1 % 2 === 0 ? " odd" : ""}`}
                 key={fieldValue}
               >
-                <div className="col-3">{index2 === 0 ? columnName : ""}</div>
+                <div className="col-3">
+                  {index2 === 0 ? headerNames[columnName] ?? columnName : ""}
+                </div>
                 <div className="col-2">{fieldValue}</div>
                 <div className="col-2">{counts[fieldValue]}</div>
                 <div className="col-2">{_.startCase(parentPath)}</div>

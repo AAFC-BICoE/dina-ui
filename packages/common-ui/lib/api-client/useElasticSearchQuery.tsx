@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import useSWR from "swr";
 import { useApiClient } from "./ApiClientContext";
-import { v4 as uuidv4 } from "uuid";
 
 export interface UseElasticSearchQueryProps {
   indexName: string;
@@ -60,7 +59,7 @@ export function useElasticSearchQuery({
   const queryKey = JSON.stringify({ queryDSL, disabled, deps });
 
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
-  const cacheId = useMemo(() => uuidv4(), [queryKey]);
+  const cacheId = useMemo(() => crypto.randomUUID(), [queryKey]);
 
   const {
     data: apiResponse,

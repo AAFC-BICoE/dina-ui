@@ -24,11 +24,7 @@ const TABLE_COLUMNS: ColumnDefinition<PcrBatch>[] = [
       row: {
         original: { id, name }
       }
-    }) => (
-      <Link href={`/seqdb/pcr-batch/view?id=${id}`} legacyBehavior>
-        {name || id}
-      </Link>
-    ),
+    }) => <Link href={`/seqdb/pcr-batch/view?id=${id}`}>{name || id}</Link>,
     accessorKey: "name"
   },
   "primerForward.name",

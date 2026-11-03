@@ -169,11 +169,9 @@ describe("workbookDuplicateUtils", () => {
   });
 
   describe("checkServerDuplicatePrimaryIds", () => {
-    it("flags entries that already exist in the same collection without filtering by group", async () => {
-      const mockGet = jest.fn(async (path: string) => ({
-        data: path.includes("S-1")
-          ? [{ id: "existing", type: "material-sample" }]
-          : []
+    it("flags entries that already exist in the same collection with one request", async () => {
+      const mockGet = jest.fn(async (_path: string, _params: any) => ({
+        data: [{ id: "existing", materialSampleName: "S-1" }]
       }));
 
       const entries = getPrimaryIdEntries(
@@ -202,12 +200,62 @@ describe("workbookDuplicateUtils", () => {
         true,
         false
       ]);
+      expect(mockGet).toHaveBeenCalledTimes(1);
+      const [path, params] = mockGet.mock.calls[0];
+      expect(path).toEqual("collection-api/material-sample");
+      expect(JSON.stringify(params.filter)).toContain(COLLECTION_A_UUID);
+      expect(JSON.stringify(params.filter)).not.toContain("group");
+    });
+
+    it("looks up names containing a comma individually with EQ", async () => {
+      const mockGet = jest.fn(async (_path: string, params: any) => {
+        const filter = JSON.stringify(params.filter);
+        return {
+          data: filter.includes("S-1, b")
+            ? [{ id: "existing", materialSampleName: "S-1, b" }]
+            : []
+        };
+      });
+
+      const entries = getPrimaryIdEntries(
+        [
+          {
+            rowNumber: 1,
+            materialSampleName: "S-1, b",
+            "collection.name": "Collection A"
+          },
+          {
+            rowNumber: 2,
+            materialSampleName: "S-2",
+            "collection.name": "Collection A"
+          },
+          {
+            rowNumber: 3,
+            materialSampleName: "S-3",
+            "collection.name": "Collection A"
+          }
+        ],
+        "Collection Name",
+        relationshipMapping
+      );
+
+      const result = await checkServerDuplicatePrimaryIds(
+        { get: mockGet } as any,
+        entries
+      );
+
+      expect(result.map((entry) => entry.serverDuplicate)).toEqual([
+        true,
+        false,
+        false
+      ]);
+      // One IN request for S-2 and S-3, one EQ request for the comma name.
       expect(mockGet).toHaveBeenCalledTimes(2);
-      for (const [path] of mockGet.mock.calls) {
-        expect(path).toContain("collection-api/material-sample");
-        expect(path).toContain(COLLECTION_A_UUID);
-        expect(path).not.toContain("group");
-      }
+      const filters = mockGet.mock.calls.map(([, params]) =>
+        JSON.stringify(params.filter)
+      );
+      expect(filters.filter((f) => f.includes("S-1, b"))).toHaveLength(1);
+      expect(filters.find((f) => f.includes("S-2"))).toContain("S-3");
     });
 
     it("does not query the server for entries without a collection", async () => {

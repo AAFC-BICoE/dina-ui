@@ -48,6 +48,9 @@ export interface DinaFormContextI {
    */
   horizontal?: boolean | [number, number] | "flex" | number;
 
+  /** Use tighter spacing between fields (e.g. the inline field layout). */
+  compact?: boolean;
+
   /** The initial form values passed into Formik. */
   initialValues?: any;
 
@@ -468,6 +471,12 @@ export function useDinaFormContext() {
 }
 
 export type DinaFormSectionProps = PropsWithChildren<Partial<DinaFormContextI>>;
+
+/**
+ * Label width (in em) for the inline field layout, e.g.
+ * <FieldSet className="clean-section" horizontal={INLINE_LABEL_WIDTH} compact={true}>
+ */
+export const INLINE_LABEL_WIDTH = 18;
 
 /**
  * Override context values for a section of the form.
