@@ -9,6 +9,7 @@ import { ArrayFieldContainer } from "./ArrayFieldContainer";
 
 export interface TabbedArrayFieldProps<T> {
   className?: string;
+  compact?: boolean;
   sectionId: string;
   typeName: string;
   initialIndex?: number;
@@ -20,6 +21,7 @@ export interface TabbedArrayFieldProps<T> {
   renderTab: (element: T, index: number) => ReactNode;
   renderAboveTabs?: () => ReactNode;
   wrapContent?: (content: ReactNode) => ReactNode;
+  /** Use a compact panel and labeled action buttons. */
 
   /** Remove the padding and border around the fieldset. */
   removePadding?: boolean;
@@ -41,6 +43,7 @@ export interface TabPanelCtx<T> {
  */
 export function TabbedArrayField<T>({
   className,
+  compact = false,
   name,
   typeName,
   makeNewElement,
@@ -127,9 +130,11 @@ export function TabbedArrayField<T>({
                 ? elements.map((_, index) => (
                     <TabPanel key={index}>
                       <div
-                        className="card-body border-top-0 mb-3"
+                        className={
+                          compact ? "mb-3 py-2" : "card-body border-top-0 mb-3"
+                        }
                         style={
-                          elements.length > 1
+                          !compact && elements.length > 1
                             ? { border: "1px solid rgb(170, 170, 170)" }
                             : undefined
                         }
@@ -143,11 +148,26 @@ export function TabbedArrayField<T>({
                           <div className="list-inline d-flex align-items-center gap-2">
                             <div className="d-inline-flex">
                               <FormikButton
-                                className="btn btn-primary add-button"
+                                className={
+                                  compact
+                                    ? "btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2"
+                                    : "btn btn-primary add-button"
+                                }
                                 onClick={addElement}
                               >
-                                <div data-testid="add-another-button">
-                                  <FaPlus />
+                                <div
+                                  data-testid="add-another-button"
+                                  className={
+                                    compact
+                                      ? "d-inline-flex align-items-center gap-2"
+                                      : undefined
+                                  }
+                                >
+                                  <FaPlus
+                                    size={compact ? "0.85em" : undefined}
+                                  />
+                                  {compact &&
+                                    formatMessage("addAnother", { typeName })}
                                 </div>
                               </FormikButton>
                               <Tooltip
@@ -159,11 +179,28 @@ export function TabbedArrayField<T>({
                             {elements.length >= 1 && (
                               <div className="d-inline-flex">
                                 <FormikButton
-                                  className="btn btn-dark"
+                                  className={
+                                    compact
+                                      ? "btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2"
+                                      : "btn btn-dark"
+                                  }
                                   onClick={() => removeElement(index)}
                                 >
-                                  <div data-testid="remove-this-button">
-                                    <FaMinus />
+                                  <div
+                                    data-testid="remove-this-button"
+                                    className={
+                                      compact
+                                        ? "d-inline-flex align-items-center gap-2"
+                                        : undefined
+                                    }
+                                  >
+                                    <FaMinus
+                                      size={compact ? "0.85em" : undefined}
+                                    />
+                                    {compact &&
+                                      formatMessage("removeThisElement", {
+                                        typeName
+                                      })}
                                   </div>
                                 </FormikButton>
                                 <Tooltip

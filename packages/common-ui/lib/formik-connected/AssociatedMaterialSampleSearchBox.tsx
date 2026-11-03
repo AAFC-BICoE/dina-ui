@@ -90,7 +90,7 @@ export function MaterialSampleSearchHelper({
   const { formatMessage } = useDinaIntl();
 
   return showSearch ? (
-    <div className="p-2 mt-2" style={{ borderStyle: "dashed" }}>
+    <div className="mt-3 pt-3 border-top">
       <div className="mb-4">
         <span className="me-2 fw-bold" style={{ fontSize: "1.2em" }}>
           {formatMessage("search")}
