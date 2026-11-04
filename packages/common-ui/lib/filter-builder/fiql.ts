@@ -6,27 +6,71 @@ import {
   SimpleSearchFilter,
   SimpleSearchFilterCondition,
   SimpleSearchFilterValue,
-  isEmptyInList
+  isEmptyInList,
+  isEmptySimpleSearchFilter
 } from "../util/simpleSearchFilterBuilder";
+import {
+  parseInList,
+  replaceUnreadable
+} from "../util/simpleSearchFilterQueryString";
 import {
   FilterModel,
   filterModelToSimpleSearchFilter
 } from "./filterModelToSimpleSearchFilter";
 
 /**
- * Characters a FIQL argument can contain without quotes. This is the intersection of what the RSQL
- * and back-end query-string grammars accept unquoted. Other characters require double quotes.
+ * Returns `{ filter }` for standard filters, `{ fiql }` when the filter contains a negated
+ * pattern (`NOT_ILIKE` or `NEQ` with `*`), or `{}` if the filter is empty.
  */
-const UNQUOTED_FIQL_ARGUMENT = /^[A-Za-z0-9_\-.%/:*]*$/;
+export function filterOrFiqlParams(
+  filter: SimpleSearchFilter | null | undefined
+): { filter?: SimpleSearchFilter; fiql?: string } {
+  if (!filter || isEmptySimpleSearchFilter(filter)) {
+    return {};
+  }
+  return hasNegatedPattern(filter)
+    ? { fiql: simpleSearchFilterToFiql(filter) }
+    : { filter };
+}
+
+/** True if the filter has a NOT_ILIKE condition or a NEQ containing "*", in any group. */
+function hasNegatedPattern(filter: SimpleSearchFilter): boolean {
+  return Object.entries(filter).some(([key, value]) => {
+    if (key === OR_KEY || key === AND_KEY) {
+      return (
+        Array.isArray(value) &&
+        (value as SimpleSearchFilter[]).some(hasNegatedPattern)
+      );
+    }
+    if (value === null || typeof value !== "object" || Array.isArray(value)) {
+      return false;
+    }
+    const { NOT_ILIKE, NEQ } = value as SimpleSearchFilterCondition;
+    // An "IS NOT" + "Exact Match" with "*" is a negated pattern too
+    return (
+      NOT_ILIKE !== undefined || (typeof NEQ === "string" && NEQ.includes("*"))
+    );
+  });
+}
+
+/** Characters permitted unquoted in a FIQL argument. */
+const FIQL_ARGUMENT_CHARACTER = /^[\p{L}0-9_\-.%/: !=*]$/u;
 
 /**
- * Quotes a FIQL argument containing characters that require quotes.
- * Double quotes cannot be escaped in the back-end query-string grammar and are dropped.
+ * Formats a value as a FIQL argument, replacing disallowed characters and filter keywords with `*`.
+ * Quotes the value instead if negated or if replacement would reduce it to only `*` wildcards.
  */
-export function fiqlArgument(value: string): string {
-  return UNQUOTED_FIQL_ARGUMENT.test(value)
-    ? value
-    : `"${value.replace(/"/g, "")}"`;
+export function fiqlArgument(value: string, negated = false): string {
+  const argument = replaceUnreadable(
+    value,
+    (character) => FIQL_ARGUMENT_CHARACTER.test(character),
+    "*",
+    // Skip legacy lexer rules when negated so valid identifiers (e.g. a_IN) are not quoted
+    { legacyLexer: !negated }
+  );
+  return (negated || /^\*+$/.test(argument)) && argument !== value
+    ? `"${value.replace(/"/g, "")}"`
+    : argument;
 }
 
 /**
@@ -35,7 +79,7 @@ export function fiqlArgument(value: string): string {
  *   { name: { ILIKE: "%a%" }, $or: [{ group: { EQ: "b" } }, { group: { EQ: "c" } }] }
  *   => name==*a*;(group==b,group==c)
  *
- * This is the only place FIQL should be produced.
+ * This is the only place FIQL should be produced. Use it through {@link filterOrFiqlParams}.
  */
 export function simpleSearchFilterToFiql(
   filter: FilterParam | SimpleSearchFilter | null | undefined
@@ -132,23 +176,38 @@ function conditionToFiql(
     case "EQ":
       return { text: `${field}==${argument(value)}`, compound: false };
     case "NEQ":
-      return { text: `${field}!=${argument(value)}`, compound: false };
+      return { text: `${field}!=${argument(value, true)}`, compound: false };
     case "LIKE":
     case "ILIKE":
       return { text: `${field}==${wildcardArgument(value)}`, compound: false };
     case "NOT_ILIKE":
-      return { text: `${field}!=${wildcardArgument(value)}`, compound: false };
+      return {
+        text: `${field}!=${wildcardArgument(value, true)}`,
+        compound: false
+      };
     case "GT":
-      return { text: `${field}=gt=${String(value)}`, compound: false };
+      return {
+        text: `${field}=gt=${comparedArgument(value)}`,
+        compound: false
+      };
     case "GOE":
-      return { text: `${field}=ge=${String(value)}`, compound: false };
+      return {
+        text: `${field}=ge=${comparedArgument(value)}`,
+        compound: false
+      };
     case "LT":
-      return { text: `${field}=lt=${String(value)}`, compound: false };
+      return {
+        text: `${field}=lt=${comparedArgument(value)}`,
+        compound: false
+      };
     case "LOE":
-      return { text: `${field}=le=${String(value)}`, compound: false };
+      return {
+        text: `${field}=le=${comparedArgument(value)}`,
+        compound: false
+      };
     case "IN": {
-      // FIQL has no "in" operator so IN becomes an OR of equalities. Values are arrays or comma lists.
-      const values = Array.isArray(value) ? value : String(value).split(",");
+      // FIQL has no "in" operator so IN becomes an OR of equalities. Values are arrays or IN lists.
+      const values = Array.isArray(value) ? value : parseInList(String(value));
       return joinTerms(
         values.map((val) => ({
           text: `${field}==${argument(val)}`,
@@ -161,19 +220,32 @@ function conditionToFiql(
 }
 
 function argument(
-  value: SimpleSearchFilterValue | SimpleSearchFilterValue[]
+  value: SimpleSearchFilterValue | SimpleSearchFilterValue[],
+  negated = false
 ): string {
   if (value === null) {
     return "null";
   }
-  return typeof value === "string" ? fiqlArgument(value) : String(value);
+  return fiqlArgument(String(value), negated);
 }
 
 /** LIKE and ILIKE values use "%" as the wildcard whereas FIQL uses "*". */
 function wildcardArgument(
-  value: SimpleSearchFilterValue | SimpleSearchFilterValue[]
+  value: SimpleSearchFilterValue | SimpleSearchFilterValue[],
+  negated = false
 ): string {
   return typeof value === "string"
-    ? fiqlArgument(value.replace(/%/g, "*"))
-    : argument(value);
+    ? fiqlArgument(value.replace(/%/g, "*"), negated)
+    : argument(value, negated);
+}
+
+/** Converts UTC ISO timestamps (`...Z`) to `-00:00` offset without milliseconds for FIQL compatibility. */
+function comparedArgument(
+  value: SimpleSearchFilterValue | SimpleSearchFilterValue[]
+): string {
+  return argument(
+    typeof value === "string"
+      ? value.replace(/^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(\.\d+)?Z$/, "$1-00:00")
+      : value
+  );
 }
