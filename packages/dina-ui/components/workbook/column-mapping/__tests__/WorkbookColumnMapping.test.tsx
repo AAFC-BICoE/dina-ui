@@ -73,7 +73,36 @@ const IDENTIFIERS = [
   }
 ];
 
+const TAXONOMIC_RANKS = [{ key: "genus", name: "genus" }];
+
+/** Returned by the duplicate check, which filters by collection. */
 let existingMaterialSampleNames: string[] = [];
+/** Returned by the parent lookup, which filters by group. */
+let parentMaterialSampleNames: string[] = [];
+
+/** Answers a material-sample lookup with the given names that the filter asks for. */
+function findMaterialSamples(names: string[], filter: any) {
+  const requested = filter?.materialSampleName?.IN
+    ? String(filter.materialSampleName.IN).split(",")
+    : [filter?.materialSampleName?.EQ];
+  return names
+    .filter((name) => requested.includes(name))
+    .map((name) => ({
+      id: `id-${name}`,
+      type: "material-sample",
+      materialSampleName: name
+    }));
+}
+
+function getMaterialSampleFilters(filterField: "group" | "collection.uuid") {
+  return mockGet.mock.calls
+    .filter(
+      ([path, params]) =>
+        path === "collection-api/material-sample" &&
+        params?.filter?.[filterField]
+    )
+    .map(([, params]) => params.filter);
+}
 
 const mockGet = jest.fn(async (path: string, params?: any) => {
   if (
@@ -91,13 +120,17 @@ const mockGet = jest.fn(async (path: string, params?: any) => {
     );
     return { data: isIdentifierQuery ? IDENTIFIERS : MANAGED_ATTRIBUTES };
   }
+  if (path === "collection-api/vocabulary2/taxonomicRank") {
+    return { data: { vocabularyElements: TAXONOMIC_RANKS } };
+  }
   if (path === "collection-api/material-sample") {
     return {
-      data: existingMaterialSampleNames.map((name) => ({
-        id: "existing",
-        type: "material-sample",
-        materialSampleName: name
-      }))
+      data: findMaterialSamples(
+        params?.filter?.["collection.uuid"]
+          ? existingMaterialSampleNames
+          : parentMaterialSampleNames,
+        params?.filter
+      )
     };
   }
   return { data: [] };
@@ -206,6 +239,7 @@ describe("WorkbookColumnMapping", () => {
     jest.clearAllMocks();
     localStorage.clear();
     existingMaterialSampleNames = [];
+    parentMaterialSampleNames = [];
   });
 
   describe("relationship mapping", () => {
@@ -470,6 +504,147 @@ describe("WorkbookColumnMapping", () => {
     });
   });
 
+  describe("classification", () => {
+    it("automatically maps a taxonomic rank column and imports the rank", async () => {
+      await renderColumnMapping(
+        createSpreadsheet([
+          ["Primary ID", "Genus"],
+          ["S-1", "Aus"]
+        ])
+      );
+
+      const mappingRow = await findColumnMappingRow("Genus");
+      await waitFor(() =>
+        expect(
+          Array.from(mappingRow.querySelectorAll("[class*='singleValue']")).map(
+            (value) => value.textContent
+          )
+        ).toEqual(["Scientific Name Classification", "genus"])
+      );
+
+      await submitForm();
+
+      const resources = await waitForSavedResources();
+      expect(
+        resources[0].organism[0].determination[0].scientificNameDetails
+      ).toEqual({ classificationRanks: "genus", classificationPath: "Aus" });
+    });
+  });
+
+  describe("network requests", () => {
+    async function countRequests(columnCount: number, rowCount: number) {
+      mockGet.mockClear();
+      const headers = [
+        "Primary ID",
+        ...Array.from({ length: columnCount - 1 }, (_, i) => `Column ${i}`)
+      ];
+      const { unmount } = mountWithAppContext(
+        <WorkbookUploadContextProvider>
+          <UploadSpreadsheet
+            spreadsheet={createSpreadsheet([
+              headers,
+              ...Array.from({ length: rowCount }, (_, row) =>
+                headers.map((header) => `${header} ${row}`)
+              )
+            ])}
+          />
+        </WorkbookUploadContextProvider>,
+        { apiContext }
+      );
+      // The column map is only built once every lookup has loaded.
+      await waitFor(async () =>
+        expect(
+          getSelectedValue(await findColumnMappingRow("Primary ID"))
+        ).toEqual("Primary ID")
+      );
+      const count = mockGet.mock.calls.length;
+      unmount();
+      return count;
+    }
+
+    it("does not grow with the number of columns or rows", async () => {
+      const small = await countRequests(1, 1);
+      const large = await countRequests(20, 100);
+
+      expect(large).toEqual(small);
+    });
+  });
+
+  describe("parent material sample lookup", () => {
+    /** The parent ids are resolved into the saved column map, not the rows. */
+    function getParentValueMapping() {
+      return (db.workbooks.add as jest.Mock).mock.calls[0][0]
+        .relationshipMapping.Parent.valueMapping;
+    }
+
+    it("links the parent without treating it as a duplicate", async () => {
+      // S-1 exists as a parent in the group, but not in Collection A.
+      parentMaterialSampleNames = ["P-1", "S-1"];
+      await renderColumnMapping(
+        createSpreadsheet([
+          ["Primary ID", "Collection", "Parent"],
+          ["S-1", "Collection A", "P-1"]
+        ])
+      );
+
+      await submitForm();
+
+      await waitForSavedResources();
+      expect(getParentValueMapping()["P-1"]).toEqual({
+        id: "id-P-1",
+        type: "material-sample"
+      });
+      expect(screen.queryByText("Duplicate Primary IDs")).toBeNull();
+    });
+
+    it("does not use the duplicate check results to find the parent", async () => {
+      existingMaterialSampleNames = ["P-1"];
+      await renderColumnMapping(
+        createSpreadsheet([
+          ["Primary ID", "Collection", "Parent"],
+          ["S-1", "Collection A", "P-1"]
+        ])
+      );
+
+      await submitForm();
+
+      expect(
+        await findErrorMessage(/Missing parent material sample names: P-1/)
+      ).toBeInTheDocument();
+    });
+
+    it("looks up parents in chunks of 100 and names with a comma individually", async () => {
+      const parents = [
+        ...Array.from({ length: 150 }, (_, i) => `P-${i}`),
+        "P, comma"
+      ];
+      parentMaterialSampleNames = parents;
+      await renderColumnMapping(
+        createSpreadsheet([
+          ["Primary ID", "Parent"],
+          ...parents.map((parent, i) => [`S-${i}`, parent]),
+          // A repeated parent is only looked up once.
+          ["S-extra", "P-0"]
+        ])
+      );
+
+      await submitForm();
+
+      await waitForSavedResources();
+      expect(Object.keys(getParentValueMapping()).sort()).toEqual(
+        [...parents].sort()
+      );
+      const filters = getMaterialSampleFilters("group");
+      expect(
+        filters.map(
+          ({ materialSampleName }) =>
+            materialSampleName.EQ ??
+            String(materialSampleName.IN).split(",").length
+        )
+      ).toEqual([100, 50, "P, comma"]);
+    });
+  });
+
   describe("validation", () => {
     it("shows an error when two columns map to the same field", async () => {
       await renderColumnMapping(
@@ -678,6 +853,46 @@ describe("WorkbookColumnMapping", () => {
         "S-2"
       ]);
     });
+
+    it.each([
+      ["a Collection Name header", undefined],
+      [
+        "a generated template's collection.name column",
+        ["materialSampleName", "collection.name"]
+      ]
+    ])(
+      "checks the server for duplicates from %s",
+      async (_description, originalColumns) => {
+        existingMaterialSampleNames = ["S-1"];
+        await renderColumnMapping({
+          0: {
+            sheetName: "Sheet1",
+            originalColumns,
+            rows: [
+              { rowNumber: 0, content: ["Primary ID", "Collection Name"] },
+              { rowNumber: 1, content: ["S-1", "Collection A"] },
+              { rowNumber: 2, content: ["S-2", "Collection A"] }
+            ]
+          }
+        });
+        await waitFor(async () =>
+          expect(
+            getSelectedValue(await findRelationshipRow("Collection A"))
+          ).toEqual("Collection A")
+        );
+
+        await submitForm();
+
+        expect(
+          await screen.findByText(/already exist in the same collection/)
+        ).toBeInTheDocument();
+        expect(getMaterialSampleFilters("collection.uuid")).toEqual([
+          expect.objectContaining({
+            "collection.uuid": { EQ: "collection-a" }
+          })
+        ]);
+      }
+    );
 
     it("does not check the server for duplicates when appending data", async () => {
       existingMaterialSampleNames = ["S-1"];
