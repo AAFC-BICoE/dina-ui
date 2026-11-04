@@ -582,6 +582,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   groupSearchPlaceholder: "Rechercher par code, chemin ou étiquette",
   groupsIBelongTo: "Mes groupes",
   hideSelectedOptions: "Masquer les sélectionnés",
+  hideEmptySections:
+    "{count, plural, one {Masquer # section vide} other {Masquer # sections vides}}",
+  showEmptySections:
+    "{count, plural, one {Afficher # section vide} other {Afficher # sections vides}}",
   hierarchyMoreLevels: "{count} de plus",
   hierarchyOtherType: "Autre / aucun type",
   hierarchyShowMoreLevels: "Afficher {count} niveaux de plus",

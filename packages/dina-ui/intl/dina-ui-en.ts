@@ -810,6 +810,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   groupSearchPlaceholder: "Search by code, path or label",
   groupsIBelongTo: "My Groups",
   hideSelectedOptions: "Hide selected",
+  hideEmptySections:
+    "{count, plural, one {Hide # empty section} other {Hide # empty sections}}",
+  showEmptySections:
+    "{count, plural, one {Show # empty section} other {Show # empty sections}}",
   hierarchyMoreLevels: "{count} more",
   hierarchyOtherType: "Other / no type",
   hierarchyShowMoreLevels: "Show {count} more levels",

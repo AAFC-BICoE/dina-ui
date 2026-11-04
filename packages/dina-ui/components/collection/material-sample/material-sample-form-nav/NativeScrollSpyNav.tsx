@@ -134,21 +134,20 @@ export function NativeScrollSpyNav({
         (target) => target.top
       )?.id;
 
-      // The page can't scroll far enough for the last targets to reach the band,
-      // so at the bottom, use whatever is showing there instead.
+      // A clicked section stays active while it's on screen, even if the page couldn't scroll it
+      // into the band (near the bottom, or content above it grew while scrolling).
+      // Otherwise at the bottom, the last targets can't reach the band, so use whatever is showing.
       const atBottom = isScrolledToPageBottom();
-      if (atBottom) {
-        const pinnedTop = targets.find(
-          (target) => target.id === pinnedIdRef.current
-        )?.top;
-        const lastTarget = _.maxBy(
+      const pinnedTop = targets.find(
+        (target) => target.id === pinnedIdRef.current
+      )?.top;
+      if (pinnedTop !== undefined && pinnedTop < window.innerHeight) {
+        nextActiveId = pinnedIdRef.current ?? undefined;
+      } else if (atBottom) {
+        nextActiveId = _.maxBy(
           targets.filter((target) => target.top < window.innerHeight),
           (target) => target.top
-        );
-        nextActiveId =
-          pinnedTop !== undefined && pinnedTop < window.innerHeight
-            ? pinnedIdRef.current ?? undefined
-            : lastTarget?.id;
+        )?.id;
       }
 
       // Sub-sections: everything overlapping the band, since several can be in view at once.
