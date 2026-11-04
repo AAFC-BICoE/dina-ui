@@ -74,16 +74,34 @@ import {
   WORKFLOWS_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { Row } from "@tanstack/react-table";
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useMemo, useState } from "react";
 import { dynamicFieldMappingForMaterialSample } from "./list";
 import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { FaRegClock } from "react-icons/fa";
 import { useLocalStorage } from "@rehooks/local-storage";
 
+/** Sections whose FieldSet renders nothing when the selected form template leaves them out. */
+const TEMPLATE_CONTROLLED_SECTIONS = [
+  IDENTIFIER_COMPONENT_NAME,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
+  COLLECTING_EVENT_COMPONENT_NAME,
+  PREPARATIONS_COMPONENT_NAME,
+  ORGANISMS_COMPONENT_NAME,
+  ASSOCIATIONS_COMPONENT_NAME,
+  SCHEDULED_ACTIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
+  WORKFLOWS_COMPONENT_NAME
+];
+
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
   const { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW } =
     useMaterialSampleRelationshipColumns();
+  // Keep the same array between renders: a new one makes the children table reload its columns and search again.
+  const childrenColumns = useMemo(
+    () => ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW,
+    [locale]
+  );
   const id = router.query.id?.toString();
   const { save } = useApiClient();
 
@@ -359,12 +377,22 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             ],
             [WORKFLOWS_COMPONENT_NAME, "workflowsLegend", workflowCount]
           ] as const
-        ).map(([sectionId, labelKey, value]) => ({
-          id: sectionId,
-          msg: <DinaMessage id={labelKey} />,
-          disabled: !value,
-          badge: typeof value === "number" ? value : undefined
-        }));
+        )
+          // Leave out sections the selected form template hides (same rule as FieldSet).
+          .filter(
+            ([sectionId]) =>
+              !sampleFormTemplate ||
+              !TEMPLATE_CONTROLLED_SECTIONS.includes(sectionId) ||
+              sampleFormTemplate.components?.find(
+                (component) => component.name === sectionId
+              )?.visible
+          )
+          .map(([sectionId, labelKey, value]) => ({
+            id: sectionId,
+            msg: <DinaMessage id={labelKey} />,
+            disabled: !value,
+            badge: typeof value === "number" ? value : undefined
+          }));
 
         return (
           <>
@@ -431,7 +459,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     <CustomQueryPageView
                       rowStyling={rowStyling}
                       indexName="dina_material_sample_index"
-                      columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
+                      columns={childrenColumns}
                       uniqueName="material-sample-children"
                       customQueryOptions={[
                         {
