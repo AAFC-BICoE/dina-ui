@@ -20,6 +20,7 @@ import React from "react";
 import { SequencingRunItem } from "./useMolecularAnalysisRun";
 import { QualityControlWithAttachment } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
 import { VocabularyOption } from "../collection/VocabularySelectField";
+import { TabularResultsCell } from "./TabularResultsCell";
 import { FaExclamationTriangle, FaTrashAlt, FaUnlink } from "react-icons/fa";
 import _ from "lodash";
 
@@ -423,6 +424,19 @@ export function useMolecularAnalysisRunColumns({
           )
       },
       {
+        id: "tabularResults",
+        enableSorting: false,
+        size: 300,
+        cell: ({ row: { original } }) => (
+          <TabularResultsCell
+            sequencingRunItem={original}
+            setSequencingRunItems={setSequencingRunItems}
+          />
+        ),
+        header: () => <DinaMessage id="tabularResults_column" />,
+        accessorKey: "tabularResults"
+      },
+      {
         id: "action",
         enableSorting: false,
         size: 300,
@@ -445,6 +459,33 @@ export function useMolecularAnalysisRunColumns({
                 readOnly={readOnly ?? true}
                 onChange={async (newMetadatas) => {
                   if (original.molecularAnalysisRunItem) {
+                    const existingResultId =
+                      original.molecularAnalysisRunItem.result?.id;
+                    // Keep the existing result (it may hold tabularResults) instead of replacing it.
+                    if (existingResultId) {
+                      await save?.<MolecularAnalysisResult>(
+                        [
+                          {
+                            type: "molecular-analysis-result",
+                            resource: {
+                              id: existingResultId,
+                              type: "molecular-analysis-result",
+                              relationships: {
+                                attachments: {
+                                  data: _.map(newMetadatas, (item) =>
+                                    _.pick(item, "id", "type")
+                                  ) as Metadata[]
+                                }
+                              }
+                            }
+                          } as any
+                        ],
+                        { apiBaseUrl: "/seqdb-api" }
+                      );
+                      setReloadGenericMolecularAnalysisRun?.(Date.now());
+                      return;
+                    }
+
                     const molecularAnalysisRunResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
                       [
                         {
@@ -518,8 +559,11 @@ export function useMolecularAnalysisRunColumns({
                       (attachment) => !metadataIds.includes(attachment.id)
                     );
 
-                    // If no attachments remain, delete the result entirely
-                    if (remainingAttachments.length === 0) {
+                    // If no attachments remain (and no tabular results), delete the result entirely
+                    if (
+                      remainingAttachments.length === 0 &&
+                      !original.molecularAnalysisRunItem.result.tabularResults
+                    ) {
                       // 1. Unlink the Result from the Run Item
                       const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
                         [
@@ -603,6 +647,26 @@ export function useMolecularAnalysisRunColumns({
                     original.molecularAnalysisRunItem.result
                   ) {
                     try {
+                      // Keep the result when it holds tabular results: only clear its attachments.
+                      if (
+                        original.molecularAnalysisRunItem.result.tabularResults
+                      ) {
+                        await save?.<MolecularAnalysisResult>(
+                          [
+                            {
+                              type: "molecular-analysis-result",
+                              resource: {
+                                id: original.molecularAnalysisRunItem.result.id,
+                                type: "molecular-analysis-result",
+                                relationships: { attachments: { data: [] } }
+                              }
+                            } as any
+                          ],
+                          { apiBaseUrl: "/seqdb-api" }
+                        );
+                        setReloadGenericMolecularAnalysisRun?.(Date.now());
+                        return;
+                      }
                       const molecularAnalysisRunItemSaveArgs = [
                         {
                           resource: {
