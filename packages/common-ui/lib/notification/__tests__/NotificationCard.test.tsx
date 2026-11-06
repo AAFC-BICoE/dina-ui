@@ -7,12 +7,13 @@ import { Notification } from "../types";
 // Mock moment to have consistent timestamps in tests
 jest.mock("moment", () => {
   const actualMoment = jest.requireActual("moment");
-  return (date?: string) => {
+  const mockedMoment = (date?: string) => {
     const m = actualMoment(date);
     // Mock fromNow to return a consistent value
     m.fromNow = () => "2 hours ago";
     return m;
   };
+  return Object.assign(mockedMoment, actualMoment);
 });
 
 describe("NotificationCard", () => {

@@ -4790,16 +4790,19 @@ describe("Material Sample Edit Page", () => {
       }
       await userEvent.click(scheduledActionToggle[0]);
 
-      // Enter an action type:
-      await userEvent.type(
-        wrapper.getByRole("textbox", { name: /action type/i }),
-        "Check Vouchers"
+      // The empty section shows a placeholder; open the form:
+      await userEvent.click(
+        await wrapper.findByRole("button", { name: /add scheduled action/i })
       );
 
-      // Enter an action status:
+      // Enter (create) an action type and status:
       await userEvent.type(
-        wrapper.getByRole("textbox", { name: /action status/i }),
-        "ongoing"
+        wrapper.getByRole("combobox", { name: /action type/i }),
+        "Check Vouchers{enter}"
+      );
+      await userEvent.type(
+        wrapper.getByRole("combobox", { name: /action status/i }),
+        "ongoing{enter}"
       );
 
       // Enter a date:
@@ -4809,11 +4812,9 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Add the scheduled action.
-      await userEvent.click(
-        wrapper.getAllByRole("button", { name: /add/i })[0]
-      );
+      await userEvent.click(wrapper.getByRole("button", { name: /^add$/i }));
 
-      // Verify it appears in the table.
+      // Verify it appears in the list.
       await waitFor(() => {
         expect(wrapper.getByText(/Check Vouchers/i)).toBeInTheDocument();
         expect(wrapper.getByText(/ongoing/i)).toBeInTheDocument();
@@ -4878,11 +4879,12 @@ describe("Material Sample Edit Page", () => {
         testCtx
       );
 
-      await waitFor(() =>
-        expect(
-          wrapper.getByRole("textbox", { name: /action type/i })
-        ).toBeInTheDocument()
+      await userEvent.click(
+        await wrapper.findByRole("button", { name: /add scheduled action/i })
       );
+      expect(
+        wrapper.getByRole("combobox", { name: /action type/i })
+      ).toBeInTheDocument();
       expect(
         wrapper.queryByRole("combobox", { name: /assigned to/i })
       ).not.toBeInTheDocument();

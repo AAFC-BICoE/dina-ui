@@ -1,32 +1,29 @@
-import { ColumnDef, Row } from "@tanstack/react-table";
+import classNames from "classnames";
 import {
-  AutoSuggestTextField,
+  CreatableSelectField,
   DateField,
   DinaForm,
   DinaFormSection,
-  FieldHeader,
   FieldSet,
   FieldSpy,
   FormikButton,
-  JsonApiQuerySpec,
   OnFormikSubmit,
-  ReactTable,
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { FormikContextType } from "formik";
 import _ from "lodash";
-import { Fragment, ReactNode, useState } from "react";
+import moment, { Moment } from "moment";
+import { Fragment, ReactNode, useRef, useState } from "react";
+import { FaPlus, FaRegCalendar } from "react-icons/fa";
+import { MdDelete, MdEdit } from "react-icons/md";
 import * as yup from "yup";
 import { UserSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  MaterialSample,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   ScheduledAction
 } from "../../../types/collection-api";
-import React from "react";
-import { MdEdit } from "react-icons/md";
+import styles from "./ScheduledActionsField.module.css";
 
 /** Type-safe object with all ScheduledAction fields. */
 export const SCHEDULEDACTION_FIELDS_OBJECT: Required<
@@ -55,10 +52,28 @@ export interface ScheduledActionsFieldProps {
   id?: string;
 }
 
+/** Pill color per lower-cased status. Any other status is gray. */
+const PILL_COLORS: Record<string, string> = {
+  pending: styles.amber,
+  "in progress": styles.blue,
+  done: styles.green
+};
+
+/** Determine the date box color based on the status and if it's past due */
+function dateBoxColor(status: string, date: Moment) {
+  // Cancelled actions are always gray.
+  if (status.startsWith("cancel")) return styles.cancelled;
+
+  // Future or current actions are navy.
+  if (!date.isBefore(moment(), "day")) return styles.navy;
+
+  // Overdue actions are red unless done, which is green.
+  return status === "done" ? styles.green : styles.red;
+}
+
 export function ScheduledActionsField({
   className,
-  // The default date is today:
-  defaultDate = new Date().toISOString().slice(0, 10),
+  defaultDate = moment().format("YYYY-MM-DD"),
   wrapContent = (content) => content,
   id = SCHEDULED_ACTIONS_COMPONENT_NAME
 }: ScheduledActionsFieldProps) {
@@ -67,96 +82,18 @@ export function ScheduledActionsField({
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
-  const [actionToEdit, setActionToEdit] = useState<
-    "NEW" | { index: number } | null
-  >(null);
+  /** Index (in the form's array) of the action being edited. */
+  const [editIndex, setEditIndex] = useState<number | null>(null);
 
-  const isEditing = !!actionToEdit;
+  /** Whether the empty-state placeholder was swapped for the form. */
+  const [formOpen, setFormOpen] = useState(false);
 
-  function openRowEditor(row: Row<ScheduledAction>) {
-    row.getToggleExpandedHandler()();
-    setActionToEdit({ index: row.index });
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+
+  function closeEmptyForm() {
+    setFormOpen(false);
+    setTimeout(() => addButtonRef.current?.focus());
   }
-
-  function removeAction(
-    formik: FormikContextType<ScheduledAction>,
-    index: number
-  ) {
-    setActionToEdit(null);
-    const scheduledActions =
-      formik.getFieldMeta<ScheduledAction[]>(fieldName).value ?? [];
-    // Remove the item at the index:
-    formik.setFieldValue(fieldName, [
-      ...scheduledActions.slice(0, index),
-      ...scheduledActions.slice(index + 1)
-    ]);
-  }
-
-  const buttonProps = () => ({ disabled: isEditing, style: { width: "7rem" } });
-
-  const actionColumns: ColumnDef<ScheduledAction>[] = [
-    {
-      id: "actionType",
-      accessorKey: "actionType",
-      header: () => <FieldHeader name={formatMessage("actionType")} />
-    },
-    {
-      id: "date",
-      accessorKey: "date",
-      header: () => <FieldHeader name={formatMessage("date")} />
-    },
-    {
-      id: "actionStatus",
-      accessorKey: "actionStatus",
-      header: () => <FieldHeader name={formatMessage("status")} />
-    },
-    {
-      id: "assignedTo",
-      accessorKey: "assignedTo",
-      header: () => <FieldHeader name={formatMessage("assignedTo")} />,
-      cell: ({ row }) => (
-        <DinaFormSection readOnly={true}>
-          <UserSelectField
-            name={`${fieldName}[${row.index}].assignedTo`}
-            removeLabel={true}
-            additionalSort="username"
-          />
-        </DinaFormSection>
-      )
-    },
-    {
-      id: "remarks",
-      accessorKey: "remarks",
-      header: () => <FieldHeader name={formatMessage("remarks")} />
-    },
-    ...(readOnly
-      ? []
-      : [
-          {
-            id: "action",
-            size: 270,
-            cell: ({ row }) => (
-              <div className={`d-flex gap-3`}>
-                <FormikButton
-                  className="btn btn-primary edit-button"
-                  buttonProps={buttonProps}
-                  onClick={() => openRowEditor(row)}
-                >
-                  <MdEdit className="me-2" />
-                  <DinaMessage id="editButtonText" />
-                </FormikButton>
-                <FormikButton
-                  className="btn btn-danger remove-button"
-                  buttonProps={buttonProps}
-                  onClick={(_, form) => removeAction(form, row.index)}
-                >
-                  <DinaMessage id="remove" />
-                </FormikButton>
-              </div>
-            )
-          }
-        ])
-  ];
 
   return (
     <FieldSet
@@ -170,79 +107,193 @@ export function ScheduledActionsField({
       {wrapContent(
         <FieldSpy fieldName={fieldName}>
           {(value, { form }) => {
-            const scheduledActions = (value ?? []) as ScheduledAction[];
+            const actions = (value ?? []) as ScheduledAction[];
+            // Sort by date to make it easier to see upcoming actions first.
+            const rows = _.sortBy(
+              actions.map((action, index) => ({ action, index })),
+              "action.date"
+            );
 
-            const hasActions = !!scheduledActions.length;
-
-            async function saveAction(savedAction: ScheduledAction) {
-              if (actionToEdit === "NEW" || !actionToEdit) {
-                form.setFieldValue(fieldName, [
-                  ...scheduledActions,
-                  savedAction
-                ]);
-              } else {
-                form.setFieldValue(
-                  fieldName,
-                  scheduledActions.map((action, index) =>
-                    index === actionToEdit?.index ? savedAction : action
-                  )
-                );
+            // Remove an action from the form's array by its index.
+            function removeAction(index: number) {
+              form.setFieldValue(
+                fieldName,
+                actions.filter((_it, i) => i !== index)
+              );
+              if (editIndex === index) {
+                setEditIndex(null);
+              } else if (editIndex !== null && index < editIndex) {
+                // Keep editing the same action after the one above it is removed:
+                setEditIndex(editIndex - 1);
               }
-              setActionToEdit(null);
+            }
+
+            // Save a new or edited action to the form's array.
+            async function saveAction(saved: ScheduledAction) {
+              form.setFieldValue(
+                fieldName,
+                editIndex === null
+                  ? [...actions, saved]
+                  : actions.map((it, i) => (i === editIndex ? saved : it))
+              );
+              setEditIndex(null);
+              setFormOpen(false);
             }
 
             return (
-              <>
-                {hasActions && (
-                  <ReactTable<ScheduledAction>
-                    columns={actionColumns}
-                    sort={[{ id: "date", desc: true }]}
-                    data={scheduledActions}
-                    showPagination={false}
-                    className="-striped mb-2"
-                    getRowCanExpand={() => true}
-                    renderSubComponent={({ row }) => (
-                      <div className="m-2">
-                        <ScheduledActionSubForm
-                          actionToEdit={row.original}
-                          defaultDate={defaultDate}
-                          onSaveAction={(newAction) => {
-                            row.getToggleExpandedHandler()();
-                            return saveAction(newAction);
-                          }}
-                          onCancelClick={
-                            hasActions
-                              ? () => {
-                                  setActionToEdit(null);
-                                  row.getToggleExpandedHandler()();
-                                }
-                              : undefined
-                          }
-                        />
-                      </div>
-                    )}
-                  />
-                )}
-                {readOnly ? null : !hasActions || actionToEdit === "NEW" ? (
-                  <ScheduledActionSubForm
-                    defaultDate={defaultDate}
-                    onSaveAction={(newAction) => {
-                      return saveAction(newAction);
-                    }}
-                    onCancelClick={
-                      hasActions ? () => setActionToEdit(null) : undefined
-                    }
-                  />
-                ) : (
-                  <FormikButton
-                    className="btn btn-primary mb-3 add-new-button"
-                    buttonProps={buttonProps}
-                    onClick={() => setActionToEdit("NEW")}
+              <div className="pb-3">
+                {/* No scheduled actions found, show placeholder and add button if not read-only */}
+                {!rows.length && !formOpen && (
+                  <section
+                    aria-label={formatMessage("scheduledActions")}
+                    className={styles.placeholder}
                   >
-                    <DinaMessage id="addNew" />
-                  </FormikButton>
+                    <FaRegCalendar size={28} color="#adb5bd" aria-hidden />
+                    <div className="small text-muted my-2">
+                      <DinaMessage id="noRowsFound" />
+                    </div>
+                    {!readOnly && (
+                      <button
+                        type="button"
+                        ref={addButtonRef}
+                        className="btn btn-outline-primary"
+                        aria-expanded={false}
+                        onClick={() => setFormOpen(true)}
+                      >
+                        <FaPlus className="me-2" aria-hidden />
+                        <DinaMessage id="addScheduledAction" />
+                      </button>
+                    )}
+                  </section>
                 )}
-              </>
+
+                {/* Display the list of scheduled actions if any exist */}
+                {!!rows.length && (
+                  <ul className={styles.list}>
+                    {rows.map(({ action, index }) => {
+                      // The form requires a date, so it is always set:
+                      const date = moment(action.date);
+                      const status = action.actionStatus?.toLowerCase() ?? "";
+                      return (
+                        <li
+                          key={index}
+                          className={classNames(
+                            styles.action,
+                            editIndex === index && styles.editing
+                          )}
+                        >
+                          <div
+                            className={classNames(
+                              styles.tile,
+                              dateBoxColor(status, date)
+                            )}
+                          >
+                            <div className={styles.month}>
+                              {date.format("MMM")}
+                            </div>
+                            <div className={styles.day}>
+                              {date.format("DD")}
+                            </div>
+                            <div>{date.format("YYYY")}</div>
+                          </div>
+                          <div className={styles.details}>
+                            <strong className={styles.type}>
+                              {action.actionType}
+                            </strong>
+                            {action.actionStatus && (
+                              <span
+                                className={classNames(
+                                  styles.pill,
+                                  PILL_COLORS[status] ?? styles.gray
+                                )}
+                              >
+                                {action.actionStatus}
+                              </span>
+                            )}
+                            <span className="small text-muted ms-2">
+                              {date.isSame(moment(), "day")
+                                ? formatMessage("today")
+                                : date.from(moment().startOf("day"))}
+                            </span>
+                            <div
+                              className={classNames(
+                                "text-muted",
+                                styles.subline
+                              )}
+                            >
+                              <DinaFormSection readOnly={true}>
+                                <UserSelectField
+                                  name={`${fieldName}[${index}].assignedTo`}
+                                  removeLabel={true}
+                                  additionalSort="username"
+                                />
+                              </DinaFormSection>
+                              {action.remarks && (
+                                <span className="text-truncate">
+                                  {action.assignedTo && "· "}
+                                  {action.remarks}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {!readOnly && (
+                            <div className="d-flex gap-2">
+                              <button
+                                type="button"
+                                className={classNames(
+                                  styles.rowButton,
+                                  styles.edit
+                                )}
+                                title={formatMessage("editButtonText")}
+                                aria-label={formatMessage("editButtonText")}
+                                onClick={() => setEditIndex(index)}
+                              >
+                                <MdEdit />
+                              </button>
+                              <button
+                                type="button"
+                                className={classNames(
+                                  styles.rowButton,
+                                  styles.remove
+                                )}
+                                title={formatMessage("remove")}
+                                aria-label={formatMessage("remove")}
+                                onClick={() => removeAction(index)}
+                              >
+                                <MdDelete />
+                              </button>
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+
+                {/* Add/Edit form */}
+                {!readOnly && (!!rows.length || formOpen) && (
+                  <div className={styles.form}>
+                    <ScheduledActionSubForm
+                      // Remount to load the edited action, or to clear the form after a save:
+                      key={editIndex ?? `new-${actions.length}`}
+                      actionToEdit={
+                        editIndex === null ? undefined : actions[editIndex]
+                      }
+                      defaultDate={defaultDate}
+                      existingActions={actions}
+                      onSaveAction={saveAction}
+                      autoFocus={formOpen}
+                      onCancelClick={
+                        formOpen
+                          ? closeEmptyForm
+                          : editIndex === null
+                          ? undefined
+                          : () => setEditIndex(null)
+                      }
+                    />
+                  </div>
+                )}
+              </div>
             );
           }}
         </FieldSpy>
@@ -256,15 +307,21 @@ export interface ScheduledActionSubFormProps {
   onCancelClick?: () => void;
   actionToEdit?: ScheduledAction;
   defaultDate: string;
+  /** Previously entered values, offered as options. */
+  existingActions?: ScheduledAction[];
+  autoFocus?: boolean;
 }
 
 export function ScheduledActionSubForm({
   onSaveAction,
   onCancelClick,
   actionToEdit,
-  defaultDate
+  defaultDate,
+  existingActions = [],
+  autoFocus
 }: ScheduledActionSubFormProps) {
   const { initialValues, isTemplate, formTemplate } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
 
   // TODO: This needs to be fixed.
   const enabledFields: string[] = [];
@@ -306,94 +363,92 @@ export function ScheduledActionSubForm({
     await onSaveAction(newAction);
   };
 
-  // Fetch the last 50 scheduled actions.
-  // No filtering by search text yet due to API limitations. The future search API should provide better autocomplete support.
-  const autoSuggestQuery: (
-    searchTerm: string,
-    formikCtx: FormikContextType<any>
-  ) => JsonApiQuerySpec = (_, ctx) => ({
-    path: "collection-api/material-sample",
-    fields: { "material-sample": "scheduledActions" },
-    filter: {
-      scheduledActions: { NEQ: "null" },
-      ...(ctx.values.group && { group: { EQ: ctx.values.group } })
-    },
-    page: { limit: 50 }
-  });
-
   const defaultInitialValues = {
     date: defaultDate
   };
 
+  const toOptions = (values: (string | undefined)[]) =>
+    _.uniq(_.compact(values)).map((it) => ({ label: it, value: it }));
+
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
-      <FieldSet legend={<DinaMessage id="addScheduledAction" />}>
-        <FormWrapper
-          validationSchema={scheduledActionSchema}
-          {...(!isTemplate ? { formTemplate } : {})}
-          initialValues={
-            actionToEdit ?? actionTemplateInitialValues ?? defaultInitialValues
-          }
-          componentName={SCHEDULED_ACTIONS_COMPONENT_NAME}
-          sectionName="scheduled-actions-add-section"
-        >
-          <div className="row">
-            <AutoSuggestTextField<MaterialSample>
-              {...fieldProps("actionType")}
-              jsonApiBackend={{
-                query: autoSuggestQuery,
-                option: (matSample) =>
-                  matSample?.scheduledActions?.map(
-                    (it) => it?.actionType ?? ""
-                  ) ?? ""
-              }}
-              blankSearchBackend={"json-api"}
-              className="col-sm-6"
-            />
-            <DateField {...fieldProps("date")} className="col-sm-6" />
-          </div>
-          <div className="row">
-            <AutoSuggestTextField<MaterialSample>
-              {...fieldProps("actionStatus")}
-              jsonApiBackend={{
-                query: autoSuggestQuery,
-                option: (matSample) =>
-                  matSample?.scheduledActions?.map(
-                    (it) => it?.actionStatus ?? ""
-                  ) ?? ""
-              }}
-              blankSearchBackend={"json-api"}
-              className="col-sm-6"
-            />
-            <UserSelectField
-              {...fieldProps("assignedTo")}
-              className="col-sm-6"
-              additionalSort="username"
-            />
-          </div>
-          <TextField {...fieldProps("remarks")} multiLines={true} />
-          {!isTemplate && (
-            <div className="d-flex justify-content-center gap-2">
-              <FormikButton
-                className="btn btn-primary mb-3 add-button"
-                buttonProps={() => ({ style: { width: "10rem" } })}
-                onClick={submitAction}
-              >
-                <DinaMessage id={actionToEdit ? "submitBtnText" : "add"} />
+      <div className="fw-bold mb-2">
+        <DinaMessage
+          id={actionToEdit ? "editScheduledAction" : "addScheduledAction"}
+        />
+      </div>
+      <FormWrapper
+        validationSchema={scheduledActionSchema}
+        {...(!isTemplate ? { formTemplate } : {})}
+        initialValues={
+          actionToEdit ?? actionTemplateInitialValues ?? defaultInitialValues
+        }
+        componentName={SCHEDULED_ACTIONS_COMPONENT_NAME}
+        sectionName="scheduled-actions-add-section"
+      >
+        {/* Labels are hidden, so each select gets an aria-label as its accessible name. */}
+        <div className={styles.fields}>
+          <CreatableSelectField<string>
+            {...fieldProps("actionType")}
+            removeLabel={true}
+            options={toOptions(existingActions.map((it) => it.actionType))}
+            selectProps={{
+              placeholder: formatMessage("actionType"),
+              "aria-label": formatMessage("actionType"),
+              autoFocus
+            }}
+          />
+          <DateField {...fieldProps("date")} removeLabel={true} />
+          <CreatableSelectField<string>
+            {...fieldProps("actionStatus")}
+            removeLabel={true}
+            options={toOptions([
+              "Pending",
+              "In progress",
+              "Done",
+              ...existingActions.map((it) => it.actionStatus)
+            ])}
+            selectProps={{
+              placeholder: formatMessage("actionStatus"),
+              "aria-label": formatMessage("actionStatus")
+            }}
+          />
+          <UserSelectField
+            {...fieldProps("assignedTo")}
+            removeLabel={true}
+            additionalSort="username"
+            placeholder={formatMessage("assignedTo")}
+            selectProps={{ "aria-label": formatMessage("assignedTo") }}
+          />
+        </div>
+        <TextField
+          {...fieldProps("remarks")}
+          removeLabel={true}
+          placeholder={formatMessage("remarks")}
+        />
+        {!isTemplate && (
+          <div className="d-flex justify-content-end gap-2">
+            {onCancelClick && (
+              <FormikButton className="btn btn-dark" onClick={onCancelClick}>
+                <DinaMessage id="cancelButtonText" />
               </FormikButton>
-              {onCancelClick && (
-                <FormikButton
-                  className="btn btn-dark mb-3"
-                  buttonProps={() => ({ style: { width: "10rem" } })}
-                  onClick={onCancelClick}
-                >
-                  <DinaMessage id="cancelButtonText" />
-                </FormikButton>
-              )}
-            </div>
-          )}
-        </FormWrapper>
-      </FieldSet>
+            )}
+            <FormikButton
+              className={classNames("btn btn-primary", styles.submit)}
+              buttonProps={({ values }) => ({
+                disabled: !(
+                  values.actionType &&
+                  values.date &&
+                  values.actionStatus
+                )
+              })}
+              onClick={submitAction}
+            >
+              <DinaMessage id={actionToEdit ? "submitBtnText" : "add"} />
+            </FormikButton>
+          </div>
+        )}
+      </FormWrapper>
     </div>
   );
 }
