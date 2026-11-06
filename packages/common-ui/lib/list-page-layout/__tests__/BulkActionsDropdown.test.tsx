@@ -87,7 +87,7 @@ describe("BulkActionsDropdown", () => {
     const w = mountMenu({});
 
     expect(w.getByText("Actions")).toBeInTheDocument();
-    expect(w.getByText("On selected")).toBeInTheDocument();
+    expect(w.getByText("Selected (0)")).toBeInTheDocument();
     for (const name of [
       /edit selected/i,
       /split selected/i,
@@ -97,7 +97,10 @@ describe("BulkActionsDropdown", () => {
       expect(buttonNamed(w, name)).toBeDisabled();
       expect(buttonNamed(w, name)).toHaveAttribute("aria-disabled", "true");
     }
-    expect(w.getByText("On all 326 matched")).toBeInTheDocument();
+    expect(
+      w.getByText(/Tick the checkboxes in the table to choose records/)
+    ).toBeInTheDocument();
+    expect(w.getByText("All matched (326)")).toBeInTheDocument();
     expect(buttonNamed(w, /export all matching/i)).toBeEnabled();
   });
 
@@ -105,7 +108,7 @@ describe("BulkActionsDropdown", () => {
     const w = mountMenu({ a: true, b: true, c: true, d: false });
 
     expect(w.getByText("Actions on 3 selected")).toBeInTheDocument();
-    expect(w.getByText("On 3 selected")).toBeInTheDocument();
+    expect(w.getByText("Selected (3)")).toBeInTheDocument();
     for (const name of [
       /edit selected/i,
       /split selected/i,
@@ -155,6 +158,10 @@ describe("BulkActionsDropdown", () => {
       await w.findByText(
         "You don't have permission to delete records in these groups: guestGroup, readOnlyGroup."
       )
+    ).toBeInTheDocument();
+    // One muted line lists every group lacking a permission:
+    expect(
+      w.getByText("No permission for group: readOnlyGroup, guestGroup")
     ).toBeInTheDocument();
     // Other actions are unaffected:
     expect(buttonNamed(w, /split selected/i)).toBeEnabled();

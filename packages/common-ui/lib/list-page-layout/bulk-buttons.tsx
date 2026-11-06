@@ -18,15 +18,16 @@ import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 import { KitsuResource } from "kitsu";
 import { useSessionStorage } from "usehooks-ts";
 import { useIntl } from "react-intl";
-import { MdEdit } from "react-icons/md";
 import {
   FaCheck,
+  FaCodeBranch,
+  FaDownload,
   FaExclamationTriangle,
+  FaInfoCircle,
+  FaPen,
   FaTimes,
   FaTrash
 } from "react-icons/fa";
-import { FiDownload } from "react-icons/fi";
-import { TbArrowsSplit2 } from "react-icons/tb";
 import { ReactNode, useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import {
@@ -186,23 +187,18 @@ export function BulkActionsDropdown<TData extends KitsuResource>({
     tooltip?: { id: string; intlValues: Record<string, string> }
   ) =>
     tooltip ? (
-      <div className="position-relative">
-        {button}
-        <span className="position-absolute top-50 end-0 translate-middle-y me-3">
-          <Tooltip
-            {...tooltip}
-            placement="left"
-            disableSpanMargin
-            visibleElement={<FaExclamationTriangle className="text-warning" />}
-          />
-        </span>
-      </div>
+      <Tooltip
+        {...tooltip}
+        placement="left"
+        className="bulk-actions-tip"
+        visibleElement={button}
+      />
     ) : (
       button
     );
+  const deniedGroups = _.union(denied.update, denied.delete);
   const Chevron = open ? FaChevronUp : FaChevronDown;
-  const itemClass = "dropdown-item d-flex align-items-center fw-bold py-2";
-  const groupLabelClass = "px-3 pt-2 pb-1 small fw-bold text-uppercase";
+  const itemClass = "dropdown-item d-flex align-items-center";
 
   return (
     <Dropdown className="bulk-actions-dropdown" show={open} onToggle={setOpen}>
@@ -215,20 +211,11 @@ export function BulkActionsDropdown<TData extends KitsuResource>({
         )}
         <Chevron className="ms-2" />
       </Dropdown.Toggle>
-      <Dropdown.Menu
-        align="end"
-        renderOnMount
-        className="py-0"
-        style={{ width: "340px" }}
-      >
+      <Dropdown.Menu align="end" renderOnMount style={{ width: "340px" }}>
         {/* Clicking an action closes the menu. */}
         <div onClick={() => setOpen(false)}>
-          <div className={`${groupLabelClass} text-muted`}>
-            {count ? (
-              <CommonMessage id="onSelectedCount" values={{ count }} />
-            ) : (
-              <CommonMessage id="onSelected" />
-            )}
+          <div className="bulk-actions-header">
+            <CommonMessage id="onSelectedCount" values={{ count }} />
             {loading && (
               <Tooltip
                 id="checkingPermissions"
@@ -263,17 +250,30 @@ export function BulkActionsDropdown<TData extends KitsuResource>({
               withWarning(
                 <BulkDeleteButton
                   {...del}
-                  className={`${itemClass} ${
-                    count && !loading && !deleteWarning ? "text-danger" : ""
-                  }`}
+                  className={itemClass}
                   disabled={loading || !!deleteWarning}
                 />,
                 deleteWarning
               )}
           </div>
+          {(!count || deniedGroups.length > 0) && (
+            <div className="bulk-actions-note">
+              <FaInfoCircle />
+              <span>
+                {count ? (
+                  <CommonMessage
+                    id="noPermissionForGroups"
+                    values={{ groups: deniedGroups.join(", ") }}
+                  />
+                ) : (
+                  <CommonMessage id="noSelectionHint" />
+                )}
+              </span>
+            </div>
+          )}
           {dataExport && (
-            <div className="border-top">
-              <div className={`${groupLabelClass} text-muted`}>
+            <div className="bulk-actions-section">
+              <div className="bulk-actions-header">
                 <CommonMessage
                   id="onAllMatched"
                   values={{ total: dataExport.totalRecords.toLocaleString() }}
@@ -611,7 +611,7 @@ export function BulkEditButton({
         }
       }}
     >
-      <MdEdit className="me-2" />
+      <FaPen className="me-2" />
       <CommonMessage id="editSelectedButtonText" />
     </FormikButton>
   );
@@ -706,7 +706,7 @@ export function DataExportButton<TData extends KitsuResource>({
         });
       }}
     >
-      <FiDownload className="me-2" />
+      <FaDownload className="me-2" />
       <CommonMessage
         id={exportAll ? "exportAllMatching" : "exportSelectedButtonText"}
       />
@@ -746,7 +746,7 @@ export function BulkSplitButton({
         await router.push({ pathname });
       }}
     >
-      <TbArrowsSplit2 className="me-2" />
+      <FaCodeBranch className="me-2" />
       <CommonMessage id="splitSelectedButtonText" />
     </FormikButton>
   );
