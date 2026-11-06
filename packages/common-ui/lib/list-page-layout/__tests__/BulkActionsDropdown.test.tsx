@@ -2,7 +2,7 @@ import "@testing-library/jest-dom";
 import { waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DinaForm, mountWithAppContext } from "common-ui";
-import { BulkActionsDropdown } from "../bulk-buttons";
+import { BulkActionsDropdown, BulkDeleteButtonProps } from "../bulk-buttons";
 
 const mockPost = jest.fn();
 
@@ -10,7 +10,11 @@ jest.mock("next/router", () => ({ useRouter: () => ({ push: jest.fn() }) }));
 
 function mountMenu(
   itemIdsToSelect: Record<string, boolean>,
-  accountContext: any = { isAdmin: false }
+  accountContext: any = { isAdmin: false },
+  del: BulkDeleteButtonProps = {
+    typeName: "material-sample",
+    apiBaseUrl: "/collection-api"
+  }
 ) {
   return mountWithAppContext(
     <DinaForm initialValues={{ itemIdsToSelect }}>
@@ -18,7 +22,7 @@ function mountMenu(
         indexName="idx"
         edit={{ pathname: "/edit" }}
         split={{ pathname: "/split" }}
-        del={{ typeName: "material-sample", apiBaseUrl: "/collection-api" }}
+        del={del}
         dataExport={
           {
             pathname: "/export",
@@ -40,8 +44,14 @@ function mountMenu(
   );
 }
 
-/** Search aggregation returns one bucket per group; permission-check grants per the table. */
-function mockApi(permissionsByGroup: Record<string, string[]>) {
+/**
+ * Search aggregation returns one bucket per group; permission-check grants per the table.
+ * Like the real API, it only reads the group from `groupAttribute`, otherwise the user can only read.
+ */
+function mockApi(
+  permissionsByGroup: Record<string, string[]>,
+  groupAttribute = "group"
+) {
   mockPost.mockImplementation(async (url: string, body: any) => {
     // Small delay so the "checking" state is observable:
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -50,7 +60,9 @@ function mockApi(permissionsByGroup: Record<string, string[]>) {
           data: {
             data: {
               attributes: {
-                permissions: permissionsByGroup[body.data.attributes.group]
+                permissions: permissionsByGroup[
+                  body.data.attributes[groupAttribute]
+                ] ?? ["read"]
               }
             }
           }
@@ -162,6 +174,32 @@ describe("BulkActionsDropdown", () => {
     ).toBeNull();
     // One search plus one permission check for the single group:
     expect(mockPost).toHaveBeenCalledTimes(2);
+    // The group is sent as "group" unless the target says otherwise:
+    expect(mockPost).toHaveBeenCalledWith("/collection-api/permission-check", {
+      data: { type: "material-sample", attributes: { group: "mine" } }
+    });
+  });
+
+  it("Sends the group under the target's groupAttribute (object-store reads it from bucket).", async () => {
+    mockApi({ mine: ["read", "update", "delete"] }, "bucket");
+    const w = mountMenu(
+      { a: true },
+      { isAdmin: false },
+      {
+        typeName: "metadata",
+        apiBaseUrl: "/objectstore-api",
+        groupAttribute: "bucket"
+      }
+    );
+    await userEvent.click(
+      w.container.querySelector(".bulk-actions-dropdown > button")!
+    );
+
+    await waitFor(() => expect(buttonNamed(w, /edit selected/i)).toBeEnabled());
+    expect(buttonNamed(w, /delete selected/i)).toBeEnabled();
+    expect(mockPost).toHaveBeenCalledWith("/objectstore-api/permission-check", {
+      data: { type: "metadata", attributes: { bucket: "mine" } }
+    });
   });
 
   it("Makes no permission requests when nothing is selected.", async () => {

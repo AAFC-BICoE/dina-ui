@@ -65,7 +65,7 @@ function useSelectionPermissions(
   enabled: boolean,
   ids: string[],
   indexName?: string,
-  target?: { apiBaseUrl: string; typeName: string }
+  target?: { apiBaseUrl: string; typeName: string; groupAttribute?: string }
 ) {
   const { apiClient } = useApiClient();
   const { isAdmin } = useAccount();
@@ -100,7 +100,12 @@ function useSelectionPermissions(
           groups.map(async (group) => {
             const res = await apiClient.axios.post(
               `${target.apiBaseUrl}/permission-check`,
-              { data: { type: target.typeName, attributes: { group } } }
+              {
+                data: {
+                  type: target.typeName,
+                  attributes: { [target.groupAttribute ?? "group"]: group }
+                }
+              }
             );
             return [
               group,
@@ -127,7 +132,15 @@ function useSelectionPermissions(
     return () => {
       cancelled = true;
     };
-  }, [enabled, isAdmin, key, indexName, target?.apiBaseUrl, target?.typeName]);
+  }, [
+    enabled,
+    isAdmin,
+    key,
+    indexName,
+    target?.apiBaseUrl,
+    target?.typeName,
+    target?.groupAttribute
+  ]);
 
   return state;
 }
@@ -321,6 +334,8 @@ export interface BulkDeleteButtonProps {
   disabled?: boolean;
   typeName: string;
   apiBaseUrl: string;
+  /** Attribute the API's permission-check reads the group from ("group" unless the API says otherwise). */
+  groupAttribute?: string;
   beforeDelete?: (resourceIds: string[]) => Promise<any>;
   afterDelete?: (
     resourceIds: string[],
