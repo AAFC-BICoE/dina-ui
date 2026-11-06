@@ -35,7 +35,7 @@ export function TabularResultsModal({
   onRemove,
   onClose
 }: TabularResultsModalProps) {
-  const { locale } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
   const [confirmRemove, setConfirmRemove] = useState(false);
 
   const columns = Object.keys(tabularResults.records[0] ?? {});
@@ -51,7 +51,7 @@ export function TabularResultsModal({
         aria-labelledby="tabular-results-title"
       >
         {/* Header with title and close button */}
-        <Modal.Header closeButton>
+        <Modal.Header closeButton closeLabel={formatMessage("close")}>
           <Modal.Title id="tabular-results-title">
             <DinaMessage
               id="tabularResults_modalTitle"
@@ -164,7 +164,7 @@ export function TabularResultsModal({
         size="lg"
         centered={true}
       >
-        <Modal.Header closeButton>
+        <Modal.Header closeButton closeLabel={formatMessage("close")}>
           <Modal.Title>
             <DinaMessage id="tabularResults_confirmTitle" />
           </Modal.Title>

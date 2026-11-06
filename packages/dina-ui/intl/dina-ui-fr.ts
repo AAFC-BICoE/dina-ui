@@ -19,6 +19,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   tabularResults_confirmTitle: "Supprimer les résultats tabulaires",
   tabularResults_confirmText:
     "Supprimer les résultats tabulaires de cet élément de l'analyse ?",
+  removeButtonText: "Supprimer",
 
   LETTER: "Lettre",
   NUMERICAL: "Numérique",
