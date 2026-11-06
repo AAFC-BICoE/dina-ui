@@ -1,4 +1,8 @@
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  mountWithAppContext,
+  OBJECT_STORE_MAPPING,
+  waitForLoadingToDisappear
+} from "common-ui";
 import {
   MolecularAnalysisResultsStep,
   MolecularAnalysisResultsStepProps
@@ -6,7 +10,7 @@ import {
 import { useState } from "react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { waitFor } from "@testing-library/react";
+import { waitFor, within } from "@testing-library/react";
 import {
   TEST_MOLECULAR_ANALYSIS,
   TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN,
@@ -1414,6 +1418,347 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
               type: "molecular-analysis-run"
             },
             type: "molecular-analysis-run"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+    });
+  });
+
+  describe("Tabular Results", () => {
+    const TABULAR_RESULTS = {
+      records: [
+        { region: "1", product: "NRPS", KCB_hit: "fusarin" },
+        { region: "2", product: "T1PKS", KCB_hit: "equisetin" }
+      ]
+    };
+    const CONVERTED_TSV = {
+      0: {
+        rows: [
+          { rowNumber: 0, content: ["region", "product"] },
+          { rowNumber: 1, content: ["1", "NRPS"] },
+          { rowNumber: 2, content: ["2", "T1PKS"] },
+          { rowNumber: 3, content: ["3", "terpene"] }
+        ]
+      }
+    };
+
+    /** Mounts the step with a single run item that has the given result (or none). */
+    function mountWithResult(result?: any) {
+      const runItem = {
+        id: "run-item-tabular",
+        type: "molecular-analysis-run-item",
+        name: "Run Item With Tabular Results",
+        usageType:
+          MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+        ...(result ? { result } : {}),
+        run: TEST_MOLECULAR_ANALYSIS_RUN
+      };
+      const genericItem = {
+        id: "generic-item-tabular",
+        type: "generic-molecular-analysis-item",
+        genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+        materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[0],
+        molecularAnalysisRunItem: runItem,
+        storageUnitUsage: STORAGE_UNIT_USAGE_1
+      };
+
+      const get = jest.fn<any, any>(async (path, params) => {
+        if (
+          path === "/seqdb-api/generic-molecular-analysis-item" &&
+          filterIncludes(params, TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
+        ) {
+          return { data: [genericItem] };
+        }
+        // The "Attach Existing Objects" tab lists objects through elasticsearch.
+        if (path === "search-api/search-ws/mapping") {
+          return OBJECT_STORE_MAPPING;
+        }
+        return mockGet(path, params);
+      });
+      const bulkGet = jest.fn(async (paths) =>
+        paths.map((path: string) => {
+          // Return a copy: the step replaces the attachments of what it receives.
+          if (result && path.includes(result.id)) return { ...result };
+          if (path.includes(TEST_METADATA_1.id)) return TEST_METADATA_1;
+          if (path.includes(TEST_METADATA_2.id)) return TEST_METADATA_2;
+          if (path.includes(TEST_MATERIAL_SAMPLE_SUMMARY[0].id))
+            return TEST_MATERIAL_SAMPLE_SUMMARY[0];
+          if (path.includes(STORAGE_UNIT_USAGE_1.id!))
+            return STORAGE_UNIT_USAGE_1;
+          return null;
+        })
+      );
+      const post = jest.fn<any, any>(async (path) =>
+        path === "search-api/search-ws/search"
+          ? {
+              data: {
+                hits: {
+                  total: { value: 1 },
+                  hits: [
+                    {
+                      _source: {
+                        data: {
+                          id: TEST_METADATA_2.id,
+                          type: "metadata",
+                          attributes: TEST_METADATA_2
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          : { data: CONVERTED_TSV }
+      );
+      const ctx = {
+        apiContext: {
+          apiClient: { get, axios: { get, post } },
+          bulkGet,
+          save: mockSave
+        }
+      } as any;
+
+      return mountWithAppContext(<TestComponentWrapper />, ctx);
+    }
+
+    const RESULT_WITH_TSV = {
+      id: "result-tabular",
+      type: "molecular-analysis-result",
+      attachments: [],
+      tabularResults: TABULAR_RESULTS
+    };
+
+    it("Shows Upload TSV for a run item without a result", async () => {
+      const wrapper = mountWithResult();
+      await waitForLoadingToDisappear();
+
+      expect(
+        wrapper.getByRole("columnheader", { name: /tabular results/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("button", { name: /upload tsv/i })
+      ).toBeInTheDocument();
+    });
+
+    it("Shows the row and column counts of the saved tabular results", async () => {
+      const wrapper = mountWithResult(RESULT_WITH_TSV);
+      await waitForLoadingToDisappear();
+
+      expect(
+        wrapper.getByRole("button", { name: /open full table/i })
+      ).toHaveTextContent("2 rows · 3 columns");
+      expect(
+        wrapper.queryByRole("button", { name: /upload tsv/i })
+      ).not.toBeInTheDocument();
+    });
+
+    it("Opens the full table with every column and row", async () => {
+      const wrapper = mountWithResult(RESULT_WITH_TSV);
+      await waitForLoadingToDisappear();
+
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /open full table/i })
+      );
+
+      expect(
+        await wrapper.findByText(/tabular results: run item with tabular/i)
+      ).toBeInTheDocument();
+      // Scoped to the dialog: the hover preview renders the same headers.
+      const dialog = within(wrapper.getByRole("dialog"));
+      ["region", "product", "KCB_hit"].forEach((header) =>
+        expect(
+          dialog.getByRole("columnheader", { name: header })
+        ).toBeInTheDocument()
+      );
+      expect(dialog.getByText("equisetin")).toBeInTheDocument();
+    });
+
+    it("Uploading a TSV creates a result, links it to the run item and shows the table", async () => {
+      const wrapper = mountWithResult();
+      await waitForLoadingToDisappear();
+
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /upload tsv/i })
+      );
+      await userEvent.upload(
+        wrapper.container.querySelector(
+          "input[type=file][accept='.tsv,text/tab-separated-values']"
+        ) as HTMLInputElement,
+        new File(["x"], "results.tsv", { type: "text/tab-separated-values" })
+      );
+
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledTimes(2);
+      });
+
+      // 1st: create the result with the parsed table (every row, headers as in the file).
+      expect(mockSave).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            resource: {
+              group: "aafc",
+              createdBy: "test-user",
+              tabularResults: {
+                records: [
+                  { region: "1", product: "NRPS" },
+                  { region: "2", product: "T1PKS" },
+                  { region: "3", product: "terpene" }
+                ]
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+
+      // 2nd: link the new result to the run item.
+      expect(mockSave).toHaveBeenNthCalledWith(
+        2,
+        [
+          {
+            resource: expect.objectContaining({
+              id: "run-item-tabular",
+              relationships: {
+                result: {
+                  data: {
+                    id: "saved-id-123",
+                    type: "molecular-analysis-result"
+                  }
+                }
+              }
+            }),
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+
+      // The row is updated in place, without reloading the whole step.
+      expect(
+        await wrapper.findByRole("button", { name: /open full table/i })
+      ).toHaveTextContent("3 rows · 2 columns");
+    });
+
+    it("Detach All keeps a result that holds tabular results and only clears its attachments", async () => {
+      const wrapper = mountWithResult({
+        ...RESULT_WITH_TSV,
+        attachments: [{ id: TEST_METADATA_1.id, type: "metadata" }]
+      });
+      await waitForLoadingToDisappear();
+
+      // The first one belongs to the Sequencing Run Content section.
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /detach all/i })[0]
+      );
+
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledTimes(1);
+      });
+      expect(mockSave).toHaveBeenCalledWith(
+        [
+          {
+            resource: {
+              id: "result-tabular",
+              relationships: { attachments: { data: [] } },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+      // Neither unlinked from the run item nor deleted.
+      expect(mockSave).not.toHaveBeenCalledWith(
+        [{ delete: expect.anything() }],
+        expect.anything()
+      );
+    });
+
+    it("Detaching the last attachment keeps a result that holds tabular results", async () => {
+      const wrapper = mountWithResult({
+        ...RESULT_WITH_TSV,
+        attachments: [{ id: TEST_METADATA_1.id, type: "metadata" }]
+      });
+      await waitForLoadingToDisappear();
+
+      // Open the attachments popup of the run item and detach everything.
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[0]
+      );
+      await waitForLoadingToDisappear();
+      await userEvent.click(
+        wrapper.getByRole("checkbox", { name: /check all/i })
+      );
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /detach selected/i })
+      );
+
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledTimes(1);
+      });
+      expect(mockSave).toHaveBeenCalledWith(
+        [
+          {
+            resource: {
+              id: "result-tabular",
+              relationships: { attachments: { data: [] } },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+    });
+
+    it("Adding an attachment updates the existing result instead of replacing it", async () => {
+      const wrapper = mountWithResult({
+        ...RESULT_WITH_TSV,
+        attachments: [{ id: TEST_METADATA_1.id, type: "metadata" }]
+      });
+      await waitForLoadingToDisappear();
+
+      // Open the attachments popup of the run item, then its "attach existing objects" tab.
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[0]
+      );
+      await waitForLoadingToDisappear();
+      await userEvent.click(
+        await wrapper.findByRole("tab", { name: /attach existing objects/i })
+      );
+      await userEvent.click(
+        await wrapper.findByRole("checkbox", { name: /check all/i })
+      );
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /attach selected/i })
+      );
+
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledTimes(1);
+      });
+
+      // Only the existing result is updated (same id, old + new attachments);
+      // no new result is created and the run item is not relinked.
+      expect(mockSave).toHaveBeenCalledWith(
+        [
+          {
+            resource: {
+              id: "result-tabular",
+              relationships: {
+                attachments: {
+                  data: [
+                    { id: TEST_METADATA_1.id, type: "metadata" },
+                    { id: TEST_METADATA_2.id, type: "metadata" }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }
