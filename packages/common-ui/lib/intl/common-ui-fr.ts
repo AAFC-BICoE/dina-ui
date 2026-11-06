@@ -12,9 +12,11 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
       "Vous n'avez pas la permission de modifier les enregistrements de ces groupes : {groups}.",
     noDeletePermission:
       "Vous n'avez pas la permission de supprimer les enregistrements de ces groupes : {groups}.",
-    onSelected: "Sur la sélection",
-    onSelectedCount: "Sur {count} sélectionné(s)",
-    onAllMatched: "Sur les {total} résultats",
+    onSelectedCount: "Sélection ({count})",
+    onAllMatched: "Tous les résultats ({total})",
+    noPermissionForGroups: "Aucune permission pour le groupe : {groups}",
+    noSelectionHint:
+      "Cochez les cases du tableau pour choisir des enregistrements. Ces actions s'appliquent aux enregistrements choisis.",
     actionsOnSelected: "Actions sur {count} sélectionné(s)",
     exportSelectedButtonText: "Exporter la sélection",
     exportAllMatching: "Exporter tous les résultats",
