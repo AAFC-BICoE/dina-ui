@@ -19,6 +19,7 @@ import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
 import { screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
+import moment from "moment";
 import {
   TEST_FORM_TEMPLATE,
   TEST_COLLECTING_EVENT_1,
@@ -1220,31 +1221,30 @@ describe("MaterialSampleBulkEditor", () => {
     );
     await waitFor(() => {}); // Allow for any state updates
 
-    // Override the scheduled acitons
-    await clearAndType(
-      wrapper.getByRole("textbox", { name: /action type/i }),
-      "new-action-type"
+    // Override the scheduled actions: open the empty section's form and add one.
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /add scheduled action/i })
     );
-
-    // Click the "Add" schedule button.
-    const scheduleActionButton = wrapper.container.querySelector(
-      "#" + SCHEDULED_ACTIONS_COMPONENT_NAME + " button"
+    await userEvent.type(
+      wrapper.getByRole("combobox", { name: /action type/i }),
+      "new-action-type{enter}"
     );
-    if (!scheduleActionButton) {
-      throw new Error("Schedule add button needs to exist at this point.");
-    }
-    await userEvent.click(scheduleActionButton);
+    await userEvent.type(
+      wrapper.getByRole("combobox", { name: /action status/i }),
+      "new-action-status{enter}"
+    );
+    await userEvent.click(wrapper.getByRole("button", { name: /^add$/i }));
     await waitFor(() =>
       expect(
         wrapper.container.querySelectorAll(".has-bulk-edit-value").length
-      ).toEqual(5)
+      ).toEqual(6)
     );
 
     // All overridable fieldsets should now have the green bulk edited indicator
     const overrideClasses = wrapper.container.querySelectorAll(
       ".has-bulk-edit-value"
     );
-    expect(overrideClasses.length).toEqual(5);
+    expect(overrideClasses.length).toEqual(6);
 
     // All Override All buttons should be gone now
     const overrideButtons = wrapper.container.querySelectorAll(
@@ -1291,7 +1291,15 @@ describe("MaterialSampleBulkEditor", () => {
                 organism: {
                   data: [{ id: "11111", type: "organism" }]
                 }
-              }
+              },
+              scheduledActions: [
+                {
+                  actionStatus: "new-action-status",
+                  actionType: "new-action-type",
+                  // The form's default date (today):
+                  date: moment().format("YYYY-MM-DD")
+                }
+              ]
             }
           }))
         ],
