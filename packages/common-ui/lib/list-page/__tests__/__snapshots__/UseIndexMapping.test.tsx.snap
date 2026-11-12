@@ -2088,7 +2088,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "containsSupport": false,
           "distinctTerm": true,
           "dynamicField": {
-            "apiEndpoint": "seqdb-api/vocabulary/molecularAnalysisType",
+            "apiEndpoint": "seqdb-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=f964c7f8-526e-4b4a-88d4-264f77e6c324",
             "label": "items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.analysisType",
             "path": "included.attributes.items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.analysisType",
             "type": "vocabulary",
