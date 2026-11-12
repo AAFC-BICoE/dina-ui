@@ -1,3 +1,4 @@
+import { SEQDB_MOLECULAR_ANALYSIS_TYPE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import React from "react";
 import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
@@ -22,7 +23,7 @@ export function MaterialSampleWorkflows({
   workflows: GenericMolecularAnalysis[] | undefined;
 }) {
   const { vocabOptions, loading } = useVocabularyOptions({
-    path: "seqdb-api/vocabulary/molecularAnalysisType"
+    path: `seqdb-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${SEQDB_MOLECULAR_ANALYSIS_TYPE_ID}`
   });
 
   const WORKFLOW_TABLE_COLUMNS: ColumnDef<any>[] = [

@@ -166,7 +166,7 @@ export function DataBlock({
         {!readOnly && (
           <button
             type="button"
-            className="btn btn-remove-light"
+            className="btn btn-outline-danger btn-sm text-nowrap"
             onClick={() => removeBlock?.(props.name)}
           >
             <FaTrash className="me-2" />
@@ -215,7 +215,7 @@ export function DataBlock({
         {!readOnly && (
           <button
             type="button"
-            className="btn btn-sm btn-outline-secondary btn-gray-text"
+            className="btn btn-outline-primary btn-sm"
             onClick={addRow}
             data-testid="add row button"
           >

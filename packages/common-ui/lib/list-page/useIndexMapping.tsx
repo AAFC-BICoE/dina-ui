@@ -1,3 +1,4 @@
+import { SEQDB_MOLECULAR_ANALYSIS_TYPE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { useEffect, useState } from "react";
 import { useApiClient } from "..";
 import {
@@ -67,7 +68,7 @@ export const overrideRelationshipConfig: OverrideRelationshipConfig = {
       {
         fields: ["keyword"],
         isReverseRelationship: true,
-        vocabularyEndpoint: "seqdb-api/vocabulary/molecularAnalysisType"
+        vocabularyEndpoint: `seqdb-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${SEQDB_MOLECULAR_ANALYSIS_TYPE_ID}`
       }
   },
   collectingEvent: {
