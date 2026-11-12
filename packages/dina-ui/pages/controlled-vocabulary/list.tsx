@@ -8,8 +8,7 @@ import {
   useApiClient,
   LoadingSpinner,
   SelectField,
-  SimpleSearchFilterBuilder,
-  simpleSearchFilterToFiql
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { useLocalStorage } from "@rehooks/local-storage";
 import Link from "next/link";
@@ -181,11 +180,9 @@ const MODULE_TABS: ModuleTabConfig[] = CV_MODULES.map(({ titleKey }) => ({
 }));
 
 const SHARED_CV_PARAMS = {
-  fiql: simpleSearchFilterToFiql(
-    SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
-      .whereIn("type", ["MANAGED_ATTRIBUTE", "SYSTEM"])
-      .build()
-  ),
+  filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+    .whereIn("type", ["MANAGED_ATTRIBUTE", "SYSTEM"])
+    .build(),
   fields: { "controlled-vocabulary": "id,name,key,type,vocabClass" },
   sort: "name"
 };

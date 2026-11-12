@@ -6,6 +6,7 @@ export const COLLECTION_MODULE_TYPES = [
   "ORGANISM",
   "PREPARATION",
   "SITE",
+  "STORAGE_UNIT",
   "COLLECTION",
   "PROJECT",
   "TRANSACTION"
@@ -22,6 +23,7 @@ export const COLLECTION_MODULE_TYPE_LABELS: Record<
   ORGANISM: "organism",
   PREPARATION: "preparation",
   SITE: "site",
+  STORAGE_UNIT: "field_storageUnit",
   COLLECTION: "collection",
   PROJECT: "project",
   TRANSACTION: "loanTransaction"

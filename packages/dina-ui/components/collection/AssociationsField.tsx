@@ -1,4 +1,9 @@
-import { FieldSet, TextField } from "common-ui";
+import {
+  DinaFormSection,
+  FieldSet,
+  INLINE_LABEL_WIDTH,
+  TextField
+} from "common-ui";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   HostOrganism
@@ -27,25 +32,23 @@ export function AssociationsField({ id = ASSOCIATIONS_COMPONENT_NAME }) {
       <FieldSet
         legend={<DinaMessage id="hostOrganismLegend" />}
         id="associations-host-organism"
-        className="non-strip"
+        className="non-strip clean-section"
         sectionName="associations-host-organism-section"
       >
-        <div className="row">
-          <div className="col-md-6">
+        <DinaFormSection horizontal={INLINE_LABEL_WIDTH} compact={true}>
+          <div className="d-flex flex-column">
             <AssociationsHostField
-              name={"hostOrganism.name"}
+              name="hostOrganism.name"
               customName="host"
               isDetermination={false}
             />
-          </div>
-          <div className="col-md-6">
             <TextField
               multiLines={true}
               name="hostOrganism.remarks"
               customName="remarks"
             />
           </div>
-        </div>
+        </DinaFormSection>
       </FieldSet>
       <MaterialSampleAssociationsField />
     </FieldSet>

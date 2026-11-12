@@ -546,7 +546,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                 tabindex="0"
               >
                 <input
-                  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv"
+                  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv, .tsv"
                   style="display: none;"
                   tabindex="-1"
                   type="file"
@@ -584,7 +584,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                 style="font-size: 0.78rem; color: rgb(173, 181, 189);"
               >
                 <span>
-                  Supported Formats: XLSX, CSV
+                  Supported Formats: XLSX, CSV, TSV
                 </span>
               </div>
               <div />

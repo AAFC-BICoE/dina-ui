@@ -31,6 +31,9 @@ export const OBJECT_STORE_MANAGED_ATTRIBUTE_ID =
 export const SEQDB_MANAGED_ATTRIBUTE_ID =
   "fe62b8b4-875d-43b4-91a8-94f85b3aae42";
 
+export const SEQDB_MOLECULAR_ANALYSIS_TYPE_ID =
+  "f964c7f8-526e-4b4a-88d4-264f77e6c324";
+
 export const AGENT_IDENTIFIERS_ID = "bff566b9-4044-4e0c-a9cd-0ab22c6f0e5b";
 
 export type ControlledVocabularyApi =

@@ -71,9 +71,37 @@ describe("materialSampleHandler", () => {
 
     const result = await materialSampleHandler.processResource(baseContext);
 
+    expect(mockApiClient.get).toHaveBeenCalledWith(
+      "collection-api/material-sample",
+      {
+        filter: {
+          materialSampleName: { EQ: "TEST-SAMPLE-001" },
+          group: { EQ: "test-group" }
+        },
+        include: "attachment"
+      }
+    );
     expect(baseContext.resource.id).toBe("existing-123");
     expect(baseContext.resourcesUpdatedCount.current).toBe(1);
     expect(result.shouldPause).toBe(false);
+  });
+
+  it("should not update a sample whose name differs from the sheet's", async () => {
+    baseContext.appendData = true;
+    mockApiClient.get.mockResolvedValue({
+      data: [
+        {
+          id: "other-123",
+          materialSampleName: "TEST-SAMPLE-0001",
+          type: "material-sample"
+        }
+      ]
+    });
+
+    await expect(
+      materialSampleHandler.processResource(baseContext)
+    ).rejects.toMatchObject({ messageKey: "appendDataNoMatchingRecordError" });
+    expect(baseContext.resource.id).toBeUndefined();
   });
 
   it("should pause when multiple existing resources found", async () => {

@@ -8,7 +8,6 @@ import {
   QueryTable,
   ReactTable,
   SimpleSearchFilterBuilder,
-  simpleSearchFilterToFiql,
   useAccount,
   useApiClient,
   useGroupedCheckBoxes
@@ -142,6 +141,8 @@ export function LibraryPoolContentStep({
       "/seqdb-api/library-pool-content",
       {
         filter: { "libraryPool.uuid": { EQ: libraryPoolId } },
+        // Without the include, seqdb-api returns the pooled batch or pool as null: no Type or Name.
+        include: "libraryPool,pooledLibraryPrepBatch,pooledLibraryPool",
         page: {
           limit: 1000 // Maximum page size.
         }
@@ -154,15 +155,13 @@ export function LibraryPoolContentStep({
   const {
     CheckBoxField: LibraryPrepBatchCheckBox,
     CheckBoxHeader: LibraryPrepBatchCheckBoxHeader,
-    setAvailableItems: setAvailableBatches,
-    availableItems: availableBatches
+    setAvailableItems: setAvailableBatches
   } = useGroupedCheckBoxes({ fieldName: "libraryPrepBatchIdsToSelect" });
 
   const {
     CheckBoxField: LibraryPoolCheckBox,
     CheckBoxHeader: LibraryPoolCheckBoxHeader,
-    setAvailableItems: setAvailablePools,
-    availableItems: availablePools
+    setAvailableItems: setAvailablePools
   } = useGroupedCheckBoxes({ fieldName: "libraryPoolIdsToSelect" });
 
   const {
@@ -170,6 +169,13 @@ export function LibraryPoolContentStep({
     CheckBoxHeader: DeselectCheckBoxHeader,
     setAvailableItems: setLibraryPoolContents
   } = useGroupedCheckBoxes({ fieldName: "libraryPoolContentIdsToDelete" });
+
+  // Every batch and pool loaded so far, so items ticked before the list changed can still be added
+  const [loadedItems, setLoadedItems] = useState<
+    Record<string, LibraryPrepBatch | LibraryPool>
+  >({});
+  const rememberLoaded = (items: (LibraryPrepBatch | LibraryPool)[]) =>
+    setLoadedItems((loaded) => ({ ...loaded, ..._.keyBy(items, "id") }));
 
   const [storedHideUsedItems, setHideUsedItems] =
     useLocalStorage(HIDE_USED_ITEMS_KEY);
@@ -185,19 +191,16 @@ export function LibraryPoolContentStep({
         ),
       1000
     );
-  const batchFilter = simpleSearchFilterToFiql(
-    SimpleSearchFilterBuilder.create<LibraryPrepBatch>()
-      .searchFilter("name", nameFilter)
-      .when(hideUsedItems, (b) => b.where("dateUsed", "EQ", null))
-      .build()
-  );
-  const poolFilter = simpleSearchFilterToFiql(
-    SimpleSearchFilterBuilder.create<LibraryPool>()
-      .where("uuid", "NEQ", libraryPool.id)
-      .searchFilter("name", nameFilter)
-      .when(hideUsedItems, (b) => b.where("dateUsed", "EQ", null))
-      .build()
-  );
+  // The back-end can't search for a blank date yet: "dateUsed EQ null" matches nothing.
+  const batchFilter = SimpleSearchFilterBuilder.create<LibraryPrepBatch>()
+    .searchFilter("name", nameFilter)
+    .when(hideUsedItems, (b) => b.where("dateUsed", "EQ", null))
+    .build();
+  const poolFilter = SimpleSearchFilterBuilder.create<LibraryPool>()
+    .where("uuid", "NEQ", libraryPool.id)
+    .searchFilter("name", nameFilter)
+    .when(hideUsedItems, (b) => b.where("dateUsed", "EQ", null))
+    .build();
 
   const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] =
     [
@@ -327,7 +330,7 @@ export function LibraryPoolContentStep({
           setToDelete(toDelete);
           libraryPoolContent = libraryPoolContent[0];
         } else {
-          const pooledLibraryPool = availablePools.find((p) => p.id === id);
+          const pooledLibraryPool = loadedItems[id] as LibraryPool | undefined;
           libraryPoolContent = {
             id: `tmp_library_pool_${id}`,
             type: "library-pool-content",
@@ -347,9 +350,9 @@ export function LibraryPoolContentStep({
           setToDelete(toDelete);
           libraryPoolContent = libraryPoolContent[0];
         } else {
-          const pooledLibraryPrepBatch = availableBatches.find(
-            (p) => p.id === id
-          );
+          const pooledLibraryPrepBatch = loadedItems[id] as
+            | LibraryPrepBatch
+            | undefined;
           libraryPoolContent = {
             id: `tmp_library_prep_batch_${id}`,
             type: "library-pool-content",
@@ -362,6 +365,11 @@ export function LibraryPoolContentStep({
       })
     ];
 
+    // A content needs the batch or pool it pools
+    _.remove(
+      newPoolContents,
+      (content) => !content.pooledLibraryPool && !content.pooledLibraryPrepBatch
+    );
     if (newPoolContents.length > 0) {
       const temp = _.concat(selectedResources, newPoolContents);
       setSelectedResources(temp);
@@ -441,8 +449,11 @@ export function LibraryPoolContentStep({
                   <QueryTable<LibraryPrepBatch>
                     columns={LIBRARY_PREP_BATCH_TABLE_COLUMNS}
                     deps={[]}
-                    fiql={batchFilter || undefined}
-                    onSuccess={(res) => setAvailableBatches(res.data)}
+                    filter={batchFilter}
+                    onSuccess={(res) => {
+                      setAvailableBatches(res.data);
+                      rememberLoaded(res.data);
+                    }}
                     path="seqdb-api/library-prep-batch"
                     enableFilters={true}
                     reactTableProps={{
@@ -456,9 +467,12 @@ export function LibraryPoolContentStep({
                   <QueryTable<LibraryPool>
                     columns={LIBRARY_POOL_TABLE_COLUMNS}
                     deps={[]}
-                    fiql={poolFilter || undefined}
+                    filter={poolFilter}
                     enableFilters={true}
-                    onSuccess={(res) => setAvailablePools(res.data)}
+                    onSuccess={(res) => {
+                      setAvailablePools(res.data);
+                      rememberLoaded(res.data);
+                    }}
                     path="seqdb-api/library-pool"
                     reactTableProps={{
                       defaultColumnFilters: [{ id: "name", value: nameFilter }],

@@ -83,17 +83,95 @@ describe("filterModelToSimpleSearchFilter", () => {
     ).toEqual({ name: { NOT_ILIKE: "%abc%" } });
   });
 
-  it("converts blank field filters to null comparisons", () => {
+  it("keeps a * in an exact match a wildcard, as it was in FIQL", () => {
+    const row = (predicate: "IS" | "IS NOT") =>
+      filterModelToSimpleSearchFilter({
+        type: "FILTER_ROW",
+        id: 1,
+        attribute: "name",
+        predicate,
+        searchType: "EXACT_MATCH",
+        value: "PR1956*"
+      });
+    expect(row("IS")).toEqual({ name: { LIKE: "PR1956*" } });
+    // The simple filter can't negate a pattern: filterOrFiqlParams sends this NEQ as FIQL.
+    expect(row("IS NOT")).toEqual({ name: { NEQ: "PR1956*" } });
+  });
+
+  it("sends a search made only of characters the back-end can't read as an exact match, as it would match every record", () => {
+    const row = (
+      searchType: "PARTIAL_MATCH" | "EXACT_MATCH",
+      value: string,
+      predicate: "IS" | "IS NOT" = "IS"
+    ) =>
+      filterModelToSimpleSearchFilter({
+        type: "FILTER_ROW",
+        id: 1,
+        attribute: "name",
+        predicate,
+        searchType,
+        value
+      });
+    expect(row("PARTIAL_MATCH", "'")).toEqual({ name: { EQ: "'" } });
+    expect(row("PARTIAL_MATCH", "+#")).toEqual({ name: { EQ: "+#" } });
+    expect(row("EXACT_MATCH", "'*")).toEqual({ name: { EQ: "'*" } });
+    expect(
+      filterModelToSimpleSearchFilter({
+        type: "FREE_TEXT_SEARCH_FILTER",
+        value: "'",
+        filterAttributes: ["name", "key"]
+      })
+    ).toEqual({ $or: [{ name: { EQ: "'" } }, { key: { EQ: "'" } }] });
+    // Text with a readable character, and wildcards alone, stay patterns
+    expect(row("PARTIAL_MATCH", "O'Brien")).toEqual({
+      name: { ILIKE: "%O'Brien%" }
+    });
+    expect(row("PARTIAL_MATCH", "_")).toEqual({ name: { ILIKE: "%_%" } });
+    expect(row("EXACT_MATCH", "*")).toEqual({ name: { LIKE: "*" } });
+    // A negated pattern is sent as FIQL, where its quoted value excludes nothing
+    expect(row("PARTIAL_MATCH", "'", "IS NOT")).toEqual({
+      name: { NOT_ILIKE: "%'%" }
+    });
+  });
+
+  it("converts blank field filters to null comparisons, and a text field with a value to LIKE %", () => {
+    const row = (attribute: any, predicate: "IS" | "IS NOT") =>
+      filterModelToSimpleSearchFilter({
+        type: "FILTER_ROW",
+        id: 1,
+        attribute,
+        predicate,
+        searchType: "BLANK_FIELD",
+        value: null
+      });
+    expect(row("description", "IS")).toEqual({ description: { EQ: null } });
+    // The back-end matches nothing for NEQ null
+    expect(row("description", "IS NOT")).toEqual({
+      description: { LIKE: "%" }
+    });
+    expect(row({ name: "description", type: "STRING" }, "IS NOT")).toEqual({
+      description: { LIKE: "%" }
+    });
+    // Other types keep NEQ null
+    expect(row({ name: "parent", type: "DROPDOWN" }, "IS NOT")).toEqual({
+      parent: { NEQ: null }
+    });
+    expect(row({ name: "number", allowRange: true }, "IS NOT")).toEqual({
+      number: { NEQ: null }
+    });
+  });
+
+  it("ignores a blank field search type left on a date row, which shows none", () => {
     expect(
       filterModelToSimpleSearchFilter({
         type: "FILTER_ROW",
         id: 1,
-        attribute: "description",
-        predicate: "IS NOT",
+        attribute: { name: "createdOn", type: "DATE" },
+        predicate: "FROM",
         searchType: "BLANK_FIELD",
-        value: null
+        value: "2020-10-06T12:00:00.000Z"
       })
-    ).toEqual({ description: { NEQ: null } });
+    ).toEqual({ createdOn: { GOE: "2020-10-06T00:00:00.000Z" } });
   });
 
   it("converts IN and NOT IN, using the ID of dropdown values", () => {
@@ -199,8 +277,8 @@ describe("filterModelToSimpleSearchFilter", () => {
       })
     ).toEqual({
       createdOn: {
-        GOE: "2020-10-06T00:00:00+00:00",
-        LOE: "2020-10-06T23:59:59+00:00"
+        GOE: "2020-10-06T00:00:00.000Z",
+        LOE: "2020-10-06T23:59:59.999Z"
       }
     });
     expect(
@@ -212,7 +290,26 @@ describe("filterModelToSimpleSearchFilter", () => {
         searchType: "PARTIAL_MATCH",
         value
       })
-    ).toEqual({ createdOn: { GOE: "2020-10-06T00:00:00+00:00" } });
+    ).toEqual({ createdOn: { GOE: "2020-10-06T00:00:00.000Z" } });
+  });
+
+  it("sends dates in UTC, with no +hh:mm offset", () => {
+    // jest runs with TZ=UTC; the offset form "+hh:mm" is what used to break east of UTC.
+    const result = filterModelToSimpleSearchFilter({
+      type: "FILTER_ROW",
+      id: 1,
+      attribute: { name: "createdOn", type: "DATE" },
+      predicate: "IS NOT",
+      searchType: "PARTIAL_MATCH",
+      value: "2020-10-06T12:00:00.000Z"
+    });
+    expect(JSON.stringify(result)).not.toContain("+");
+    expect(result).toEqual({
+      $or: [
+        { createdOn: { LT: "2020-10-06T00:00:00.000Z" } },
+        { createdOn: { GT: "2020-10-06T23:59:59.999Z" } }
+      ]
+    });
   });
 
   it("converts a free-text search to an OR over the attributes, and nothing for a blank search", () => {

@@ -273,7 +273,8 @@ export function WorkbookColumnMapping({
     );
     const entries = getPrimaryIdEntries(
       getDataFromWorkbook(spreadsheetData, sheet, fieldMaps, true),
-      collectionColumn?.columnHeader,
+      // The relationship mapping is keyed by the generated column path when the sheet has one.
+      collectionColumn?.originalColumn ?? collectionColumn?.columnHeader,
       relationshipMapping as RelationshipMapping
     );
 

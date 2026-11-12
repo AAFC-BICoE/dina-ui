@@ -12,11 +12,12 @@ import {
   QueryTableProps,
   useGroupedCheckBoxes
 } from "..";
-import { simpleSearchFilterToFiql } from "../filter-builder/fiql";
+import { filterOrFiqlParams } from "../filter-builder/fiql";
 import { filterModelToSimpleSearchFilter } from "../filter-builder/filterModelToSimpleSearchFilter";
 import {
   SimpleSearchFilter,
-  SimpleSearchFilterBuilder
+  SimpleSearchFilterBuilder,
+  isEmptySimpleSearchFilter
 } from "../util/simpleSearchFilterBuilder";
 import {
   BulkDeleteButton,
@@ -34,8 +35,9 @@ export enum ListLayoutFilterType {
 
 export interface ListPageLayoutProps<TData extends KitsuResource> {
   /**
-   * Filters combined with the filter form filters using AND. Build them with SimpleSearchFilterBuilder
-   * like `.whereProvided("group", "EQ", filterForm.group)`. Raw FIQL strings are ignored.
+   * Filters combined with the filter form filters, and the `queryTableProps` filter, using AND.
+   * Build them with SimpleSearchFilterBuilder like `.whereProvided("group", "EQ", filterForm.group)`.
+   * Raw FIQL strings are ignored, and so is a `queryTableProps` fiql.
    */
   additionalFilters?:
     | SimpleSearchFilter
@@ -118,7 +120,8 @@ export function ListPageLayout<TData extends KitsuResource>({
   const [defaultPageSize, setDefaultPageSize] =
     useLocalStorage<number>(tablePageSizeKey);
 
-  let fiqlFilter: string | undefined;
+  // The filter form's filters combined with the additional filters, unless filtering in memory
+  let layoutFilter: SimpleSearchFilter | undefined;
   let inMemoryFilter:
     | ((
         value: PersistedResource<TData>,
@@ -153,12 +156,10 @@ export function ListPageLayout<TData extends KitsuResource>({
         : additionalFiltersProp;
 
     // Combine filter form filters with additional filters using AND.
-    const filter = SimpleSearchFilterBuilder.create()
+    layoutFilter = SimpleSearchFilterBuilder.create()
       .add(filterBuilderFilter)
       .add(additionalFilters)
       .build();
-
-    fiqlFilter = simpleSearchFilterToFiql(filter) || undefined;
   }
 
   const {
@@ -175,6 +176,17 @@ export function ListPageLayout<TData extends KitsuResource>({
     typeof queryTableProps === "function"
       ? queryTableProps({ CheckBoxField })
       : queryTableProps;
+
+  // Use queryTableProps.filter until layoutFilter is active, then merge all filters into filter or fiql
+  const { filter, fiql } =
+    !layoutFilter || isEmptySimpleSearchFilter(layoutFilter)
+      ? { filter: resolvedQueryTableProps.filter, fiql: undefined }
+      : filterOrFiqlParams(
+          SimpleSearchFilterBuilder.create()
+            .add(layoutFilter)
+            .add(resolvedQueryTableProps.filter)
+            .build()
+        );
 
   const columns: ColumnDefinition<TData>[] = [
     ...(showRowCheckboxes
@@ -204,7 +216,6 @@ export function ListPageLayout<TData extends KitsuResource>({
       filterFn={inMemoryFilter}
       defaultPageSize={defaultPageSize ?? undefined}
       defaultSort={defaultSort ?? undefined}
-      fiql={fiqlFilter}
       onPageSizeChange={(newSize) => setDefaultPageSize(newSize)}
       onSortedChange={(newSort) => setStoredDefaultSort(newSort)}
       topRightCorner={
@@ -216,6 +227,8 @@ export function ListPageLayout<TData extends KitsuResource>({
         </div>
       }
       {...resolvedQueryTableProps}
+      filter={filter}
+      fiql={fiql}
       columns={columns}
       onSuccess={onSuccess}
     />
