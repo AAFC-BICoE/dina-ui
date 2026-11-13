@@ -36,6 +36,11 @@
   background-color: rgba(51, 80, 117, 0.08);
 }
 
+/* Keep the radio square when the label and description need the room. */
+.splitOption input {
+  flex-shrink: 0;
+}
+
 .splitOption input:checked {
   background-color: #335075;
   border-color: #335075;
@@ -56,8 +61,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 380px;
-  max-width: 80vw;
+  width: 440px;
+  max-width: calc(100vw - 2rem);
   padding: 14px;
   color: #333;
   font-weight: normal;
@@ -114,6 +119,11 @@
   border-style: dashed;
 }
 
+.diagramRow.skipped {
+  border-style: dashed;
+  opacity: 0.6;
+}
+
 .rowId {
   font-size: 0.875rem;
   font-weight: 700;
@@ -137,4 +147,46 @@
 .diagramRow.base .pill {
   color: #fff;
   background-color: #335075;
+}
+
+.stepCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background-color: #6c757d;
+  border-radius: 50%;
+}
+
+.diagramRow.base .stepCircle {
+  background-color: #335075;
+}
+
+/* Second line of a checked row: the two conditions and what the search did. */
+.checkLine {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.conditionPill {
+  padding: 1px 8px;
+  white-space: nowrap;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 50rem;
+}
+
+.conditionPill.causedStop {
+  color: #fff;
+  background-color: #335075;
+  border-color: #335075;
 }

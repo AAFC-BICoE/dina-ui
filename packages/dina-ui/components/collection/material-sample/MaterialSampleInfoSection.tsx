@@ -11,6 +11,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../..//intl/dina-ui-intl";
+import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 import {
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MaterialSample,
@@ -109,62 +110,98 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
   );
 }
 
-/** Static example hierarchies for each option's info panel. Each depth level indents 22px. */
-const SPLIT_EXAMPLES = {
+/** One sample in an info panel's example hierarchy. */
+interface SplitExampleRow {
+  id: string;
+  type: keyof typeof DINAUI_MESSAGES_ENGLISH;
+  tag: keyof typeof DINAUI_MESSAGES_ENGLISH;
+  /** Indent level; each level indents 22px. */
+  depth: number;
+  role?: "base" | "new" | "skipped";
+  /** Set on rows the search checked, in the order it checked them. */
+  step?: number;
+  check?: { settingOn: boolean; typeDifferent: boolean };
+}
+
+const SPLIT_EXAMPLES: Record<"parent" | "thisSample", SplitExampleRow[]> = {
   parent: [
     {
       id: "ABC-123",
       type: "splitExampleWholeOrganism",
       tag: "splitExampleBaseName",
       depth: 0,
-      role: "base"
+      role: "base",
+      step: 2,
+      check: { settingOn: false, typeDifferent: true }
     },
     {
       id: "ABC-123-a",
       type: "splitExampleOrganismPart",
-      tag: "splitExampleBeingSplit",
+      tag: "splitExampleChecked",
       depth: 1,
-      role: "existing"
+      step: 1,
+      check: { settingOn: false, typeDifferent: false }
     },
     {
       id: "ABC-123-b",
       type: "splitExampleOrganismPart",
-      tag: "splitExampleNew",
-      depth: 2,
-      role: "new"
+      tag: "splitExampleBeingSplit",
+      depth: 2
     },
     {
       id: "ABC-123-c",
       type: "splitExampleOrganismPart",
       tag: "splitExampleNew",
-      depth: 2,
+      depth: 3,
+      role: "new"
+    },
+    {
+      id: "ABC-123-d",
+      type: "splitExampleOrganismPart",
+      tag: "splitExampleNew",
+      depth: 3,
       role: "new"
     }
   ],
   thisSample: [
     {
+      id: "ABC-123",
+      type: "splitExampleWholeOrganism",
+      tag: "splitExampleNotChecked",
+      depth: 0,
+      role: "skipped"
+    },
+    {
       id: "T-100",
       type: "splitExampleOrganismPart",
-      tag: "splitExampleBaseNameBeingSplit",
-      depth: 0,
-      role: "base"
+      tag: "splitExampleBaseName",
+      depth: 1,
+      role: "base",
+      step: 1,
+      check: { settingOn: true, typeDifferent: false }
     },
     {
       id: "T-100-a",
       type: "splitExampleOrganismPart",
-      tag: "splitExampleNew",
-      depth: 1,
-      role: "new"
+      tag: "splitExampleBeingSplit",
+      depth: 2
     },
     {
       id: "T-100-b",
       type: "splitExampleOrganismPart",
       tag: "splitExampleNew",
-      depth: 1,
+      depth: 3,
+      role: "new"
+    },
+    {
+      id: "T-100-c",
+      type: "splitExampleOrganismPart",
+      tag: "splitExampleNew",
+      depth: 3,
       role: "new"
     }
   ]
-} as const;
+};
 
 /** Where split names start from: this sample (isBaseForSplitByType) or a parent of another type. */
 function SplitNamesStartFromField() {
@@ -173,12 +210,14 @@ function SplitNamesStartFromField() {
     {
       value: false,
       label: formatMessage("splitNamesFromParent"),
+      description: formatMessage("splitNamesFromParentDescription"),
       rule: formatMessage("splitNamesFromParentRule"),
       example: SPLIT_EXAMPLES.parent
     },
     {
       value: true,
       label: formatMessage("splitNamesFromThisSample"),
+      description: formatMessage("splitNamesFromThisSampleDescription"),
       rule: formatMessage("splitNamesFromThisSampleRule"),
       example: SPLIT_EXAMPLES.thisSample
     }
@@ -206,6 +245,7 @@ function SplitNamesStartFromField() {
           {options.map((option, index) => {
             const selected = !!value === option.value;
             const panelId = `split-option-info-${option.value}`;
+            const descriptionId = `split-option-description-${option.value}`;
             const showInfo = () => setInfoFor(option.value);
             const hideInfo = () =>
               setInfoFor((current) =>
@@ -238,9 +278,17 @@ function SplitNamesStartFromField() {
                     checked={selected}
                     onChange={() => setValue(option.value)}
                     aria-label={option.label}
-                    aria-describedby={panelId}
+                    aria-describedby={`${descriptionId} ${panelId}`}
                   />
-                  <span>{option.label}</span>
+                  <span>
+                    {option.label}
+                    <span
+                      id={descriptionId}
+                      className="d-block small text-muted fw-normal"
+                    >
+                      {option.description}
+                    </span>
+                  </span>
                 </div>
                 <SplitOptionInfoPanel
                   {...option}
@@ -265,7 +313,7 @@ interface SplitOptionInfoPanelProps {
   id: string;
   label: string;
   rule: string;
-  example: (typeof SPLIT_EXAMPLES)[keyof typeof SPLIT_EXAMPLES];
+  example: SplitExampleRow[];
   hidden: boolean;
   alignEnd: boolean;
 }
@@ -293,16 +341,64 @@ function SplitOptionInfoPanel({
     >
       <strong>{label}</strong>
       <div className={styles.infoRule}>{rule}</div>
+      <div>
+        <div className="small fw-bold text-muted mb-1">
+          {formatMessage("splitHowBaseIsFound")}
+        </div>
+        <ol className="small mb-0 ps-3">
+          <li>{formatMessage("splitHowBaseIsFoundStep1")}</li>
+          <li>{formatMessage("splitHowBaseIsFoundStep2")}</li>
+          <li>{formatMessage("splitHowBaseIsFoundStep3")}</li>
+        </ol>
+      </div>
       <div className={styles.diagram}>
-        {example.map((row) => (
+        {example.map(({ id, type, tag, depth, role, step, check }) => (
           <div
-            key={row.id}
-            className={classNames(styles.diagramRow, styles[row.role])}
-            style={{ marginLeft: row.depth * 22 }}
+            key={id}
+            className={classNames(styles.diagramRow, role && styles[role])}
+            style={{ marginLeft: depth * 22 }}
           >
-            <span className={styles.rowId}>{row.id}</span>
-            <span className={styles.rowType}>{formatMessage(row.type)}</span>
-            <span className={styles.pill}>{formatMessage(row.tag)}</span>
+            {step && <span className={styles.stepCircle}>{step}</span>}
+            <span className={styles.rowId}>{id}</span>
+            <span className={styles.rowType}>{formatMessage(type)}</span>
+            <span className={styles.pill}>{formatMessage(tag)}</span>
+            {check && (
+              // Either condition stops the search, so a true condition is filled; its text says so too.
+              <div className={styles.checkLine}>
+                <span
+                  className={classNames(
+                    styles.conditionPill,
+                    check.settingOn && styles.causedStop
+                  )}
+                >
+                  {formatMessage(
+                    check.settingOn
+                      ? "splitExampleSettingOn"
+                      : "splitExampleSettingOff"
+                  )}
+                </span>
+                <span
+                  className={classNames(
+                    styles.conditionPill,
+                    check.typeDifferent && styles.causedStop
+                  )}
+                >
+                  {formatMessage(
+                    check.typeDifferent
+                      ? "splitExampleTypeDifferent"
+                      : "splitExampleTypeSame"
+                  )}
+                </span>
+                <span className="text-muted">
+                  <span aria-hidden="true">→ </span>
+                  {formatMessage(
+                    check.settingOn || check.typeDifferent
+                      ? "splitExampleStop"
+                      : "splitExampleKeepGoing"
+                  )}
+                </span>
+              </div>
+            )}
           </div>
         ))}
       </div>

@@ -602,18 +602,34 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitNamesFromThisSample: "This sample",
   splitNamesStartFromHelp:
     "This setting is only relevant when using a Material Sample Type split strategy.",
+  splitNamesFromParentDescription:
+    "Default. Names start from the nearest sample above with a different type.",
+  splitNamesFromThisSampleDescription:
+    "Names for samples split below this one start from this sample.",
   splitNamesFromParentRule:
-    "New children are named from the nearest ancestor that has a different sample type.",
+    "The search keeps moving up until it finds a sample of a different type. Here ABC-123-a is the same type, so it continues to ABC-123.",
   splitNamesFromThisSampleRule:
-    "No ancestor has a different sample type, so the sample with this setting turned on is used as the base.",
+    "With this setting on, the search stops at this sample, even though a higher sample (ABC-123) has a different type.",
+  splitHowBaseIsFound: "How the base is found",
+  splitHowBaseIsFoundStep1: "Start at the parent of the sample being split.",
+  splitHowBaseIsFoundStep2:
+    "Stop if that sample has this setting on, or has a different type.",
+  splitHowBaseIsFoundStep3: "Otherwise move up one level and check again.",
   splitExampleWholeOrganism: "Whole Organism",
   splitExampleOrganismPart: "Organism Part",
   splitExampleBaseName: "Base name",
   splitExampleBeingSplit: "Being split",
-  splitExampleBaseNameBeingSplit: "Base name · being split",
+  splitExampleChecked: "Checked",
+  splitExampleNotChecked: "Not checked",
   splitExampleNew: "New",
+  splitExampleSettingOn: "This setting: On",
+  splitExampleSettingOff: "This setting: Off",
+  splitExampleTypeSame: "Type: Same",
+  splitExampleTypeDifferent: "Type: Different",
+  splitExampleKeepGoing: "keep going up",
+  splitExampleStop: "stop: names start here",
   splitExampleFooter:
-    "Sample IDs and types are examples. Actual names depend on the split configuration selected.",
+    "Numbers show the order levels are checked. Dashed rows are the new children. Sample IDs and types are examples.",
   field_isolatedBy: "Isolated By",
   field_isolatedOn: "Isolated On",
   field_isolationRemarks: "Isolation Remarks",
