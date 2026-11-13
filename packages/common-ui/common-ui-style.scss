@@ -1303,7 +1303,72 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   background-color: #e9ecef;
 }
 
-/* Faint divider between the rows of the bulk Actions menu. */
-.bulk-actions-rows > * + * {
-  border-top: 1px solid var(--bs-light);
+/* Bulk Actions menu: quiet headers, one icon column, grey row fill on hover/focus only. */
+.bulk-actions-dropdown .dropdown-menu {
+  padding: 6px 0;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.bulk-actions-header {
+  padding: 12px 16px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6c757d;
+}
+
+.bulk-actions-section,
+.bulk-actions-note {
+  margin-top: 4px;
+  border-top: 1px solid #e9ecef;
+}
+
+.bulk-actions-note {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px 4px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.bulk-actions-note svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+}
+
+.bulk-actions-tip,
+.bulk-actions-tip span {
+  display: block;
+}
+
+.bulk-actions-dropdown .dropdown-item {
+  padding: 8px 16px;
+  font-weight: 400;
+  color: #333;
+  background: transparent;
+}
+
+.bulk-actions-dropdown .dropdown-item:hover:not(:disabled),
+.bulk-actions-dropdown .dropdown-item:focus-visible:not(:disabled) {
+  background: #f3f3f3;
+}
+
+.bulk-actions-dropdown .dropdown-item:disabled {
+  color: #adb5bd;
+}
+
+.bulk-actions-dropdown svg {
+  overflow: visible;
+}
+
+.bulk-actions-dropdown .dropdown-item svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-right: 12px !important;
 }
