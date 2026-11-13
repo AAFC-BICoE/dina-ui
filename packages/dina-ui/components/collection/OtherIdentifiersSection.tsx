@@ -1,22 +1,20 @@
 import {
   AreYouSureModal,
-  CheckBoxWithoutWrapper,
-  DateField,
-  FieldSet,
-  NumberField,
-  SelectField,
-  StringToggleField,
-  TextField,
+  Chip,
+  ChipList,
+  ChipsArrayField,
+  FieldWrapper,
   useDinaFormContext,
   useFieldLabels,
   useModal
 } from "common-ui";
-import { FieldArray, useFormikContext } from "formik";
-import { DinaMessage } from "../../intl/dina-ui-intl";
-import { FaMinus, FaPlus } from "react-icons/fa";
-import { getFormTemplateCheckboxes } from "../form-template/formTemplateUtils";
+import { useFormikContext } from "formik";
 import { useState } from "react";
+import Select from "react-select";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { getFormTemplateCheckboxes } from "../form-template/formTemplateUtils";
 import useControlledVocabularyOptions from "../controlled-vocabulary/useControlledVocabularyOptions";
+import styles from "./OtherIdentifiersSection.module.css";
 
 export interface OtherIdentifiersSectionProps {
   /** Controlled vocabulary UUID for identifier types. */
@@ -33,6 +31,13 @@ export interface OtherIdentifiersSectionProps {
   hideOtherCatalogNumbers?: boolean;
 }
 
+/** Input types for identifier values, by vocabulary element type. Text by default. */
+const VALUE_INPUT_TYPES: Record<string, string> = {
+  DATE: "date",
+  INTEGER: "number",
+  DECIMAL: "number"
+};
+
 export function OtherIdentifiersSection({
   controlledVocabularyUuid,
   dinaComponent,
@@ -41,7 +46,7 @@ export function OtherIdentifiersSection({
   valueFieldName = "value",
   hideOtherCatalogNumbers = false
 }: OtherIdentifiersSectionProps) {
-  const { readOnly, isTemplate, formTemplate, isBulkEditAllTab } =
+  const { readOnly, isTemplate, formTemplate, isBulkEditAllTab, horizontal } =
     useDinaFormContext();
   const { values } = useFormikContext();
   const { getFieldLabel } = useFieldLabels();
@@ -96,403 +101,253 @@ export function OtherIdentifiersSection({
     name: "dwcOtherCatalogNumbers"
   }).fieldLabel.replace(/s$/, "");
 
+  const typeLabel = (type: string) =>
+    vocabOptions.find((option) => option.value === type)?.label ?? type;
+
+  // Chip rows can grow taller, so line the label up with the first line in the inline layout.
+  const chipFieldClass = horizontal ? styles.chipField : undefined;
+
+  /** Bulk edit "Edit All" warning shown while a field overrides every sample. */
+  function overrideWarning(fieldName: string) {
+    return isBulkEditAllTab ? (
+      <div className="alert alert-warning">
+        <DinaMessage
+          id="bulkEditResourceSetWarningMulti"
+          values={{ targetType: resourceTypeLabel, fieldName }}
+        />
+      </div>
+    ) : null;
+  }
+
+  /** Bulk edit "Edit All" button to start overriding a field for every sample. */
+  function overrideButton(
+    setOverride: (override: boolean) => void,
+    fieldName: string,
+    className: string
+  ) {
+    return (
+      <button
+        type="button"
+        className={`btn btn-primary ${className}`}
+        onClick={() =>
+          openModal(
+            <AreYouSureModal
+              actionMessage={
+                <DinaMessage
+                  id="overrideAllConfirmationTitle"
+                  values={{ fieldName }}
+                />
+              }
+              messageBody={
+                <DinaMessage
+                  id="overrideAllConfirmation"
+                  values={{ fieldName }}
+                />
+              }
+              onYesButtonClicked={() => setOverride(true)}
+            />
+          )
+        }
+      >
+        <DinaMessage id="overrideAll" />
+      </button>
+    );
+  }
+
   return (
-    <FieldSet
-      legend={<DinaMessage id={"otherIdentifiers"} />}
-      wrapLegend={() => <></>}
-      id="identifierLegend"
-    >
-      {otherIdentifiersVisible && bulkEditOtherIdentifiersOverride && (
-        <FieldArray name="identifiers">
-          {({ form, push, remove }) => {
-            const identifiers = form?.values?.identifiers ?? [];
-            const selectedTypes = identifiers?.map?.((obj) => obj.type) ?? [];
-
-            // If empty, just display one.
-            if (identifiers?.length === 0 && !readOnly) {
-              push({});
+    <>
+      {otherCatalogNumbersVisible &&
+        (bulkEditCatalogNumbersOverride ? (
+          <>
+            {overrideWarning(otherCatalogNumberLabel)}
+            <ChipsArrayField
+              name="dwcOtherCatalogNumbers"
+              className={chipFieldClass}
+              disabled={isTemplate}
+            />
+          </>
+        ) : (
+          <FieldWrapper name="dwcOtherCatalogNumbers" disableLabelClick={true}>
+            {() =>
+              overrideButton(
+                setBulkEditCatalogNumbersOverride,
+                otherCatalogNumberLabel,
+                "override-all-button-catalog-numbers"
+              )
             }
-
-            function addIdentifier() {
-              push({});
-            }
-
-            function removeIdentifier(index: number) {
-              remove(index);
-            }
-
-            function containsEmptyObject() {
-              return (
-                identifiers?.some?.((obj) => Object.keys(obj).length === 0) ??
-                false
-              );
-            }
-
-            // Add button should be disabled if there is already an empty option being displayed or out of types to use.
-            const disableAddButton =
-              selectedTypes.length === vocabOptions.length ||
-              containsEmptyObject();
-
-            return (
-              <div className={`identifier-section`}>
-                {/* Top header, where the plus icon is displayed */}
-                <div className="row">
-                  <div className="col-md-8 d-flex">
-                    {isTemplate && (
-                      <div style={{ marginTop: "20px", marginRight: "20px" }}>
-                        <CheckBoxWithoutWrapper
-                          name={`templateCheckboxes['${templateCheckboxPrefix}.identifiers-section.identifiers']`}
-                          className={`col-sm-1 templateCheckBox`}
-                        />
-                      </div>
-                    )}
-                    <h2 className="fieldset-h2-adjustment">
-                      <DinaMessage id="otherIdentifiers" />
-                    </h2>
-                  </div>
-                  <div className="col-md-4 d-flex align-items-center justify-content-between">
-                    {!readOnly && (
-                      <FaPlus
-                        className="ms-auto"
-                        style={{
-                          cursor: disableAddButton ? "not-allowed" : "pointer",
-                          color: disableAddButton ? "gray" : "black"
-                        }}
-                        onClick={() => {
-                          if (!disableAddButton) {
-                            addIdentifier();
-                          }
-                        }}
-                        size="1.00em"
-                        onMouseOver={(event) => {
-                          if (!disableAddButton) {
-                            event.currentTarget.style.color = "blue";
-                          }
-                        }}
-                        onMouseOut={(event) => {
-                          if (disableAddButton) {
-                            event.currentTarget.style.color = "gray";
-                          } else {
-                            event.currentTarget.style.color = "black";
-                          }
-                        }}
-                        data-testid="add row button"
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Warning message if overriding all */}
-                {bulkEditOtherIdentifiersOverride && isBulkEditAllTab && (
-                  <div className="alert alert-warning">
-                    <DinaMessage
-                      id="bulkEditResourceSetWarningMulti"
-                      values={{
-                        targetType: resourceTypeLabel,
-                        fieldName: otherIdentifierLabel
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* Each of other identifier rows to be displayed */}
-                {identifiers?.map?.((identifier, index) => {
-                  // Retrieve the controlled vocabulary based on the ID selected. By default, string is used.
-                  const identifierType =
+          </FieldWrapper>
+        ))}
+      {otherIdentifiersVisible && (
+        <FieldWrapper
+          name="identifiers"
+          className={chipFieldClass}
+          disableLabelClick={true}
+          readOnlyRender={(identifiers) => (
+            <ChipList>
+              {(identifiers ?? []).map((identifier, index) => (
+                <Chip key={index}>
+                  <strong>{typeLabel(identifier?.type)}:</strong>{" "}
+                  {identifier?.[valueFieldName]}
+                </Chip>
+              ))}
+            </ChipList>
+          )}
+        >
+          {({ value, setValue }) =>
+            bulkEditOtherIdentifiersOverride ? (
+              <div className="flex-grow-1">
+                {overrideWarning(otherIdentifierLabel)}
+                <IdentifiersInput
+                  // Drop the empty rows the old row-per-identifier form kept around.
+                  identifiers={(value ?? []).filter((it) => it?.type)}
+                  onChange={setValue}
+                  disabled={isTemplate}
+                  valueFieldName={valueFieldName}
+                  vocabOptions={vocabOptions}
+                  typeLabel={typeLabel}
+                  elementTypeOf={(type) =>
                     controlledVocabularies?.find?.(
-                      (vocab) => vocab?.id === identifier?.type
-                    )?.vocabularyElementType ?? "STRING";
-                  const commonProps = {
-                    name: `identifiers[${index}].${valueFieldName}`,
-                    hideLabel: true,
-                    disableTemplateCheckbox: true,
-                    disabled: isTemplate
-                  };
-
-                  return (
-                    <div className="row" key={index}>
-                      <div
-                        className={readOnly ? "col-md-2" : "col-md-5"}
-                        data-testid={"identifiers[" + index + "].type"}
-                      >
-                        <SelectField
-                          name={"identifiers[" + index + "].type"}
-                          options={vocabOptions}
-                          filterValues={selectedTypes}
-                          readOnlyRender={(optionValue) => (
-                            <strong>
-                              {vocabOptions.find(
-                                (item) => item.value === optionValue
-                              )?.label ??
-                                optionValue ??
-                                ""}
-                              :
-                            </strong>
-                          )}
-                          disableTemplateCheckbox={true}
-                          disabled={isTemplate}
-                          hideLabel={true}
-                        />
-                      </div>
-                      <div
-                        className="col-md-6"
-                        data-testid={`identifiers[${index}].${valueFieldName}`}
-                      >
-                        {identifierType === "STRING" && (
-                          <TextField {...commonProps} />
-                        )}
-                        {identifierType === "DATE" && (
-                          <DateField {...commonProps} />
-                        )}
-                        {identifierType === "INTEGER" && (
-                          <NumberField {...commonProps} isInteger={true} />
-                        )}
-                        {identifierType === "DECIMAL" && (
-                          <NumberField {...commonProps} isInteger={false} />
-                        )}
-                        {identifierType === "BOOL" && (
-                          <StringToggleField {...commonProps} />
-                        )}
-                      </div>
-                      <div className="col-md-1 d-flex align-items-center justify-content-between">
-                        {!readOnly && (
-                          <FaMinus
-                            className="ms-auto"
-                            style={{ marginTop: "-10px", cursor: "pointer" }}
-                            onClick={() => removeIdentifier(index)}
-                            size="1.00em"
-                            onMouseOver={(event) =>
-                              (event.currentTarget.style.color = "blue")
-                            }
-                            onMouseOut={(event) =>
-                              (event.currentTarget.style.color = "")
-                            }
-                            data-testid="add row button"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                      (vocab) => vocab?.id === type
+                    )?.vocabularyElementType ?? "STRING"
+                  }
+                />
               </div>
-            );
-          }}
-        </FieldArray>
+            ) : (
+              overrideButton(
+                setBulkEditOtherIdentifiersOverride,
+                otherIdentifierLabel,
+                "override-all-button-identifiers"
+              )
+            )
+          }
+        </FieldWrapper>
       )}
-      {!bulkEditOtherIdentifiersOverride && (
-        <>
-          <h2 className="fieldset-h2-adjustment">
-            <DinaMessage id="otherIdentifiers" />
-          </h2>
-          <div className="d-flex mb-2">
-            <button
-              className="btn btn-primary override-all-button-identifiers"
-              onClick={() =>
-                openModal(
-                  <AreYouSureModal
-                    actionMessage={
-                      <DinaMessage
-                        id="overrideAllConfirmationTitle"
-                        values={{ fieldName: otherIdentifierLabel }}
-                      />
-                    }
-                    messageBody={
-                      <DinaMessage
-                        id="overrideAllConfirmation"
-                        values={{ fieldName: otherIdentifierLabel }}
-                      />
-                    }
-                    onYesButtonClicked={() =>
-                      setBulkEditOtherIdentifiersOverride(true)
-                    }
-                  />
-                )
+    </>
+  );
+}
+
+/** Other identifiers as "Type: value" chips with one row to add a new pair. */
+function IdentifiersInput({
+  identifiers,
+  onChange,
+  disabled,
+  valueFieldName,
+  vocabOptions,
+  typeLabel,
+  elementTypeOf
+}: {
+  identifiers: any[];
+  onChange: (identifiers: any[]) => void;
+  disabled?: boolean;
+  valueFieldName: string;
+  vocabOptions: { label: string; value: string }[];
+  typeLabel: (type: string) => string;
+  elementTypeOf: (type?: string) => string;
+}) {
+  const { formatMessage } = useDinaIntl();
+  const [draftType, setDraftType] = useState<string>();
+  const [draftValue, setDraftValue] = useState("");
+  const elementType = elementTypeOf(draftType);
+  const canAdd = !!draftType && !!draftValue.trim();
+
+  function addDraft() {
+    if (canAdd) {
+      onChange([
+        ...identifiers,
+        { type: draftType, [valueFieldName]: draftValue.trim() }
+      ]);
+      setDraftType(undefined);
+      setDraftValue("");
+    }
+  }
+
+  const valueInputProps = {
+    className: elementType === "BOOL" ? "form-select" : "form-control",
+    style: { flex: 2 },
+    "aria-label": formatMessage("dataValue"),
+    disabled,
+    value: draftValue,
+    onChange: (event) => setDraftValue(event.target.value),
+    onKeyDown: (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        addDraft();
+      } else if (event.key === "Escape") {
+        setDraftValue("");
+      }
+    }
+  };
+
+  return (
+    <div className="d-flex flex-column gap-2">
+      {!!identifiers.length && (
+        <ChipList>
+          {identifiers.map((identifier, index) => (
+            <Chip
+              key={index}
+              onRemove={
+                disabled
+                  ? undefined
+                  : () => onChange(identifiers.filter((_, i) => i !== index))
               }
+              removeLabel={formatMessage("removeValue", {
+                value: `${typeLabel(identifier.type)}: ${
+                  identifier[valueFieldName] ?? ""
+                }`
+              })}
             >
-              <DinaMessage id="overrideAll" />
-            </button>
-          </div>
-        </>
+              <strong>{typeLabel(identifier.type)}:</strong>{" "}
+              {identifier[valueFieldName]}
+            </Chip>
+          ))}
+        </ChipList>
       )}
-
-      {otherCatalogNumbersVisible && bulkEditCatalogNumbersOverride && (
-        <FieldArray name="dwcOtherCatalogNumbers">
-          {({ form, push, remove }) => {
-            const otherCatalogNumbers =
-              form?.values?.dwcOtherCatalogNumbers ?? [];
-
-            // If empty, just display one.
-            if (otherCatalogNumbers.length === 0) {
-              push("");
+      <div className="d-flex gap-2">
+        <div style={{ flex: 1 }}>
+          <Select
+            aria-label={formatMessage("otherIdentifiers")}
+            classNamePrefix="react-select"
+            placeholder={formatMessage("identifierTypePlaceholder")}
+            options={vocabOptions.filter(
+              (option) => !identifiers.some((it) => it.type === option.value)
+            )}
+            value={
+              vocabOptions.find((option) => option.value === draftType) ?? null
             }
-
-            function addCatalogNumber() {
-              push("");
-            }
-
-            function removeCatalogNumber(index: number) {
-              remove(index);
-            }
-
-            function containsEmptyObject() {
-              return (
-                otherCatalogNumbers.some(
-                  (obj) => Object.keys(obj).length === 0
-                ) || otherCatalogNumbers.find((obj) => obj.value === "")
-              );
-            }
-
-            const disableAddButton = containsEmptyObject();
-
-            return (
-              <div className="other-catalogue-numbers-section">
-                {/* Top header, where the plus icon is displayed */}
-                <div
-                  className="row"
-                  style={{
-                    borderTop: !otherIdentifiersVisible
-                      ? "0px solid white"
-                      : "1px solid lightgray",
-                    paddingTop: "15px"
-                  }}
-                >
-                  <div className="col-md-8 d-flex">
-                    {isTemplate && (
-                      <div style={{ marginTop: "3px", marginRight: "20px" }}>
-                        <CheckBoxWithoutWrapper
-                          name={`templateCheckboxes['${templateCheckboxPrefix}.identifiers-section.dwcOtherCatalogNumbers']`}
-                          className={`col-sm-1 templateCheckBox`}
-                        />
-                      </div>
-                    )}
-                    <strong>
-                      <DinaMessage id={"field_dwcOtherCatalogNumbers"} />
-                    </strong>
-                  </div>
-                  <div className="col-md-4 d-flex align-items-center justify-content-between">
-                    {!readOnly && (
-                      <FaPlus
-                        className="ms-auto"
-                        style={{
-                          cursor: disableAddButton ? "not-allowed" : "pointer",
-                          color: disableAddButton ? "gray" : "black"
-                        }}
-                        onClick={() => {
-                          if (!disableAddButton) {
-                            addCatalogNumber();
-                          }
-                        }}
-                        size="1.00em"
-                        onMouseOver={(event) => {
-                          if (!disableAddButton) {
-                            event.currentTarget.style.color = "blue";
-                          }
-                        }}
-                        onMouseOut={(event) => {
-                          if (disableAddButton) {
-                            event.currentTarget.style.color = "gray";
-                          } else {
-                            event.currentTarget.style.color = "black";
-                          }
-                        }}
-                        data-testid="add row button"
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Warning message if overriding all */}
-                {bulkEditCatalogNumbersOverride && isBulkEditAllTab && (
-                  <div className="alert alert-warning">
-                    <DinaMessage
-                      id="bulkEditResourceSetWarningMulti"
-                      values={{
-                        targetType: resourceTypeLabel,
-                        fieldName: otherCatalogNumberLabel
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* Each of other catalog numbers rows to be displayed */}
-                {!readOnly &&
-                  otherCatalogNumbers?.map((_, index) => (
-                    <div className="row" key={index}>
-                      <div
-                        className="col-md-11"
-                        data-testid={"dwcOtherCatalogNumbers[" + index + "]"}
-                      >
-                        <TextField
-                          name={"dwcOtherCatalogNumbers[" + index + "]"}
-                          hideLabel={true}
-                          disableTemplateCheckbox={true}
-                          disabled={isTemplate}
-                        />
-                      </div>
-                      <div className="col-md-1 d-flex align-items-center justify-content-between">
-                        {!readOnly && (
-                          <FaMinus
-                            className="ms-auto"
-                            style={{ marginTop: "-10px", cursor: "pointer" }}
-                            onClick={() => removeCatalogNumber(index)}
-                            size="1.00em"
-                            onMouseOver={(event) =>
-                              (event.currentTarget.style.color = "blue")
-                            }
-                            onMouseOut={(event) =>
-                              (event.currentTarget.style.color = "")
-                            }
-                            data-testid="add row button"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  ))}
-
-                {/* Read-only mode, display it like an array. */}
-                {readOnly && (
-                  <p className="mt-2">{otherCatalogNumbers.join(", ")}</p>
-                )}
-              </div>
-            );
-          }}
-        </FieldArray>
-      )}
-      {!bulkEditCatalogNumbersOverride && (
-        <>
-          <strong>
-            <DinaMessage id={"field_dwcOtherCatalogNumbers"} />
-          </strong>
-          <div className="d-flex mt-2">
-            <button
-              className="btn btn-primary override-all-button-catalog-numbers"
-              onClick={() =>
-                openModal(
-                  <AreYouSureModal
-                    actionMessage={
-                      <DinaMessage
-                        id="overrideAllConfirmationTitle"
-                        values={{ fieldName: otherCatalogNumberLabel }}
-                      />
-                    }
-                    messageBody={
-                      <DinaMessage
-                        id="overrideAllConfirmation"
-                        values={{ fieldName: otherCatalogNumberLabel }}
-                      />
-                    }
-                    onYesButtonClicked={() =>
-                      setBulkEditCatalogNumbersOverride(true)
-                    }
-                  />
-                )
-              }
-            >
-              <DinaMessage id="overrideAll" />
-            </button>
-          </div>
-        </>
-      )}
-    </FieldSet>
+            onChange={(option) => {
+              setDraftType(option?.value);
+              setDraftValue("");
+            }}
+            isDisabled={disabled}
+            styles={{
+              placeholder: (base) => ({ ...base, color: "#5c5c5c" }),
+              menu: (base) => ({ ...base, zIndex: 1050 })
+            }}
+          />
+        </div>
+        {elementType === "BOOL" ? (
+          <select {...valueInputProps}>
+            <option value="">{formatMessage("dataValue")}</option>
+            <option value="true">{formatMessage("true")}</option>
+            <option value="false">{formatMessage("false")}</option>
+          </select>
+        ) : (
+          <input
+            {...valueInputProps}
+            type={VALUE_INPUT_TYPES[elementType] ?? "text"}
+            step={elementType === "DECIMAL" ? "any" : undefined}
+            placeholder={formatMessage("dataValue")}
+          />
+        )}
+        <button
+          type="button"
+          className="btn btn-primary"
+          disabled={disabled || !canAdd}
+          onClick={addDraft}
+        >
+          <DinaMessage id="add" />
+        </button>
+      </div>
+    </div>
   );
 }

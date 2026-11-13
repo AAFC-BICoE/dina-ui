@@ -1,12 +1,14 @@
 import {
   CheckBoxField,
   FieldSet,
+  INLINE_LABEL_WIDTH,
   TextField,
   useDinaFormContext
 } from "common-ui";
+import classNames from "classnames";
 import { useField } from "formik";
-import { useState } from "react";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { FaCheck, FaCircleInfo, FaWandMagicSparkles } from "react-icons/fa6";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   IDENTIFIER_COMPONENT_NAME,
   MaterialSample
@@ -42,9 +44,18 @@ export function MaterialSampleIdentifiersSection({
   hideUseSequence,
   id = IDENTIFIER_COMPONENT_NAME
 }: MaterialSampleIdentifiersSectionProps) {
-  const [{ value }] = useField("collection");
-  const { readOnly, initialValues } = useDinaFormContext();
-  const [primaryIdDisabled, setPrimaryIdDisabled] = useState(false);
+  const { formatMessage } = useDinaIntl();
+  const { readOnly, isTemplate, initialValues } = useDinaFormContext();
+  const [{ value: collection }] = useField("collection");
+  const [{ value: nextSequenceValue }, , { setValue: setUseNextSequence }] =
+    useField<boolean | undefined>("useNextSequence");
+  const hasCollection = !!collection?.id;
+  // Save only uses the sequence when a collection is set, so show it off without one.
+  const useNextSequence = hasCollection && !!nextSequenceValue;
+
+  // The ID is generated on save, which only applies to new samples.
+  const showNextAvailable =
+    !readOnly && !isTemplate && !hideUseSequence && !initialValues.id;
 
   return (
     <FieldSet
@@ -53,50 +64,82 @@ export function MaterialSampleIdentifiersSection({
       className={className}
       componentName={IDENTIFIER_COMPONENT_NAME}
       sectionName="identifiers-section"
+      horizontal={INLINE_LABEL_WIDTH}
+      compact={true}
     >
-      <div className="row">
-        <div className="col-md-7">
-          <div className="d-flex">
-            <TextField
-              disableTemplateCheckbox={true}
-              name={`${namePrefix}materialSampleName`}
-              inputProps={{ disabled: primaryIdDisabled }}
-              customName="materialSampleName"
-              className="materialSampleName flex-grow-1"
-              readOnly={disableSampleNameField}
-              placeholder={sampleNamePlaceHolder}
-            />
-            {!readOnly && !hideUseSequence && (
-              <CheckBoxField
-                onCheckBoxClick={(event) =>
-                  setPrimaryIdDisabled(event.target.checked)
-                }
-                name="useNextSequence"
-                className="ms-2 mt-1"
-                // only enabled when add new sample and collection is selected
-                disabled={initialValues.id || !value?.id}
-                overridecheckboxProps={{
-                  style: {
-                    height: "30px",
-                    width: "30px"
-                  }
-                }}
-              />
-            )}
-          </div>
-        </div>
-        <div className="col-md-5">
-          <TextField name={`${namePrefix}barcode`} customName="barcode" />
-        </div>
-      </div>
-      <div className="row">
-        <OtherIdentifiersSection
-          controlledVocabularyUuid={COLLECTION_OTHER_IDENTIFIERS_ID}
-          dinaComponent="MATERIAL_SAMPLE"
-          resourceLabelKey="material-sample"
-          templateCheckboxPrefix={IDENTIFIER_COMPONENT_NAME}
-        />
-      </div>
+      <TextField
+        disableTemplateCheckbox={true}
+        name={`${namePrefix}materialSampleName`}
+        customName="materialSampleName"
+        className="materialSampleName"
+        readOnly={disableSampleNameField}
+        placeholder={sampleNamePlaceHolder}
+        customInput={
+          showNextAvailable
+            ? (inputProps) => (
+                <div className="flex-grow-1">
+                  <div className="d-flex gap-2">
+                    {/* The typed name stays in the form and comes back when Next available is turned off. */}
+                    <input
+                      type="text"
+                      {...inputProps}
+                      disabled={inputProps.disabled || useNextSequence}
+                      value={useNextSequence ? "" : inputProps.value}
+                      placeholder={
+                        useNextSequence
+                          ? formatMessage("assignedOnSave")
+                          : inputProps.placeholder
+                      }
+                      className={classNames(
+                        inputProps.className,
+                        useNextSequence && "fst-italic"
+                      )}
+                    />
+                    <button
+                      type="button"
+                      className={classNames(
+                        "btn text-nowrap",
+                        // Bootstrap's disabled outline-primary is bright blue, so use gray while disabled.
+                        !hasCollection
+                          ? "btn-outline-secondary btn-gray-text"
+                          : useNextSequence
+                          ? "btn-primary"
+                          : "btn-outline-primary"
+                      )}
+                      disabled={!hasCollection}
+                      aria-pressed={useNextSequence}
+                      onClick={() => setUseNextSequence(!useNextSequence)}
+                    >
+                      {useNextSequence ? (
+                        <FaCheck className="me-2" />
+                      ) : (
+                        <FaWandMagicSparkles className="me-2" />
+                      )}
+                      <DinaMessage id="nextAvailable" />
+                    </button>
+                  </div>
+                  {!hasCollection && (
+                    <div className="small text-muted mt-1 d-flex align-items-center gap-1">
+                      <FaCircleInfo style={{ color: "#335075" }} />
+                      <DinaMessage id="setCollectionToUseNextAvailable" />
+                    </div>
+                  )}
+                </div>
+              )
+            : undefined
+        }
+      />
+      {/* Form templates can still set a default for Next available. */}
+      {isTemplate && !hideUseSequence && (
+        <CheckBoxField name="useNextSequence" />
+      )}
+      <TextField name={`${namePrefix}barcode`} customName="barcode" />
+      <OtherIdentifiersSection
+        controlledVocabularyUuid={COLLECTION_OTHER_IDENTIFIERS_ID}
+        dinaComponent="MATERIAL_SAMPLE"
+        resourceLabelKey="material-sample"
+        templateCheckboxPrefix={IDENTIFIER_COMPONENT_NAME}
+      />
     </FieldSet>
   );
 }
