@@ -20,13 +20,37 @@ Root `tsconfig.json` path aliases: `@dina-ui/*` → `packages/dina-ui/*`, `commo
 
 Run these from the repo root (not from inside a package):
 
-- `npx jest [path]` — run Jest tests for a specific path.
+- `yarn jest <path> -c jest.config.ts [-t '<name regex>']` — run Jest for one test file, optionally one test or `describe` (see **Running tests** below).
 - `npx tsc --noEmit` — type-check the whole repo.
 - `yarn lint` / `yarn lint:fix` — run ESLint (optionally auto-fixing).
 - `yarn` — install dependencies for all workspaces. Re-run after switching branches.
 - `yarn workspace dina-ui build` — production static export build.
 
-Do not run a full-repo `npx jest` (no path) — it's too resource-intensive. Run only the specific path(s) or suite(s) relevant to the change. The developer will report any test failures they hit elsewhere. For the same reason, don't use `yarn test` or `yarn test:coverage`: both run `tsc` followed by the full Jest suite.
+### Running tests
+
+Never run the full suite. Run only the specific test file(s) or test(s) relevant to the task; the developer will report failures elsewhere. For the same reason, don't use `npx jest` with no path, `yarn test` or `yarn test:coverage` (the last two run `tsc` followed by the full Jest suite).
+
+Run from the repo root, with a single test file and the root config:
+
+```
+yarn jest 'packages/dina-ui/components/seqdb/molecular-analysis-workflow/__tests__/MolecularAnalysisResultStep\.test\.tsx' -c 'jest.config.ts'
+```
+
+To run only one test or `describe` block, add `-t` with an anchored regex of its full name (escape regex characters, and end with `(\s[\s\S]*)?$` so nested tests under that `describe` also match):
+
+```
+yarn jest 'packages/dina-ui/components/seqdb/molecular-analysis-workflow/__tests__/MolecularAnalysisResultStep\.test\.tsx' -c 'jest.config.ts' -t '^Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step Tabular Results(\s[\s\S]*)?$'
+```
+
+### Test coverage
+
+`collectCoverageFrom` in `jest.config.ts` covers every source file, so always scope coverage to the files under test, otherwise the report is huge and slow:
+
+```
+yarn jest '<test file path>' -c 'jest.config.ts' --coverage --collectCoverageFrom='<path/to/source-file.tsx>' --coverageReporters=text
+```
+
+Use it to check that new or changed code is exercised (look at the uncovered lines column), not to chase a percentage. Coverage output goes to `coverage/` (git-ignored); don't commit it.
 
 A pre-commit hook (Husky) runs `sync-documentation-versions`, stages `docs/versions.adoc`, then runs `lint-staged` (ESLint --fix and Prettier on staged files).
 
@@ -50,7 +74,7 @@ All server communication goes through a JSON:API client (Kitsu) exposed via Reac
 
 ### Reuse these helpers
 
-Check for an existing helper before writing a new one. Common ones, all exported via `common-ui` unless noted:
+Always look for an existing component or helper before writing a new one, and don't hand-roll UI or call Bootstrap directly when a shared component exists. For example, use the `Tooltip` component (`packages/common-ui/lib/tooltip/Tooltip.tsx`) rather than building your own tooltip or using Bootstrap's tooltip markup/JS. Search `packages/common-ui/lib` and `packages/dina-ui/components` first. Common ones, all exported via `common-ui` unless noted:
 
 - `withResponse(query, renderFn)` — render loading/error/success states for a `useQuery` result.
 - `getPreferredMultilingualPair(pairs, valueKey, locale)` (`packages/common-ui/lib/table/multilingual-cells.tsx`) — picks the best translation from a multilingual _data_ field (e.g. `MultilingualTitle.titles`, `MultilingualDescription.descriptions` — arrays of `{ lang, <value> }` pairs on a resource, distinct from intl UI-text messages). It prefers the pair matching the current locale, falling back to the first non-blank one. `titleCell`/`descriptionCell` (table cell renderers) and dina-ui's `getDatasetTitle` (a plain-string getter for use outside a table, e.g. a page heading) are thin wrappers around it — don't reimplement the lookup.

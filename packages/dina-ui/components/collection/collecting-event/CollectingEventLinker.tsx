@@ -2,10 +2,11 @@ import {
   ColumnDefinition,
   FilterForm,
   filterModelToSimpleSearchFilter,
+  filterOrFiqlParams,
   FormikButton,
   QueryTable,
+  SimpleSearchFilter,
   SimpleSearchFilterBuilder,
-  simpleSearchFilterToFiql,
   stringArrayCell
 } from "common-ui";
 import { FormikContextType } from "formik";
@@ -83,7 +84,10 @@ export function CollectingEventLinker({
     }
   ];
 
-  const [filterParam, setFilterParam] = useState<string>();
+  const [filterParams, setFilterParams] = useState<{
+    filter?: SimpleSearchFilter;
+    fiql?: string;
+  }>({});
 
   function onFilterSubmit(values) {
     const filter = SimpleSearchFilterBuilder.create<CollectingEvent>()
@@ -91,7 +95,7 @@ export function CollectingEventLinker({
       .add(filterModelToSimpleSearchFilter(values?.filterBuilderModel))
       .build();
 
-    setFilterParam(simpleSearchFilterToFiql(filter) || undefined);
+    setFilterParams(filterOrFiqlParams(filter));
   }
 
   return (
@@ -115,7 +119,8 @@ export function CollectingEventLinker({
         <QueryTable
           path="collection-api/collecting-event"
           columns={COLLECTING_EVENT_TABLE_COLUMNS}
-          fiql={filterParam}
+          filter={filterParams.filter}
+          fiql={filterParams.fiql}
         />
       </div>
     </div>

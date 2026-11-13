@@ -1,6 +1,6 @@
 import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
 import { ColumnSort, Row, SortingState } from "@tanstack/react-table";
-import { FormikContextType } from "formik";
+import { FormikContextType, FormikProps } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import _ from "lodash";
 import React, {
@@ -1281,6 +1281,19 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => crypto.randomUUID(), []);
+  const formRef = useRef<FormikProps<any>>(null);
+
+  // Compare by value so re-submitting the same search keeps the same checked rows.
+  const searchKey = useMemo(
+    () => JSON.stringify([Utils.getTree(submittedQueryBuilderTree), groups]),
+    [submittedQueryBuilderTree, groups]
+  );
+
+  // Clear checked rows when the query or groups change. Paging and sorting keep them.
+  useEffect(() => {
+    formRef.current?.setFieldValue("itemIdsToSelect", {});
+    formRef.current?.setFieldValue("selectAll.itemIdsToSelect", false);
+  }, [searchKey]);
 
   return (
     <>
@@ -1327,6 +1340,7 @@ export function QueryPage<TData extends KitsuResource>({
         <div className={resultsAside ? "query-page-results-main" : undefined}>
           <DinaForm
             key={formKey}
+            innerRef={formRef}
             initialValues={defaultGroups}
             onSubmit={onSubmit}
           >

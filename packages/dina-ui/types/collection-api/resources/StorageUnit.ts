@@ -15,6 +15,7 @@ export interface StorageUnitAttributes {
   isMultiple?: boolean | null;
   isGeneric?: boolean;
   barcode?: string;
+  managedAttributes?: Record<string, string | null | undefined>;
 }
 
 export interface HierarchyItem {

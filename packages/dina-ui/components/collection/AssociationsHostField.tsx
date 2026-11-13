@@ -110,6 +110,7 @@ export function AssociationsHostField({
           </div>
         ) : (
           <GlobalNamesSearchBox
+            compact={true}
             fetchJson={fetchJson}
             onSelect={(newValue) => {
               const val = _.isArray(newValue) ? newValue?.[1] : newValue;

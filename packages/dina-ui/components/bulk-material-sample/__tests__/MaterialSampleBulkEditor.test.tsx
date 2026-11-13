@@ -669,29 +669,23 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Edit the first sample
     await userEvent.click(wrapper.getByRole("tab", { name: /ms1/i }));
-    await clearAndType(
-      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
-        "textbox"
-      ),
-      "otherCatalog1"
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /other catalog numbers/i }),
+      "otherCatalog1{enter}"
     );
 
     // Edit the second sample
     await userEvent.click(wrapper.getByRole("tab", { name: /ms2/i }));
-    await clearAndType(
-      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
-        "textbox"
-      ),
-      "otherCatalog2"
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /other catalog numbers/i }),
+      "otherCatalog2{enter}"
     );
 
     // Edit the third sample
     await userEvent.click(wrapper.getByRole("tab", { name: /ms3/i }));
-    await clearAndType(
-      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
-        "textbox"
-      ),
-      "otherCatalog3"
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /other catalog numbers/i }),
+      "otherCatalog3{enter}"
     );
 
     // Submit the form.
@@ -804,12 +798,12 @@ describe("MaterialSampleBulkEditor", () => {
     );
     await waitFor(() =>
       expect(
-        wrapper.getAllByRole("button", { name: /override all/i })[1]
+        wrapper.container.querySelector(".override-all-button-catalog-numbers")
       ).toBeInTheDocument()
     );
 
     await userEvent.click(
-      wrapper.getAllByRole("button", { name: /override all/i })[1]
+      wrapper.container.querySelector(".override-all-button-catalog-numbers")!
     );
     await waitFor(() =>
       expect(wrapper.getByRole("button", { name: /yes/i })).toBeInTheDocument()
@@ -817,16 +811,14 @@ describe("MaterialSampleBulkEditor", () => {
     await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
     await waitFor(() =>
       expect(
-        wrapper.getByTestId("dwcOtherCatalogNumbers[0]")
+        wrapper.getByRole("textbox", { name: /other catalog numbers/i })
       ).toBeInTheDocument()
     );
 
     // Update the other cataloge value
-    await clearAndType(
-      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
-        "textbox"
-      ),
-      "otherCatalogAll"
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /other catalog numbers/i }),
+      "otherCatalogAll{enter}"
     );
 
     // Submit the form.
@@ -3211,7 +3203,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).not.toBeNull();
     expect(
       wrapper2.container.querySelector(
-        ".sample-tabpanel-0 .dwcOtherCatalogNumbers_0_-field input"
+        ".sample-tabpanel-0 .dwcOtherCatalogNumbers-field input"
       )
     ).toBeNull();
   });

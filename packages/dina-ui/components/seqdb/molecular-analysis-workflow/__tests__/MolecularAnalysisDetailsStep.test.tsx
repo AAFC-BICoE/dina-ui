@@ -22,7 +22,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return { data: TEST_PROTOCOLS };
     case "user-api/group":
       return TEST_GROUP;
-    case "seqdb-api/vocabulary/molecularAnalysisType":
+    case "seqdb-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=f964c7f8-526e-4b4a-88d4-264f77e6c324":
       return { data: TEST_MOLECULAR_ANALYSIS_TYPES };
   }
 });
