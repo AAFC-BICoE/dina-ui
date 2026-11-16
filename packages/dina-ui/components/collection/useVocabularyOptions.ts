@@ -23,9 +23,7 @@ export default function useVocabularyOptions({ path }) {
   }
 
   // If using new endpoint, parse the response differently
-  const vocabOptions = path.includes(
-    "collection-api/controlled-vocabulary-item"
-  )
+  const vocabOptions = path.includes("controlled-vocabulary-item")
     ? response?.data instanceof Array
       ? response.data.map(toOption) ?? []
       : [toOption(response?.data as any as VocabularyElement)]

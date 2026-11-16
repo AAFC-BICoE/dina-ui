@@ -601,9 +601,39 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_isPrimary_tooltip:
     "Make this determination the primary data point when exported. Only one determination can be primary",
   field_isRestricted: "Is Restricted",
-  field_isBaseForSplitByType: "Use As Base Name For Split",
-  field_isBaseForSplitByType_tooltip:
-    "When enabled and using type based Split Configurations, if no parents contain a different Material Sample Type then this Material Sample will be used to derive the identifier from.",
+  field_isBaseForSplitByType: "Split Names Start From",
+  splitNamesFromParent: "Parent of another type",
+  splitNamesFromThisSample: "This sample",
+  splitNamesStartFromHelp:
+    "This setting is only relevant when using a Material Sample Type split strategy.",
+  splitNamesFromParentDescription:
+    "Default. Names start from the nearest sample above with a different type.",
+  splitNamesFromThisSampleDescription:
+    "Names for samples split below this one start from this sample.",
+  splitNamesFromParentRule:
+    "The search keeps moving up until it finds a sample of a different type. Here ABC-123-a is the same type, so it continues to ABC-123.",
+  splitNamesFromThisSampleRule:
+    "With this setting on, the search stops at this sample, even though a higher sample (ABC-123) has a different type.",
+  splitHowBaseIsFound: "How the base is found",
+  splitHowBaseIsFoundStep1: "Start at the parent of the sample being split.",
+  splitHowBaseIsFoundStep2:
+    "Stop if that sample has this setting on, or has a different type.",
+  splitHowBaseIsFoundStep3: "Otherwise move up one level and check again.",
+  splitExampleWholeOrganism: "Whole Organism",
+  splitExampleOrganismPart: "Organism Part",
+  splitExampleBaseName: "Base name",
+  splitExampleBeingSplit: "Being split",
+  splitExampleChecked: "Checked",
+  splitExampleNotChecked: "Not checked",
+  splitExampleNew: "New",
+  splitExampleSettingOn: "This setting: On",
+  splitExampleSettingOff: "This setting: Off",
+  splitExampleTypeSame: "Type: Same",
+  splitExampleTypeDifferent: "Type: Different",
+  splitExampleKeepGoing: "keep going up",
+  splitExampleStop: "stop: names start here",
+  splitExampleFooter:
+    "Numbers show the order levels are checked. Dashed rows are the new children. Sample IDs and types are examples.",
   field_isolatedBy: "Isolated By",
   field_isolatedOn: "Isolated On",
   field_isolationRemarks: "Isolation Remarks",
@@ -813,6 +843,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   groupSearchPlaceholder: "Search by code, path or label",
   groupsIBelongTo: "My Groups",
   hideSelectedOptions: "Hide selected",
+  hideEmptySections:
+    "{count, plural, one {Hide # empty section} other {Hide # empty sections}}",
+  showEmptySections:
+    "{count, plural, one {Show # empty section} other {Show # empty sections}}",
   hierarchyMoreLevels: "{count} more",
   hierarchyOtherType: "Other / no type",
   hierarchyShowMoreLevels: "Show {count} more levels",
@@ -826,6 +860,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   identifiers: "Identifiers",
   imagePreview: "Image Preview",
   otherIdentifiers: "Other Identifiers",
+  nextAvailable: "Next available",
+  assignedOnSave: "Assigned on save",
+  setCollectionToUseNextAvailable: "Set a Collection to use Next available.",
+  identifierTypePlaceholder: "Type...",
   includeAll: "Include All",
   insertHybridSymbol: "Insert Hybrid Symbol",
   institution: "Institution",
@@ -1629,6 +1667,32 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addButtonText: "Add",
   removeButtonText: "Remove",
   removeAllButtonText: "Detach All",
+  tabularResults_column: "Tabular Results",
+  tabularResults_upload: "Upload TSV",
+  tabularResults_countShort: "{rows} rows · {cols} columns",
+  tabularResults_rows: "rows",
+  tabularResults_columns: "columns",
+  tabularResults_openAria: "Open full table, {name}, {counts}",
+  tabularResults_quickMore: "Showing 5 of {rows} rows.",
+  tabularResults_clickOpen: "Click to open full table",
+  tabularResults_errorUnreadable:
+    "The file could not be read. Make sure it is a UTF-8 encoded TSV file with no unclosed quotation marks.",
+  tabularResults_errorEmpty: "The file is empty.",
+  tabularResults_errorInvalidCharacters:
+    "The file contains invalid characters (null characters).",
+  tabularResults_errorColumns:
+    "The file needs a header row with at least 2 columns.",
+  tabularResults_errorNoRows: "The file has no data rows.",
+  tabularResults_errorInvalidValue:
+    "The file contains a value that isn't allowed. Remove any text that looks like HTML, such as words in angle brackets.",
+  tabularResults_errorSave: "The table could not be saved.",
+  tabularResults_retry: "Retry",
+  tabularResults_modalTitle: "Tabular Results: {name}",
+  tabularResults_replaceFile: "Replace File",
+  tabularResults_parsing: "Parsing file...",
+  tabularResults_tableKept: "The existing table was kept.",
+  tabularResults_confirmTitle: "Remove Tabular Results",
+  tabularResults_confirmText: "Remove the tabular results for this run item?",
   field_uriTemplate: "URI Template",
   attachmentsFoundBannerText: "{numAttachmentsFound} attachments were found.",
   singleAttachmentFoundBannerText: "1 attachment was found.",

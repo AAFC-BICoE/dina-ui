@@ -6,19 +6,6 @@ exports[`MaterialSampleBulkEditor Bulk edit all material samples using other cat
     [
       {
         "resource": {
-          "type": "material-sample",
-        },
-        "type": "material-sample",
-      },
-    ],
-    {
-      "apiBaseUrl": "/collection-api",
-    },
-  ],
-  [
-    [
-      {
-        "resource": {
           "dwcOtherCatalogNumbers": [
             "otherCatalogAll",
           ],

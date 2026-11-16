@@ -5,7 +5,7 @@ import {
   waitForLoadingToDisappear
 } from "common-ui";
 import { mockResponses, mockResponsesTabs } from "../__mocks__/QueryPageMocks";
-import { waitFor } from "@testing-library/react";
+import { act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MaterialSampleListPage from "@dina-ui/pages/collection/material-sample/list";
 import "@testing-library/jest-dom";
@@ -165,6 +165,88 @@ describe("QueryPage test", () => {
     // Verify router.reload() is called at the very end
     await waitFor(() => {
       expect(mockReload).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("Clears the checked rows when the selected groups change", async () => {
+    mockPost.mockImplementation(async (path) => mockResponses[path]);
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <MaterialSampleListPage />
+      </DinaForm>,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+    await wrapper.findByTestId("ReactTable");
+
+    await userEvent.click(
+      wrapper.getByRole("checkbox", { name: /check all/i })
+    );
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/matched records.*2 selected/i)
+      ).toBeInTheDocument();
+    });
+
+    // Change the group to trigger the clearing of checked rows.
+    act(() => {
+      writeStorage("material-sample-list_groupStorage", ["cnc"]);
+    });
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/matched records.*0 selected/i)
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("Keeps the checked rows when the page or sort changes", async () => {
+    writeStorage("material-sample-list-last-used-page-size", 1);
+    mockPost.mockImplementation(async (path) => mockResponses[path]);
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <MaterialSampleListPage />
+      </DinaForm>,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+    await wrapper.findByTestId("ReactTable");
+
+    await userEvent.click(
+      wrapper.getByRole("checkbox", { name: /check all/i })
+    );
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/matched records.*2 selected/i)
+      ).toBeInTheDocument();
+    });
+
+    const searchCountBeforePaging = mockPost.mock.calls.length;
+    await userEvent.click(
+      wrapper.container.querySelectorAll<HTMLElement>(".-next button")[0]
+    );
+    await waitFor(() => {
+      expect(mockPost.mock.calls.length).toBeGreaterThan(
+        searchCountBeforePaging
+      );
+    });
+
+    const searchCountBeforeSorting = mockPost.mock.calls.length;
+    await userEvent.click(
+      wrapper
+        .getByTestId("ReactTable")
+        .querySelector<HTMLElement>("thead th.-cursor-pointer")!
+    );
+    await waitFor(() => {
+      expect(mockPost.mock.calls.length).toBeGreaterThan(
+        searchCountBeforeSorting
+      );
+    });
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/matched records.*2 selected/i)
+      ).toBeInTheDocument();
     });
   });
 

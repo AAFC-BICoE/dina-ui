@@ -212,7 +212,7 @@ export function DataRow({
         {!readOnly && (
           <button
             type="button"
-            className="btn btn-link p-0 data-entry-remove"
+            className="btn btn-outline-secondary btn-sm text-nowrap data-entry-remove"
             onClick={removeRow}
             name={getFieldName(name, "removeRow", rowIndex)}
           >

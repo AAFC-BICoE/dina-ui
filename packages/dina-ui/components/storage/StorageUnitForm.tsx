@@ -33,6 +33,8 @@ import StorageUnitGrid from "./grid/StorageUnitGrid";
 import { FormikProps, useFormikContext } from "formik";
 import { useStorageUnitSave } from "./useStorageUnit";
 import { AttachmentsField } from "../object-store/attachment-list/AttachmentsField";
+import { ManagedAttributesEditor } from "../managed-attributes/ManagedAttributesEditor";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "../controlled-vocabulary/controlledVocabularyItemUtils";
 
 export const storageUnitFormSchema = yup.object({
   storageUnitType: yup.object().required()
@@ -279,6 +281,17 @@ export function StorageUnitFormFields({
           <DateField className="col-md-6" name="createdOn" showTime={true} />
           <TextField className="col-md-6" name="createdBy" />
         </div>
+      )}
+
+      {!reduceRendering && !isBulkEditTabForm && (
+        <ManagedAttributesEditor
+          valuesPath="managedAttributes"
+          managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+          managedAttributeComponent="STORAGE_UNIT"
+          controlledVocabularyId={COLLECTION_MANAGED_ATTRIBUTE_ID}
+          disableClearButton={true}
+          isControlledVocabulary={true}
+        />
       )}
 
       {!reduceRendering && !isBulkEditTabForm && (

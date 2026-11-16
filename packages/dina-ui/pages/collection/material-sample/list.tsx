@@ -435,9 +435,9 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedType: "material-sample"
       },
 
-      // Parent Material Sample - Material Sample - Classification
+      // Parent Material Sample - Classification (hidden, not possible)
       {
-        type: "classification",
+        type: "unsupported",
         label:
           "targetIdentifiableEntitySummary.primaryDetermination.classification",
         component: "MATERIAL_SAMPLE",

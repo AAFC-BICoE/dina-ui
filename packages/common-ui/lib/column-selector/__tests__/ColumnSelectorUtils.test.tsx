@@ -1306,5 +1306,33 @@ describe("ColumnSelectorUtils", () => {
         "collectingEvent.habitat"
       ]);
     });
+
+    it("exports entity level classification using the full attribute path", async () => {
+      const column = await generateColumnDefinition({
+        indexMappings: [],
+        path: "classification/order",
+        apiClient: {
+          get: jest.fn().mockResolvedValue({
+            data: [{ id: "order", multilingualTitle: { titles: [] } }]
+          })
+        } as any,
+        dynamicFieldsMappingConfig: {
+          fields: [
+            {
+              type: "classification",
+              label:
+                "targetIdentifiableEntitySummary.primaryDetermination.classification",
+              path: "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification",
+              apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
+            }
+          ],
+          relationshipFields: []
+        }
+      });
+
+      expect(convertColumnsToPaths([column])).toStrictEqual([
+        "targetIdentifiableEntitySummary.primaryDetermination.classification.order"
+      ]);
+    });
   });
 });

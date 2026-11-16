@@ -11,7 +11,9 @@ import {
   TextField,
   NumberField,
   DOIField,
-  useDinaFormContext
+  useDinaFormContext,
+  DinaFormSection,
+  INLINE_LABEL_WIDTH
 } from "common-ui";
 import { FormikContextType, FieldArray } from "formik";
 import _ from "lodash";
@@ -87,7 +89,7 @@ export function CitationsField({
     ]);
   }
 
-  const buttonProps = () => ({ disabled: isEditing, style: { width: "7rem" } });
+  const buttonProps = () => ({ disabled: isEditing });
 
   const columns: ColumnDef<Citation>[] = [
     {
@@ -97,8 +99,8 @@ export function CitationsField({
       cell: ({ getValue }) => {
         const doi = getValue() as string;
         return doi ? (
-          <a href={`${doi}`} target="_blank" rel="noopener noreferrer">
-            {doi}
+          <a href={doi} target="_blank" rel="noopener noreferrer">
+            {doi.replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "")}
           </a>
         ) : null;
       },
@@ -204,9 +206,9 @@ export function CitationsField({
             id: "reference",
             size: 270,
             cell: ({ row }) => (
-              <div className={`d-flex gap-3`}>
+              <div className="d-flex gap-2">
                 <FormikButton
-                  className="btn btn-primary edit-button"
+                  className="btn btn-outline-primary btn-sm edit-button"
                   buttonProps={buttonProps}
                   onClick={() => openRowEditor(row)}
                 >
@@ -214,7 +216,7 @@ export function CitationsField({
                   <DinaMessage id="editButtonText" />
                 </FormikButton>
                 <FormikButton
-                  className="btn btn-danger remove-button"
+                  className="btn btn-outline-danger btn-sm remove-button"
                   buttonProps={buttonProps}
                   onClick={(_, form) => removeAction(form, row.index)}
                 >
@@ -403,11 +405,12 @@ export function CitationsField({
                   />
                 ) : (
                   <FormikButton
-                    className="btn btn-primary mb-3 add-new-button"
+                    className="btn btn-outline-primary btn-sm mb-3 d-inline-flex align-items-center gap-2"
                     buttonProps={buttonProps}
                     onClick={() => setReferenceToEdit("NEW")}
                   >
-                    <DinaMessage id="addNew" />
+                    <FaPlus size="0.85em" />
+                    <DinaMessage id="addCitation" />
                   </FormikButton>
                 )}
               </>
@@ -483,7 +486,10 @@ export function CitationSubForm({
 
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
-      <FieldSet legend={<DinaMessage id="addCitation" />}>
+      <FieldSet
+        legend={<DinaMessage id="addCitation" />}
+        className="non-strip clean-section"
+      >
         <div className="d-flex align-items-center justify-content-end mb-2">
           <label className="me-2" htmlFor="manualInput">
             <DinaMessage id="manual" />
@@ -603,18 +609,16 @@ export function CitationSubForm({
               </div>
             )}
           </div>
-          <div className="row">
-            <TextField
-              {...fieldProps("title")}
-              className="col-sm-6"
-              disabled={!isManualInput}
-            />
-            <NumberField
-              {...fieldProps("year")}
-              className="col-sm-6"
-              disabled={!isManualInput}
-            />
-          </div>
+          <DinaFormSection
+            sectionName="general-section"
+            horizontal={INLINE_LABEL_WIDTH}
+            compact={true}
+          >
+            <div className="d-flex flex-column">
+              <TextField {...fieldProps("title")} disabled={!isManualInput} />
+              <NumberField {...fieldProps("year")} disabled={!isManualInput} />
+            </div>
+          </DinaFormSection>
           <div className="row">
             <FieldArray name="authors">
               {({ form, push, remove }) => {
@@ -663,39 +667,23 @@ export function CitationSubForm({
                             />
                           </div>
                         )}
-                        <strong>
-                          <DinaMessage id={"authors"} />
-                        </strong>
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <strong>
+                            <DinaMessage id="authors" />
+                          </strong>
+                          {/* Add Author button */}
+                        </div>
                       </div>
                       <div className="col-md-1 d-flex align-items-center justify-content-between">
-                        <FaPlus
-                          className="ms-auto"
-                          style={{
-                            cursor: disableAddButton
-                              ? "not-allowed"
-                              : "pointer",
-                            color: disableAddButton ? "gray" : "black"
-                          }}
-                          onClick={() => {
-                            if (!disableAddButton) {
-                              addAuthor();
-                            }
-                          }}
-                          size="2em"
-                          onMouseOver={(event) => {
-                            if (!disableAddButton) {
-                              event.currentTarget.style.color = "blue";
-                            }
-                          }}
-                          onMouseOut={(event) => {
-                            if (disableAddButton) {
-                              event.currentTarget.style.color = "gray";
-                            } else {
-                              event.currentTarget.style.color = "black";
-                            }
-                          }}
-                          data-testid="add row button"
-                        />
+                        <button
+                          type="button"
+                          className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2"
+                          disabled={disableAddButton}
+                          onClick={addAuthor}
+                        >
+                          <FaPlus size="0.85em" />
+                          Add Author
+                        </button>
                       </div>
                     </div>
 
@@ -733,25 +721,15 @@ export function CitationSubForm({
                           </div>
                         </div>
                         <div className="col-md-1 d-flex align-items-center justify-content-between">
-                          <FaMinus
-                            className="ms-auto"
-                            style={{
-                              marginTop: "-10px",
-                              cursor: isManualInput ? "pointer" : "not-allowed",
-                              color: isManualInput ? "" : "grey"
-                            }}
-                            onClick={() => isManualInput && removeAuthor(index)}
-                            size="2em"
-                            onMouseOver={(event) => {
-                              if (isManualInput)
-                                event.currentTarget.style.color = "blue";
-                            }}
-                            onMouseOut={(event) => {
-                              if (isManualInput)
-                                event.currentTarget.style.color = "";
-                            }}
-                            data-testid="add row button"
-                          />
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2"
+                            disabled={!isManualInput}
+                            onClick={() => removeAuthor(index)}
+                          >
+                            <FaMinus size="0.85em" />
+                            Remove
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -760,29 +738,18 @@ export function CitationSubForm({
               }}
             </FieldArray>
           </div>
-          <div className="row">
-            <TextField
-              {...fieldProps("journal")}
-              className="col-sm-6"
-              disabled={!isManualInput}
-            />
-            <TextField
-              {...fieldProps("volume")}
-              className="col-sm-6"
-              disabled={!isManualInput}
-            />
-          </div>
-          <div className="row">
-            <TextField
-              {...fieldProps("pages")}
-              className="col-sm-6"
-              disabled={!isManualInput}
-            />
-            <TextField
-              {...fieldProps("citationRemarks")}
-              className="col-sm-6"
-            />
-          </div>
+          <DinaFormSection
+            sectionName="general-section"
+            horizontal={INLINE_LABEL_WIDTH}
+            compact={true}
+          >
+            <div className="d-flex flex-column">
+              <TextField {...fieldProps("journal")} disabled={!isManualInput} />
+              <TextField {...fieldProps("volume")} disabled={!isManualInput} />
+              <TextField {...fieldProps("pages")} disabled={!isManualInput} />
+              <TextField {...fieldProps("citationRemarks")} />
+            </div>
+          </DinaFormSection>
           {!isTemplate && (
             <div className="d-flex justify-content-center gap-2">
               <FormikButton

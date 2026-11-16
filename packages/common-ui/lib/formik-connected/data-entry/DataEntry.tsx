@@ -199,9 +199,9 @@ export function DataEntry({
           {!readOnly && (
             <Button
               onClick={() => addBlock()}
-              className="add-datablock align-self-start mb-3"
+              className="add-datablock align-self-start mb-2 text-white"
             >
-              <FaPlus className="me-2" />
+              <FaPlus size="0.85em" className="me-2" />
               <DinaMessage id="addExtension" />
             </Button>
           )}

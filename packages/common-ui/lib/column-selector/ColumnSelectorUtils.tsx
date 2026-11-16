@@ -617,7 +617,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
     if (
       dynamicFieldsMappingConfig &&
       pathParts.length === 2 &&
-      pathParts[0] === "classification"
+      pathParts[0].startsWith("classification")
     ) {
       const relationshipName = parseRelationshipNameFromType(pathParts[0]);
 
@@ -1162,14 +1162,28 @@ async function getVocabularyColumn<TData extends KitsuResource>(
   }
 }
 
+/**
+ * Extracts the portion of a path string that comes after "attributes".
+ *
+ * @param path The full path string containing "attributes".
+ * @returns The portion of the path after "attributes", or the last segment if "attributes"
+ *    is not found.
+ */
+function getPathAfterAttributes(path: string): string {
+  const parts = path.split(".");
+  const attributesIndex = parts.indexOf("attributes");
+  return attributesIndex !== -1
+    ? parts.slice(attributesIndex + 1).join(".")
+    : parts[parts.length - 1];
+}
+
 export function getAttributeVocabularyColumn<TData extends KitsuResource>(
   path: string,
   vocabulary: VocabularyElement,
   config: DynamicField
 ): TableColumn<TData> {
   const accessorKey = `${config.path}.${vocabulary.key || vocabulary.id}`;
-  const pathParts = config.path.split(".");
-  const fieldName = pathParts[pathParts.length - 1];
+  const fieldName = getPathAfterAttributes(config.path);
 
   const vocabularyColumn = {
     header: () => <VocabularyFieldHeader vocabulary={vocabulary} />,
@@ -1192,9 +1206,7 @@ export function getIncludedVocabularyColumn<TData extends KitsuResource>(
   config: RelationshipDynamicField
 ): TableColumn<TData> {
   const accessorKey = `${config.path}.${vocabulary.key || vocabulary.id}`;
-
-  const pathParts = config.path.split(".");
-  const fieldName = pathParts[pathParts.length - 1];
+  const fieldName = getPathAfterAttributes(config.path);
 
   const vocabularyColumn = {
     cell: ({ row: { original } }) => {

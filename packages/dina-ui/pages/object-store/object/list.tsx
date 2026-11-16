@@ -251,7 +251,8 @@ export default function MetadataListPage() {
                 columns={METADATA_TABLE_COLUMNS}
                 bulkDeleteButtonProps={{
                   typeName: "metadata",
-                  apiBaseUrl: "/objectstore-api"
+                  apiBaseUrl: "/objectstore-api",
+                  groupAttribute: "bucket"
                 }}
                 bulkEditPath={"/object-store/metadata/bulk-edit"}
                 dataExportProps={{

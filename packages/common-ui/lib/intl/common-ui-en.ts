@@ -149,6 +149,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   queryTableMultiSortTooltipTitle: "Multi-column sorting",
   remarks: "Remarks",
   remove: "Remove",
+  removeValue: "Remove {value}",
+  typeAndPressEnter: "Type and press Enter",
   requiredField: "Required field",
   resetButtonText: "Reset",
   resetFilters: "Reset Filters",
@@ -228,9 +230,11 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
     "You don't have permission to edit records in these groups: {groups}.",
   noDeletePermission:
     "You don't have permission to delete records in these groups: {groups}.",
-  onSelected: "On selected",
-  onSelectedCount: "On {count} selected",
-  onAllMatched: "On all {total} matched",
+  onSelectedCount: "Selected ({count})",
+  onAllMatched: "All matched ({total})",
+  noPermissionForGroups: "No permission for group: {groups}",
+  noSelectionHint:
+    "Tick the checkboxes in the table to choose records. These actions apply to the records you choose.",
   actionsOnSelected: "Actions on {count} selected",
   tableSelectedSuffix: " · {count} selected",
   exportSelectedButtonText: "Export Selected",
