@@ -25,6 +25,32 @@ function isScrolledToPageBottom(): boolean {
   );
 }
 
+/**
+ * Instantly scrolls to half a viewport above a distant target.
+ *
+ * This fixes the issue where the sidebar navigation glitches when navigating to a different section.
+ */
+function jumpNearTarget(id: string) {
+  const target = document.getElementById(id);
+  if (!target) {
+    return;
+  }
+  const destination = Math.min(
+    window.scrollY +
+      target.getBoundingClientRect().top -
+      (parseFloat(getComputedStyle(target).scrollMarginTop) || 0),
+    document.documentElement.scrollHeight - window.innerHeight
+  );
+  const glide = window.innerHeight / 2;
+  const distance = destination - window.scrollY;
+  if (Math.abs(distance) > glide) {
+    window.scrollTo({
+      top: destination - Math.sign(distance) * glide,
+      behavior: "instant"
+    });
+  }
+}
+
 /** Scrolls the nav's own scroll container (not the page) so the active items stay visible. */
 function scrollNavToActiveItems(activeNavClass: string) {
   const activeItem = document.querySelector<HTMLElement>(
@@ -87,6 +113,11 @@ export function NativeScrollSpyNav({
         event.target as HTMLElement | null
       )?.closest<HTMLAnchorElement>(".material-sample-nav a[href^='#']");
       const clickedId = link?.getAttribute("href")?.slice(1);
+
+      // Smooth anchor scroll would otherwise pass every section in between.
+      if (clickedId) {
+        jumpNearTarget(clickedId);
+      }
       if (clickedId && scrollTargetIds.includes(clickedId)) {
         pinnedIdRef.current = clickedId;
         setActiveId(clickedId);
