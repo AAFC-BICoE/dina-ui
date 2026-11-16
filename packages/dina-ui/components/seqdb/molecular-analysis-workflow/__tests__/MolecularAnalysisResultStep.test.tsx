@@ -1519,7 +1519,15 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
         }
       } as any;
 
-      return mountWithAppContext(<TestComponentWrapper />, ctx);
+      return mountWithAppContext(
+        <TestComponentWrapper
+          molecularAnalysis={{
+            ...TEST_MOLECULAR_ANALYSIS,
+            group: "workflow-group"
+          }}
+        />,
+        ctx
+      );
     }
 
     const RESULT_WITH_TSV = {
@@ -1598,7 +1606,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
         [
           {
             resource: {
-              group: "aafc",
+              group: "workflow-group",
               createdBy: "test-user",
               tabularResults: {
                 records: [

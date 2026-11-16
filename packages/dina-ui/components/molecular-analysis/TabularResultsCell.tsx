@@ -14,6 +14,8 @@ import { useTabularResultsUpload } from "./useTabularResultsUpload";
 
 export interface TabularResultsCellProps {
   sequencingRunItem: SequencingRunItem;
+  /** Group of the workflow, used when creating a new result. */
+  group?: string;
   setSequencingRunItems?: Dispatch<
     SetStateAction<SequencingRunItem[] | undefined>
   >;
@@ -25,16 +27,17 @@ const PREVIEW_ROWS = 5;
 /** "Tabular Results" cell of the Results tab: upload, quick view and full table of one TSV. */
 export function TabularResultsCell({
   sequencingRunItem,
+  group,
   setSequencingRunItems
 }: TabularResultsCellProps) {
   const { formatMessage, locale } = useDinaIntl();
-  const { status, fileName, submit, remove } = useTabularResultsUpload({
+  const { status, error, fileName, submit, remove } = useTabularResultsUpload({
     sequencingRunItem,
+    group,
     setSequencingRunItems
   });
   const fileInput = useRef<HTMLInputElement>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [replaceFailed, setReplaceFailed] = useState(false);
 
   const runItemName = sequencingRunItem.molecularAnalysisRunItem?.name ?? "";
   const tabularResults =
@@ -56,8 +59,7 @@ export function TabularResultsCell({
     if (!file) {
       return;
     }
-    const success = await submit(file);
-    setReplaceFailed(!success);
+    await submit(file);
   }
 
   const hiddenInput = (
@@ -168,7 +170,7 @@ export function TabularResultsCell({
           tabularResults={tabularResults!}
           busy={status === "busy"}
           fileName={fileName}
-          replaceFailed={replaceFailed && status === "error"}
+          replaceError={error}
           onReplace={() => fileInput.current?.click()}
           onRemove={async () => {
             if (await remove()) {
@@ -205,7 +207,7 @@ export function TabularResultsCell({
   }
 
   // Error state...
-  if (status === "error") {
+  if (error) {
     return (
       <div
         role="alert"
@@ -215,7 +217,7 @@ export function TabularResultsCell({
         {hiddenInput}
         <FaExclamationCircle size={18} />
         <span>
-          <DinaMessage id="tabularResults_parseFailed" />
+          <DinaMessage id={error} />
         </span>
         <button
           type="button"

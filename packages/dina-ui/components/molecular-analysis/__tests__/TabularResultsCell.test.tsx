@@ -28,6 +28,7 @@ function mount(item: SequencingRunItem) {
   const wrapper = mountWithAppContext(
     <TabularResultsCell
       sequencingRunItem={item}
+      group="workflow-group"
       setSequencingRunItems={setItems}
     />,
     {
@@ -72,7 +73,7 @@ describe("TabularResultsCell", () => {
     expect(mockSave.mock.calls[0][0][0].resource).toEqual(
       expect.objectContaining({
         type: "molecular-analysis-result",
-        group: "aafc",
+        group: "workflow-group",
         createdBy: "test-user",
         tabularResults: {
           records: [
@@ -104,7 +105,7 @@ describe("TabularResultsCell", () => {
     await pickFile(wrapper);
 
     expect(
-      await wrapper.findByText(/failed to parse the file/i)
+      await wrapper.findByText(/the table could not be saved/i)
     ).toBeInTheDocument();
     expect(mockSave).toHaveBeenCalledTimes(2);
   });
@@ -182,9 +183,48 @@ describe("TabularResultsCell", () => {
     await pickFile(wrapper);
 
     expect(
-      await wrapper.findByText(/failed to parse the file/i)
+      await wrapper.findByText(/the file could not be read/i)
     ).toBeInTheDocument();
     expect(wrapper.getByRole("button", { name: /retry/i })).toBeInTheDocument();
+    expect(mockSave).not.toHaveBeenCalled();
+  });
+
+  it("shows the cause when the file can't be used", async () => {
+    mockPost.mockResolvedValue({
+      data: { 0: { rows: [{ rowNumber: 0, content: ["a", "b"] }] } }
+    });
+    const { wrapper } = mount(runItem());
+
+    await userEvent.click(wrapper.getByRole("button", { name: /upload tsv/i }));
+    await pickFile(wrapper);
+
+    expect(
+      await wrapper.findByText(/the file has no data rows/i)
+    ).toBeInTheDocument();
+    expect(mockSave).not.toHaveBeenCalled();
+  });
+
+  it("keeps the existing table and shows the cause when replacing fails", async () => {
+    mockPost.mockRejectedValue(new Error("bad file"));
+    const { wrapper } = mount(
+      runItem({
+        id: "res-1",
+        type: "molecular-analysis-result",
+        tabularResults: { records: [{ a: "old", b: "old" }] }
+      })
+    );
+
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /open full table/i })
+    );
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /replace file/i })
+    );
+    await pickFile(wrapper);
+
+    expect(
+      await wrapper.findByText(/the file could not be read/i)
+    ).toHaveTextContent(/the existing table was kept/i);
     expect(mockSave).not.toHaveBeenCalled();
   });
 
@@ -196,7 +236,7 @@ describe("TabularResultsCell", () => {
 
     await userEvent.click(wrapper.getByRole("button", { name: /upload tsv/i }));
     await pickFile(wrapper);
-    await wrapper.findByText(/failed to parse the file/i);
+    await wrapper.findByText(/the file could not be read/i);
 
     await userEvent.click(wrapper.getByRole("button", { name: /retry/i }));
     await pickFile(wrapper);

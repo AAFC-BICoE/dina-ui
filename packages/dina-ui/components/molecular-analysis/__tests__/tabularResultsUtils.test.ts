@@ -28,7 +28,7 @@ describe("toTabularResults", () => {
   it("stores every row and ignores blank lines", () => {
     const rows = Array.from({ length: 600 }, (_, i) => [`${i}`, "a"]);
     const result = toTabularResults(sheet(["id", "v"], ...rows, [" ", " \t"]));
-    expect(result?.records).toHaveLength(600);
+    expect((result as { records: unknown[] }).records).toHaveLength(600);
   });
 
   it("ignores blank headers and cells beyond the header count", () => {
@@ -56,15 +56,21 @@ describe("toTabularResults", () => {
     });
   });
 
-  it("rejects a workbook without a first sheet or rows", () => {
-    expect(toTabularResults({})).toBeUndefined();
-    expect(toTabularResults(sheet())).toBeUndefined();
-  });
-
-  it("rejects files without data, with one column, or no response", () => {
-    expect(toTabularResults(sheet(["a", "b"]))).toBeUndefined();
-    expect(toTabularResults(sheet(["a"], ["1"]))).toBeUndefined();
-    expect(toTabularResults(sheet(["a", "b"], ["", ""]))).toBeUndefined();
-    expect(toTabularResults(undefined)).toBeUndefined();
+  it("returns the cause when the file can't be used", () => {
+    expect(toTabularResults(undefined)).toBe("tabularResults_errorUnreadable");
+    expect(toTabularResults({})).toBe("tabularResults_errorEmpty");
+    expect(toTabularResults(sheet())).toBe("tabularResults_errorEmpty");
+    expect(toTabularResults(sheet(["a", "b"], ["1", "x\0y"]))).toBe(
+      "tabularResults_errorInvalidCharacters"
+    );
+    expect(toTabularResults(sheet(["a"], ["1"]))).toBe(
+      "tabularResults_errorColumns"
+    );
+    expect(toTabularResults(sheet(["a", "b"]))).toBe(
+      "tabularResults_errorNoRows"
+    );
+    expect(toTabularResults(sheet(["a", "b"], ["", ""]))).toBe(
+      "tabularResults_errorNoRows"
+    );
   });
 });

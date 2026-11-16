@@ -3,6 +3,7 @@ import { FaTrashAlt, FaUpload } from "react-icons/fa";
 import { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { TabularResults } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { TabularResultsUploadError } from "./useTabularResultsUpload";
 
 // Table height for the modal, calculated to fill most of the viewport since we need to display
 // potentially large tables.
@@ -14,7 +15,7 @@ export interface TabularResultsModalProps {
   tabularResults: TabularResults;
   busy: boolean;
   fileName: string;
-  replaceFailed: boolean;
+  replaceError?: TabularResultsUploadError;
   onReplace: () => void;
   onRemove: () => Promise<void>;
   onClose: () => void;
@@ -30,7 +31,7 @@ export function TabularResultsModal({
   tabularResults,
   busy,
   fileName,
-  replaceFailed,
+  replaceError,
   onReplace,
   onRemove,
   onClose
@@ -70,9 +71,10 @@ export function TabularResultsModal({
             <strong>{columns.length.toLocaleString(numberLocale)}</strong>{" "}
             <DinaMessage id="tabularResults_columns" />
           </p>
-          {replaceFailed && (
+          {replaceError && (
             <Alert variant="danger">
-              <DinaMessage id="tabularResults_replaceFailed" />
+              <DinaMessage id={replaceError} />{" "}
+              <DinaMessage id="tabularResults_tableKept" />
             </Alert>
           )}
           {busy ? (

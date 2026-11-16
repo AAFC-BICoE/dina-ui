@@ -39,6 +39,8 @@ interface UseMolecularAnalysisRunColumnsProps {
   setSequencingRunItems?: Dispatch<
     SetStateAction<SequencingRunItem[] | undefined>
   >;
+  /** Group of the workflow, used when creating results from tabular files. */
+  group?: string;
   deps?: any[]; // Dependency array for useMemo, to allow for dynamic dependencies based on input
 }
 
@@ -51,6 +53,7 @@ export function useMolecularAnalysisRunColumns({
   updateExistingQualityControls,
   qualityControlTypes,
   setSequencingRunItems,
+  group,
   deps = []
 }: UseMolecularAnalysisRunColumnsProps) {
   const { compareByStringAndNumber } = useStringComparator();
@@ -430,6 +433,7 @@ export function useMolecularAnalysisRunColumns({
         cell: ({ row: { original } }) => (
           <TabularResultsCell
             sequencingRunItem={original}
+            group={group}
             setSequencingRunItems={setSequencingRunItems}
           />
         ),

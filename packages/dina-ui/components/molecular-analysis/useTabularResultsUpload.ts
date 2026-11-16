@@ -4,10 +4,16 @@ import { SequencingRunItem } from "./useMolecularAnalysisRun";
 import { MolecularAnalysisResult } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useWorkbookConversion } from "../workbook/utils/useWorkbookConversion";
-import { toTabularResults } from "./tabularResultsUtils";
+import { TabularResultsError, toTabularResults } from "./tabularResultsUtils";
+
+export type TabularResultsUploadError =
+  | TabularResultsError
+  | "tabularResults_errorSave";
 
 export interface UseTabularResultsUploadProps {
   sequencingRunItem: SequencingRunItem;
+  /** Group of the workflow, used when creating a new result. */
+  group?: string;
   setSequencingRunItems?: Dispatch<
     SetStateAction<SequencingRunItem[] | undefined>
   >;
@@ -19,13 +25,15 @@ export interface UseTabularResultsUploadProps {
  */
 export function useTabularResultsUpload({
   sequencingRunItem,
+  group,
   setSequencingRunItems
 }: UseTabularResultsUploadProps) {
   const { save } = useApiClient();
-  const { groupNames, username } = useAccount();
+  const { username } = useAccount();
   const { convertWorkbookFile } = useWorkbookConversion();
 
-  const [status, setStatus] = useState<"idle" | "busy" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "busy">("idle");
+  const [error, setError] = useState<TabularResultsUploadError>();
   const [fileName, setFileName] = useState<string>("");
 
   /** This will update the table row in memory and not trigger a full reload of the table. */
@@ -78,7 +86,7 @@ export function useTabularResultsUpload({
           type: "molecular-analysis-result",
           resource: {
             type: "molecular-analysis-result",
-            group: groupNames?.[0],
+            group,
             createdBy: username,
             tabularResults
           }
@@ -112,31 +120,32 @@ export function useTabularResultsUpload({
     } as MolecularAnalysisResult);
   }
 
-  /** Upload (or replace) with a file. Resolves true when parsed and saved. */
-  async function submit(file: File): Promise<boolean> {
+  /** Upload (or replace) with a file. Sets `error` when it can't be parsed or saved. */
+  async function submit(file: File) {
     setFileName(file.name);
+    setError(undefined);
     setStatus("busy");
-    try {
-      const converted = await convertWorkbookFile([{ file } as IFileWithMeta]);
-      const tabularResults = toTabularResults(converted);
-      if (!tabularResults) {
-        setStatus("error");
-        return false;
+    // convertWorkbookFile doesn't throw, it resolves undefined on failure.
+    const tabularResults = toTabularResults(
+      await convertWorkbookFile([{ file } as IFileWithMeta])
+    );
+    if (typeof tabularResults === "string") {
+      setError(tabularResults);
+    } else {
+      try {
+        await saveTabularResults(tabularResults);
+      } catch (saveError) {
+        console.error(saveError);
+        setError("tabularResults_errorSave");
       }
-      await saveTabularResults(tabularResults);
-      setStatus("idle");
-      return true;
-    } catch (error) {
-      console.error(error);
-      setStatus("error");
-      return false;
     }
+    setStatus("idle");
   }
 
   async function remove(): Promise<boolean> {
     try {
       await saveTabularResults(null);
-      setStatus("idle");
+      setError(undefined);
       return true;
     } catch (error) {
       console.error(error);
@@ -146,6 +155,7 @@ export function useTabularResultsUpload({
 
   return {
     status,
+    error,
     fileName,
     submit,
     remove

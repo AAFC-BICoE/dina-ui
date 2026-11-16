@@ -1634,13 +1634,20 @@ export const DINAUI_MESSAGES_ENGLISH = {
   tabularResults_openAria: "Open full table, {name}, {counts}",
   tabularResults_quickMore: "Showing 5 of {rows} rows.",
   tabularResults_clickOpen: "Click to open full table",
-  tabularResults_parseFailed: "Failed to parse the file",
+  tabularResults_errorUnreadable:
+    "The file could not be read. Make sure it is a UTF-8 encoded TSV file.",
+  tabularResults_errorEmpty: "The file is empty.",
+  tabularResults_errorInvalidCharacters:
+    "The file contains invalid characters (null characters).",
+  tabularResults_errorColumns:
+    "The file needs a header row with at least 2 columns.",
+  tabularResults_errorNoRows: "The file has no data rows.",
+  tabularResults_errorSave: "The table could not be saved.",
   tabularResults_retry: "Retry",
   tabularResults_modalTitle: "Tabular Results: {name}",
   tabularResults_replaceFile: "Replace File",
   tabularResults_parsing: "Parsing file...",
-  tabularResults_replaceFailed:
-    "Failed to parse the file. The existing table was kept.",
+  tabularResults_tableKept: "The existing table was kept.",
   tabularResults_confirmTitle: "Remove Tabular Results",
   tabularResults_confirmText: "Remove the tabular results for this run item?",
   field_uriTemplate: "URI Template",

@@ -86,7 +86,8 @@ export function MolecularAnalysisResultsStep({
       type: "generic-molecular-analysis-results",
       readOnly: true,
       setSequencingRunItems,
-      setReloadGenericMolecularAnalysisRun
+      setReloadGenericMolecularAnalysisRun,
+      group: molecularAnalysis.group
     });
 
   const qualityControlColumns: ColumnDef<QualityControlWithAttachment>[] =

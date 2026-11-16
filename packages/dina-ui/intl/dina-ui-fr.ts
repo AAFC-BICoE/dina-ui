@@ -9,13 +9,20 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   tabularResults_openAria: "Ouvrir le tableau complet, {name}, {counts}",
   tabularResults_quickMore: "5 lignes affichées sur {rows}.",
   tabularResults_clickOpen: "Cliquer pour ouvrir le tableau complet",
-  tabularResults_parseFailed: "Échec de l'analyse du fichier",
+  tabularResults_errorUnreadable:
+    "Le fichier n'a pas pu être lu. Assurez-vous qu'il s'agit d'un fichier TSV encodé en UTF-8.",
+  tabularResults_errorEmpty: "Le fichier est vide.",
+  tabularResults_errorInvalidCharacters:
+    "Le fichier contient des caractères non valides (caractères nuls).",
+  tabularResults_errorColumns:
+    "Le fichier doit avoir une ligne d'en-tête d'au moins 2 colonnes.",
+  tabularResults_errorNoRows: "Le fichier ne contient aucune ligne de données.",
+  tabularResults_errorSave: "Le tableau n'a pas pu être enregistré.",
   tabularResults_retry: "Réessayer",
   tabularResults_modalTitle: "Résultats tabulaires : {name}",
   tabularResults_replaceFile: "Remplacer le fichier",
   tabularResults_parsing: "Analyse du fichier en cours...",
-  tabularResults_replaceFailed:
-    "Échec de l'analyse du fichier. Le tableau existant a été conservé.",
+  tabularResults_tableKept: "Le tableau existant a été conservé.",
   tabularResults_confirmTitle: "Supprimer les résultats tabulaires",
   tabularResults_confirmText:
     "Supprimer les résultats tabulaires de cet élément de l'analyse ?",
