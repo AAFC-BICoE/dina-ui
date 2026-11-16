@@ -25,6 +25,32 @@ function isScrolledToPageBottom(): boolean {
   );
 }
 
+/**
+ * Instantly scrolls to half a viewport above a distant target.
+ *
+ * This fixes the issue where the sidebar navigation glitches when navigating to a different section.
+ */
+function jumpNearTarget(id: string) {
+  const target = document.getElementById(id);
+  if (!target) {
+    return;
+  }
+  const destination = Math.min(
+    window.scrollY +
+      target.getBoundingClientRect().top -
+      (parseFloat(getComputedStyle(target).scrollMarginTop) || 0),
+    document.documentElement.scrollHeight - window.innerHeight
+  );
+  const glide = window.innerHeight / 2;
+  const distance = destination - window.scrollY;
+  if (Math.abs(distance) > glide) {
+    window.scrollTo({
+      top: destination - Math.sign(distance) * glide,
+      behavior: "instant"
+    });
+  }
+}
+
 /** Scrolls the nav's own scroll container (not the page) so the active items stay visible. */
 function scrollNavToActiveItems(activeNavClass: string) {
   const activeItem = document.querySelector<HTMLElement>(
@@ -87,6 +113,11 @@ export function NativeScrollSpyNav({
         event.target as HTMLElement | null
       )?.closest<HTMLAnchorElement>(".material-sample-nav a[href^='#']");
       const clickedId = link?.getAttribute("href")?.slice(1);
+
+      // Smooth anchor scroll would otherwise pass every section in between.
+      if (clickedId) {
+        jumpNearTarget(clickedId);
+      }
       if (clickedId && scrollTargetIds.includes(clickedId)) {
         pinnedIdRef.current = clickedId;
         setActiveId(clickedId);
@@ -134,21 +165,20 @@ export function NativeScrollSpyNav({
         (target) => target.top
       )?.id;
 
-      // The page can't scroll far enough for the last targets to reach the band,
-      // so at the bottom, use whatever is showing there instead.
+      // A clicked section stays active while it's on screen, even if the page couldn't scroll it
+      // into the band (near the bottom, or content above it grew while scrolling).
+      // Otherwise at the bottom, the last targets can't reach the band, so use whatever is showing.
       const atBottom = isScrolledToPageBottom();
-      if (atBottom) {
-        const pinnedTop = targets.find(
-          (target) => target.id === pinnedIdRef.current
-        )?.top;
-        const lastTarget = _.maxBy(
+      const pinnedTop = targets.find(
+        (target) => target.id === pinnedIdRef.current
+      )?.top;
+      if (pinnedTop !== undefined && pinnedTop < window.innerHeight) {
+        nextActiveId = pinnedIdRef.current ?? undefined;
+      } else if (atBottom) {
+        nextActiveId = _.maxBy(
           targets.filter((target) => target.top < window.innerHeight),
           (target) => target.top
-        );
-        nextActiveId =
-          pinnedTop !== undefined && pinnedTop < window.innerHeight
-            ? pinnedIdRef.current ?? undefined
-            : lastTarget?.id;
+        )?.id;
       }
 
       // Sub-sections: everything overlapping the band, since several can be in view at once.

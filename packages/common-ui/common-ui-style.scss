@@ -206,7 +206,7 @@ input[id^="react-select"] {
 
 .material-sample-nav .list-group-item {
   background-color: transparent;
-  height: 2.5rem !important;
+  min-height: 2.5rem;
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
   border: none;
@@ -235,9 +235,17 @@ input[id^="react-select"] {
 }
 
 .material-sample-nav .nav-item-icon {
+  flex: none;
   margin-right: 0.6rem;
-  vertical-align: -0.125em;
+  margin-top: 0.2em; /* Lines the icon up with the first line of a wrapped label. */
   color: #335075;
+}
+
+/* Wrapped labels line up after the icon instead of under it. */
+.material-sample-nav .list-group-item > .flex-grow-1 {
+  display: flex;
+  align-items: flex-start;
+  line-height: 1.3;
 }
 
 .material-sample-nav .list-group-item div.flex-grow-1 .nav-item-icon {
@@ -246,6 +254,22 @@ input[id^="react-select"] {
 
 .material-sample-nav .list-group-item.active .nav-item-icon {
   color: #fff;
+}
+
+.material-sample-nav .empty-sections {
+  border-top: var(--border-width, 1px) solid var(--border-subtle, #dee2e6);
+  margin-top: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+.material-sample-nav .nav-item-badge {
+  background-color: #335075;
+  color: #fff;
+}
+
+.material-sample-nav .list-group-item.active .nav-item-badge {
+  background-color: #fff;
+  color: #335075;
 }
 
 .material-sample-nav .list-group-item.active .react-switch-bg {

@@ -26,7 +26,11 @@ import {
   FaBoxArchive,
   FaBug,
   FaCalendarDays,
+  FaChevronDown,
+  FaChevronUp,
   FaCircleInfo,
+  FaDiagramProject,
+  FaDna,
   FaFingerprint,
   FaFlask,
   FaLink,
@@ -35,6 +39,8 @@ import {
   FaPaperclip,
   FaPuzzlePiece,
   FaQuoteRight,
+  FaRightLeft,
+  FaSitemap,
   FaSliders
 } from "react-icons/fa6";
 import { IconType } from "react-icons";
@@ -48,21 +54,22 @@ import {
   IDENTIFIER_COMPONENT_NAME,
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+  MATERIAL_SAMPLE_CHILDREN_COMPONENT_NAME,
+  MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME,
   MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
   ORGANISMS_COMPONENT_NAME,
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  STORAGE_COMPONENT_NAME,
+  TRANSACTIONS_COMPONENT_NAME,
+  WORKFLOWS_COMPONENT_NAME
 } from "../../../../types/collection-api";
-import { useMaterialSampleSave } from "../useMaterialSample";
-import { useMaterialSampleSectionOrder } from "./useMaterialSampleSectionOrder";
 import { NativeScrollSpyNav } from "./NativeScrollSpyNav";
 
 export interface MaterialSampleFormNavProps {
-  dataComponentState: ReturnType<
-    typeof useMaterialSampleSave
-  >["dataComponentState"];
+  /** Sections to list, in order. On the edit page these come from useMaterialSampleSectionOrder. */
+  scrollTargets: ScrollTarget[];
 
   /** Disabled the Are You Sure modal when toggling a data component off. */
   disableRemovePrompt?: boolean;
@@ -71,20 +78,13 @@ export interface MaterialSampleFormNavProps {
   disableCollectingEventSwitch?: boolean;
 
   /**
-   * The current order that should be applied. This should come from a form template.
-   */
-  navOrder?: string[] | null;
-
-  /**
    * This should only be used when editing a form template. Returns the new order of the
    * navigation.
    */
   onChangeNavOrder?: (newOrder: string[] | null) => void;
 
-  /**
-   * Are we currently editing a form template?
-   */
-  isTemplate: boolean;
+  /** List disabled (empty) sections last, behind a show/hide toggle. Used on the view page. */
+  collapseEmptySections?: boolean;
 }
 
 // Don't render the scroll-spy component during tests because it only works in the browser.
@@ -103,6 +103,8 @@ function setFormSectionHovered(targetId: string, hovered: boolean) {
 export interface ScrollTarget {
   id: string;
   msg: string | React.JSX.Element;
+  /** Item count shown at the end of the row. Hidden when 0 or undefined. */
+  badge?: number;
   className?: string;
   disabled?: boolean;
   setEnabled?: (val: boolean) => void;
@@ -128,7 +130,12 @@ export const SECTION_ICONS: Record<string, IconType> = {
   [CITATIONS_COMPONENT_NAME]: FaQuoteRight,
   [FIELD_EXTENSIONS_COMPONENT_NAME]: FaPuzzlePiece,
   [MANAGED_ATTRIBUTES_COMPONENT_NAME]: FaSliders,
-  [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: FaPaperclip
+  [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: FaPaperclip,
+  [WORKFLOWS_COMPONENT_NAME]: FaDna,
+  // View page only:
+  [MATERIAL_SAMPLE_CHILDREN_COMPONENT_NAME]: FaSitemap,
+  [MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME]: FaDiagramProject,
+  [TRANSACTIONS_COMPONENT_NAME]: FaRightLeft
 };
 
 /** Sub-links shown under a top-level nav item while it's the active scroll target. */
@@ -204,18 +211,19 @@ const SUB_SCROLL_TARGET_IDS = Object.values(SECTION_SUB_LINKS).flatMap(
 
 /** Form navigation and toggles to enable/disable form sections. */
 export function MaterialSampleFormNav({
-  dataComponentState,
+  scrollTargets: sortedScrollTargets,
   disableRemovePrompt,
   disableCollectingEventSwitch,
-  navOrder,
   onChangeNavOrder,
-  isTemplate
+  collapseEmptySections
 }: MaterialSampleFormNavProps) {
-  const { sortedScrollTargets } = useMaterialSampleSectionOrder({
-    dataComponentState,
-    navOrder,
-    isTemplate
-  });
+  const [showEmptySections, setShowEmptySections] = useState(false);
+  const emptySections = collapseEmptySections
+    ? sortedScrollTargets.filter((it) => it.disabled)
+    : [];
+  const listedSections = collapseEmptySections
+    ? sortedScrollTargets.filter((it) => !it.disabled)
+    : sortedScrollTargets;
 
   const [items, setItems] = useState(sortedScrollTargets.map((it) => it.id));
 
@@ -260,6 +268,20 @@ export function MaterialSampleFormNav({
     return () => observer.disconnect();
   }, []);
 
+  const renderItem = (section: ScrollTarget) => (
+    <DataComponentNavItem
+      id={section.id}
+      key={section.id}
+      section={section}
+      renderedSubLinkIds={renderedSubLinkIds}
+      disableRemovePrompt={disableRemovePrompt}
+      disableSwitch={
+        section.id === COLLECTING_EVENT_COMPONENT_NAME &&
+        disableCollectingEventSwitch
+      }
+    />
+  );
+
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
@@ -284,21 +306,38 @@ export function MaterialSampleFormNav({
               {/* Display each row of the data components. */}
               <div className="list-group">
                 <SortableNavGroup>
-                  {sortedScrollTargets.map((section) => (
-                    <DataComponentNavItem
-                      id={section.id}
-                      key={section.id}
-                      section={section}
-                      renderedSubLinkIds={renderedSubLinkIds}
-                      disableRemovePrompt={disableRemovePrompt}
-                      disableSwitch={
-                        section.id === COLLECTING_EVENT_COMPONENT_NAME &&
-                        disableCollectingEventSwitch
-                      }
-                    />
-                  ))}
+                  {listedSections.map(renderItem)}
                 </SortableNavGroup>
               </div>
+              {emptySections.length > 0 && (
+                <div className="empty-sections">
+                  <button
+                    type="button"
+                    className="btn btn-link btn-sm px-2"
+                    aria-expanded={showEmptySections}
+                    onClick={() => setShowEmptySections(!showEmptySections)}
+                  >
+                    {showEmptySections ? (
+                      <FaChevronUp className="me-1" />
+                    ) : (
+                      <FaChevronDown className="me-1" />
+                    )}
+                    <DinaMessage
+                      id={
+                        showEmptySections
+                          ? "hideEmptySections"
+                          : "showEmptySections"
+                      }
+                      values={{ count: emptySections.length }}
+                    />
+                  </button>
+                  {showEmptySections && (
+                    <SortableNavGroup>
+                      {emptySections.map(renderItem)}
+                    </SortableNavGroup>
+                  )}
+                </div>
+              )}
             </nav>
           </ScrollSpyNav>
         </div>
@@ -394,7 +433,7 @@ const DataComponentNavItem = ({
           "list-group-item d-flex gap-2 align-items-center"
         )}
         key={section.id}
-        style={{ ...style, height: "3rem", zIndex: 1030 }}
+        style={{ ...style, zIndex: 1030 }}
       >
         {isTemplate && <NavSortHandle {...listeners} isDragging={isDragging} />}
         <Tag
@@ -406,6 +445,11 @@ const DataComponentNavItem = ({
           {SectionIcon && <SectionIcon className="nav-item-icon" />}
           {section.msg}
         </Tag>
+        {!!section.badge && (
+          <span className="badge rounded-pill nav-item-badge">
+            {section.badge}
+          </span>
+        )}
         {section.setEnabled &&
           (disableSwitch ? (
             <Tooltip

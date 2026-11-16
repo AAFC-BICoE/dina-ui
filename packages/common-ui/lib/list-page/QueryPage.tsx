@@ -319,6 +319,9 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   onDeselect?: (deselectedData: TData[]) => void;
 
+  /** Called whenever the query's total record count changes. */
+  onTotalRecordsChange?: (totalRecords: number) => void;
+
   /**
    * Boolean flag to display the QueryPage in view mode (no query builder and search bar).
    */
@@ -423,6 +426,7 @@ export function QueryPage<TData extends KitsuResource>({
   enableDnd = false,
   onSelect,
   onDeselect,
+  onTotalRecordsChange,
   enableColumnSelector = true,
   tabs,
   defaultTab,
@@ -444,6 +448,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Total number of records from the query. This is not the total displayed on the screen.
   const [totalRecords, setTotalRecords] = useState<number>(0);
+  useEffect(() => onTotalRecordsChange?.(totalRecords), [totalRecords]);
 
   // Columns to be displayed on the table, if column selector is used this can be anything. Default
   // is the columns prop if not being used.
