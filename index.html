@@ -1355,11 +1355,9 @@ export default function ExamplePage() {
   jsonApiBackend={{
     query: searchValue =&gt; ({
       path: "agent-api/person",
-      fiql: simpleSearchFilterToFiql(
-        SimpleSearchFilterBuilder.create&lt;Organism&gt;()
-          .searchFilter("name", searchValue)
-          .build()
-      )
+      filter: SimpleSearchFilterBuilder.create&lt;Person&gt;()
+        .searchFilter("name", searchValue)
+        .build()
     }),
     option: person =&gt; person?.name
   }}
@@ -1459,11 +1457,9 @@ export default function ExamplePage() {
   jsonApiBackend={{
     query: searchValue =&gt; ({
       path: "agent-api/person",
-      fiql: simpleSearchFilterToFiql(
-        SimpleSearchFilterBuilder.create&lt;Organism&gt;()
-          .searchFilter("name", searchValue)
-          .build()
-      )
+      filter: SimpleSearchFilterBuilder.create&lt;Person&gt;()
+        .searchFilter("name", searchValue)
+        .build()
     }),
     option: person =&gt; person?.name
   }}
@@ -1561,11 +1557,9 @@ export default function ExamplePage() {
   jsonApiBackend={{
     query: searchValue =&gt; ({
       path: "agent-api/person",
-      fiql: simpleSearchFilterToFiql(
-        SimpleSearchFilterBuilder.create&lt;Organism&gt;()
-          .searchFilter("name", searchValue)
-          .build()
-      )
+      filter: SimpleSearchFilterBuilder.create&lt;Person&gt;()
+        .searchFilter("name", searchValue)
+        .build()
     }),
     option: person =&gt; person?.name
   }}
@@ -1595,11 +1589,9 @@ export default function ExamplePage() {
   jsonApiBackend={{
     query: searchValue =&gt; ({
       path: "agent-api/person",
-      fiql: simpleSearchFilterToFiql(
-        SimpleSearchFilterBuilder.create&lt;Organism&gt;()
-          .searchFilter("name", searchValue)
-          .build()
-      )
+      filter: SimpleSearchFilterBuilder.create&lt;Person&gt;()
+        .searchFilter("name", searchValue)
+        .build()
     }),
     option: person =&gt; person?.name
   }}
@@ -1622,7 +1614,7 @@ export default function ExamplePage() {
 <div class="sect4">
 <h5 id="_filterbuilderfield_component">FilterBuilderField component</h5>
 <div class="paragraph">
-<p>The FilterBuilderField component provides a Formik input for creating complex filter queries. The FilterGroupModel value this input provides can be converted to an FIQL string to be included in the API request.</p>
+<p>The FilterBuilderField component provides a Formik input for creating complex filter queries. The FilterGroupModel value this input provides can be converted with <code>filterModelToSimpleSearchFilter</code> and sent with <code>filterOrFiqlParams</code>, which uses FIQL only for the "IS NOT" rows the simple filter can&#8217;t express.</p>
 </div>
 <div class="paragraph">
 <p>Example usage for filtering PcrPrimers in a list page:</p>
@@ -1630,10 +1622,13 @@ export default function ExamplePage() {
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-tsx" data-lang="tsx">export default function ExamplePage() {
-  const [filter, setFilter] = useState&lt;FilterParam&gt;();
+  const [filterParams, setFilterParams] = useState&lt;{
+    filter?: SimpleSearchFilter;
+    fiql?: string;
+  }&gt;({});
 
   const onSubmit: DinaFormOnSubmit = ({ submittedValues: { filter } }) =&gt; {
-    setFilter({ fiql: fiql(filter) });
+    setFilterParams(filterOrFiqlParams(filterModelToSimpleSearchFilter(filter)));
   };
 
   return (
@@ -1650,7 +1645,8 @@ export default function ExamplePage() {
         &lt;/DinaForm&gt;
         &lt;QueryTable
           columns={["name", "type", "group.groupName"]}
-          filter={filter}
+          filter={filterParams.filter}
+          fiql={filterParams.fiql}
           include="group"
           path="pcrPrimer"
         /&gt;
@@ -1937,15 +1933,15 @@ provide a button that creates a new Region with a random name and symbol:</p>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Simple filter</strong> query params (e.g. <code>filter[name][ILIKE]=%test%</code>). Used by <code>ResourceSelect</code> and most <code>useQuery</code> calls.</p>
+<p><strong>Simple filter</strong> query params (e.g. <code>filter[name][ILIKE]=%test%</code>). Used by every request, including list pages (<code>ListPageLayout</code>, <code>QueryTable</code>).</p>
 </li>
 <li>
-<p>A <strong>FIQL</strong> string (e.g. <code>fiql=name==<strong>test</strong>;group==aafc</code>). Used by list pages (<code>ListPageLayout</code>, <code>QueryTable</code>) and lookups requiring OR groups or null checks.</p>
+<p>A <strong>FIQL</strong> string (e.g. <code>fiql=name!=<strong>test</strong></code>). Used only for a filter with a negated pattern (<code>NOT_ILIKE</code>, or <code>NEQ</code> with <code>*</code>), which the simple filter cannot express. <code>filterOrFiqlParams(filter)</code> picks the format.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>FIQL is currently being retired. The back-end simple filter grammar supports groups as of <code>dina-base-api</code> 0.178. The UI generates all FIQL strings from a <code>SimpleSearchFilter</code> via <code>simpleSearchFilterToFiql</code>. Retiring FIQL means we will send the filter object directly instead of generating the FIQL string.</p>
+<p>FIQL is currently being retired. The back-end simple filter grammar supports groups as of <code>dina-base-api</code> 0.178. The UI generates all FIQL strings from a <code>SimpleSearchFilter</code> via <code>simpleSearchFilterToFiql</code>.</p>
 </div>
 <div class="sect3">
 <h4 id="_building_a_filter">8.3.1. Building a Filter</h4>
@@ -2027,7 +2023,7 @@ provide a button that creates a new Region with a random name and symbol:</p>
 </div>
 <div class="paragraph">
 <p>The <code>simpleSearchFilterToQueryString(filter)</code> function serializes the object to the back-end simple filter grammar including grouped syntax: <code>(filter[createdBy][EQ]=me|filter[restrictToCreatedBy][EQ]=false)&amp;filter[group][EQ]=aafc</code>.
-The API client uses this function for every <code>filter</code> param. A filter without groups serializes exactly like Kitsu did previously.</p>
+The API client uses this function for every <code>filter</code> param. A filter without groups serializes like Kitsu did previously, except that values the back-end cannot read as typed are quoted or have characters replaced (see <code>simpleSearchFilterQueryString.ts</code>).</p>
 </div>
 <div class="paragraph">
 <p>The filter builder UI model combines easily with <code>additionalFilters</code> after being converted by <code>filterModelToSimpleSearchFilter</code>.</p>
@@ -2041,22 +2037,16 @@ The API client uses this function for every <code>filter</code> param. A filter 
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Replace <code>fiql: simpleSearchFilterToFiql(filter)</code> and <code>fiql={&#8230;&#8203;}</code> with <code>filter: filter</code> and <code>filter={&#8230;&#8203;}</code> everywhere (including <code>ListPageLayout</code>, <code>QueryTable</code>, <code>CollectingEventLinker</code>, <code>AutoSuggestTextField</code>, workbook queries, and storage-unit queries).</p>
-</li>
-<li>
 <p>Update every module filtered with groups to <code>dina-base-api</code> 0.178 or newer. Older versions do not parse the grouped syntax.</p>
 </li>
 <li>
-<p>Identify back-end equivalents for negated partial matches (<code>NOT_ILIKE</code>) and <code>null</code> comparisons. The simple filter grammar lacks both. Currently, <code>simpleSearchFilterToQueryString</code> emits these normally so the web app server-side can intercept and translate them. You must drop them from the UI if back-end equivalents are not created.</p>
-</li>
-<li>
-<p>Removing FIQL fixes unescapable commas. The Apache CXF <code>FiqlParser</code> splits FIQL on <code>,</code> and <code>;</code> before evaluating quotes or backslashes. Currently, searches like <code>Smith, John</code> fail completely. Moving away from FIQL resolves this because the simple filter URL-encodes each value independently. Until FIQL is removed, splitting the value across an OR of equalities is the only workaround.</p>
+<p>Identify back-end equivalents for negated partial matches (<code>NOT_ILIKE</code>) and <code>null</code> comparisons. The simple filter grammar lacks both. Until then, <code>filterOrFiqlParams</code> sends filters with <code>NOT_ILIKE</code> as FIQL, and <code>EQ null</code> / <code>NEQ null</code> match nothing.</p>
 </li>
 <li>
 <p>Avoid mixing <code>fiql=</code> and <code>filter[&#8230;&#8203;]</code> params. The back-end will use FIQL and completely ignore the simple filter.</p>
 </li>
 <li>
-<p>Remove <code>fiql</code> from <code>GetParams</code> (<code>packages/common-ui/types/kitsu.d.ts</code>), <code>useQuery</code>, <code>QueryTable</code>, and <code>fiql.ts</code>. Delete the <code>fiqlArgument</code> quoting rules as well.</p>
+<p>Remove <code>filterOrFiqlParams</code>, then <code>fiql</code> from <code>GetParams</code> (<code>packages/common-ui/types/kitsu.d.ts</code>), <code>useQuery</code>, <code>QueryTable</code>, and <code>fiql.ts</code>. Delete the <code>fiqlArgument</code> quoting rules as well.</p>
 </li>
 </ol>
 </div>
@@ -2907,7 +2897,7 @@ CSVFILE=messages.csv yarn import-intl-csv</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-10-29 20:33:41 UTC
+Last updated 2026-11-16 20:35:57 UTC
 </div>
 </div>
 </body>
