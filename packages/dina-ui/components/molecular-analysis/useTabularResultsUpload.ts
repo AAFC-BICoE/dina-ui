@@ -8,6 +8,7 @@ import { TabularResultsError, toTabularResults } from "./tabularResultsUtils";
 
 export type TabularResultsUploadError =
   | TabularResultsError
+  | "tabularResults_errorInvalidValue"
   | "tabularResults_errorSave";
 
 export interface UseTabularResultsUploadProps {
@@ -136,7 +137,12 @@ export function useTabularResultsUpload({
         await saveTabularResults(tabularResults);
       } catch (saveError) {
         console.error(saveError);
-        setError("tabularResults_errorSave");
+        // The API rejects values that look like HTML (e.g. "<tab>") with this message.
+        setError(
+          String(saveError).includes("Unaccepted value")
+            ? "tabularResults_errorInvalidValue"
+            : "tabularResults_errorSave"
+        );
       }
     }
     setStatus("idle");

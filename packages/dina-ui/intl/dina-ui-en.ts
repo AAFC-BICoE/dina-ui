@@ -1635,13 +1635,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   tabularResults_quickMore: "Showing 5 of {rows} rows.",
   tabularResults_clickOpen: "Click to open full table",
   tabularResults_errorUnreadable:
-    "The file could not be read. Make sure it is a UTF-8 encoded TSV file.",
+    "The file could not be read. Make sure it is a UTF-8 encoded TSV file with no unclosed quotation marks.",
   tabularResults_errorEmpty: "The file is empty.",
   tabularResults_errorInvalidCharacters:
     "The file contains invalid characters (null characters).",
   tabularResults_errorColumns:
     "The file needs a header row with at least 2 columns.",
   tabularResults_errorNoRows: "The file has no data rows.",
+  tabularResults_errorInvalidValue:
+    "The file contains a value that isn't allowed. Remove any text that looks like HTML, such as words in angle brackets.",
   tabularResults_errorSave: "The table could not be saved.",
   tabularResults_retry: "Retry",
   tabularResults_modalTitle: "Tabular Results: {name}",

@@ -10,13 +10,15 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   tabularResults_quickMore: "5 lignes affichées sur {rows}.",
   tabularResults_clickOpen: "Cliquer pour ouvrir le tableau complet",
   tabularResults_errorUnreadable:
-    "Le fichier n'a pas pu être lu. Assurez-vous qu'il s'agit d'un fichier TSV encodé en UTF-8.",
+    "Le fichier n'a pas pu être lu. Assurez-vous qu'il s'agit d'un fichier TSV encodé en UTF-8 sans guillemets non fermés.",
   tabularResults_errorEmpty: "Le fichier est vide.",
   tabularResults_errorInvalidCharacters:
     "Le fichier contient des caractères non valides (caractères nuls).",
   tabularResults_errorColumns:
     "Le fichier doit avoir une ligne d'en-tête d'au moins 2 colonnes.",
   tabularResults_errorNoRows: "Le fichier ne contient aucune ligne de données.",
+  tabularResults_errorInvalidValue:
+    "Le fichier contient une valeur non permise. Retirez tout texte ressemblant à du HTML, comme des mots entre chevrons.",
   tabularResults_errorSave: "Le tableau n'a pas pu être enregistré.",
   tabularResults_retry: "Réessayer",
   tabularResults_modalTitle: "Résultats tabulaires : {name}",

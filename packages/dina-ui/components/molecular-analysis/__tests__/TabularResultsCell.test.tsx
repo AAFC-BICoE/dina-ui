@@ -110,6 +110,21 @@ describe("TabularResultsCell", () => {
     expect(mockSave).toHaveBeenCalledTimes(2);
   });
 
+  it("shows an invalid value error when the API rejects a value", async () => {
+    mockPost.mockResolvedValue({ data: CONVERTED });
+    mockSave.mockRejectedValueOnce(
+      new Error("Bad Request: Unaccepted value detected in attributes")
+    );
+    const { wrapper } = mount(runItem());
+
+    await userEvent.click(wrapper.getByRole("button", { name: /upload tsv/i }));
+    await pickFile(wrapper);
+
+    expect(
+      await wrapper.findByText(/the file contains a value that isn't allowed/i)
+    ).toBeInTheDocument();
+  });
+
   it("only updates tabularResults on an existing result", async () => {
     mockPost.mockResolvedValue({ data: CONVERTED });
     const { wrapper } = mount(
