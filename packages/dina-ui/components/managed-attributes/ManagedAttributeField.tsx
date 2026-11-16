@@ -63,7 +63,9 @@ export function ManagedAttributeFieldWithLabel(
     <label
       key={attributeKey}
       className={`${attributeKey}-field ${
-        compact ? "col-12 mb-1 d-flex align-items-center" : "col-sm-6 mb-3"
+        compact
+          ? "col-12 mb-1 inline-field-spacing d-flex align-items-center"
+          : "col-sm-6 mb-3"
       }`}
       htmlFor="none"
     >

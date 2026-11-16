@@ -169,6 +169,41 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Créer un échantillon à l'aide d'un modèle de formulaire",
   createSavedSearch: "Créer une recherche sauvegardée",
   createSplitWorkflow: "Créer un fractionnement",
+  field_isBaseForSplitByType: "Noms du fractionnement à partir de",
+  splitNamesFromParent: "Parent d’un autre type",
+  splitNamesFromThisSample: "Cet échantillon",
+  splitNamesStartFromHelp:
+    "Ce paramètre ne s’applique que lors de l’utilisation d’une stratégie de fractionnement par type d’échantillon de matériel.",
+  splitNamesFromParentDescription:
+    "Par défaut. Les noms partent de l’échantillon le plus proche au-dessus ayant un type différent.",
+  splitNamesFromThisSampleDescription:
+    "Les noms des échantillons fractionnés sous celui-ci partent de cet échantillon.",
+  splitNamesFromParentRule:
+    "La recherche remonte jusqu’à trouver un échantillon d’un type différent. Ici, ABC-123-a est du même type, elle continue donc jusqu’à ABC-123.",
+  splitNamesFromThisSampleRule:
+    "Lorsque ce paramètre est activé, la recherche s’arrête à cet échantillon, même si un échantillon plus haut (ABC-123) a un type différent.",
+  splitHowBaseIsFound: "Comment la base est trouvée",
+  splitHowBaseIsFoundStep1:
+    "Commencer au parent de l’échantillon en fractionnement.",
+  splitHowBaseIsFoundStep2:
+    "Arrêter si cet échantillon a ce paramètre activé ou un type différent.",
+  splitHowBaseIsFoundStep3:
+    "Sinon, remonter d’un niveau et vérifier à nouveau.",
+  splitExampleWholeOrganism: "Organisme entier",
+  splitExampleOrganismPart: "Partie d’organisme",
+  splitExampleBaseName: "Nom de base",
+  splitExampleBeingSplit: "En fractionnement",
+  splitExampleChecked: "Vérifié",
+  splitExampleNotChecked: "Non vérifié",
+  splitExampleNew: "Nouveau",
+  splitExampleSettingOn: "Ce paramètre : activé",
+  splitExampleSettingOff: "Ce paramètre : désactivé",
+  splitExampleTypeSame: "Type : identique",
+  splitExampleTypeDifferent: "Type : différent",
+  splitExampleKeepGoing: "continuer à remonter",
+  splitExampleStop: "arrêter : les noms partent d’ici",
+  splitExampleFooter:
+    "Les numéros indiquent l’ordre de vérification des niveaux. Les lignes en pointillés sont les nouveaux enfants. Les identifiants et types d’échantillons sont des exemples.",
   createStorage: "Créer un espace d'entreposage",
   customPlaceName: "Nom de lieu personnalisé",
   dataComponents: "Sections",
