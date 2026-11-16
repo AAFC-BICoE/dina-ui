@@ -4804,13 +4804,21 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Add the scheduled action.
-      await userEvent.click(wrapper.container.querySelector(".add-button")!);
+      const scheduledActions = wrapper.container.querySelector<HTMLElement>(
+        "#scheduled-actions-component"
+      )!;
+      await userEvent.click(
+        within(scheduledActions).getByRole("button", { name: /^add$/i })
+      );
 
-      // Verify it appears in the list.
-      await waitFor(() => {
-        expect(wrapper.getByText(/Check Vouchers/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/ongoing/i)).toBeInTheDocument();
-      });
+      // Verify it appears in the list (not just as the sub-form's selected values).
+      await waitFor(() =>
+        expect(
+          within(scheduledActions)
+            .getAllByRole("listitem")
+            .find((li) => li.textContent?.includes("Check Vouchers"))
+        ).toHaveTextContent(/ongoing/i)
+      );
 
       // Save the form
       await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
