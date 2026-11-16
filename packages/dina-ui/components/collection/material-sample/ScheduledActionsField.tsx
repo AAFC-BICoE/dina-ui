@@ -129,7 +129,11 @@ export function ScheduledActionsField({
             }
 
             // Save a new or edited action to the form's array.
-            async function saveAction(saved: ScheduledAction) {
+            async function saveAction(input: ScheduledAction) {
+              // The user select's "<None>" option gives { id: null }; store no assignee instead.
+              const saved = input.assignedTo?.id
+                ? input
+                : _.omit(input, "assignedTo");
               form.setFieldValue(
                 fieldName,
                 editIndex === null
