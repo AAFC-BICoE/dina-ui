@@ -70,6 +70,13 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
             enableSorting: true
           },
           {
+            id: "filename",
+            accessorFn: (row) =>
+              row.filename ?? (row as any).objectUpload?.originalFilename,
+            header: () => <DinaMessage id="field_filename" />,
+            enableSorting: true
+          },
+          {
             id: "dcFormat",
             accessorKey: "dcFormat",
             header: () => <DinaMessage id="field_dcFormat" />
