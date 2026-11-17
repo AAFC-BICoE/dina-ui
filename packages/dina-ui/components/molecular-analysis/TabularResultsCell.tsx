@@ -173,9 +173,11 @@ export function TabularResultsCell({
           replaceError={error}
           onReplace={() => fileInput.current?.click()}
           onRemove={async () => {
-            if (await remove()) {
+            const removed = await remove();
+            if (removed) {
               setModalOpen(false);
             }
+            return removed;
           }}
           onClose={() => setModalOpen(false)}
         />
