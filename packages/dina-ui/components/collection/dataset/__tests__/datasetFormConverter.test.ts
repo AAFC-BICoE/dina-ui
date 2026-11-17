@@ -195,7 +195,10 @@ describe("datasetFormConverter", () => {
   });
 
   it("Returns a blank dataset when there is nothing to convert", () => {
-    expect(convertDatasetToFormData()).toEqual({ type: "dataset" });
+    expect(convertDatasetToFormData()).toEqual({
+      type: "dataset",
+      datasetVersion: "1.0"
+    });
   });
 
   it("Handles a dataset with no multilingual, agent or project values", () => {

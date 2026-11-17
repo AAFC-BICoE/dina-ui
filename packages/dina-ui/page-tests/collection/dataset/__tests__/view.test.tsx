@@ -1,6 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import "@testing-library/jest-dom";
-import { waitFor } from "@testing-library/react";
+import { waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import DatasetDetailsPage from "../../../../pages/collection/dataset/view";
 import { Dataset } from "../../../../types/collection-api";
@@ -106,6 +106,13 @@ describe("Dataset details page", () => {
 
     await userEvent.click(exportButton);
 
+    // Confirm the version in the popup (the version is unchanged, so only the
+    // export request is saved).
+    const dialog = await wrapper.findByRole("dialog");
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: /^export$/i })
+    );
+
     await waitFor(() => {
       expect(mockSave).toHaveBeenCalledWith(
         [
@@ -128,6 +135,6 @@ describe("Dataset details page", () => {
     const savedRequest = mockSave.mock.calls[0][0][0].resource;
     expect(JSON.stringify(savedRequest.query)).toContain("Salmon");
 
-    expect(await wrapper.findByRole("status")).toBeInTheDocument();
+    expect(await wrapper.findByRole("tooltip")).toBeInTheDocument();
   });
 });
