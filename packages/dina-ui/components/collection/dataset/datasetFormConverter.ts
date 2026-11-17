@@ -24,6 +24,9 @@ export interface DatasetFormValues
   license?: License | null;
 }
 
+/** The version pre-populated when creating a new Dataset. */
+export const DEFAULT_DATASET_VERSION = "1.0";
+
 /** A Dataset with the License resolved from usageRights.licenseUrl. */
 export type DatasetWithLicense = Dataset & { license?: License | null };
 
@@ -78,7 +81,7 @@ export function convertDatasetToFormData(
   dataset?: DatasetWithLicense
 ): DatasetFormValues {
   if (!dataset) {
-    return { type: "dataset" };
+    return { type: "dataset", datasetVersion: DEFAULT_DATASET_VERSION };
   }
 
   return {
