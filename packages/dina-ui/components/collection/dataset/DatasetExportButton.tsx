@@ -16,6 +16,9 @@ import {
 
 interface DatasetExportButtonProps {
   dataset: Dataset;
+
+  /** Called after a new version is saved, so the page can show it. */
+  onVersionSaved?: (version: string) => void;
 }
 
 /**
@@ -23,7 +26,10 @@ interface DatasetExportButtonProps {
  * name. The query is converted to the Elasticsearch format the export service
  * expects.
  */
-export function DatasetExportButton({ dataset }: DatasetExportButtonProps) {
+export function DatasetExportButton({
+  dataset,
+  onVersionSaved
+}: DatasetExportButtonProps) {
   const { save } = useApiClient();
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -75,6 +81,7 @@ export function DatasetExportButton({ dataset }: DatasetExportButtonProps) {
           { apiBaseUrl: "/collection-api" }
         );
         datasetToExport = { ...dataset, datasetVersion: newVersion };
+        onVersionSaved?.(newVersion);
       }
 
       const request: DataExport = {
