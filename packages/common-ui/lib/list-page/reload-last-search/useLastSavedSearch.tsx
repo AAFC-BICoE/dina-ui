@@ -35,6 +35,12 @@ interface UseLastSavedSearchProps {
    * to remain the same across tables, it can share the same name.
    */
   uniqueName: string;
+
+  /**
+   * Skip loading the last used search on mount. Used when a form owns the query
+   * tree so the stored value isn't overwritten.
+   */
+  disabled?: boolean;
 }
 
 interface UseLastSavedSearchReturn {
@@ -50,7 +56,8 @@ export function useLastSavedSearch({
   setQueryBuilderTree,
   setSubmittedQueryBuilderTree,
   performSubmit,
-  uniqueName
+  uniqueName,
+  disabled
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
   const [queryLoaded, setQueryLoaded] = useState<boolean>(false);
 
@@ -65,6 +72,9 @@ export function useLastSavedSearch({
 
   // Once the query builder tree has been loaded in, perform a submit.
   useEffect(() => {
+    if (disabled) {
+      return;
+    }
     if (sessionStorageQueryTree) {
       setQueryBuilderTree(Utils.loadTree(sessionStorageQueryTree as JsonTree));
       setSubmittedQueryBuilderTree(
@@ -73,7 +83,7 @@ export function useLastSavedSearch({
     } else {
       performSubmit();
     }
-  }, [queryLoaded]);
+  }, [queryLoaded, disabled]);
 
   return {
     loadLastUsed: !!sessionStorageQueryTree,
