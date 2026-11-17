@@ -50,6 +50,7 @@ export function MolecularAnalysisResultsStep({
     errorMessage,
     multipleRunWarning,
     sequencingRunItems,
+    setSequencingRunItems,
     setReloadGenericMolecularAnalysisRun,
     qualityControls,
     qualityControlTypes,
@@ -84,7 +85,9 @@ export function MolecularAnalysisResultsStep({
     useMolecularAnalysisRunColumns({
       type: "generic-molecular-analysis-results",
       readOnly: true,
-      setReloadGenericMolecularAnalysisRun
+      setSequencingRunItems,
+      setReloadGenericMolecularAnalysisRun,
+      group: molecularAnalysis.group
     });
 
   const qualityControlColumns: ColumnDef<QualityControlWithAttachment>[] =

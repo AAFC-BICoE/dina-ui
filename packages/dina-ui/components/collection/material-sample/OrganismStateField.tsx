@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   DinaFormSection,
   FieldSpy,
+  INLINE_LABEL_WIDTH,
   SimpleSearchFilterBuilder,
   TextField,
   ToggleField,
@@ -10,7 +11,6 @@ import {
 import { DeterminationField, ManagedAttributesEditor } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api";
-import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 /**
@@ -64,9 +64,13 @@ export function OrganismStateField({
   const navIdPrefix = index === 0 ? "organism" : undefined;
 
   return (
-    <DinaFormSection sectionName="organisms-general-section">
+    <DinaFormSection
+      sectionName="organisms-general-section"
+      horizontal={INLINE_LABEL_WIDTH}
+      compact={true}
+    >
       <div className="organism-state-field">
-        <div className="row">
+        <div className="d-flex flex-column">
           {individualEntry && !readOnly && useTargetOrganism && (
             <ToggleField
               {...fieldProps("isTarget")}
@@ -79,36 +83,30 @@ export function OrganismStateField({
             />
           )}
           <AutoSuggestTextField<Organism>
-            className="col-sm-6"
             {...fieldProps("lifeStage")}
             customName="lifeStage"
             jsonApiBackend={{
               query: (search, ctx) => ({
                 path: "collection-api/organism",
-                fiql: simpleSearchFilterToFiql(
-                  SimpleSearchFilterBuilder.create<Organism>()
-                    .searchFilter("lifeStage", search)
-                    .whereProvided("group", "EQ", ctx.values.group)
-                    .build()
-                )
+                filter: SimpleSearchFilterBuilder.create<Organism>()
+                  .searchFilter("lifeStage", search)
+                  .whereProvided("group", "EQ", ctx.values.group)
+                  .build()
               }),
               option: (org) => org?.lifeStage
             }}
             blankSearchBackend={"json-api"}
           />
           <AutoSuggestTextField<Organism>
-            className={individualEntry ? "col-sm-5" : "col-sm-6"}
             {...fieldProps("sex")}
             customName="sex"
             jsonApiBackend={{
               query: (search, ctx) => ({
                 path: "collection-api/organism",
-                fiql: simpleSearchFilterToFiql(
-                  SimpleSearchFilterBuilder.create<Organism>()
-                    .searchFilter("sex", search)
-                    .whereProvided("group", "EQ", ctx.values.group)
-                    .build()
-                )
+                filter: SimpleSearchFilterBuilder.create<Organism>()
+                  .searchFilter("sex", search)
+                  .whereProvided("group", "EQ", ctx.values.group)
+                  .build()
               }),
               option: (org) => org?.sex
             }}
@@ -117,13 +115,11 @@ export function OrganismStateField({
           <TextField
             {...fieldProps("remarks")}
             customName="organismRemarks"
-            className="col-sm-12"
             multiLines={true}
           />
           <TextField
             {...fieldProps("dwcVernacularName")}
             customName="dwcVernacularName"
-            className="col-sm-12"
           />
         </div>
         <DinaFormSection disableEditAllDelete={true}>
@@ -136,7 +132,9 @@ export function OrganismStateField({
             fieldSetProps={{
               legend: <DinaMessage id="organismManagedAttributes" />,
               id: navIdPrefix && `${navIdPrefix}-managed-attributes`,
-              className: "non-strip",
+              className: "non-strip clean-section mt-4",
+              horizontal: INLINE_LABEL_WIDTH,
+              compact: true,
               sectionName: "organism-managed-attributes-section"
             }}
             managedAttributeOrderFieldName="organismManagedAttributesOrder"

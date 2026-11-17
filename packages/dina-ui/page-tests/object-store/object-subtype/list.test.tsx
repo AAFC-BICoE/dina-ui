@@ -53,7 +53,7 @@ describe("Object subtype list page", () => {
       ).toBeInTheDocument();
       expect(wrapper.getByRole("link", { name: /drawing/i })).toHaveAttribute(
         "href",
-        "/object-store/object-subtype/edit?id=6c524135-3c3e-41c1-a057-45afb4e3e7be"
+        "/object-store/object-subtype/view?id=6c524135-3c3e-41c1-a057-45afb4e3e7be"
       );
     });
   });

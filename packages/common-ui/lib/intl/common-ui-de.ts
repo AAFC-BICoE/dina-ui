@@ -162,6 +162,8 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   selected: "ausgewählt",
   showChanges: "Änderungen anzeigen",
   showHide: "Anzeigen / Verbergen",
+  showLess: "Weniger anzeigen",
+  showMore: "Mehr anzeigen",
   somethingWentWrong: "Hier ist etwas schief gegangen",
   sourceField: "Ursprungsfeld",
   sourceText: "Ursprungstext",

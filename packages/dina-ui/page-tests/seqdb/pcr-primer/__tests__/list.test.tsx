@@ -61,7 +61,9 @@ describe("PcrPrimer list page", () => {
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(
         "seqdb-api/pcr-primer",
-        expect.objectContaining({ fiql: "name==*101F*" })
+        expect.objectContaining({
+          filter: { name: { ILIKE: "%101F%" } }
+        })
       );
       expect(wrapper.getByText(/test primer 1/i)).toBeInTheDocument();
       expect(wrapper.getByText(/test primer 2/i)).toBeInTheDocument();

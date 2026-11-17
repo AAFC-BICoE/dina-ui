@@ -470,21 +470,18 @@ describe("useWorkbookConverters", () => {
   });
 
   it("linkRelationshipAttribute 1", async () => {
-    const mockSave = jest
-      .fn()
-      .mockResolvedValue([
-        { id: "newId", type: "object-field", name: "name1" }
-      ]);
+    const mockSave = jest.fn().mockResolvedValue([
+      { id: "newId1", type: "object-field", name: "name1" },
+      { id: "newId2", type: "object-field", name: "name1" }
+    ]);
     jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
       apiClient: {
         get: jest.fn().mockResolvedValue({})
       } as any,
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute } = getWorkbookConverter(
-      mockConfig,
-      "mockEntity"
-    );
+    const { linkRelationshipAttribute, saveWithPendingCreates } =
+      getWorkbookConverter(mockConfig, "mockEntity");
     const mockResource: any = {
       attr1: 123,
       attr2: "abc",
@@ -586,6 +583,7 @@ describe("useWorkbookConverters", () => {
         "group1"
       );
     }
+    await saveWithPendingCreates(async () => undefined);
     expect(mockResource).toEqual({
       attr1: 123,
       attr2: "abc",
@@ -599,14 +597,14 @@ describe("useWorkbookConverters", () => {
         objectArray1: {
           data: [
             {
-              id: "newId",
+              id: "newId2",
               type: "object-field"
             }
           ]
         },
         objectAttr1: {
           data: {
-            id: "newId",
+            id: "newId1",
             type: "object-field"
           }
         }
@@ -616,21 +614,18 @@ describe("useWorkbookConverters", () => {
   });
 
   it("linkRelationshipAttribute 2", async () => {
-    const mockSave = jest
-      .fn()
-      .mockResolvedValue([
-        { id: "newId", type: "object-field", name: "name1" }
-      ]);
+    const mockSave = jest.fn().mockResolvedValue([
+      { id: "newId1", type: "object-field", name: "name1" },
+      { id: "newId2", type: "object-field", name: "name1" }
+    ]);
     jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
       apiClient: {
         get: jest.fn().mockResolvedValue({})
       } as any,
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute } = getWorkbookConverter(
-      mockConfig,
-      "mockEntity"
-    );
+    const { linkRelationshipAttribute, saveWithPendingCreates } =
+      getWorkbookConverter(mockConfig, "mockEntity");
     const mockResource: any = {
       attr1: 123,
       attr2: "abc",
@@ -733,7 +728,16 @@ describe("useWorkbookConverters", () => {
         "group1"
       );
     }
-    expect(mockSave).toHaveBeenCalledTimes(2);
+    // Both new records have the same type, so they are created in one request.
+    await saveWithPendingCreates(async () => undefined);
+    expect(mockSave).toHaveBeenCalledTimes(1);
+    expect(mockSave).toHaveBeenCalledWith(
+      [
+        expect.objectContaining({ type: "object-field" }),
+        expect.objectContaining({ type: "object-field" })
+      ],
+      { apiBaseUrl: "fake-api" }
+    );
     expect(mockResource).toEqual({
       attr1: 123,
       attr2: "abc",
@@ -746,20 +750,145 @@ describe("useWorkbookConverters", () => {
       relationships: {
         objectAttr1: {
           data: {
-            id: "newId",
+            id: "newId1",
             type: "object-field"
           }
         },
         objectArray1: {
           data: [
             {
-              id: "newId",
+              id: "newId2",
               type: "object-field"
             }
           ]
         }
       },
       type: "mock-resource"
+    });
+  });
+
+  it("saveWithPendingCreates sends one request per resource type", async () => {
+    const mockSave = jest.fn(async (args: any[]) =>
+      args.map((arg, i) => ({ id: `${arg.type}-${i}`, type: arg.type }))
+    );
+    jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+      apiClient: { get: jest.fn().mockResolvedValue({}) } as any,
+      save: mockSave
+    } as any);
+    const { linkRelationshipAttribute, saveWithPendingCreates } =
+      getWorkbookConverter(mockConfig, "mockEntity");
+    const createConfig = (type: string) => ({
+      baseApiPath: "fake-api",
+      hasGroup: true,
+      linkOrCreateSetting: LinkOrCreateSetting.CREATE,
+      type
+    });
+    const mockResource: any = {
+      relationshipConfig: createConfig("mock-resource"),
+      a: { name: "a", relationshipConfig: createConfig("type-a") },
+      b: { name: "b", relationshipConfig: createConfig("type-b") },
+      c: { name: "c", relationshipConfig: createConfig("type-a") }
+    };
+
+    for (const key of Object.keys(mockResource)) {
+      await linkRelationshipAttribute(mockResource, {}, key, "group1");
+    }
+    await saveWithPendingCreates(async () => undefined);
+
+    expect(mockSave).toHaveBeenCalledTimes(2);
+    expect(mockResource.relationships).toEqual({
+      a: { data: { id: "type-a-0", type: "type-a" } },
+      b: { data: { id: "type-b-0", type: "type-b" } },
+      c: { data: { id: "type-a-1", type: "type-a" } }
+    });
+    expect(
+      mockSave.mock.calls.map(([args]) => args.map((a) => a.type))
+    ).toEqual([["type-a", "type-a"], ["type-b"]]);
+  });
+
+  describe("saveWithPendingCreates cleanup", () => {
+    const createConfig = (type: string) => ({
+      baseApiPath: "fake-api",
+      hasGroup: true,
+      linkOrCreateSetting: LinkOrCreateSetting.CREATE,
+      type
+    });
+
+    // Queues two "type-a" records and one "type-b" record.
+    async function setup(mockSave: jest.Mock) {
+      const mockBulkDelete = jest.fn().mockResolvedValue({});
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: { get: jest.fn().mockResolvedValue({}) } as any,
+        save: mockSave,
+        bulkDeleteResources: mockBulkDelete
+      } as any);
+      const { linkRelationshipAttribute, saveWithPendingCreates } =
+        getWorkbookConverter(mockConfig, "mockEntity");
+      const mockResource: any = {
+        relationshipConfig: createConfig("mock-resource"),
+        a: { name: "a", relationshipConfig: createConfig("type-a") },
+        b: { name: "b", relationshipConfig: createConfig("type-b") },
+        c: { name: "c", relationshipConfig: createConfig("type-a") }
+      };
+      for (const key of Object.keys(mockResource)) {
+        await linkRelationshipAttribute(mockResource, {}, key, "group1");
+      }
+      return { saveWithPendingCreates, mockBulkDelete };
+    }
+
+    const createdIds = async (args: any[]) =>
+      args.map((arg, i) => ({ id: `${arg.type}-${i}`, type: arg.type }));
+
+    it("keeps the created records and returns the result when saving succeeds", async () => {
+      const { saveWithPendingCreates, mockBulkDelete } = await setup(
+        jest.fn(createdIds)
+      );
+
+      await expect(
+        saveWithPendingCreates(async () => "saved")
+      ).resolves.toEqual("saved");
+      expect(mockBulkDelete).not.toHaveBeenCalled();
+    });
+
+    it("deletes the created records when saving the resources that link to them fails", async () => {
+      const { saveWithPendingCreates, mockBulkDelete } = await setup(
+        jest.fn(createdIds)
+      );
+
+      await expect(
+        saveWithPendingCreates(async () => {
+          throw new Error("save failed");
+        })
+      ).rejects.toThrow("save failed");
+
+      expect(mockBulkDelete.mock.calls).toEqual([
+        [["type-b-0"], { apiBaseUrl: "fake-api", resourceType: "type-b" }],
+        [
+          ["type-a-0", "type-a-1"],
+          { apiBaseUrl: "fake-api", resourceType: "type-a" }
+        ]
+      ]);
+    });
+
+    it("deletes the records created so far when a later create fails", async () => {
+      const mockSave = jest
+        .fn()
+        .mockImplementationOnce(createdIds)
+        .mockRejectedValueOnce(new Error("create failed"));
+      const { saveWithPendingCreates, mockBulkDelete } = await setup(mockSave);
+      const saveResources = jest.fn();
+
+      await expect(saveWithPendingCreates(saveResources)).rejects.toThrow(
+        "create failed"
+      );
+
+      expect(saveResources).not.toHaveBeenCalled();
+      expect(mockBulkDelete.mock.calls).toEqual([
+        [
+          ["type-a-0", "type-a-1"],
+          { apiBaseUrl: "fake-api", resourceType: "type-a" }
+        ]
+      ]);
     });
   });
 

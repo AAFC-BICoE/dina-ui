@@ -1,12 +1,25 @@
 import { PersistedResource } from "kitsu";
 import { StorageUnitForm } from "../../../../components";
 import { clearAndType, mountWithAppContext } from "common-ui";
-import { StorageUnit } from "../../../../types/collection-api";
+import {
+  ControlledVocabularyItem,
+  StorageUnit
+} from "../../../../types/collection-api";
 import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 const STORAGE_UNIT_TYPE_NAME = "Type";
+
+const TEST_MANAGED_ATTRIBUTE: PersistedResource<ControlledVocabularyItem> = {
+  id: "verbatim-family",
+  type: "controlled-vocabulary-item",
+  key: "verbatim_family",
+  name: "Verbatim family",
+  group: "test-group",
+  dinaComponent: "STORAGE_UNIT",
+  vocabularyElementType: "STRING"
+};
 
 const PARENT_STORAGE_UNIT: PersistedResource<StorageUnit> = {
   id: "A",
@@ -38,6 +51,8 @@ const mockGet = jest.fn<any, any>(async (path) => {
       };
     case "user-api/group":
       return { data: [{ name: "aafc", labels: { en: "AAFC" } }] };
+    case "collection-api/controlled-vocabulary-item":
+      return { data: [TEST_MANAGED_ATTRIBUTE] };
   }
 });
 
@@ -124,6 +139,43 @@ describe("Storage Unit edit page.", () => {
           { apiBaseUrl: "/collection-api" }
         ]
       ]);
+    });
+  });
+
+  it("Loads, edits and saves a Storage Unit managed attribute", async () => {
+    const storageUnit: PersistedResource<StorageUnit> = {
+      ...PARENT_STORAGE_UNIT,
+      managedAttributes: {
+        verbatim_family: "Carabidae"
+      }
+    };
+
+    const wrapper = mountWithAppContext(
+      <StorageUnitForm storageUnit={storageUnit} onSaved={mockOnSaved} />,
+      { apiContext }
+    );
+
+    const managedAttributeInput = await wrapper.findByDisplayValue("Carabidae");
+
+    await clearAndType(managedAttributeInput, "Carabidae (historical)");
+
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(mockSave).toHaveBeenLastCalledWith(
+        [
+          {
+            resource: expect.objectContaining({
+              id: "A",
+              managedAttributes: {
+                verbatim_family: "Carabidae (historical)"
+              }
+            }),
+            type: "storage-unit"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
     });
   });
 });

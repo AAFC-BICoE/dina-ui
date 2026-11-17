@@ -5,8 +5,7 @@ import {
   SaveArgs,
   SimpleSearchFilterBuilder,
   useApiClient,
-  useQuery,
-  simpleSearchFilterToFiql
+  useQuery
 } from "common-ui";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { MaterialSample, StorageUnit } from "../../../types/collection-api";
@@ -50,11 +49,9 @@ export function StorageUnitSampleSelectionStep({
   useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
-      fiql: simpleSearchFilterToFiql(
-        SimpleSearchFilterBuilder.create()
-          .where("storageUnitUsage.storageUnit.uuid", "EQ", storageUnit?.id)
-          .build()
-      ),
+      filter: SimpleSearchFilterBuilder.create()
+        .where("storageUnitUsage.storageUnit.uuid", "EQ", storageUnit?.id)
+        .build(),
       page: { limit: 1000 },
       include: "storageUnitUsage"
     },

@@ -1,6 +1,5 @@
 import {
   SimpleSearchFilterBuilder,
-  simpleSearchFilterToFiql,
   useAccount,
   useApiClient
 } from "common-ui/lib";
@@ -341,15 +340,13 @@ export default function useSavedExports<TData extends KitsuResource>({
     // Group restriction reduces API checks while the API enforces user-level permissions.
     await apiClient
       .get<DataExportTemplate[]>("dina-export-api/data-export-template", {
-        fiql: simpleSearchFilterToFiql(
-          SimpleSearchFilterBuilder.create<DataExportTemplate>()
-            .or((b) =>
-              b
-                .where("publiclyReleasable", "EQ", true)
-                .whereIn("group", groupNames)
-            )
-            .build()
-        )
+        filter: SimpleSearchFilterBuilder.create<DataExportTemplate>()
+          .or((b) =>
+            b
+              .where("publiclyReleasable", "EQ", true)
+              .whereIn("group", groupNames)
+          )
+          .build()
       })
       .then((response) => {
         setLoadingSavedExports(false);

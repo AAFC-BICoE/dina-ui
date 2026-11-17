@@ -42,6 +42,9 @@ export interface GlobalNamesSearchBoxProps {
 
   setValue?: (newValue: any) => void;
 
+  /** Render without the surrounding card border and padding. */
+  compact?: boolean;
+
   /** user entered initial search value. */
   initSearchValue?: string;
 
@@ -69,6 +72,7 @@ export function GlobalNamesSearchBox({
   onChange,
   formik,
   isDetermination,
+  compact = false,
   dateSupplier = () => moment().format("YYYY-MM-DD") // Today
 }: GlobalNamesSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
@@ -255,7 +259,7 @@ export function GlobalNamesSearchBox({
   };
 
   return (
-    <div className="card card-body">
+    <div className={compact ? "" : "card card-body"}>
       <div className="d-flex align-items-center">
         <div className="flex-grow-1">
           {isDetermination ? (
@@ -264,7 +268,11 @@ export function GlobalNamesSearchBox({
                 <input
                   aria-label={formatMessage("globalNameSearchLabel")}
                   className="form-control global-name-input"
-                  onChange={(e) => onInputChange((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
+                  onChange={(e) =>
+                    onInputChange(
+                      (e.target as HTMLTextAreaElement | HTMLInputElement).value
+                    )
+                  }
                   onFocus={(e) => (e.target as HTMLInputElement).select()}
                   onKeyDown={(e) => {
                     if (e.keyCode === 13) {
@@ -341,7 +349,11 @@ export function GlobalNamesSearchBox({
               <input
                 aria-label={formatMessage("colSearchLabel")}
                 className="form-control global-name-input"
-                onChange={(e) => onInputChange((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
+                onChange={(e) =>
+                  onInputChange(
+                    (e.target as HTMLTextAreaElement | HTMLInputElement).value
+                  )
+                }
                 onFocus={(e) => (e.target as HTMLInputElement).select()}
                 onKeyDown={(e) => {
                   if (e.keyCode === 13) {

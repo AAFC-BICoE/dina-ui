@@ -813,6 +813,67 @@ describe("Material Sample Edit Page", () => {
     ]);
   });
 
+  it("Lets the collecting event tabs be changed with the arrow keys.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tab", { name: /create new/i })
+      ).toBeInTheDocument()
+    );
+
+    const createNewTab = wrapper.getByRole("tab", { name: /create new/i });
+    await userEvent.click(createNewTab);
+    await userEvent.keyboard("{ArrowRight}");
+
+    const linkExistingTab = wrapper.getByRole("tab", {
+      name: /link existing/i
+    });
+    await waitFor(() =>
+      expect(linkExistingTab).toHaveAttribute("aria-selected", "true")
+    );
+    expect(linkExistingTab).toHaveFocus();
+    // Only the selected tab is in the Tab order:
+    expect(createNewTab).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("Keeps the sidebar sub-links in sync with the collecting event cards on the page.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tab", { name: /create new/i })
+      ).toBeInTheDocument()
+    );
+    const identifiersLink = () =>
+      wrapper.container.querySelector('.sub-nav-list a[href="#identifiers"]');
+
+    await waitFor(() => expect(identifiersLink()).toBeInTheDocument());
+
+    // Take the card out and put it back without React re-rendering the sidebar
+    // (like a tab switch or async load elsewhere on the page):
+    const card = document.getElementById("identifiers")!;
+    const parent = card.parentNode!;
+    const nextSibling = card.nextSibling;
+    card.remove();
+    await waitFor(() => expect(identifiersLink()).not.toBeInTheDocument());
+
+    parent.insertBefore(card, nextSibling);
+    await waitFor(() => expect(identifiersLink()).toBeInTheDocument());
+  });
+
   it("Discards create-new collecting event changes and links to existing collecting event when toggled back.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
@@ -3272,12 +3333,11 @@ describe("Material Sample Edit Page", () => {
   });
 
   describe("Use Next Identifer functionality", () => {
-    it("Use Next Identifier checkbox disabled if no collection is selected", async () => {
+    it("Next available button disabled if no collection is selected", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleForm
           materialSample={{
             type: "material-sample",
-            id: "333",
             group: "test-group",
             materialSampleName: "test-ms"
           }}
@@ -3287,23 +3347,15 @@ describe("Material Sample Edit Page", () => {
       );
       await waitForLoadingToDisappear();
 
+      // The Next available button should be disabled:
       await waitFor(() =>
         expect(
-          wrapper.getByRole("checkbox", {
-            name: /use next available identifier/i
-          })
-        ).toBeInTheDocument()
+          wrapper.getByRole("button", { name: /next available/i })
+        ).toBeDisabled()
       );
-
-      // The Use Next Identifier checkbox should be disabled:
-      expect(
-        wrapper.getByRole("checkbox", {
-          name: /use next available identifier/i
-        })
-      ).toBeDisabled();
     });
 
-    it("Use Next Identifier checkbox enabled if a collection is selected", async () => {
+    it("Next available button enabled if a collection is selected", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleForm
           materialSample={{
@@ -3332,14 +3384,15 @@ describe("Material Sample Edit Page", () => {
         ).toHaveDisplayValue("COLL");
       });
 
-      // The Use Next Identifier checkbox should be enabled:
-      const checkbox = wrapper.getByRole("checkbox", {
-        name: /use next available identifier/i
+      // The Next available button should be enabled:
+      const nextAvailableButton = wrapper.getByRole("button", {
+        name: /next available/i
       });
-      expect(checkbox).toBeEnabled();
+      expect(nextAvailableButton).toBeEnabled();
 
-      // Click the checkbox to use the next available identifier:
-      await userEvent.click(checkbox);
+      // Click the button to use the next available identifier:
+      await userEvent.click(nextAvailableButton);
+      expect(nextAvailableButton).toHaveAttribute("aria-pressed", "true");
 
       // Submit the form, an API call should be made to determine the next available identifier.
       await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -4748,9 +4801,7 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Add the scheduled action.
-      await userEvent.click(
-        wrapper.getAllByRole("button", { name: /add/i })[0]
-      );
+      await userEvent.click(wrapper.container.querySelector(".add-button")!);
 
       // Verify it appears in the table.
       await waitFor(() => {

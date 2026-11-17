@@ -1,13 +1,43 @@
 import { DINAUI_MESSAGES_ENGLISH } from "./dina-ui-en";
 
 export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
+  tabularResults_column: "Résultats tabulaires",
+  tabularResults_upload: "Téléverser un TSV",
+  tabularResults_countShort: "{rows} lignes · {cols} colonnes",
+  tabularResults_rows: "lignes",
+  tabularResults_columns: "colonnes",
+  tabularResults_openAria: "Ouvrir le tableau complet, {name}, {counts}",
+  tabularResults_quickMore: "5 lignes affichées sur {rows}.",
+  tabularResults_clickOpen: "Cliquer pour ouvrir le tableau complet",
+  tabularResults_errorUnreadable:
+    "Le fichier n'a pas pu être lu. Assurez-vous qu'il s'agit d'un fichier TSV encodé en UTF-8 sans guillemets non fermés.",
+  tabularResults_errorEmpty: "Le fichier est vide.",
+  tabularResults_errorInvalidCharacters:
+    "Le fichier contient des caractères non valides (caractères nuls).",
+  tabularResults_errorColumns:
+    "Le fichier doit avoir une ligne d'en-tête d'au moins 2 colonnes.",
+  tabularResults_errorNoRows: "Le fichier ne contient aucune ligne de données.",
+  tabularResults_errorInvalidValue:
+    "Le fichier contient une valeur non permise. Retirez tout texte ressemblant à du HTML, comme des mots entre chevrons.",
+  tabularResults_errorSave: "Le tableau n'a pas pu être enregistré.",
+  tabularResults_retry: "Réessayer",
+  tabularResults_modalTitle: "Résultats tabulaires : {name}",
+  tabularResults_replaceFile: "Remplacer le fichier",
+  tabularResults_parsing: "Analyse du fichier en cours...",
+  tabularResults_tableKept: "Le tableau existant a été conservé.",
+  tabularResults_confirmTitle: "Supprimer les résultats tabulaires",
+  tabularResults_confirmText:
+    "Supprimer les résultats tabulaires de cet élément de l'analyse ?",
+  removeButtonText: "Supprimer",
+
   LETTER: "Lettre",
   NUMERICAL: "Numérique",
+  accessAndTags: "Accès et étiquettes",
   actionType: "Type d’action",
   addAnother: "Ajouter un autre {typeName}",
   addAnotherIdentifier: "Ajouter un autre identifiant",
   addAssemblageTitle: "Ajouter un assemblage",
-  addAssertion: "Ajouter une géoréférence",
+  addAssertion: "Ajouter une assertion",
   addAttachments: "Ajouter des pièces jointes",
   addAttributesTemplateTitle: "Nouveau modèle d’attributs",
   addCataloguedObjectTitle: "Ajouter un objet catalogué",
@@ -20,6 +50,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addExistingStorageUnitAsChild: "Ajouter une unité de stockage existante",
   addExistingStorageUnitAsChild_tooltip:
     "Ajouter une unité de stockage existante comme enfant de cette unité de stockage.",
+  addExternalResource: "Ajouter une ressource externe",
   addExternalResourceTitle: "Ajouter une nouvelle ressource externe",
   addFilesButton: "Ajouter des fichiers",
   addGroup: "Ajouter un groupe",
@@ -167,12 +198,50 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Créer un échantillon à l'aide d'un modèle de formulaire",
   createSavedSearch: "Créer une recherche sauvegardée",
   createSplitWorkflow: "Créer un fractionnement",
+  field_isBaseForSplitByType: "Noms du fractionnement à partir de",
+  splitNamesFromParent: "Parent d’un autre type",
+  splitNamesFromThisSample: "Cet échantillon",
+  splitNamesStartFromHelp:
+    "Ce paramètre ne s’applique que lors de l’utilisation d’une stratégie de fractionnement par type d’échantillon de matériel.",
+  splitNamesFromParentDescription:
+    "Par défaut. Les noms partent de l’échantillon le plus proche au-dessus ayant un type différent.",
+  splitNamesFromThisSampleDescription:
+    "Les noms des échantillons fractionnés sous celui-ci partent de cet échantillon.",
+  splitNamesFromParentRule:
+    "La recherche remonte jusqu’à trouver un échantillon d’un type différent. Ici, ABC-123-a est du même type, elle continue donc jusqu’à ABC-123.",
+  splitNamesFromThisSampleRule:
+    "Lorsque ce paramètre est activé, la recherche s’arrête à cet échantillon, même si un échantillon plus haut (ABC-123) a un type différent.",
+  splitHowBaseIsFound: "Comment la base est trouvée",
+  splitHowBaseIsFoundStep1:
+    "Commencer au parent de l’échantillon en fractionnement.",
+  splitHowBaseIsFoundStep2:
+    "Arrêter si cet échantillon a ce paramètre activé ou un type différent.",
+  splitHowBaseIsFoundStep3:
+    "Sinon, remonter d’un niveau et vérifier à nouveau.",
+  splitExampleWholeOrganism: "Organisme entier",
+  splitExampleOrganismPart: "Partie d’organisme",
+  splitExampleBaseName: "Nom de base",
+  splitExampleBeingSplit: "En fractionnement",
+  splitExampleChecked: "Vérifié",
+  splitExampleNotChecked: "Non vérifié",
+  splitExampleNew: "Nouveau",
+  splitExampleSettingOn: "Ce paramètre : activé",
+  splitExampleSettingOff: "Ce paramètre : désactivé",
+  splitExampleTypeSame: "Type : identique",
+  splitExampleTypeDifferent: "Type : différent",
+  splitExampleKeepGoing: "continuer à remonter",
+  splitExampleStop: "arrêter : les noms partent d’ici",
+  splitExampleFooter:
+    "Les numéros indiquent l’ordre de vérification des niveaux. Les lignes en pointillés sont les nouveaux enfants. Les identifiants et types d’échantillons sont des exemples.",
   createStorage: "Créer un espace d'entreposage",
   customPlaceName: "Nom de lieu personnalisé",
   dataComponents: "Sections",
   dataEntryLabel: "Saisie de données",
-  dataType: "Taper: ",
-  dataValue: "Valeur: ",
+  dataType: "Type",
+  dataValue: "Valeur",
+  addExtension: "Ajouter une extension",
+  removeExtension: "Supprimer l'extension",
+  addField: "Ajouter un champ",
   dataset: "Ensemble de données",
   datasetSearchTooltip:
     "Pour utiliser un ensemble de données différent du Catalogue de la vie.",
@@ -338,6 +407,11 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dwcGeoreferenceVerificationStatus: "Géoréférencement impossible",
   field_dwcMunicipality: "Municipalité",
   field_dwcOtherCatalogNumbers: "Autres numéros de catalogues",
+  nextAvailable: "Prochain disponible",
+  assignedOnSave: "Attribué à l’enregistrement",
+  setCollectionToUseNextAvailable:
+    "Définissez une collection pour utiliser Prochain disponible.",
+  identifierTypePlaceholder: "Type...",
   field_dwcOtherRecordNumbers: "Autres numéros de mentions",
   field_dwcRecordNumber: "Numéro du collecteur",
   field_dwcRecordNumber_tooltip:
@@ -548,6 +622,11 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   generateSeries: "Produire une série",
   generatingReport: "Production de rapport...",
   geoReferenceAssertion: "Assertion de géoréférencement",
+  assertionNumber: "Assertion {number}",
+  georeferencingStatus: "Statut du géoréférencement",
+  georeferenced: "Géoréférencé",
+  notPossible: "Impossible",
+  exampleValue: "p. ex. {value}",
   geoReferencing: "Géoréférencement",
   geoReferencingLegend: "Géoréférencement",
   geographyLegend: "Géographie (Lieux)",
@@ -572,6 +651,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   groupSearchPlaceholder: "Rechercher par code, chemin ou étiquette",
   groupsIBelongTo: "Mes groupes",
   hideSelectedOptions: "Masquer les sélectionnés",
+  hideEmptySections:
+    "{count, plural, one {Masquer # section vide} other {Masquer # sections vides}}",
+  showEmptySections:
+    "{count, plural, one {Afficher # section vide} other {Afficher # sections vides}}",
   hierarchyMoreLevels: "{count} de plus",
   hierarchyOtherType: "Autre / aucun type",
   hierarchyShowMoreLevels: "Afficher {count} niveaux de plus",
@@ -606,7 +689,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   longitudeValidationError:
     "Longitude invalide : {longtitude}, \nLa longitude valide est comprise entre -180 et 180 pour les degrés, et entre 0 et 60 pour les minutes et les secondes",
   makeFiledAs: "Indiquer comme Classé en tant que",
-  makePrimary: "Marque principale",
+  makePrimary: "Définir comme principale",
   managedAttributeEditTitle: "Modifier l’attribut géré",
   managedAttributeTemplateOrderInfo:
     "Cette disposition des attributs gérés sera sauvegardée dans le modèle de formulaire.",
@@ -692,6 +775,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   mustBeValidIntegerValue: "Doit être une valeur entière valide.",
   myRoleInGroup: "Mon rôle",
   noChildren: "Aucune table enfant",
+  noDataComponent: "Aucun composant de données",
   noFileToDisplay: "Aucun fichier à afficher",
   noFiltersAvailable: "Aucun filtre disponible",
   noGroups: "Aucun groupe",
@@ -705,10 +789,11 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   publiclyReleasable: "Diffusion publique",
   objectListTitle: "Objets stockés",
   objectStoreDataUnavailable:
-    "Les données du stockage de l’objet ne sont pas disponibles",
+    "Les pièces jointes ne peuvent pas être chargées pour le moment. Veuillez réessayer plus tard.",
   objectStoreDetailsTitle: "Détails sur le stockage de l’objet",
   objectStoreTitle: "Dépôt d’objet",
   objectSubtypeListTitle: "Sous-types d’objet",
+  objectSubtypeName: "Nom du sous-type d’objet",
   objectSubtypeTitle: "Sous-type d’objet",
   openGeographySearchButtonLabel: "Recherche sur Open Street Maps",
   organism: "Organisme",
@@ -796,7 +881,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   queryBuilder_value_true: "true",
   reception: "Réception",
   reloadSavedSearch: "Recharger la recherche enregistrée",
-  removeAssertionLabel: "Supprimer ce géoréférencement",
+  removeAssertionLabel: "Supprimer l'assertion",
   removeComponentData: "Suppression des données de {composant}",
   removeFromParentStorageUnit: "Retirer de l’unité de stockage parent",
   removeGroup: "Supprimer un groupe",
@@ -850,6 +935,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   savedSearchOverwriteExisting:
     "Il existe déjà une recherche enregistrée portant le nom « {savedSearchName} ». La création de cette recherche enregistrée écrasera la recherche enregistrée existante.",
   scheduledActions: "Actions prévues",
+  addClassificationRank: "Ajouter un rang de classification",
+  removeClassificationRank: "Supprimer le rang de classification",
+  enterClassificationManually: "Saisir la classification manuellement",
   scientificNameSearch: "Classification",
   searchButton: "Recherche",
   searchOnCOL: "Chercher dans le Catalogue of Life",
@@ -874,8 +962,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   settingLabel: "Paramètres",
   shipmentAddress: "Adresse d'expédition",
   shipmentDetails: "Détails de l'expédition",
-  showLess: "Montrer moins",
-  showMore: "Montrer plus",
   showing: "Affiché",
   showingFilteredStorageUnits: "Afficher les unités de stockage filtrées",
   showingTopLevelStorageUnits:
@@ -965,6 +1051,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   reindexNoSubmissions: "Aucune requête soumise pour l’instant.",
   reindexAccepted: "Acceptée",
   reindexFailed: "Échouée",
+  reindexUnconfirmed: "Non confirmée",
+  reindexTimedOut:
+    "L’API n’a pas répondu à temps. La réindexation est peut-être encore en cours, vérifiez les résultats de recherche avant de réessayer.",
   tags: "Étiquettes",
   target: "Cible",
   taxonomicHierarchy: "Hiérarchie taxonomique",
@@ -1004,7 +1093,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   typeNewTagOrSearchPreviousTags:
     "Entrer la nouvelle étiquette ou consulter les précédentes étiquettes",
   typeSpecimen: "Taper spécimen",
-  unit: "Unité: ",
+  unit: "Unité",
   unsavedChanges: "Modifications non sauvegardées apportées",
   unsetAsDefault: "Ne plus définir par défaut",
   unsupportedFileTypeError:

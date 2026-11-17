@@ -4,6 +4,7 @@ import {
   OR_KEY,
   SimpleSearchFilter,
   isEmptySimpleSearchFilter,
+  isPlainFilterValue,
   mergeSimpleSearchFilters
 } from "../util/simpleSearchFilterBuilder";
 import { FreeTextSearchFilterModel } from "../filter-free-text-search/FilterFreeTextSearchField";
@@ -84,7 +85,12 @@ function rowToFilter(row: FilterRowModel): SimpleSearchFilter {
       : attribute;
   const selector = attributeConfig.name;
 
-  if (searchType === "BLANK_FIELD") {
+  // Ignore BLANK_FIELD if carried over onto a DATE attribute.
+  if (searchType === "BLANK_FIELD" && attributeConfig.type !== "DATE") {
+    // Use LIKE "%" for non-blank text fields since back-end "NEQ null" matches nothing.
+    if (predicate === "IS NOT" && isTextAttribute(attributeConfig)) {
+      return { [selector]: { LIKE: "%" } };
+    }
     return { [selector]: { [predicate === "IS" ? "EQ" : "NEQ"]: null } };
   }
 
@@ -131,13 +137,14 @@ function rowToFilter(row: FilterRowModel): SimpleSearchFilter {
     // Sort dates in case they are given out of order.
     const [low, high] = dates.sort((a, b) => Date.parse(a) - Date.parse(b));
 
+    // Send dates in UTC ("Z") because the back-end parser strips "+" from "+hh:mm" offsets.
     const beginningOfRange = new Date(low);
     beginningOfRange.setHours(0, 0, 0, 0); // Beginning of the day.
-    const beginningOfRangeString = moment(beginningOfRange).format();
+    const beginningOfRangeString = moment(beginningOfRange).toISOString();
 
     const endOfRange = new Date(high);
     endOfRange.setHours(23, 59, 59, 999); // End of the day.
-    const endOfRangeString = moment(endOfRange).format();
+    const endOfRangeString = moment(endOfRange).toISOString();
 
     switch (predicate) {
       case "FROM":
@@ -164,6 +171,26 @@ function rowToFilter(row: FilterRowModel): SimpleSearchFilter {
   );
 }
 
+/** Returns true for non-range string attributes. */
+function isTextAttribute(attributeConfig: FilterAttributeConfig): boolean {
+  return (
+    (attributeConfig.type ?? "STRING") === "STRING" &&
+    !attributeConfig.allowRange
+  );
+}
+
+/**
+ * Returns true if all non-wildcard characters in `value` are non-plain characters
+ * (which would otherwise turn into all-wildcard patterns matching every record).
+ */
+function isUnsearchable(value: string): boolean {
+  const characters = Array.from(value.replace(/[%_*]/g, ""));
+  return (
+    characters.length > 0 &&
+    characters.every((character) => !isPlainFilterValue(character))
+  );
+}
+
 /** A single exact, partial, positive or negated value match condition. */
 function matchFilter(
   selector: string,
@@ -171,10 +198,23 @@ function matchFilter(
   positive: boolean,
   value: string | null
 ): SimpleSearchFilter {
+  // Fall back to EQ when a positive pattern has only non-plain characters (see isUnsearchable)
+  if (
+    positive &&
+    value !== null &&
+    (searchType === "PARTIAL_MATCH" || value.includes("*")) &&
+    isUnsearchable(value)
+  ) {
+    return { [selector]: { EQ: value } };
+  }
   if (searchType === "PARTIAL_MATCH") {
     return {
       [selector]: { [positive ? "ILIKE" : "NOT_ILIKE"]: `%${value}%` }
     };
+  }
+  // Treat "*" in an exact match as a wildcard (LIKE for positive, NEQ for negated FIQL)
+  if (value?.includes("*")) {
+    return { [selector]: positive ? { LIKE: value } : { NEQ: value } };
   }
   return { [selector]: { [positive ? "EQ" : "NEQ"]: value } };
 }
@@ -191,7 +231,10 @@ function freeTextSearchToFilter(
     filterAttributes.map((attribute) => {
       const selector =
         typeof attribute === "string" ? attribute : attribute.name;
-      return { [selector]: { ILIKE: `%${value}%` } };
+      // Fall back to EQ when value has only non-plain characters
+      return isUnsearchable(value)
+        ? { [selector]: { EQ: value } }
+        : { [selector]: { ILIKE: `%${value}%` } };
     })
   );
 }

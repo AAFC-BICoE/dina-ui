@@ -17,6 +17,10 @@ if (process.env.GITHUB_ACTIONS === "true") {
 
 const config: Config.InitialOptions = {
   reporters,
+  // Only scan the packages directory for tests, do not scan node modules or git worktrees.
+  roots: ["<rootDir>/packages"],
+  // Improve stability of test coverage on local developer machines to prevent using too much memory.
+  ...(process.env.CI ? {} : { maxWorkers: "25%" }),
   collectCoverageFrom: ["**/*.{ts,tsx,js,jsx}"],
   coveragePathIgnorePatterns: [
     "/node_modules/",
@@ -73,9 +77,7 @@ const config: Config.InitialOptions = {
       }
     ]
   },
-  transformIgnorePatterns: [
-    `/node_modules/(?!common-ui|axios|dnd-core|uuid|dexie)`
-  ],
+  transformIgnorePatterns: [`/node_modules/(?!common-ui|axios|dnd-core|dexie)`],
   globalSetup: "./jest-global-setup.js"
 };
 

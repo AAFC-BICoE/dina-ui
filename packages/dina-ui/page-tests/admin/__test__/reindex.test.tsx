@@ -22,6 +22,13 @@ const apiContext: any = {
 
 const adminAccount = { isAdmin: true };
 
+/** Matches the error thrown by the api client's makeAxiosErrorMoreReadable interceptor. */
+function httpError(status: number, statusText = "") {
+  return Object.assign(new Error(`index-refresh: ${statusText}`), {
+    cause: { status, statusText }
+  });
+}
+
 const EXPECTED_HEADERS = {
   headers: { "Content-Type": "application/vnd.api+json" }
 };
@@ -158,9 +165,7 @@ describe("Reindex Documents page", () => {
   });
 
   it("Displays a failed entry when the request is rejected", async () => {
-    mockPost.mockRejectedValue({
-      response: { status: 400, statusText: "Bad Request" }
-    });
+    mockPost.mockRejectedValue(httpError(400, "Bad Request"));
     mountWithAppContext(<ReindexPage />, {
       apiContext,
       accountContext: adminAccount
@@ -168,8 +173,68 @@ describe("Reindex Documents page", () => {
 
     await userEvent.click(screen.getByRole("button", { name: /Reindex All/ }));
 
-    expect(await getSubmittedList().findByText("Failed")).toBeInTheDocument();
-    expect(getSubmittedList().getByText(/400 Bad Request/)).toBeInTheDocument();
+    expect(
+      await getSubmittedList().findByText("Failed 400")
+    ).toBeInTheDocument();
+    expect(getSubmittedList().getByText(/Bad Request/)).toBeInTheDocument();
+  });
+
+  it.each([
+    ["a gateway timeout", httpError(504), "Unconfirmed 504"],
+    ["no response", { message: "Network Error" }, "Unconfirmed"]
+  ])(
+    "Displays an unconfirmed entry when reindex all gets %s",
+    async (_, rejection, badgeText) => {
+      mockPost.mockRejectedValue(rejection);
+      mountWithAppContext(<ReindexPage />, {
+        apiContext,
+        accountContext: adminAccount
+      });
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /Reindex All/ })
+      );
+
+      expect(
+        await getSubmittedList().findByText(badgeText)
+      ).toBeInTheDocument();
+      expect(
+        getSubmittedList().getByText(/Reindexing may still be running/)
+      ).toBeInTheDocument();
+      expect(getSubmittedList().queryByText(/Failed/)).toBeNull();
+    }
+  );
+
+  it("Displays a failed entry when reindex all gets a 404", async () => {
+    mockPost.mockRejectedValue(httpError(404));
+    mountWithAppContext(<ReindexPage />, {
+      apiContext,
+      accountContext: adminAccount
+    });
+
+    await userEvent.click(screen.getByRole("button", { name: /Reindex All/ }));
+
+    expect(
+      await getSubmittedList().findByText("Failed 404")
+    ).toBeInTheDocument();
+  });
+
+  it("Displays a failed entry when a single document reindex times out", async () => {
+    mockPost.mockRejectedValue(httpError(504));
+    mountWithAppContext(<ReindexPage />, {
+      apiContext,
+      accountContext: adminAccount
+    });
+
+    await userEvent.click(screen.getByLabelText("Single document"));
+    await userEvent.type(screen.getByLabelText("Document UUID"), VALID_UUID);
+    await userEvent.click(
+      screen.getByRole("button", { name: /Reindex Document/ })
+    );
+
+    expect(
+      await getSubmittedList().findByText("Failed 504")
+    ).toBeInTheDocument();
   });
 
   it("Resets the form back to the defaults", async () => {

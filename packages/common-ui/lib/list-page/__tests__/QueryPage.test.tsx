@@ -5,7 +5,7 @@ import {
   waitForLoadingToDisappear
 } from "common-ui";
 import { mockResponses, mockResponsesTabs } from "../__mocks__/QueryPageMocks";
-import { waitFor } from "@testing-library/react";
+import { act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MaterialSampleListPage from "@dina-ui/pages/collection/material-sample/list";
 import "@testing-library/jest-dom";
@@ -120,7 +120,10 @@ describe("QueryPage test", () => {
       })
     );
 
-    // Click the Bulk Delete button
+    // Click the Bulk Delete button (inside the Actions dropdown)
+    await userEvent.click(
+      wrapper.container.querySelector(".bulk-actions-dropdown button")!
+    );
     await userEvent.click(
       wrapper.getByRole("button", {
         name: /delete selected/i
@@ -162,6 +165,88 @@ describe("QueryPage test", () => {
     // Verify router.reload() is called at the very end
     await waitFor(() => {
       expect(mockReload).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("Clears the checked rows when the selected groups change", async () => {
+    mockPost.mockImplementation(async (path) => mockResponses[path]);
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <MaterialSampleListPage />
+      </DinaForm>,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+    await wrapper.findByTestId("ReactTable");
+
+    await userEvent.click(
+      wrapper.getByRole("checkbox", { name: /check all/i })
+    );
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/matched records.*2 selected/i)
+      ).toBeInTheDocument();
+    });
+
+    // Change the group to trigger the clearing of checked rows.
+    act(() => {
+      writeStorage("material-sample-list_groupStorage", ["cnc"]);
+    });
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/matched records.*0 selected/i)
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("Keeps the checked rows when the page or sort changes", async () => {
+    writeStorage("material-sample-list-last-used-page-size", 1);
+    mockPost.mockImplementation(async (path) => mockResponses[path]);
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <MaterialSampleListPage />
+      </DinaForm>,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+    await wrapper.findByTestId("ReactTable");
+
+    await userEvent.click(
+      wrapper.getByRole("checkbox", { name: /check all/i })
+    );
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/matched records.*2 selected/i)
+      ).toBeInTheDocument();
+    });
+
+    const searchCountBeforePaging = mockPost.mock.calls.length;
+    await userEvent.click(
+      wrapper.container.querySelectorAll<HTMLElement>(".-next button")[0]
+    );
+    await waitFor(() => {
+      expect(mockPost.mock.calls.length).toBeGreaterThan(
+        searchCountBeforePaging
+      );
+    });
+
+    const searchCountBeforeSorting = mockPost.mock.calls.length;
+    await userEvent.click(
+      wrapper
+        .getByTestId("ReactTable")
+        .querySelector<HTMLElement>("thead th.-cursor-pointer")!
+    );
+    await waitFor(() => {
+      expect(mockPost.mock.calls.length).toBeGreaterThan(
+        searchCountBeforeSorting
+      );
+    });
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/matched records.*2 selected/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -223,6 +308,73 @@ describe("QueryPage test", () => {
       });
     } finally {
       mockRouter.query = {};
+      mockGet.mockImplementation(
+        async (path) => mockResponses[path] ?? { data: [] }
+      );
+    }
+  });
+
+  it("Ignores the response of an older search that arrives after a newer one", async () => {
+    const searchPath = "search-api/search-ws/search";
+    const managedAttribute = {
+      id: "8504783b-cf16-4702-b2fe-88c2db2ee475",
+      type: "controlled-vocabulary-item",
+      name: "Field Number",
+      key: "field_number",
+      group: "other-group",
+      vocabularyElementType: "STRING",
+      acceptedValues: null
+    };
+    let searchCount = 0;
+    mockPost.mockReset();
+    mockPost.mockImplementation(async (path) => {
+      if (path !== searchPath) {
+        return mockResponses[path];
+      }
+      // The first (unfiltered) search is slow, so its response arrives after the filtered one.
+      if (searchCount++ === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return mockResponses[searchPath];
+      }
+      return {
+        data: { hits: { total: { relation: "eq", value: 0 }, hits: [] } }
+      };
+    });
+    mockGet.mockImplementation(async (path, params) => {
+      if (params?.filter?.uuid?.EQ === managedAttribute.id) {
+        return { data: [managedAttribute] };
+      }
+      return mockResponses[path] ?? { data: [] };
+    });
+    mockRouter.query = {
+      queryTree: JSON.stringify({
+        c: "a",
+        p: [
+          {
+            f: "data.attributes.managedAttributes",
+            o: "exactMatch",
+            v: "F-043134",
+            t: "managedAttribute",
+            d: managedAttribute.id
+          }
+        ]
+      })
+    };
+
+    try {
+      const wrapper = mountWithAppContext(
+        <DinaForm initialValues={{}}>
+          <MaterialSampleListPage />
+        </DinaForm>,
+        testCtx
+      );
+      await waitFor(() => expect(searchCount).toBeGreaterThan(1));
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      expect(wrapper.queryByText("Sample 1")).not.toBeInTheDocument();
+    } finally {
+      mockRouter.query = {};
+      mockPost.mockImplementation(async (path) => mockResponses[path]);
       mockGet.mockImplementation(
         async (path) => mockResponses[path] ?? { data: [] }
       );

@@ -1,5 +1,4 @@
 import { SimpleSearchFilterBuilder } from "common-ui";
-import { simpleSearchFilterToFiql } from "common-ui/lib/filter-builder/fiql";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   ResourceHandler,
@@ -35,22 +34,24 @@ export const materialSampleHandler: ResourceHandler = {
         const resp = await apiClient.get<MaterialSample[]>(
           "collection-api/material-sample",
           {
-            fiql: simpleSearchFilterToFiql(
-              SimpleSearchFilterBuilder.create<MaterialSample>()
-                .where("materialSampleName", "EQ", resource?.materialSampleName)
-                .where("group", "EQ", group)
-                .build()
-            ),
+            filter: SimpleSearchFilterBuilder.create<MaterialSample>()
+              .where("materialSampleName", "EQ", resource?.materialSampleName)
+              .where("group", "EQ", group)
+              .build(),
             include: "attachment"
           }
         );
+        // Verify exact name match in case the back-end stripped special characters during filtering
+        const matches = resp.data.filter(
+          (sample) => sample.materialSampleName === resource?.materialSampleName
+        );
 
-        if (resp.data.length > 1) {
-          sameNameExistingResources.current = resp.data;
+        if (matches.length > 1) {
+          sameNameExistingResources.current = matches;
           return { shouldPause: true };
-        } else if (resp.data[0]) {
-          resource.id = resp.data[0].id;
-          userSelectedSameNameExistingResource.current = resp.data[0];
+        } else if (matches[0]) {
+          resource.id = matches[0].id;
+          userSelectedSameNameExistingResource.current = matches[0];
           resourcesUpdatedCount.current = resourcesUpdatedCount.current + 1;
         } else {
           // No matching record found - throw error instead of creating new record

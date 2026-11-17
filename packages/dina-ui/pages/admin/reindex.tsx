@@ -60,6 +60,9 @@ interface ReindexSubmission {
   documentId?: string;
   submittedAt: Date;
   success: boolean;
+  /** No answer in time for a reindex all, the API may still be queueing documents. */
+  timedOut?: boolean;
+  status?: number;
   errorMessage?: string;
 }
 
@@ -133,9 +136,17 @@ export function ReindexPage() {
         { headers: { "Content-Type": "application/vnd.api+json" } }
       );
     } catch (error) {
+      // The api client's interceptor moves the axios response to "cause".
+      const response = error?.cause ?? error?.response;
+      const status = response?.status;
       submission.success = false;
-      submission.errorMessage = error?.response?.status
-        ? `${error.response.status} ${error.response.statusText ?? ""}`.trim()
+      submission.status = status;
+      // Reindex all queues every document before responding, so the gateway can give up while the API keeps going.
+      submission.timedOut = scope === "all" && (!status || status === 504);
+      submission.errorMessage = submission.timedOut
+        ? formatMessage("reindexTimedOut")
+        : status
+        ? response.statusText
         : error?.message;
     } finally {
       setSubmissions((current) => [submission, ...current]);
@@ -355,14 +366,26 @@ export function ReindexPage() {
                           ` · ${submission.errorMessage}`}
                       </div>
                     </div>
-                    <Badge bg={submission.success ? "success" : "danger"}>
+                    <Badge
+                      bg={
+                        submission.success
+                          ? "success"
+                          : submission.timedOut
+                          ? "warning"
+                          : "danger"
+                      }
+                      text={submission.timedOut ? "dark" : undefined}
+                    >
                       <DinaMessage
                         id={
                           submission.success
                             ? "reindexAccepted"
+                            : submission.timedOut
+                            ? "reindexUnconfirmed"
                             : "reindexFailed"
                         }
                       />
+                      {submission.status && ` ${submission.status}`}
                     </Badge>
                   </li>
                 ))}

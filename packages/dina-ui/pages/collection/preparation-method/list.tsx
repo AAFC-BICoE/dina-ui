@@ -19,10 +19,7 @@ const PREPARATION_METHOD_TABLE_COLUMNS: ColumnDefinition<PreparationMethod>[] =
           original: { id, name }
         }
       }) => (
-        <Link
-          href={`/collection/preparation-method/view?id=${id}`}
-          legacyBehavior
-        >
+        <Link href={`/collection/preparation-method/view?id=${id}`}>
           {name}
         </Link>
       ),

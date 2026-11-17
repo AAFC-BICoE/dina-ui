@@ -3,12 +3,15 @@ import {
   ColumnDefinition,
   CreateButton,
   dateCell,
+  descriptionCell,
   FieldHeader,
   QueryTable,
-  QueryTableProps
+  QueryTableProps,
+  titleCell,
+  useAccount
 } from "common-ui";
 import Link from "next/link";
-import { Footer, groupCell, Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
@@ -19,15 +22,16 @@ const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
         original: { id, acSubtype }
       }
     }) => (
-      <Link href={`/object-store/object-subtype/edit?id=${id}`}>
+      <Link href={`/object-store/object-subtype/view?id=${id}`}>
         {acSubtype}
       </Link>
     ),
     accessorKey: "acSubtype",
     header: () => <FieldHeader name="acSubtype" />
   },
+  titleCell(false, false, "multilingualTitle"),
+  descriptionCell(false, false, "multilingualDescription"),
   "dcType",
-  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];
@@ -39,6 +43,7 @@ const queryTableProps: QueryTableProps<ObjectSubtype> = {
 
 export default function ObjectSubtypeListPage() {
   const { formatMessage } = useDinaIntl();
+  const { isAdmin } = useAccount();
 
   return (
     <>
@@ -46,7 +51,9 @@ export default function ObjectSubtypeListPage() {
       <Nav marginBottom={false} />
       <ButtonBar>
         <div className="flex d-flex ms-auto">
-          <CreateButton entityLink="/object-store/object-subtype" />
+          {isAdmin && (
+            <CreateButton entityLink="/object-store/object-subtype" />
+          )}
         </div>
       </ButtonBar>
       <main className="container-fluid">

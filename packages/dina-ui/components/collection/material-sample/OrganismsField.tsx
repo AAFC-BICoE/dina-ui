@@ -1,9 +1,11 @@
 import { ColumnDef, Row } from "@tanstack/react-table";
 import classNames from "classnames";
 import {
+  DinaFormSection,
   FieldHeader,
   FieldSet,
   FormikButton,
+  INLINE_LABEL_WIDTH,
   NumberField,
   ReactTable,
   ToggleField,
@@ -144,17 +146,20 @@ export function OrganismsField({
             return (
               <div>
                 {!isTemplate && (
-                  <div className="row">
-                    <div className="col-md-6 d-flex gap-3">
+                  <DinaFormSection
+                    horizontal={INLINE_LABEL_WIDTH}
+                    compact={true}
+                  >
+                    <div className="d-flex flex-column">
                       <NumberField
                         name="organismsQuantity"
                         customName="organismsQuantity"
-                        className="flex-grow-1"
                         inputProps={{ type: "number" }}
                         min={0}
                       />
+
                       {!readOnly && (
-                        <div className="d-flex">
+                        <>
                           <ToggleField
                             name="organismsIndividualEntry"
                             onChangeExternal={(checked) => {
@@ -164,6 +169,7 @@ export function OrganismsField({
                               resetIsTargetNull();
                             }}
                           />
+
                           <ToggleField
                             disableSwitch={!organismsIndividualEntry}
                             name="useTargetOrganism"
@@ -176,10 +182,10 @@ export function OrganismsField({
                               }
                             }}
                           />
-                        </div>
+                        </>
                       )}
                     </div>
-                  </div>
+                  </DinaFormSection>
                 )}
                 {organismsQuantity > 0 &&
                   (organismsIndividualEntry ? (

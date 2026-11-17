@@ -255,6 +255,25 @@ export function parseRelationshipNameFromType(
   return undefined;
 }
 
+/**
+ * Field types that only exist for the query builder (searching) and have no column
+ * representation, so they cannot be displayed or exported.
+ *
+ * For example, "relationshipAutocomplete" (Collecting Event - Collectors) only stores the related
+ * UUIDs in the index, generating a column for it would export an unknown path.
+ */
+const QUERY_BUILDER_ONLY_FIELD_TYPES: string[] = ["relationshipAutocomplete"];
+
+/**
+ * Checks if an index mapping can be used as a column (list page or export).
+ *
+ * @param indexMapping The index mapping to check.
+ * @returns true if the index mapping can be added as a column.
+ */
+export function isColumnSelectable(indexMapping: ESIndexMapping): boolean {
+  return !QUERY_BUILDER_ONLY_FIELD_TYPES.includes(indexMapping.type);
+}
+
 export interface GenerateColumnDefinitionProps<TData extends KitsuResource> {
   /** The index mapping for the field to be added. */
   indexMappings: ESIndexMapping[];
@@ -289,6 +308,11 @@ export async function generateColumnDefinition<TData extends KitsuResource>({
   const indexMapping = indexMappings.find(
     (mapping) => mapping.label === path || mapping.value === path
   );
+
+  // Query builder only fields cannot be columns (e.g. previously saved columns).
+  if (indexMapping && !isColumnSelectable(indexMapping)) {
+    return undefined;
+  }
 
   // Check if it's a dynamic field if it could not be found directly in the index mapping.
   if (!indexMapping || indexMapping?.dynamicField) {
@@ -593,7 +617,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
     if (
       dynamicFieldsMappingConfig &&
       pathParts.length === 2 &&
-      pathParts[0] === "classification"
+      pathParts[0].startsWith("classification")
     ) {
       const relationshipName = parseRelationshipNameFromType(pathParts[0]);
 
@@ -1138,14 +1162,28 @@ async function getVocabularyColumn<TData extends KitsuResource>(
   }
 }
 
+/**
+ * Extracts the portion of a path string that comes after "attributes".
+ *
+ * @param path The full path string containing "attributes".
+ * @returns The portion of the path after "attributes", or the last segment if "attributes"
+ *    is not found.
+ */
+function getPathAfterAttributes(path: string): string {
+  const parts = path.split(".");
+  const attributesIndex = parts.indexOf("attributes");
+  return attributesIndex !== -1
+    ? parts.slice(attributesIndex + 1).join(".")
+    : parts[parts.length - 1];
+}
+
 export function getAttributeVocabularyColumn<TData extends KitsuResource>(
   path: string,
   vocabulary: VocabularyElement,
   config: DynamicField
 ): TableColumn<TData> {
   const accessorKey = `${config.path}.${vocabulary.key || vocabulary.id}`;
-  const pathParts = config.path.split(".");
-  const fieldName = pathParts[pathParts.length - 1];
+  const fieldName = getPathAfterAttributes(config.path);
 
   const vocabularyColumn = {
     header: () => <VocabularyFieldHeader vocabulary={vocabulary} />,
@@ -1168,9 +1206,7 @@ export function getIncludedVocabularyColumn<TData extends KitsuResource>(
   config: RelationshipDynamicField
 ): TableColumn<TData> {
   const accessorKey = `${config.path}.${vocabulary.key || vocabulary.id}`;
-
-  const pathParts = config.path.split(".");
-  const fieldName = pathParts[pathParts.length - 1];
+  const fieldName = getPathAfterAttributes(config.path);
 
   const vocabularyColumn = {
     cell: ({ row: { original } }) => {

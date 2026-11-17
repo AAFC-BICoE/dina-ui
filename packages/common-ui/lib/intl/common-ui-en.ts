@@ -149,6 +149,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   queryTableMultiSortTooltipTitle: "Multi-column sorting",
   remarks: "Remarks",
   remove: "Remove",
+  removeValue: "Remove {value}",
+  typeAndPressEnter: "Type and press Enter",
   requiredField: "Required field",
   resetButtonText: "Reset",
   resetFilters: "Reset Filters",
@@ -163,6 +165,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   selected: "selected",
   showChanges: "Show Changes",
   showHide: "Show / Hide",
+  showLess: "Show Less",
+  showMore: "Show More",
   somethingWentWrong: "Something went wrong",
   sourceField: "Source Field",
   sourceText: "Source Text",
@@ -221,6 +225,20 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   topMatches: "Top Matches",
   permissionError:
     "You don't have permissions to delete all of these selected records.",
+  checkingPermissions: "Checking permissions…",
+  noEditPermission:
+    "You don't have permission to edit records in these groups: {groups}.",
+  noDeletePermission:
+    "You don't have permission to delete records in these groups: {groups}.",
+  onSelectedCount: "Selected ({count})",
+  onAllMatched: "All matched ({total})",
+  noPermissionForGroups: "No permission for group: {groups}",
+  noSelectionHint:
+    "Tick the checkboxes in the table to choose records. These actions apply to the records you choose.",
+  actionsOnSelected: "Actions on {count} selected",
+  tableSelectedSuffix: " · {count} selected",
+  exportSelectedButtonText: "Export Selected",
+  exportAllMatching: "Export All Matching",
   deleteSuccess: "Successfully deleted {count} records.",
   noData: "No Data",
   listView: "List",

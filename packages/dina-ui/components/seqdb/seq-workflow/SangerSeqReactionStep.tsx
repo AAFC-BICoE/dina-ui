@@ -21,7 +21,6 @@ import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useEffect, useMemo, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { BiChevronsRight } from "react-icons/bi";
-import { v4 as uuidv4 } from "uuid";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
   PcrBatch,
@@ -406,7 +405,7 @@ export function SangerSeqReactionStep({
   );
 
   // Generate the key for the DINA form. It should only be generated once.
-  const formKey = useMemo(() => uuidv4(), []);
+  const formKey = useMemo(() => crypto.randomUUID(), []);
 
   //#endregion of PCR Batch item table
 

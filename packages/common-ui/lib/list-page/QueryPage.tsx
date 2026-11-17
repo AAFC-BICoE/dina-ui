@@ -1,6 +1,6 @@
 import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
 import { ColumnSort, Row, SortingState } from "@tanstack/react-table";
-import { FormikContextType } from "formik";
+import { FormikContextType, FormikProps } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import _ from "lodash";
 import React, {
@@ -18,7 +18,6 @@ import {
 } from "@react-awesome-query-builder/ui";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
-import { v4 as uuidv4 } from "uuid";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   ColumnSelectorMemo,
@@ -37,11 +36,9 @@ import { CommonMessage } from "../intl/common-ui-intl";
 import {
   AttachSelectedButton,
   AttachSelectedButtonProps,
-  BulkDeleteButton,
+  BulkActionsDropdown,
   BulkDeleteButtonProps,
-  BulkEditButton,
-  BulkSplitButton,
-  DataExportButton
+  SelectedCountText
 } from "../list-page-layout/bulk-buttons";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { MultiSortTooltip } from "./MultiSortTooltip";
@@ -322,6 +319,9 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   onDeselect?: (deselectedData: TData[]) => void;
 
+  /** Called whenever the query's total record count changes. */
+  onTotalRecordsChange?: (totalRecords: number) => void;
+
   /**
    * Boolean flag to display the QueryPage in view mode (no query builder and search bar).
    */
@@ -426,6 +426,7 @@ export function QueryPage<TData extends KitsuResource>({
   enableDnd = false,
   onSelect,
   onDeselect,
+  onTotalRecordsChange,
   enableColumnSelector = true,
   tabs,
   defaultTab,
@@ -447,6 +448,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Total number of records from the query. This is not the total displayed on the screen.
   const [totalRecords, setTotalRecords] = useState<number>(0);
+  useEffect(() => onTotalRecordsChange?.(totalRecords), [totalRecords]);
 
   // Columns to be displayed on the table, if column selector is used this can be anything. Default
   // is the columns prop if not being used.
@@ -488,6 +490,9 @@ export function QueryPage<TData extends KitsuResource>({
   useEffect(() => {
     latestQueryBuilderTree.current = queryBuilderTree;
   }, [queryBuilderTree]);
+
+  // Id of the latest search request, used to ignore responses of older searches that arrive late.
+  const latestSearchId = useRef(0);
 
   // The submitted query builder tree. If this changes, a search should be performed.
   const [submittedQueryBuilderTree, setSubmittedQueryBuilderTree] =
@@ -679,11 +684,14 @@ export function QueryPage<TData extends KitsuResource>({
     if (isActionTriggeredQuery.current === true) {
       isActionTriggeredQuery.current = false;
       setLoading(true);
+      const searchId = ++latestSearchId.current;
+      const isLatestSearch = () => searchId === latestSearchId.current;
 
       // Fetch data using elastic search.
       // The included section will be transformed from an array to an object with the type name for each relationship.
       elasticSearchRequest(queryDSL)
         .then((result) => {
+          if (!isLatestSearch()) return;
           const processedResult = processResults(result);
           const correctInvalidPageOffset = (recordCount: number) => {
             if (pageSize === 0 || pageOffset < recordCount) {
@@ -709,6 +717,7 @@ export function QueryPage<TData extends KitsuResource>({
           if (result?.total.value === MAX_COUNT_SIZE) {
             elasticSearchCountRequest(queryDSL)
               .then((countResult) => {
+                if (!isLatestSearch()) return;
                 setTotalRecords(countResult);
                 if (correctInvalidPageOffset(countResult)) {
                   return;
@@ -735,8 +744,8 @@ export function QueryPage<TData extends KitsuResource>({
           setError(elasticSearchError);
         })
         .finally(() => {
-          // No matter the end result, loading should stop.
-          setLoading(false);
+          // No matter the end result, loading should stop (a newer search keeps it loading).
+          if (isLatestSearch()) setLoading(false);
         });
     }
   }, [
@@ -1271,7 +1280,20 @@ export function QueryPage<TData extends KitsuResource>({
   };
 
   // Generate the key for the DINA form. It should only be generated once.
-  const formKey = useMemo(() => uuidv4(), []);
+  const formKey = useMemo(() => crypto.randomUUID(), []);
+  const formRef = useRef<FormikProps<any>>(null);
+
+  // Compare by value so re-submitting the same search keeps the same checked rows.
+  const searchKey = useMemo(
+    () => JSON.stringify([Utils.getTree(submittedQueryBuilderTree), groups]),
+    [submittedQueryBuilderTree, groups]
+  );
+
+  // Clear checked rows when the query or groups change. Paging and sorting keep them.
+  useEffect(() => {
+    formRef.current?.setFieldValue("itemIdsToSelect", {});
+    formRef.current?.setFieldValue("selectAll.itemIdsToSelect", false);
+  }, [searchKey]);
 
   return (
     <>
@@ -1318,6 +1340,7 @@ export function QueryPage<TData extends KitsuResource>({
         <div className={resultsAside ? "query-page-results-main" : undefined}>
           <DinaForm
             key={formKey}
+            innerRef={formRef}
             initialValues={defaultGroups}
             onSubmit={onSubmit}
           >
@@ -1350,29 +1373,41 @@ export function QueryPage<TData extends KitsuResource>({
                           nonExportableColumns={nonExportableColumns}
                         />
                       )}
-                      {bulkEditPath && (
-                        <BulkEditButton
-                          pathname={bulkEditPath}
-                          singleEditPathName={singleEditPath}
-                        />
-                      )}
-                      {bulkDeleteButtonProps && (
-                        <BulkDeleteButton {...bulkDeleteButtonProps} />
-                      )}
-                      {dataExportProps && (
-                        <DataExportButton
-                          pathname={dataExportProps.dataExportPath}
-                          entityLink={dataExportProps.entityLink}
-                          totalRecords={totalRecords}
-                          query={elasticSearchQuery}
-                          uniqueName={uniqueName}
-                          columns={columns}
-                          dynamicFieldMapping={dynamicFieldMapping}
+                      {(bulkEditPath ||
+                        bulkDeleteButtonProps ||
+                        dataExportProps ||
+                        bulkSplitPath) && (
+                        <BulkActionsDropdown
                           indexName={indexName}
+                          edit={
+                            bulkEditPath
+                              ? {
+                                  pathname: bulkEditPath,
+                                  singleEditPathName: singleEditPath
+                                }
+                              : undefined
+                          }
+                          split={
+                            bulkSplitPath
+                              ? { pathname: bulkSplitPath }
+                              : undefined
+                          }
+                          dataExport={
+                            dataExportProps
+                              ? {
+                                  pathname: dataExportProps.dataExportPath,
+                                  entityLink: dataExportProps.entityLink,
+                                  totalRecords,
+                                  query: elasticSearchQuery,
+                                  uniqueName,
+                                  columns,
+                                  dynamicFieldMapping,
+                                  indexName
+                                }
+                              : undefined
+                          }
+                          del={bulkDeleteButtonProps}
                         />
-                      )}
-                      {bulkSplitPath && (
-                        <BulkSplitButton pathname={bulkSplitPath} />
                       )}
                       {attachSelectedButtonsProps && (
                         <AttachSelectedButton {...attachSelectedButtonsProps} />
@@ -1427,6 +1462,9 @@ export function QueryPage<TData extends KitsuResource>({
                             values={{ totalCount: formatNumber(totalRecords) }}
                           />
                         )}
+                        {!loading &&
+                          !columnSelectorLoading &&
+                          !selectionMode && <SelectedCountText />}
                       </span>
 
                       {/* Multi sort tooltip - Only shown if it's possible to sort */}

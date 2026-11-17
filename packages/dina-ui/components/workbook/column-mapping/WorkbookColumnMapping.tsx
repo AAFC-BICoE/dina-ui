@@ -129,7 +129,8 @@ export function WorkbookColumnMapping({
     relationshipMapping,
     resolveColumnMappingAndRelationshipMapping,
     getResourceSelectField,
-    getRelationshipValues
+    getRelationshipValues,
+    taxonomicRanks
   } = useColumnMapping();
 
   const { allowAppendData, fieldColumnLocaleId } =
@@ -272,7 +273,8 @@ export function WorkbookColumnMapping({
     );
     const entries = getPrimaryIdEntries(
       getDataFromWorkbook(spreadsheetData, sheet, fieldMaps, true),
-      collectionColumn?.columnHeader,
+      // The relationship mapping is keyed by the generated column path when the sheet has one.
+      collectionColumn?.originalColumn ?? collectionColumn?.columnHeader,
       relationshipMapping as RelationshipMapping
     );
 
@@ -1047,6 +1049,7 @@ export function WorkbookColumnMapping({
                       columnName={columnName}
                       columnIndex={index}
                       fieldOptions={fieldOptions}
+                      taxonomicRanks={taxonomicRanks}
                       onFieldMappingChange={onFieldMappingChange}
                       key={index}
                       type={type}

@@ -1,6 +1,11 @@
 import { FilterParam } from "kitsu";
 import { FilterGroupModel } from "../FilterGroup";
-import { fiql, fiqlArgument, simpleSearchFilterToFiql } from "../fiql";
+import {
+  fiql,
+  fiqlArgument,
+  filterOrFiqlParams,
+  simpleSearchFilterToFiql
+} from "../fiql";
 import { SimpleSearchFilterBuilder } from "../../util/simpleSearchFilterBuilder";
 
 describe("fiql conversion", () => {
@@ -132,8 +137,9 @@ describe("fiql conversion", () => {
       type: "FILTER_GROUP"
     };
 
+    // A text field has a value if it matches LIKE "%", "*" in FIQL
     const fiqlFilter = fiql(model);
-    expect(fiqlFilter).toEqual("description!=null");
+    expect(fiqlFilter).toEqual("description==*");
   });
 
   it("Allows a range filter.", () => {
@@ -211,7 +217,7 @@ describe("fiql conversion", () => {
     const fiqlFilter = fiql(model);
     expect(fiqlFilter).toEqual(
       // Greater than or equal to {beginning of day} AND less than or equal to {end of day}:
-      "myDateField=ge=2020-10-06T00:00:00+00:00;myDateField=le=2020-10-06T23:59:59+00:00"
+      "myDateField=ge=2020-10-06T00:00:00-00:00;myDateField=le=2020-10-06T23:59:59-00:00"
     );
   });
 
@@ -240,7 +246,7 @@ describe("fiql conversion", () => {
     const fiqlFilter = fiql(model);
     expect(fiqlFilter).toEqual(
       // Less than {beginning of day} OR greater than {end of day}:
-      "myDateField=lt=2020-10-06T00:00:00+00:00,myDateField=gt=2020-10-06T23:59:59+00:00"
+      "myDateField=lt=2020-10-06T00:00:00-00:00,myDateField=gt=2020-10-06T23:59:59-00:00"
     );
   });
 
@@ -268,7 +274,7 @@ describe("fiql conversion", () => {
 
     const fiqlFilter = fiql(model);
     // Greater than or equal to {beginning of day}:
-    expect(fiqlFilter).toEqual("myDateField=ge=2020-10-06T00:00:00+00:00");
+    expect(fiqlFilter).toEqual("myDateField=ge=2020-10-06T00:00:00-00:00");
   });
 
   it("Allows date UNTIL filter.", () => {
@@ -295,7 +301,7 @@ describe("fiql conversion", () => {
 
     const fiqlFilter = fiql(model);
     // Less than or equal to {end of day}:
-    expect(fiqlFilter).toEqual("myDateField=le=2020-10-06T23:59:59+00:00");
+    expect(fiqlFilter).toEqual("myDateField=le=2020-10-06T23:59:59-00:00");
   });
 
   it("Allows date BETWEEN filter.", () => {
@@ -325,7 +331,7 @@ describe("fiql conversion", () => {
     const fiqlFilter = fiql(model);
     // From the beginning date to the end date:
     expect(fiqlFilter).toEqual(
-      "myDateField=ge=2020-10-06T00:00:00+00:00;myDateField=le=2020-10-12T23:59:59+00:00"
+      "myDateField=ge=2020-10-06T00:00:00-00:00;myDateField=le=2020-10-12T23:59:59-00:00"
     );
   });
 
@@ -357,7 +363,7 @@ describe("fiql conversion", () => {
     const fiqlFilter = fiql(model);
     // From the beginning date to the end date:
     expect(fiqlFilter).toEqual(
-      "myDateField=ge=2020-10-06T00:00:00+00:00;myDateField=le=2020-10-12T23:59:59+00:00"
+      "myDateField=ge=2020-10-06T00:00:00-00:00;myDateField=le=2020-10-12T23:59:59-00:00"
     );
   });
 
@@ -657,7 +663,7 @@ describe("fiql conversion", () => {
           blank: "",
           group: { EQ: "aafc" }
         })
-      ).toEqual('name=="todo 2";group==aafc');
+      ).toEqual("name==todo 2;group==aafc");
     });
 
     it("Converts a plain null to a blank-field search, like { EQ: null } does.", () => {
@@ -695,10 +701,14 @@ describe("fiql conversion", () => {
           name: { EQ: "x" }
         })
       ).toEqual("(group==aafc,group==cnc);name==x");
-      // Values containing commas survive as single values.
+      // FIQL can't carry a comma in a value, so it becomes the "*" wildcard.
       expect(
         simpleSearchFilterToFiql({ city: { IN: ["New York, NY", "Ottawa"] } })
-      ).toEqual('city=="New York, NY",city==Ottawa');
+      ).toEqual("city==New York* NY,city==Ottawa");
+      // Quoted IN list values are read as one value
+      expect(
+        simpleSearchFilterToFiql({ city: { IN: '"New York, NY",Ottawa' } })
+      ).toEqual("city==New York* NY,city==Ottawa");
     });
 
     it("Converts every operator.", () => {
@@ -743,7 +753,8 @@ describe("fiql conversion", () => {
       ).toEqual("(a==1,(b==2;c==3));d!=x;(e==5,(f==6,f==7))");
     });
 
-    it("Quotes values that can't appear unquoted in fiql.", () => {
+    it("Sends values unquoted, with the * wildcard for characters FIQL can't carry.", () => {
+      // The back-end keeps double quotes as part of a value, so a quoted value never matches.
       expect(
         simpleSearchFilterToFiql(
           SimpleSearchFilterBuilder.create()
@@ -753,7 +764,30 @@ describe("fiql conversion", () => {
             .build()
         )
       ).toEqual(
-        'name=="*John Smith*";email=="john@example.com";(group=="a b",group==c)'
+        "name==*John Smith*;email==john*example.com;(group==a b,group==c)"
+      );
+    });
+
+    it("Quotes a negated value FIQL can't carry as before, so it excludes nothing rather than too much.", () => {
+      expect(
+        simpleSearchFilterToFiql({
+          name: { NOT_ILIKE: "%O'Brien%" },
+          code: { NEQ: "a;b" },
+          remarks: { NOT_ILIKE: "%two words%" }
+        })
+      ).toEqual('name!="*O\'Brien*";code!="a;b";remarks!=*two words*');
+    });
+
+    it("Sends UTC date-times with a -00:00 offset and no milliseconds, which FIQL reads.", () => {
+      expect(
+        simpleSearchFilterToFiql({
+          createdOn: {
+            GOE: "2026-10-13T07:00:00.000Z",
+            LT: "2026-10-14T06:59:59.999Z"
+          }
+        })
+      ).toEqual(
+        "createdOn=ge=2026-10-13T07:00:00-00:00;createdOn=lt=2026-10-14T06:59:59-00:00"
       );
     });
 
@@ -778,14 +812,14 @@ describe("fiql conversion", () => {
       expect(fiqlFilter).toEqual("username==*john*,labels.en==*john*");
     });
 
-    it("Quotes values with spaces or characters that can't appear unquoted in fiql.", () => {
+    it("Sends free-text values with spaces or other characters unquoted.", () => {
       expect(
         fiql({
           type: "FREE_TEXT_SEARCH_FILTER",
           value: "John Smith",
           filterAttributes: ["name"]
         })
-      ).toEqual('name=="*John Smith*"');
+      ).toEqual("name==*John Smith*");
 
       expect(
         fiql({
@@ -793,10 +827,10 @@ describe("fiql conversion", () => {
           value: "john@example.com",
           filterAttributes: ["emailAddress"]
         })
-      ).toEqual('emailAddress=="*john@example.com*"');
+      ).toEqual("emailAddress==*john*example.com*");
     });
 
-    it("Quotes partial and exact match filter row values when needed.", () => {
+    it("Sends partial and exact match filter row values unquoted.", () => {
       const model: FilterGroupModel = {
         children: [
           {
@@ -812,19 +846,126 @@ describe("fiql conversion", () => {
         operator: "AND",
         type: "FILTER_GROUP"
       };
-      expect(fiql(model)).toEqual('name=="*John Smith*"');
+      expect(fiql(model)).toEqual("name==*John Smith*");
+    });
+
+    it("Keeps a * in an exact match a wildcard.", () => {
+      const row = (predicate: "IS" | "IS NOT") =>
+        fiql({
+          attribute: "name",
+          id: 1,
+          predicate,
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: "PR1956*"
+        });
+      expect(row("IS")).toEqual("name==PR1956*");
+      expect(row("IS NOT")).toEqual("name!=PR1956*");
+    });
+
+    it("Keeps a typed % or _ next to the * literal in an IS NOT exact match, as before.", () => {
+      const isNot = (value: string) =>
+        fiql({
+          attribute: "name",
+          id: 1,
+          predicate: "IS NOT",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value
+        });
+      // FIQL reads "*" as the wildcard and "%" and "_" literally
+      expect(isNot("PR1956-70%*")).toEqual("name!=PR1956-70%*");
+      expect(isNot("%*")).toEqual("name!=%*");
+      expect(isNot("T77306P-_mp*")).toEqual("name!=T77306P-_mp*");
     });
   });
 
   describe("fiqlArgument", () => {
-    it("Leaves simple values unquoted.", () => {
+    it("Leaves values the back-end reads as they are.", () => {
       expect(fiqlArgument("abc-123.4/x:y*")).toEqual("abc-123.4/x:y*");
+      expect(fiqlArgument("John Smith")).toEqual("John Smith");
+      expect(fiqlArgument("écorce µ")).toEqual("écorce µ");
+      expect(fiqlArgument("a=b!c")).toEqual("a=b!c");
     });
 
-    it("Quotes values with reserved characters and drops double quotes, which can't be escaped.", () => {
-      expect(fiqlArgument("a b")).toEqual('"a b"');
-      expect(fiqlArgument("a;b,c(d)")).toEqual('"a;b,c(d)"');
-      expect(fiqlArgument('say "hi"')).toEqual('"say hi"');
+    it("Replaces characters FIQL can't carry, and keywords, with the * wildcard.", () => {
+      expect(fiqlArgument("a;b,c(d)")).toEqual("a*b*c*d*");
+      expect(fiqlArgument('say "hi"')).toEqual("say *hi*");
+      expect(fiqlArgument("O'Brien & Sons")).toEqual("O*Brien * Sons");
+      expect(fiqlArgument("john@example.com")).toEqual("john*example.com");
+      // The back-end would end the whole query at these words
+      expect(fiqlArgument("IN SITU")).toEqual("*N SITU");
+      expect(fiqlArgument("upper limit")).toEqual("upper *imit");
+      // Replacing a letter can leave another keyword
+      expect(fiqlArgument("NEQ")).toEqual("**Q");
+      expect(fiqlArgument("x ILIKE y")).toEqual("x **IKE y");
+      // Legacy lexer rules also match keywords adjacent to "_", ".", or digits
+      expect(fiqlArgument("a_IN x.EQ.y limit_5")).toEqual(
+        "a_*N x.*Q.y *imit_5"
+      );
+    });
+
+    it("Quotes a value that would become only the * wildcard, which would match every record.", () => {
+      expect(fiqlArgument("'")).toEqual('"\'"');
+      expect(fiqlArgument("*'*")).toEqual('"*\'*"');
+      expect(fiqlArgument("+#")).toEqual('"+#"');
+      // Wildcards typed as such stay wildcards
+      expect(fiqlArgument("***")).toEqual("***");
+      expect(fiqlArgument("*")).toEqual("*");
+      expect(
+        simpleSearchFilterToFiql({
+          name: { ILIKE: "%'%" },
+          code: { EQ: "#" },
+          remarks: { NOT_ILIKE: "%a%" }
+        })
+      ).toEqual('name=="*\'*";code=="#";remarks!=*a*');
+    });
+
+    it("Quotes a negated value FIQL can't carry instead.", () => {
+      expect(fiqlArgument("John Smith", true)).toEqual("John Smith");
+      expect(fiqlArgument("O'Brien", true)).toEqual('"O\'Brien"');
+      expect(fiqlArgument("IN SITU", true)).toEqual('"IN SITU"');
+      // A double quote can't be quoted
+      expect(fiqlArgument('say "hi"', true)).toEqual('"say hi"');
+      // Keywords only matched by the legacy lexer are preserved when negated
+      expect(fiqlArgument("*tube_IN* x.EQ.y IN2023 limit_5", true)).toEqual(
+        "*tube_IN* x.EQ.y IN2023 limit_5"
+      );
+    });
+  });
+
+  describe("filterOrFiqlParams", () => {
+    it("Sends a filter as the simple filter, and only a filter with a negated pattern as FIQL.", () => {
+      const filter = { name: { ILIKE: "%a%" }, group: { EQ: "aafc" } };
+      expect(filterOrFiqlParams(filter)).toEqual({ filter });
+      expect(
+        filterOrFiqlParams({
+          group: { EQ: "aafc" },
+          $or: [{ a: { EQ: "1" } }, { b: { NOT_ILIKE: "%x%" } }]
+        })
+      ).toEqual({ fiql: "group==aafc;(a==1,b!=*x*)" });
+      // A second OR group is in $and
+      expect(
+        filterOrFiqlParams(
+          SimpleSearchFilterBuilder.create()
+            .or((b) => b.where("a", "EQ", "1").where("b", "EQ", "2"))
+            .or((b) => b.where("c", "EQ", "3").add({ d: { NOT_ILIKE: "%x%" } }))
+            .build()
+        )
+      ).toEqual({ fiql: "(a==1,b==2);(c==3,d!=*x*)" });
+      // A NEQ with "*" (an "IS NOT" + "Exact Match" row) is a negated pattern too
+      expect(filterOrFiqlParams({ name: { NEQ: "PR1956-70%*" } })).toEqual({
+        fiql: "name!=PR1956-70%*"
+      });
+      expect(filterOrFiqlParams({ name: { NEQ: "PR1956-70%" } })).toEqual({
+        filter: { name: { NEQ: "PR1956-70%" } }
+      });
+    });
+
+    it("Sends nothing for an empty filter.", () => {
+      expect(filterOrFiqlParams(undefined)).toEqual({});
+      expect(filterOrFiqlParams({})).toEqual({});
+      expect(filterOrFiqlParams({ group: { IN: "" } })).toEqual({});
     });
   });
 });

@@ -4,7 +4,7 @@ import { FormikProps } from "formik";
 import DOMPurify from "dompurify";
 import _ from "lodash";
 import { Dispatch, SetStateAction, useState } from "react";
-import Switch from "react-switch";
+import { SmallSwitch } from "common-ui";
 import {
   ScientificNameSource,
   ScientificNameSourceDetails
@@ -86,9 +86,9 @@ export function GlobalNamesField({
           <>
             <div className="d-flex align-items-center justify-content-end mb-2">
               <label className="me-2" htmlFor="manualInput">
-                <DinaMessage id="manual" />
+                <DinaMessage id="enterClassificationManually" />
               </label>
-              <Switch
+              <SmallSwitch
                 id="manualInput"
                 checked={isManualInput}
                 onChange={onToggleManualInput}

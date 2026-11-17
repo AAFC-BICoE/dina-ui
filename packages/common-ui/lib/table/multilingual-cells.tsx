@@ -1,7 +1,11 @@
 import _ from "lodash";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
+import { CommonMessage } from "../intl/common-ui-intl";
 import { intlContext } from "../intl/IntlSupport";
+
+/** Values longer than this are cut off in table cells, with a toggle to expand them. */
+const TRUNCATE_LENGTH = 100;
 
 interface MultilingualPair {
   lang: string;
@@ -110,7 +114,7 @@ function multilingualFieldCell(
             return (
               <>
                 <span className={`${className} list-inline-item`}>
-                  {preferredPair.value}
+                  <TruncatedText text={preferredPair.value} />
                 </span>
                 {languageBadge(preferredPair.lang)}
               </>
@@ -143,6 +147,27 @@ function multilingualFieldCell(
           <FieldHeader name={`multilingual${_.capitalize(className)}`} />
         )
       };
+}
+
+function TruncatedText({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+
+  if (text.length <= TRUNCATE_LENGTH) {
+    return <>{text}</>;
+  }
+
+  return (
+    <>
+      {expanded ? text : `${text.slice(0, TRUNCATE_LENGTH).trimEnd()}…`}{" "}
+      <button
+        type="button"
+        className="btn btn-link p-0 align-baseline"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <CommonMessage id={expanded ? "showLess" : "showMore"} />
+      </button>
+    </>
+  );
 }
 
 /**

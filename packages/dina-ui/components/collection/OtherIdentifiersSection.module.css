@@ -1,0 +1,7 @@
+.chipField > :global(label) {
+  align-items: flex-start !important;
+}
+
+.chipField > :global(label) > :global(.field-label) {
+  padding-top: 9px;
+}

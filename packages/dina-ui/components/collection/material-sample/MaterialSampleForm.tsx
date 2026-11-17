@@ -10,6 +10,7 @@ import {
   DinaFormContext,
   DinaFormSection,
   FieldSet,
+  INLINE_LABEL_WIDTH,
   LoadingSpinner,
   SubmitButton
 } from "common-ui";
@@ -34,6 +35,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { getLinkedMaterialSamplesHref } from "../collecting-event/CollectingEventEditAlert";
 import { getCollectingEventName } from "../collecting-event/getCollectingEventName";
 import { SECTION_ICONS } from "./material-sample-form-nav/MaterialSampleFormNav";
+import { useMaterialSampleSectionOrder } from "./material-sample-form-nav/useMaterialSampleSectionOrder";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
@@ -228,6 +230,12 @@ export function MaterialSampleForm({
   } = materialSampleSaveHook ?? materialSampleSaveResponse;
 
   const copyFromNextSample = useCopyToNextSample();
+
+  const { sortedScrollTargets } = useMaterialSampleSectionOrder({
+    dataComponentState,
+    navOrder,
+    isTemplate: isTemplate ?? false
+  });
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
@@ -491,15 +499,13 @@ export function MaterialSampleForm({
         <div className="material-sample-nav-column">
           {(!isOffScreen || !reduceRendering) && (
             <MaterialSampleFormNav
-              dataComponentState={dataComponentState}
+              scrollTargets={sortedScrollTargets}
               disableRemovePrompt={disableNavRemovePrompt}
               disableCollectingEventSwitch={
                 disableCollectingEventSwitch ||
                 initialValues.parentMaterialSample !== undefined
               }
-              navOrder={navOrder}
               onChangeNavOrder={onChangeNavOrder}
-              isTemplate={isTemplate ?? false}
             />
           )}
         </div>
@@ -525,7 +531,7 @@ export function MaterialSampleForm({
                   <div className="col-md-12">
                     {!isTemplate && (
                       <div className="mb-2">
-                        <DinaFormSection horizontal={18}>
+                        <DinaFormSection horizontal={INLINE_LABEL_WIDTH}>
                           <GroupSelectField
                             disableTemplateCheckbox={true}
                             name="group"
@@ -544,32 +550,32 @@ export function MaterialSampleForm({
 
                     <CollectionSelectSection
                       resourcePath="collection-api/collection"
-                      horizontal={18}
+                      horizontal={INLINE_LABEL_WIDTH}
                     />
                     <ProjectSelectSection
                       resourcePath="collection-api/project"
-                      horizontal={18}
+                      horizontal={INLINE_LABEL_WIDTH}
                     />
                     <ParentSelectSection
                       enableCollectingEvent={
                         dataComponentState.enableCollectingEvent
                       }
-                      horizontal={18}
+                      horizontal={INLINE_LABEL_WIDTH}
                     />
                     <AssemblageSelectSection
                       resourcePath="collection-api/assemblage"
-                      horizontal={18}
+                      horizontal={INLINE_LABEL_WIDTH}
                     />
                     <div className={`mb-2 ${styles.releasableFields}`}>
                       <NotPubliclyReleasableSection
                         defaultToNotReleasable={defaultToNotReleasable}
-                        horizontal={18}
+                        horizontal={INLINE_LABEL_WIDTH}
                       />
                     </div>
                     <TagsAndRestrictionsSection
                       resourcePath="collection-api/material-sample"
                       indexName="dina_material_sample_index"
-                      horizontal={18}
+                      horizontal={INLINE_LABEL_WIDTH}
                     />
                   </div>
                 </div>

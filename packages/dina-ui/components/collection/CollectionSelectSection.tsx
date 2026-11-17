@@ -1,5 +1,6 @@
 import {
   DinaFormSection,
+  DinaFormSectionProps,
   ResourceSelectField,
   useDinaFormContext,
   useAccount,
@@ -14,7 +15,7 @@ import Link from "next/link";
 export interface CollectionSelectSectionProps {
   resourcePath?: string;
   classNames?: string;
-  horizontal?: boolean | [number, number] | "flex" | number;
+  horizontal?: DinaFormSectionProps["horizontal"];
 }
 
 export function CollectionSelectSection({
@@ -43,7 +44,7 @@ export function CollectionSelectSection({
 export interface CollectionSelectFieldProps {
   resourcePath?: string;
   className?: string;
-  horizontal?: boolean | [number, number] | "flex" | number;
+  horizontal?: DinaFormSectionProps["horizontal"];
 }
 
 export function CollectionSelectField({

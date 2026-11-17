@@ -2,10 +2,10 @@
 
 List pages, dropdowns, and lookups filter back-end resources using `SimpleSearchFilterBuilder` (`packages/common-ui/lib/util/simpleSearchFilterBuilder.ts`). The builder creates a single filter object, which the back-end receives in one of two formats:
 
-* *Simple filter* query params (e.g. `filter[name][ILIKE]=%test%`). Used by `ResourceSelect` and most `useQuery` calls.
-* A *FIQL* string (e.g. `fiql=name==*test*;group==aafc`). Used by list pages (`ListPageLayout`, `QueryTable`) and lookups requiring OR groups or null checks.
+* *Simple filter* query params (e.g. `filter[name][ILIKE]=%test%`). Used by every request, including list pages (`ListPageLayout`, `QueryTable`).
+* A *FIQL* string (e.g. `fiql=name!=*test*`). Used only for a filter with a negated pattern (`NOT_ILIKE`, or `NEQ` with `*`), which the simple filter cannot express. `filterOrFiqlParams(filter)` picks the format.
 
-FIQL is currently being retired. The back-end simple filter grammar supports groups as of `dina-base-api` 0.178. The UI generates all FIQL strings from a `SimpleSearchFilter` via `simpleSearchFilterToFiql`. Retiring FIQL means we will send the filter object directly instead of generating the FIQL string.
+FIQL is currently being retired. The back-end simple filter grammar supports groups as of `dina-base-api` 0.178. The UI generates all FIQL strings from a `SimpleSearchFilter` via `simpleSearchFilterToFiql`.
 
 == Building a Filter
 
@@ -69,7 +69,7 @@ Legacy operator-less shapes like `{ name: "abc" }` act as equalities. Always pre
 The `simpleSearchFilterToFiql(filter)` function converts the object to FIQL: `group==aafc;age=ge=18;age=le=65;(createdBy==me,restrictToCreatedBy==false);group!=cnc`. The back-end FIQL parser lacks `=in=` support, so `IN` becomes an OR of equalities. Values with spaces or reserved characters are double-quoted.
 
 The `simpleSearchFilterToQueryString(filter)` function serializes the object to the back-end simple filter grammar including grouped syntax: `(filter[createdBy][EQ]=me|filter[restrictToCreatedBy][EQ]=false)&filter[group][EQ]=aafc`.
-The API client uses this function for every `filter` param. A filter without groups serializes exactly like Kitsu did previously.
+The API client uses this function for every `filter` param. A filter without groups serializes like Kitsu did previously, except that values the back-end cannot read as typed are quoted or have characters replaced (see `simpleSearchFilterQueryString.ts`).
 
 The filter builder UI model combines easily with `additionalFilters` after being converted by `filterModelToSimpleSearchFilter`.
 
@@ -77,9 +77,7 @@ The filter builder UI model combines easily with `additionalFilters` after being
 
 The following tasks remain for the complete removal of FIQL:
 
-. Replace `fiql: simpleSearchFilterToFiql(filter)` and `fiql={...}` with `filter: filter` and `filter={...}` everywhere (including `ListPageLayout`, `QueryTable`, `CollectingEventLinker`, `AutoSuggestTextField`, workbook queries, and storage-unit queries).
 . Update every module filtered with groups to `dina-base-api` 0.178 or newer. Older versions do not parse the grouped syntax.
-. Identify back-end equivalents for negated partial matches (`NOT_ILIKE`) and `null` comparisons. The simple filter grammar lacks both. Currently, `simpleSearchFilterToQueryString` emits these normally so the web app server-side can intercept and translate them. You must drop them from the UI if back-end equivalents are not created.
-. Removing FIQL fixes unescapable commas. The Apache CXF `FiqlParser` splits FIQL on `,` and `;` before evaluating quotes or backslashes. Currently, searches like `Smith, John` fail completely. Moving away from FIQL resolves this because the simple filter URL-encodes each value independently. Until FIQL is removed, splitting the value across an OR of equalities is the only workaround.
+. Identify back-end equivalents for negated partial matches (`NOT_ILIKE`) and `null` comparisons. The simple filter grammar lacks both. Until then, `filterOrFiqlParams` sends filters with `NOT_ILIKE` as FIQL, and `EQ null` / `NEQ null` match nothing.
 . Avoid mixing `fiql=` and `filter[...]` params. The back-end will use FIQL and completely ignore the simple filter.
-. Remove `fiql` from `GetParams` (`packages/common-ui/types/kitsu.d.ts`), `useQuery`, `QueryTable`, and `fiql.ts`. Delete the `fiqlArgument` quoting rules as well.
+. Remove `filterOrFiqlParams`, then `fiql` from `GetParams` (`packages/common-ui/types/kitsu.d.ts`), `useQuery`, `QueryTable`, and `fiql.ts`. Delete the `fiqlArgument` quoting rules as well.

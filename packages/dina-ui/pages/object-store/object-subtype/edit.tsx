@@ -1,32 +1,36 @@
 import {
   BackButton,
-  ButtonBar,
   DateField,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
+  MultilingualDescription,
+  MultilingualTitle,
+  RefSubmitButton,
   SelectField,
-  SubmitButton,
   TextField,
+  useDinaFormContext,
   useQuery,
-  withResponse,
-  QueryState
+  withResponse
 } from "common-ui";
-import { connect } from "formik";
+import { FormikProps } from "formik";
+import _ from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { Footer, Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { RefObject, useRef } from "react";
+import PageLayout from "../../../components/page/PageLayout";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
 interface ObjectSubtypeFormProps {
   objectSubtype?: ObjectSubtype;
   router: NextRouter;
+  formRef: RefObject<FormikProps<any> | null>;
 }
 
 export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
-  const { id } = router.query;
-  const { formatMessage } = useDinaIntl();
+  const id = router.query.id?.toString();
+  const formRef = useRef<FormikProps<any>>(null);
 
   const title = id ? "editObjectSubtypeTitle" : "addObjectSubtypeTitle";
 
@@ -34,116 +38,157 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
     {
       path: `objectstore-api/object-subtype/${id}`
     },
-    { disabled: !id }
+    {
+      disabled: !id,
+      // System defined subtypes can't be edited, send direct URL visits back to the view page:
+      onSuccess: async ({ data }) => {
+        if (data.systemDefined) {
+          await router.replace(`/object-store/object-subtype/view?id=${id}`);
+        }
+      }
+    }
+  );
+
+  const buttonBarContent = (
+    <>
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton entityId={id} entityLink="/object-store/object-subtype" />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <RefSubmitButton formRef={formRef} className="ms-auto" />
+        {id && (
+          <DeleteButton
+            className="ms-3"
+            id={id}
+            options={{ apiBaseUrl: "/objectstore-api" }}
+            postDeleteRedirect="/object-store/object-subtype/list"
+            type="object-subtype"
+          />
+        )}
+      </div>
+    </>
   );
 
   return (
-    <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
-      <main className="container-fluid">
-        {id ? (
-          <div>
-            <h1 id="wb-cont">
-              <DinaMessage id="editObjectSubtypeTitle" />
-            </h1>
-            {id ? (
-              withResponse(
-                query as QueryState<ObjectSubtype, undefined>,
-                ({ data }) => (
-                  <ObjectSubtypeForm objectSubtype={data} router={router} />
-                )
-              )
-            ) : (
-              <ObjectSubtypeForm router={router} />
-            )}
-          </div>
-        ) : (
-          <div>
-            <h1>
-              <DinaMessage id="addObjectSubtypeTitle" />
-            </h1>
-            <ObjectSubtypeForm router={router} />
-          </div>
-        )}
-      </main>
-      <Footer />
-    </div>
+    <PageLayout titleId={title} buttonBarContent={buttonBarContent}>
+      {id ? (
+        withResponse(query, ({ data }) =>
+          data.systemDefined ? null : (
+            <ObjectSubtypeForm
+              objectSubtype={data}
+              router={router}
+              formRef={formRef}
+            />
+          )
+        )
+      ) : (
+        <ObjectSubtypeForm router={router} formRef={formRef} />
+      )}
+    </PageLayout>
   );
 }
 
-function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
-  const { id } = router.query;
-  const initialValues = objectSubtype || { type: "object-subtype" };
+/** Converts the multilingual fields to the editable Dictionary format. */
+export function objectSubtypeToFormData(objectSubtype?: ObjectSubtype): any {
+  if (!objectSubtype) {
+    return { type: "object-subtype" };
+  }
+  return {
+    ...objectSubtype,
+    multilingualTitle: _.fromPairs(
+      objectSubtype.multilingualTitle?.titles?.map(({ lang, title }) => [
+        lang ?? "",
+        title ?? ""
+      ])
+    ),
+    multilingualDescription: _.fromPairs(
+      objectSubtype.multilingualDescription?.descriptions?.map(
+        ({ lang, desc }) => [lang ?? "", desc ?? ""]
+      )
+    )
+  };
+}
 
+function ObjectSubtypeForm({
+  objectSubtype,
+  router,
+  formRef
+}: ObjectSubtypeFormProps) {
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
     api: { save }
   }) => {
-    await save(
+    // Convert the editable Dictionary format back to the stored format, skipping blank entries:
+    const titles = _.toPairs<string>(submittedValues.multilingualTitle)
+      .filter(([, title]) => title?.trim())
+      .map(([lang, title]) => ({ lang, title }));
+    const descriptions = _.toPairs<string>(
+      submittedValues.multilingualDescription
+    )
+      .filter(([, desc]) => desc?.trim())
+      .map(([lang, desc]) => ({ lang, desc }));
+
+    const [saved] = await save<ObjectSubtype>(
       [
         {
-          resource: submittedValues,
+          resource: {
+            ...submittedValues,
+            multilingualTitle: titles.length ? { titles } : null,
+            multilingualDescription: descriptions.length
+              ? { descriptions }
+              : null
+          },
           type: "object-subtype"
         }
       ],
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    await router.push(`/object-store/object-subtype/list`);
+    await router.push(`/object-store/object-subtype/view?id=${saved.id}`);
   };
 
   return (
-    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar className="mb-3">
-        <div className="col-md-6 col-sm-12 mt-2">
-          <BackButton
-            entityId={id as string}
-            entityLink="/object-store/object-subtype"
-            byPassView={true}
-          />
-        </div>
-        <div className="col-md-6 col-sm-12 d-flex">
-          <SubmitButton className="ms-auto" />
-          <CustomDeleteButton />
-        </div>
-      </ButtonBar>
-      <div>
-        <div className="row">
-          <SelectField
-            options={DC_TYPE_OPTIONS}
-            name="dcType"
-            className="col-sm-4"
-          />
-        </div>
-        <div className="row">
-          <TextField className="col-md-4" name="acSubtype" />
-        </div>
-        <div className="row">
-          <DateField
-            className="col-md-4"
-            showTime={true}
-            name="createdOn"
-            disabled={true}
-          />
-          <TextField className="col-md-4" readOnly={true} name="createdBy" />
-        </div>
-      </div>
+    <DinaForm
+      initialValues={objectSubtypeToFormData(objectSubtype)}
+      onSubmit={onSubmit}
+      innerRef={formRef}
+    >
+      <ObjectSubtypeFormLayout />
     </DinaForm>
   );
 }
 
-const CustomDeleteButton = connect<{}, ObjectSubtype>(
-  ({ formik: { values: subType } }) => (
-    <DeleteButton
-      className="ms-3"
-      id={subType.id}
-      options={{ apiBaseUrl: "/objectstore-api" }}
-      postDeleteRedirect="/object-store/object-subtype/list"
-      type="object-subtype"
-    />
-  )
-);
+export function ObjectSubtypeFormLayout() {
+  const { readOnly } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
+
+  return (
+    <div>
+      <div className="row">
+        <SelectField
+          options={DC_TYPE_OPTIONS}
+          name="dcType"
+          className="col-md-6"
+          requiredField={true}
+        />
+        <TextField
+          className="col-md-6"
+          name="acSubtype"
+          label={formatMessage("objectSubtypeName")}
+          requiredField={true}
+        />
+      </div>
+      <MultilingualTitle />
+      <MultilingualDescription />
+      {readOnly && (
+        <div className="row">
+          <DateField className="col-md-6" showTime={true} name="createdOn" />
+          <TextField className="col-md-6" name="createdBy" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 const DC_TYPE_OPTIONS = [
   {

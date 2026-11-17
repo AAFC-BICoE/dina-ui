@@ -91,34 +91,34 @@ export const TEST_GROUP: PersistedResource<Group>[] = [
   }
 ];
 
-export const TEST_MOLECULAR_ANALYSIS_TYPES: PersistedResource<Vocabulary> = {
-  id: "molecularAnalysisType",
-  type: "vocabulary",
-  vocabularyElements: [
-    {
-      key: "hrms",
-      name: "HRMS",
-      multilingualTitle: {
-        titles: [
-          { lang: "en", title: "High Resolution Mass Spectrometry (HRMS)" }
-        ]
-      }
-    },
-    {
-      key: "gcms",
-      name: "GCMS",
-      multilingualTitle: {
-        titles: [
-          {
-            lang: "en",
-            title:
-              "Gas chromatography coupled to low-resolution mass spectrometry (GCMS)"
-          }
-        ]
-      }
+export const TEST_MOLECULAR_ANALYSIS_TYPES: any[] = [
+  {
+    id: "6bcaae0a-62d5-4242-bb28-3e8694481738",
+    type: "controlled-vocabulary-item",
+    key: "hrms",
+    name: "HRMS",
+    multilingualTitle: {
+      titles: [
+        { lang: "en", title: "High Resolution Mass Spectrometry (HRMS)" }
+      ]
     }
-  ]
-};
+  },
+  {
+    id: "660e064b-66f1-4db2-8256-b0528851f166",
+    type: "controlled-vocabulary-item",
+    key: "gcms",
+    name: "GCMS",
+    multilingualTitle: {
+      titles: [
+        {
+          lang: "en",
+          title:
+            "Gas chromatography coupled to low-resolution mass spectrometry (GCMS)"
+        }
+      ]
+    }
+  }
+];
 
 export const TEST_PROTOCOLS: PersistedResource<Protocol>[] = [
   {

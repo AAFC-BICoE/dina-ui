@@ -18,7 +18,7 @@ export function WorkbookUpload({
         onSubmit={submitData}
         onClear={onClear}
         maxFiles={1}
-        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv"
+        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv, .tsv"
         inputContent={<DinaMessage id="workbookUploadInstructions" />}
         autoUpload={autoUpload}
       />

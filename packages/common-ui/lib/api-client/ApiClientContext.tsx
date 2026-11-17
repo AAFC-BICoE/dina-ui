@@ -10,7 +10,6 @@ import Kitsu, {
 import { deserialise, error as kitsuError } from "kitsu-core";
 import _ from "lodash";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { deserialize, OperationsResponse } from "..";
 import { serialize } from "../util/serialize";
 import { serializeKitsuParams } from "../util/simpleSearchFilterQueryString";
@@ -540,7 +539,7 @@ export class ApiClientImpl implements ApiClientI {
         options?.forceOperationMethod ??
         (jsonapiResource.id ? "PATCH" : "POST");
       const targetId = String(
-        jsonapiResource.id || this.cfg.newId?.() || uuidv4()
+        jsonapiResource.id || this.cfg.newId?.() || crypto.randomUUID()
       );
 
       // Omit /{id} from path for POST or PATCH without original ID.

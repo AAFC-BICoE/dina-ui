@@ -1,5 +1,6 @@
 import {
   DinaFormSection,
+  DinaFormSectionProps,
   Tooltip,
   ResourceSelectFieldCustomQuery,
   ResourceSelectFieldCustomQueryProps,
@@ -85,7 +86,7 @@ export interface ParentSelectSectionProps {
   resourcePath?: string;
   classNames?: string;
   enableCollectingEvent?: boolean;
-  horizontal?: boolean | [number, number] | "flex" | number;
+  horizontal?: DinaFormSectionProps["horizontal"];
 }
 
 /**
@@ -122,7 +123,7 @@ interface ParentSelectFieldProps {
   resourcePath?: string;
   className?: string;
   enableCollectingEvent?: boolean;
-  horizontal?: boolean | [number, number] | "flex" | number;
+  horizontal?: DinaFormSectionProps["horizontal"];
 }
 
 function ParentSelectField({

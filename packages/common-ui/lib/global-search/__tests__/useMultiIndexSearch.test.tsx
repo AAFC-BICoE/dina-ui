@@ -2,11 +2,6 @@ import { waitFor, act, renderHook } from "@testing-library/react";
 import { useMultiIndexSearch } from "../useMultiIndexSearch";
 import { MockAppContextProvider } from "../../test-util/mock-app-context";
 
-// Mock uuid
-jest.mock("uuid", () => ({
-  v4: jest.fn(() => "mock-uuid")
-}));
-
 const mockPost = jest.fn();
 
 const mockApiContext = {

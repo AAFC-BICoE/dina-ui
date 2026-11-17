@@ -38,7 +38,8 @@ export function AssignedStorage({
   parentIdInURL,
   showRowAndColumnFields = true
 }: AssignedStorageProps) {
-  const storageQuery = useStorageUnit(value?.id);
+  // Attachments are only shown on the storage unit's own view/edit page.
+  const storageQuery = useStorageUnit(value?.id, false);
   const encoder = new AlphanumericEncoder();
   const bulkEditContext = useBulkEditTabContext();
   const { isTemplate, isBulkEditAllTab } = useDinaFormContext();

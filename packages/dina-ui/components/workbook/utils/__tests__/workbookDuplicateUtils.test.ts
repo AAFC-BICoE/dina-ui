@@ -169,11 +169,9 @@ describe("workbookDuplicateUtils", () => {
   });
 
   describe("checkServerDuplicatePrimaryIds", () => {
-    it("flags entries that already exist in the same collection without filtering by group", async () => {
-      const mockGet = jest.fn(async (path: string) => ({
-        data: path.includes("S-1")
-          ? [{ id: "existing", type: "material-sample" }]
-          : []
+    it("flags entries that already exist in the same collection with one request", async () => {
+      const mockGet = jest.fn(async (_path: string, _params: any) => ({
+        data: [{ id: "existing", materialSampleName: "S-1" }]
       }));
 
       const entries = getPrimaryIdEntries(
@@ -202,13 +200,152 @@ describe("workbookDuplicateUtils", () => {
         true,
         false
       ]);
-      expect(mockGet).toHaveBeenCalledTimes(2);
-      for (const [path] of mockGet.mock.calls) {
-        expect(path).toContain("collection-api/material-sample");
-        expect(path).toContain(COLLECTION_A_UUID);
-        expect(path).not.toContain("group");
-      }
+      expect(mockGet).toHaveBeenCalledTimes(1);
+      const [path, params] = mockGet.mock.calls[0];
+      expect(path).toEqual("collection-api/material-sample");
+      expect(JSON.stringify(params.filter)).toContain(COLLECTION_A_UUID);
+      expect(JSON.stringify(params.filter)).not.toContain("group");
     });
+
+    it("looks up names containing a comma individually with EQ", async () => {
+      const mockGet = jest.fn(async (_path: string, params: any) => {
+        const filter = JSON.stringify(params.filter);
+        return {
+          data: filter.includes("S-1, b")
+            ? [{ id: "existing", materialSampleName: "S-1, b" }]
+            : []
+        };
+      });
+
+      const entries = getPrimaryIdEntries(
+        [
+          {
+            rowNumber: 1,
+            materialSampleName: "S-1, b",
+            "collection.name": "Collection A"
+          },
+          {
+            rowNumber: 2,
+            materialSampleName: "S-2",
+            "collection.name": "Collection A"
+          },
+          {
+            rowNumber: 3,
+            materialSampleName: "S-3",
+            "collection.name": "Collection A"
+          }
+        ],
+        "Collection Name",
+        relationshipMapping
+      );
+
+      const result = await checkServerDuplicatePrimaryIds(
+        { get: mockGet } as any,
+        entries
+      );
+
+      expect(result.map((entry) => entry.serverDuplicate)).toEqual([
+        true,
+        false,
+        false
+      ]);
+      // One IN request for S-2 and S-3, one EQ request for the comma name.
+      expect(mockGet).toHaveBeenCalledTimes(2);
+      const filters = mockGet.mock.calls.map(([, params]) =>
+        JSON.stringify(params.filter)
+      );
+      expect(filters.filter((f) => f.includes("S-1, b"))).toHaveLength(1);
+      expect(filters.find((f) => f.includes("S-2"))).toContain("S-3");
+    });
+
+    function entry(
+      materialSampleName: string,
+      collectionUuid = COLLECTION_A_UUID
+    ) {
+      return {
+        materialSampleName,
+        collectionUuid,
+        rowNumbers: [1],
+        localDuplicate: false,
+        serverDuplicate: false
+      };
+    }
+
+    function requestedNames(params: any): string[] {
+      const { IN, EQ } = params.filter.materialSampleName;
+      return IN ? String(IN).split(",") : [EQ];
+    }
+
+    /** Every requested name exists, unless the request asks for failingName. */
+    function mockServer(failingName?: string) {
+      return jest.fn(async (_path: string, params: any) => {
+        const names = requestedNames(params);
+        if (failingName && names.includes(failingName)) {
+          throw new Error("Request failed");
+        }
+        return {
+          data: names.map((materialSampleName) => ({ materialSampleName }))
+        };
+      });
+    }
+
+    const names = Array.from({ length: 150 }, (_, i) => `S-${i}`);
+
+    it("splits more than 100 names into chunks of 100", async () => {
+      const mockGet = mockServer();
+
+      const result = await checkServerDuplicatePrimaryIds(
+        { get: mockGet } as any,
+        names.map((name) => entry(name))
+      );
+
+      expect(result.every((e) => e.serverDuplicate)).toBe(true);
+      expect(
+        mockGet.mock.calls.map(([, params]) => requestedNames(params).length)
+      ).toEqual([100, 50]);
+    });
+
+    it("makes one request per collection", async () => {
+      const mockGet = mockServer();
+
+      await checkServerDuplicatePrimaryIds({ get: mockGet } as any, [
+        entry("S-1", COLLECTION_A_UUID),
+        entry("S-2", COLLECTION_A_UUID),
+        entry("S-1", COLLECTION_B_UUID)
+      ]);
+
+      expect(
+        mockGet.mock.calls.map(([, params]) => [
+          params.filter["collection.uuid"].EQ,
+          requestedNames(params)
+        ])
+      ).toEqual([
+        [COLLECTION_A_UUID, ["S-1", "S-2"]],
+        [COLLECTION_B_UUID, ["S-1"]]
+      ]);
+    });
+
+    it.each([
+      // The first chunk (S-0 to S-99) fails.
+      ["a chunk", "S-0", names, names.slice(100)],
+      ["a comma name", "S-0, b", ["S-0, b", "S-1"], ["S-1"]]
+    ])(
+      "leaves only the names of %s that failed unflagged",
+      async (_description, failingName, entryNames, expectedFlagged) => {
+        jest.spyOn(console, "error").mockImplementation(() => undefined);
+
+        const result = await checkServerDuplicatePrimaryIds(
+          { get: mockServer(failingName) } as any,
+          entryNames.map((name) => entry(name))
+        );
+
+        expect(
+          result
+            .filter((e) => e.serverDuplicate)
+            .map((e) => e.materialSampleName)
+        ).toEqual(expectedFlagged);
+      }
+    );
 
     it("does not query the server for entries without a collection", async () => {
       const mockGet = jest.fn();

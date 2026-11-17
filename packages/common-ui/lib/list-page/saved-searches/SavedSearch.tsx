@@ -34,6 +34,7 @@ import {
   validateSavedSearchVerison
 } from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useSessionStorage } from "usehooks-ts";
+import { useRouter } from "next/router";
 import { useLocalStorage } from "@rehooks/local-storage";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 
@@ -157,6 +158,7 @@ export function SavedSearch({
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
   const { subject } = useAccount();
+  const router = useRouter();
 
   // Users saved preferences.
   const [userPreferences, setUserPreferences] = useState<UserPreference>();
@@ -275,6 +277,12 @@ export function SavedSearch({
       changesMade ||
       !autoLoadSavedSearch
     ) {
+      return;
+    }
+
+    // A query in the URL takes precedence over the default or last used search.
+    if (router?.query?.queryTree) {
+      setDefaultLoadedIn(true);
       return;
     }
 

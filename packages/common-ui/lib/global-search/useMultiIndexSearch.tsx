@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { useApiClient } from "../api-client/ApiClientContext";
 import useSWR from "swr";
-import { v4 as uuidv4 } from "uuid";
 import { SEARCH_INDEXES } from "./searchConfig";
 
 export interface ElasticsearchHit {
@@ -165,7 +164,7 @@ export function useMultiIndexSearch(config: UseMultiIndexSearchConfig = {}) {
   }
 
   const queryKey = JSON.stringify({ searchTerm, queryDSL });
-  const cacheId = useMemo(() => uuidv4(), [queryKey]);
+  const cacheId = useMemo(() => crypto.randomUUID(), [queryKey]);
 
   const {
     data: searchResult,

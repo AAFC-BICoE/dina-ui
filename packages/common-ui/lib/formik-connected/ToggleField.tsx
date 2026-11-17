@@ -2,6 +2,7 @@ import { FormikContextType } from "formik";
 import Switch from "react-switch";
 import { FieldWrapper, FieldWrapperProps } from "..";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
+import { SmallSwitch } from "../switch/SmallSwitch";
 
 export interface ToggleFieldProps extends FieldWrapperProps {
   onChangeExternal?: (checked: boolean, formik: FormikContextType<any>) => void;
@@ -23,7 +24,7 @@ export function ToggleField({
       disableLabelClick={true}
     >
       {({ value, setValue, formik }) => (
-        <Switch
+        <SmallSwitch
           disabled={disableSwitch}
           checked={!!value}
           onChange={(checked) => {

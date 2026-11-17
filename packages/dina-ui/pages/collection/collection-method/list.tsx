@@ -26,9 +26,7 @@ const COLLECTION_METHOD_TABLE_COLUMNS: ColumnDefinition<CollectionMethod>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/collection/collection-method/view?id=${id}`} legacyBehavior>
-        {name}
-      </Link>
+      <Link href={`/collection/collection-method/view?id=${id}`}>{name}</Link>
     ),
     accessorKey: "name"
   },

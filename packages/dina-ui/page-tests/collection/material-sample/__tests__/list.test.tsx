@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 import MaterialSampleListPage from "../../../../pages/collection/material-sample/list";
 import { MATERIAL_SAMPLE_MAPPING, mountWithAppContext } from "common-ui";
 
@@ -121,5 +122,24 @@ describe("Material Sample List Page", () => {
     expect(
       reactTable.querySelectorAll("table tbody tr")[0].getAttribute("style")
     ).toBeNull();
+  });
+
+  it("Does not offer the collectors search field in the column selector", async () => {
+    const component = mountWithAppContext(<MaterialSampleListPage />, testCtx);
+    await component.findByTestId("ReactTable");
+
+    // Open the column selector, then its add new column dropdown.
+    await userEvent.click(
+      component.getByRole("button", { name: /select column/i })
+    );
+    await userEvent.click(
+      await component.findByText("Select a field to add as a column...")
+    );
+
+    // Regular collecting event fields can be added as columns...
+    expect(await component.findByText("Habitat")).toBeInTheDocument();
+
+    // ...but collectors are only used for searching, they are only indexed as UUIDs.
+    expect(component.queryByText("Collectors")).not.toBeInTheDocument();
   });
 });

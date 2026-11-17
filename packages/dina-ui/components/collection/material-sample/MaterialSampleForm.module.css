@@ -2,7 +2,15 @@
   > fieldset
   > :global(.legend-wrapper)
   > legend
-  > :global(.fieldset-h2-adjustment) {
+  > :global(.fieldset-h2-adjustment),
+.topLevelEmbeddedSection
+  > fieldset
+  > :global(.legend-wrapper)
+  > legend
+  > :global(.fieldset-h2-adjustment),
+.topLevelEmbeddedSection
+  :global(.legend-wrapper)
+  :global(.fieldset-h2-adjustment) {
   font-size: 0.95rem !important;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -12,7 +20,9 @@
   margin-bottom: 0 !important;
 }
 
-.dataComponents > fieldset > :global(.legend-wrapper) {
+.dataComponents > fieldset > :global(.legend-wrapper),
+.topLevelEmbeddedSection > fieldset > :global(.legend-wrapper),
+.topLevelEmbeddedSection > div > fieldset > :global(.legend-wrapper) {
   background-color: #eceff4;
   margin: -0.5rem -1.5rem 1rem;
   padding: 0.9rem 1.5rem;
@@ -63,29 +73,4 @@
 .topLevelEmbeddedSection > fieldset,
 .topLevelEmbeddedSection > div > fieldset {
   background-color: #fff;
-}
-
-.topLevelEmbeddedSection > fieldset > :global(.legend-wrapper),
-.topLevelEmbeddedSection > div > fieldset > :global(.legend-wrapper) {
-  background-color: #eceff4;
-  margin: -0.5rem -1.5rem 1rem;
-  padding: 0.9rem 1.5rem;
-  border-bottom: 1px solid #d5dbe3;
-}
-
-.topLevelEmbeddedSection
-  > fieldset
-  > :global(.legend-wrapper)
-  > legend
-  > :global(.fieldset-h2-adjustment),
-.topLevelEmbeddedSection
-  :global(.legend-wrapper)
-  :global(.fieldset-h2-adjustment) {
-  font-size: 0.95rem !important;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #335075;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
 }

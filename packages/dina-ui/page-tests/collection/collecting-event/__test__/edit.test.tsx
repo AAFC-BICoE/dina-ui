@@ -447,27 +447,64 @@ describe("collecting-event edit page", () => {
 
     // The first assertion is already primary:
     await waitFor(() => {
-      expect(wrapper.getByRole("button", { name: /primary/i })).toBeDisabled();
+      expect(
+        wrapper.getByRole("button", { name: /^primary$/i })
+      ).toBeDisabled();
     });
 
-    // Add a second assertion:
-    await userEvent.click(wrapper.getByTestId("add-another-button"));
+    // Add a second assertion, which becomes the active one:
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /add assertion/i })
+    );
+
+    // Make 2nd assertion primary:
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /set as primary/i })
+      ).toBeEnabled();
+    });
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /set as primary/i })
+    );
+
+    // There should be 2 assertion cards, with the 2nd marked as primary:
+    expect(
+      wrapper.getAllByRole("button", { name: /^assertion \d/i })
+    ).toHaveLength(2);
+    expect(
+      wrapper.getByRole("button", { name: /^assertion 1$/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("button", { name: /^assertion 2\s*primary/i })
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("Disables the coordinate fields when georeferencing is not possible.", async () => {
+    mockQuery = {};
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+      apiContext
+    });
 
     await waitFor(() => {
       expect(
-        wrapper.getByRole("button", { name: /primary/i })
+        wrapper.getByRole("button", { name: /^not possible$/i })
       ).toBeInTheDocument();
     });
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /^not possible$/i })
+    );
 
-    // Make 2nd assertion primary:
-    await userEvent.click(wrapper.getByRole("button", { name: /primary/i }));
-
-    // There should be 2 assertion tabs:
-    expect(wrapper.getAllByRole("tab")).toHaveLength(2);
-    expect(wrapper.getByRole("tab", { name: /1/i })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.container.querySelector(".dwcDecimalLatitude input")
+      ).toBeDisabled();
+    });
     expect(
-      wrapper.getByRole("tab", { name: /2 \(primary\)/i })
-    ).toBeInTheDocument();
+      wrapper.container.querySelector(".literalGeoreferencedBy input")
+    ).toBeEnabled();
+    expect(
+      wrapper.getByRole("button", { name: /^assertion 1/i })
+    ).toHaveTextContent(/not possible/i);
   });
 
   it("Removes the coordinate system if there are no coordinates set.", async () => {

@@ -17,7 +17,10 @@ import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { Protocol } from "packages/dina-ui/types/collection-api";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { SEQDB_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import {
+  SEQDB_MANAGED_ATTRIBUTE_ID,
+  SEQDB_MOLECULAR_ANALYSIS_TYPE_ID
+} from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface MolecularAnalysisDetailsStepProps {
   genericMolecularAnalysisId?: string;
@@ -124,7 +127,7 @@ export function MolecularAnalysisForm() {
         <VocabularySelectField
           className="col-md-6"
           name="analysisType"
-          path="seqdb-api/vocabulary/molecularAnalysisType"
+          path={`seqdb-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${SEQDB_MOLECULAR_ANALYSIS_TYPE_ID}`}
           requiredField={true}
         />
         <ResourceSelectField<Protocol>

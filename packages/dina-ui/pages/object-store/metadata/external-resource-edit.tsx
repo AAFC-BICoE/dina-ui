@@ -22,6 +22,7 @@ import { NextRouter, useRouter } from "next/router";
 import { Field } from "formik";
 import {
   Footer,
+  GroupSelectField,
   Head,
   Nav,
   NotPubliclyReleasableWarning,
@@ -36,8 +37,9 @@ import {
   Metadata,
   ObjectSubtype
 } from "../../../types/objectstore-api";
-import { DCTYPE_OPTIONS, ORIENTATION_OPTIONS } from "../metadata/edit";
+import { ORIENTATION_OPTIONS } from "../metadata/edit";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
+import { DcTypeSelectorComponent } from "../../../components/object-store/metadata/MetadataForm";
 import { InputResource } from "kitsu";
 import _ from "lodash";
 import { useRef } from "react";
@@ -157,7 +159,8 @@ function ExternalResourceMetadataForm({
             }
           : null
       }
-    : {};
+    : // Default to the user's first group, users without a group (e.g. dina-admin) must pick one:
+      { bucket: groupNames?.[0] };
 
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
@@ -256,6 +259,18 @@ function ExternalResourceMetadataForm({
       />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
+          {/* The bucket is the record's group, so it's only picked on create. */}
+          <GroupSelectField
+            className="col-md-6"
+            name="bucket"
+            label={formatMessage("group")}
+            enableStoredDefaultGroup={true}
+            requiredField={true}
+            hideWithOnlyOneGroup={!metadata?.id}
+            selectProps={{ isDisabled: !!metadata?.id }}
+          />
+        </div>
+        <div className="row">
           <TextField className="col-md-6" name="filename" />
           <TextField
             className="col-md-6"
@@ -266,6 +281,7 @@ function ExternalResourceMetadataForm({
             className="col-md-6"
             name="resourceExternalURL"
             label={formatMessage("metadataResourceExternalURLLabel")}
+            requiredField={true}
           />
           <ResourceSelectField<MediaType>
             name="dcFormat"
@@ -279,6 +295,7 @@ function ExternalResourceMetadataForm({
             optionLabel={(format) => format.mediaType}
             removeDefaultSort={true}
             omitNullOption={true}
+            requiredField={true}
           />
           <TextField className="col-md-6" name="acCaption" />
           <DateField
@@ -288,11 +305,7 @@ function ExternalResourceMetadataForm({
           />
         </div>
         <div className="row">
-          <SelectField
-            className="col-md-6"
-            name="dcType"
-            options={DCTYPE_OPTIONS}
-          />
+          <DcTypeSelectorComponent />
           <Field name="dcType">
             {({ field: { value: dcType } }) => (
               <ResourceSelectField<ObjectSubtype>
@@ -309,6 +322,8 @@ function ExternalResourceMetadataForm({
                 }
                 model="objectstore-api/object-subtype"
                 optionLabel={(ost) => ost.acSubtype}
+                // Subtypes depend on the stored object type, pick that first:
+                isDisabled={!dcType}
               />
             )}
           </Field>
