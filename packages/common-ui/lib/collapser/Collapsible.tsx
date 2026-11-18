@@ -2,6 +2,7 @@ import _ from "lodash";
 import { PropsWithChildren, useState, createContext, useContext } from "react";
 import { Accordion } from "react-bootstrap";
 import { useIntl } from "react-intl";
+import { IconType } from "react-icons";
 
 export interface CollapsibleSectionProps {
   /**
@@ -25,6 +26,9 @@ export interface CollapsibleSectionProps {
 
   /** Start expanded. Default is false. */
   defaultOpen?: boolean;
+
+  /** Icon shown before the header label. */
+  icon?: IconType;
 }
 
 interface CollapsibleSectionContextType {
@@ -39,7 +43,8 @@ export function CollapsibleSection({
   id,
   headerKey,
   removePadding = false,
-  defaultOpen = false
+  defaultOpen = false,
+  icon: Icon
 }: PropsWithChildren<CollapsibleSectionProps>) {
   const { formatMessage, messages } = useIntl();
 
@@ -63,6 +68,7 @@ export function CollapsibleSection({
       >
         <Accordion.Item eventKey={id}>
           <Accordion.Header style={{ marginTop: "0px" }}>
+            {Icon && <Icon className="fieldset-legend-icon" />}
             {headerLabel}
           </Accordion.Header>
           <Accordion.Body style={{ padding: removePadding ? "0px" : "15px" }}>

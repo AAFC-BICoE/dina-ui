@@ -1,40 +1,4 @@
-import {
-  useDinaFormContext,
-  FieldWrapper,
-  Tooltip,
-  DinaFormSection,
-  EmptyFieldValue
-} from "common-ui";
-import { FaExclamationCircle } from "react-icons/fa";
-import { useFormikContext } from "formik";
-
-export function MaterialSampleStateWarning() {
-  const { readOnly } = useDinaFormContext();
-  const { values } = useFormikContext<any>();
-
-  if (!readOnly || !values.materialSampleState) {
-    return null;
-  }
-
-  return (
-    <DinaFormSection horizontal="flex">
-      <div className="d-flex flex-row gap-2 mb-2">
-        <Tooltip
-          visibleElement={
-            <div className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined bg-danger">
-              <FaExclamationCircle className="text-white" />
-              <span className="text-white">
-                <MaterialSampleStateReadOnlyRender removeLabel={true} />
-              </span>
-            </div>
-          }
-          id="field_materialSampleState"
-          disableSpanMargin={true}
-        />
-      </div>
-    </DinaFormSection>
-  );
-}
+import { FieldWrapper, EmptyFieldValue } from "common-ui";
 
 export function MaterialSampleStateReadOnlyRender({ removeLabel }) {
   function renderAsReadOnly(value, formik) {

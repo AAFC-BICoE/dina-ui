@@ -10,12 +10,16 @@ export interface AttachmentReadOnlySectionProps {
   detachTotalSelected?: boolean;
 
   title?: ReactNode;
+
+  /** FieldSet id, also used to look up the legend icon. */
+  id?: string;
 }
 
 export function AttachmentReadOnlySection({
   name,
   detachTotalSelected,
-  title
+  title,
+  id
 }: AttachmentReadOnlySectionProps) {
   // JSX key to reload the child components after editing Metadatas.
   const [lastSave, setLastSave] = useState<number>();
@@ -30,6 +34,7 @@ export function AttachmentReadOnlySection({
         return (
           <FieldSet
             key={lastSave}
+            id={id}
             legend={
               <>
                 {title ?? <DinaMessage id="attachments" />}{" "}

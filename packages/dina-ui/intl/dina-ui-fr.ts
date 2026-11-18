@@ -809,6 +809,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   originalMaterialSampleLabel: "Échantillon de matière original",
   overwriteValues: "Écraser les valeurs",
   parentCollectionLabel: "Collection mère",
+  parent: "Parent",
   parentMaterialSample: "Échantillon de matériau parent",
   parentSampleNotFoundLabel: "Échantillon parent non trouvé",
   partial: "Partiel",
