@@ -26,7 +26,8 @@ import {
   ModuleTabs,
   TypeFilterState,
   TypeFilterSideBarDynamic,
-  SidebarOption
+  SidebarOption,
+  useResourcePermissions
 } from "packages/dina-ui/components";
 
 import styles from "./controlled-vocabulary.module.css";
@@ -299,6 +300,10 @@ export default function ControlledVocabularyListPage() {
   ];
 
   const activeModule = CV_MODULES[currentTab];
+  const { canCreate: canCreateItem } = useResourcePermissions({
+    apiBaseUrl: activeModule.apiBaseUrl,
+    typeName: "controlled-vocabulary-item"
+  });
 
   // Active tab's data
   const {
@@ -606,15 +611,17 @@ export default function ControlledVocabularyListPage() {
     <PageLayout
       titleId="controlledVocabularyTitle"
       buttonBarContent={
-        <div className="flex d-flex ms-auto">
-          <Link
-            href={activeModule.editRoute}
-            className="btn btn-primary ms-auto"
-          >
-            <FaPlus className="me-2" />
-            <DinaMessage id="createNew" />
-          </Link>
-        </div>
+        canCreateItem && (
+          <div className="flex d-flex ms-auto">
+            <Link
+              href={activeModule.editRoute}
+              className="btn btn-primary ms-auto"
+            >
+              <FaPlus className="me-2" />
+              <DinaMessage id="createNew" />
+            </Link>
+          </div>
+        )
       }
     >
       <Head
