@@ -113,7 +113,7 @@ function ChipsInput({
 }
 
 export function ChipList({ children }: { children: ReactNode }) {
-  return <div className="d-flex flex-wrap gap-2">{children}</div>;
+  return <div className="chip-list d-flex flex-wrap gap-2">{children}</div>;
 }
 
 /** A pill-shaped value. Pass onRemove to show a remove button. */
