@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FieldHeader } from "../../../common-ui/lib";
 import Select from "react-select";
 import { FiChevronRight } from "react-icons/fi";
+import { Z_INDEX } from "common-ui";
 
 interface SampleSelectionMappingTableProps {
   extractedDataTable: string[][];
@@ -71,6 +72,7 @@ export function SampleSelectionMappingTable({
                 classNamePrefix="select"
                 // add style to make it wider
                 styles={{
+                  menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
                   control: (base) => ({
                     ...base,
                     width: "12.5rem",

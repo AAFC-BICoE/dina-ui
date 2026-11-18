@@ -5,6 +5,7 @@ import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectFiel
 import { TransformToDSLProps } from "../../types";
 import PolygonEditorMap from "@dina-ui/components/collection/site/PolygonEditorMap";
 import { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryBuilderGeoShapeSearchProps {
   /**
@@ -109,7 +110,10 @@ export default function QueryBuilderGeoShapeSearch({
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
         menuPortalTarget={document.body}
-        styles={{ menu: (base) => ({ ...base, zIndex: 9999 }) }}
+        styles={{
+          menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
+          menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+        }}
       />
 
       <PolygonEditorMap

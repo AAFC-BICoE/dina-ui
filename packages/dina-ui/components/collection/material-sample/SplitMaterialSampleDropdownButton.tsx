@@ -6,7 +6,8 @@ import {
   SimpleSearchFilterBuilder,
   Tooltip,
   useAccount,
-  useQuery
+  useQuery,
+  Z_INDEX
 } from "common-ui";
 import Dropdown from "react-bootstrap/Dropdown";
 import Select from "react-select";
@@ -129,6 +130,7 @@ export function SplitMaterialSampleDropdownButton({
             <DinaMessage id="selectSplitConfiguration" />
           </strong>
           <Select<SplitConfigurationOption>
+            styles={{ menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }) }}
             className="mt-2"
             name="splitConfiguration"
             options={splitConfigurationOptions}

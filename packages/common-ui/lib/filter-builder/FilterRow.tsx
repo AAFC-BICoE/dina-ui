@@ -16,6 +16,7 @@ import {
   FilterBuilderContextI
 } from "./FilterBuilderContext";
 import { DateRange, FilterRowDatePicker } from "./FilterRowDatePicker";
+import { Z_INDEX } from "../z-index/zIndex";
 
 export type FilterRowPredicate =
   | "IS"
@@ -92,6 +93,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
         : STRING_SEARCH_TYPES;
 
     const customStyle: any = {
+      menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
       multiValueLabel: (base) => ({ ...base, cursor: "move" }),
       placeholder: (base) => ({ ...base, color: "#5c5c5c" }),
       option: (_, state) => ({

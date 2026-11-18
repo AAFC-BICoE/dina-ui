@@ -23,6 +23,8 @@ include::stack.adoc[]
 
 include::dina_design_guidelines.adoc[]
 
+include::z_index.adoc[]
+
 include::running_tests.adoc[]
 
 include::versioning.adoc[]

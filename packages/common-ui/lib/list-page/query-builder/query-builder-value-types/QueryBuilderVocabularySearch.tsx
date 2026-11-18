@@ -5,6 +5,7 @@ import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/u
 import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOptions";
 import { LoadingSpinner } from "common-ui";
 import Select from "react-select";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryRowVocabularySearchProps {
   /**
@@ -78,7 +79,7 @@ export default function QueryRowVocabularySearch({
                   styles={{
                     menu: (base) => ({
                       ...base,
-                      zIndex: 9999
+                      zIndex: Z_INDEX.dropdown
                     })
                   }}
                 />
@@ -99,7 +100,7 @@ export default function QueryRowVocabularySearch({
                   styles={{
                     menu: (base) => ({
                       ...base,
-                      zIndex: 9999
+                      zIndex: Z_INDEX.dropdown
                     })
                   }}
                 />

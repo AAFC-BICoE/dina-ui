@@ -1,5 +1,6 @@
 import RcTooltip from "rc-tooltip";
 import * as React from "react";
+import { Z_INDEX } from "../z-index/zIndex";
 
 export interface ITooltipSelectOptionProps {
   children?: React.ReactNode;
@@ -27,7 +28,7 @@ export function TooltipSelectOption({
         }
         placement={placement}
         trigger={["focus", "hover"]}
-        zIndex={3001}
+        zIndex={Z_INDEX.tooltip}
       >
         <span>{children}</span>
       </RcTooltip>

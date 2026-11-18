@@ -33,7 +33,7 @@
   right: 0;
   width: 400px;
   max-height: 500px;
-  z-index: 1050;
+  z-index: var(--dina-z-dropdown);
   overflow: hidden;
   display: flex;
   flex-direction: column;

@@ -9,7 +9,8 @@ import {
   SubmitButton,
   useAccount,
   useQuery,
-  withResponse
+  withResponse,
+  Z_INDEX
 } from "common-ui";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import { FieldArray } from "formik";
@@ -247,6 +248,12 @@ export function RolesPerGroupEditor({
                         <DinaMessage id="addGroup" />
                       </strong>
                       <Select
+                        styles={{
+                          menu: (base) => ({
+                            ...base,
+                            zIndex: Z_INDEX.dropdown
+                          })
+                        }}
                         value={null}
                         onChange={(option) => {
                           if (option) {

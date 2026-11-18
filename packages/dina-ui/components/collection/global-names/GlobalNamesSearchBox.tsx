@@ -7,7 +7,8 @@ import {
   Tooltip,
   useAccount,
   useApiClient,
-  SaveArgs
+  SaveArgs,
+  Z_INDEX
 } from "common-ui";
 import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
@@ -307,6 +308,9 @@ export function GlobalNamesSearchBox({
                 datasetOptions && (
                   <div className="d-flex align-items-center justify-content-end mb-2">
                     <Select
+                      styles={{
+                        menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+                      }}
                       isMulti
                       name="globalNameSources"
                       options={datasetOptions}

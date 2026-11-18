@@ -9,6 +9,7 @@ import Select from "react-select";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryBuilderBooleanSearchProps {
   /**
@@ -69,7 +70,7 @@ export default function QueryBuilderBooleanSearch({
           styles={{
             menu: (base) => ({
               ...base,
-              zIndex: 9999
+              zIndex: Z_INDEX.dropdown
             })
           }}
         />

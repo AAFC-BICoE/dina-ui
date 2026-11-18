@@ -23,6 +23,7 @@ import useControlledVocabularyOptions, {
   ControlledVocabularyOption
 } from "@dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
 import { COLLECTION_OTHER_IDENTIFIERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryBuilderIdentifierSearchProps {
   /**
@@ -291,9 +292,10 @@ export default function QueryRowIdentifierSearch({
         minMenuHeight={600}
         menuPortalTarget={document.body}
         styles={{
+          menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
           menu: (base) => ({
             ...base,
-            zIndex: 9999
+            zIndex: Z_INDEX.dropdown
           })
         }}
       />
@@ -316,9 +318,10 @@ export default function QueryRowIdentifierSearch({
           minMenuHeight={600}
           menuPortalTarget={document.body}
           styles={{
+            menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
             menu: (base) => ({
               ...base,
-              zIndex: 9999
+              zIndex: Z_INDEX.dropdown
             })
           }}
         />

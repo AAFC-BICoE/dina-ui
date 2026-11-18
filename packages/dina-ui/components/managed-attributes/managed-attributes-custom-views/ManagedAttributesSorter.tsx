@@ -270,11 +270,11 @@ function AttributesViewList({
       <style>{`
         .form-control.sortable-lifted {
           background-color: rgb(222, 235, 255);
-          z-index: 1100;
+          z-index: var(--dina-z-dragging);
         }
         .sortable-managed-attribute.dragging {
           background-color: rgb(222, 235, 255);
-          z-index: 1100;
+          z-index: var(--dina-z-dragging);
         }
       `}</style>
       <DinaFormSection isTemplate={false}>

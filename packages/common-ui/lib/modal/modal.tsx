@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import ReactModal from "react-modal";
+import { Z_INDEX } from "../z-index/zIndex";
 
 interface ModalContextI {
   openModal: (content: React.JSX.Element) => void;
@@ -45,7 +46,7 @@ export function ModalProvider({ appElement, children }: ModalProviderProps) {
         // Make sure the modal is in front of the Bootstrap nav bar:
         style={{
           overlay: {
-            zIndex: 3000,
+            zIndex: Z_INDEX.modal,
             backgroundColor: "rgba(150, 150, 150, 0.75)"
           }
         }}

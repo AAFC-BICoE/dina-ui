@@ -57,7 +57,7 @@
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
-  z-index: 1000; /* Bootstrap's dropdown layer */
+  z-index: var(--dina-z-dropdown);
   display: flex;
   flex-direction: column;
   gap: 10px;

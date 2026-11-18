@@ -13,7 +13,8 @@ import {
   LoadingSpinner,
   ColumnDefinition,
   SimpleSearchFilterBuilder,
-  IFileWithMeta
+  IFileWithMeta,
+  Z_INDEX
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Alert, Button, Card, Form } from "react-bootstrap";
@@ -436,7 +437,10 @@ export function WorkbookTemplateGenerator() {
                   options={entityTypes}
                   menuPortalTarget={document.body}
                   styles={{
-                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                    menuPortal: (base) => ({
+                      ...base,
+                      zIndex: Z_INDEX.dropdown
+                    })
                   }}
                 />
               </FieldWrapper>

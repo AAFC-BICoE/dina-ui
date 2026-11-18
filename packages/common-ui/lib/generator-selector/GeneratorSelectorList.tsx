@@ -19,6 +19,7 @@ import QueryRowClassificationSearch, {
 import QueryRowIdentifierSearch, {
   IdentifierSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
+import { Z_INDEX } from "../z-index/zIndex";
 
 export interface GeneratorSelectorListProps extends GeneratorSelectorProps {
   loading: boolean;
@@ -229,8 +230,8 @@ export function GeneratorSelectorList({
         ...provided,
         color: "#5c5c5c"
       }),
-      menu: (base) => ({ ...base, zIndex: 1050 }),
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
+      menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
       control: (base) => ({
         ...base
       }),
@@ -301,7 +302,12 @@ export function GeneratorSelectorList({
                 selectProps={{
                   className: "mt-0",
                   menuPortalTarget: document.body,
-                  styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+                  styles: {
+                    menuPortal: (base) => ({
+                      ...base,
+                      zIndex: Z_INDEX.dropdown
+                    })
+                  }
                 }}
                 filter={(input) =>
                   SimpleSearchFilterBuilder.create<ManagedAttribute>()

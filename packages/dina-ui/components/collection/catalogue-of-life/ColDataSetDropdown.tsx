@@ -1,4 +1,4 @@
-import { useDebouncedFetch } from "common-ui";
+import { useDebouncedFetch, Z_INDEX } from "common-ui";
 import Select from "react-select";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { catalogueOfLifeQuery } from "./CatalogueOfLifeSearchBox";
@@ -61,7 +61,7 @@ export function ColDataSetDropdown({
         inputValue ? undefined : () => formatMessage("typeHereToSearch")
       }
       isClearable={true}
-      styles={{ menu: () => ({ zIndex: 5 }) }}
+      styles={{ menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }) }}
       options={selectOptions}
     />
   );

@@ -95,12 +95,13 @@ h1, h2, h3, h4, h5, h6 {
   position: sticky;
   top: -1rem;
   background: white;
-  z-index: 100;
+  z-index: var(--dina-z-sticky);
   margin-bottom: 20px;
 }
 
 .offcanvas-end {
   width: 500px !important;
+  z-index: var(--dina-z-overlay);
 }
 
 .no-select {
@@ -180,6 +181,7 @@ input[id^="react-select"] {
   border: var(--border-width, 1px) solid var(--border-subtle, #dee2e6);
   border-radius: var(--radius, 0.5rem);
   box-shadow: var(--shadow-sm, 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075));
+  z-index: var(--dina-z-sticky-nav);
 }
 
 .material-sample-nav .card {
@@ -231,7 +233,7 @@ input[id^="react-select"] {
   color: white;
   position: sticky;
   top: 0;
-  z-index: 1031 !important;
+  z-index: calc(var(--dina-z-sticky-nav) + 1) !important;
 }
 
 .material-sample-nav .nav-item-icon {
@@ -709,7 +711,13 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .react-datepicker-popper {
-  z-index: 9999 !important;
+  z-index: var(--dina-z-dropdown) !important;
+}
+
+/* Bootstrap dropdowns and popovers */
+.dropdown-menu,
+.popover {
+  z-index: var(--dina-z-dropdown);
 }
 
 .group--drag-handler:not(:only-child) {
@@ -776,13 +784,6 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /*
- * React Select Styles
- */
-.ReactTable .-pagination .react-select__menu {
-  z-index: 3;
-}
-
-/*
  * React Table Styles
  */
 .react-table-overflow .rt-td,
@@ -829,7 +830,7 @@ input[type="number"]::-webkit-outer-spin-button {
   padding: 0 !important;
   width: 100%;
   height: 100%;
-  z-index: 1050;
+  z-index: var(--dina-z-overlay);
   background: white;
   padding: 1rem;
   box-sizing: border-box;
@@ -888,7 +889,7 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1050;
+  z-index: var(--dina-z-overlay);
 }
 
 @keyframes pulse-animation {
@@ -965,7 +966,7 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   position: fixed;
   bottom: 30px;
   right: 30px;
-  z-index: 999999;
+  z-index: var(--dina-z-toast);
   display: grid;
   grid-template-areas: "toast-stack";
   pointer-events: none;

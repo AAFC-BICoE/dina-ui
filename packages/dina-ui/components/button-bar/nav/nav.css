@@ -6,7 +6,6 @@ body {
 }
 .dropdown:hover .dropdown-menu {
   margin-top: -5px;
-  z-index: 9000;
 }
 
 .submenu > button {

@@ -13,6 +13,7 @@ import {
   FunctionDef,
   FunctionDefinitions
 } from "@dina-ui/types/dina-export-api";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryRowColumnFunctionInputProps {
   /**
@@ -232,6 +233,7 @@ export default function QueryRowColumnFunctionInput({
         <strong>{formatMessage("selectFunctionToUse")}:</strong>
       </label>
       <Select<FormulaOption>
+        styles={{ menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }) }}
         className={isInColumnSelector ? "ps-0" : "col me-1 ms-2 ps-0"}
         onChange={(newValue: FormulaOption) => onFormulaChanged(newValue.value)}
         value={selectedFunction}

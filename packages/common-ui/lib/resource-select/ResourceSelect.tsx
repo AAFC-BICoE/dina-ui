@@ -26,6 +26,7 @@ import { JsonApiQuerySpec, useQuery } from "../api-client/useQuery";
 import { HighlightedText } from "./HighlightedText";
 import { useBulkGet } from "./useBulkGet";
 import { SortableSelect } from "common-ui";
+import { Z_INDEX } from "../z-index/zIndex";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectBaseProps<TData extends KitsuResource> {
@@ -555,12 +556,13 @@ export function ResourceSelectInner<TData extends KitsuResource>({
     }),
     menu: (base) => ({
       ...base,
-      zIndex: 9001,
+      zIndex: Z_INDEX.dropdown,
       borderRadius: "6px",
       overflow: "hidden",
       boxShadow:
         "0 0 0 1px hsla(0, 0%, 0%, 0.15), 0 4px 12px hsla(0, 0%, 0%, 0.18)"
     }),
+    menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
     // No top padding, so the sticky scope bar and group headings sit flush with the top.
     menuList: (base) => ({ ...base, paddingTop: 0 }),
     // Keep group headings visible while scrolling, just below the scope header:

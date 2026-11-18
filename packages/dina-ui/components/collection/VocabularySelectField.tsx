@@ -1,4 +1,4 @@
-import { FieldWrapper, FieldWrapperProps } from "common-ui";
+import { FieldWrapper, FieldWrapperProps, Z_INDEX } from "common-ui";
 import _ from "lodash";
 import Select, { GroupBase } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
@@ -75,6 +75,7 @@ export function VocabularySelectField({
                 formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
                 placeholder={placeholder ?? formatMessage("selectOrType")}
                 styles={{
+                  menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
                   control: (base) => ({
                     ...base,
                     ...(invalid && {
@@ -98,6 +99,7 @@ export function VocabularySelectField({
                 formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
                 placeholder={placeholder ?? formatMessage("selectOrType")}
                 styles={{
+                  menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
                   control: (base) => ({
                     ...base,
                     ...(invalid && {
