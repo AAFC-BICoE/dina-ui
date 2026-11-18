@@ -720,6 +720,10 @@ input[type="number"]::-webkit-outer-spin-button {
   z-index: var(--dina-z-dropdown);
 }
 
+body:is(.modal-open, .ReactModal__Body--open) .dropdown-menu:not(.modal .dropdown-menu, .ReactModal__Overlay .dropdown-menu) {
+  z-index: calc(var(--dina-z-overlay) - 1);
+}
+
 .group--drag-handler:not(:only-child) {
   top: 5px !important;
 }
