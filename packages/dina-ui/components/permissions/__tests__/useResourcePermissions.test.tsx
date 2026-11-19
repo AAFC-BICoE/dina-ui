@@ -34,16 +34,21 @@ function renderPermissionsHook(
   params: UseResourcePermissionsParams = PARAMS,
   accountContext: Record<string, unknown> = { groupNames: ["aafc", "cnc"] }
 ) {
-  return renderHook(() => useResourcePermissions(params), {
-    wrapper: ({ children }: { children: ReactNode }) => (
-      <MockAppContextProvider
-        apiContext={{ apiClient: { axios: { post: mockPost } } } as any}
-        accountContext={accountContext}
-      >
-        {children}
-      </MockAppContextProvider>
-    )
-  });
+  return renderHook(
+    (hookParams: UseResourcePermissionsParams) =>
+      useResourcePermissions(hookParams),
+    {
+      initialProps: params,
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <MockAppContextProvider
+          apiContext={{ apiClient: { axios: { post: mockPost } } } as any}
+          accountContext={accountContext}
+        >
+          {children}
+        </MockAppContextProvider>
+      )
+    }
+  );
 }
 
 describe("useResourcePermissions", () => {
@@ -79,6 +84,53 @@ describe("useResourcePermissions", () => {
         }
       );
     }
+  });
+
+  it("Only checks the given group instead of all of the user's groups.", async () => {
+    mockPermissionsByGroup({
+      aafc: ["read", "create", "delete"],
+      cnc: ["read", "update"]
+    });
+    const { result } = renderPermissionsHook({ ...PARAMS, group: "cnc" });
+
+    await waitFor(() =>
+      expect(result.current).toEqual({
+        canCreate: false,
+        canEdit: true,
+        canDelete: false,
+        loading: false
+      })
+    );
+    expect(mockPost).toHaveBeenCalledTimes(1);
+    expect(mockPost).toHaveBeenCalledWith("/collection-api/permission-check", {
+      data: {
+        type: "controlled-vocabulary-item",
+        attributes: { group: "cnc" }
+      }
+    });
+  });
+
+  it("Checks a given group the user is not a member of.", async () => {
+    mockPermissionsByGroup({ other: ["read", "create"] });
+    const { result } = renderPermissionsHook({ ...PARAMS, group: "other" });
+
+    await waitFor(() => expect(result.current.canCreate).toEqual(true));
+    expect(mockPost).toHaveBeenCalledTimes(1);
+  });
+
+  it("Checks the given group again when it changes.", async () => {
+    mockPermissionsByGroup({ aafc: ["read", "create"], cnc: ["read"] });
+    const { result, rerender } = renderPermissionsHook({
+      ...PARAMS,
+      group: "cnc"
+    });
+    await waitFor(() => expect(result.current.loading).toEqual(false));
+    expect(result.current.canCreate).toEqual(false);
+
+    rerender({ ...PARAMS, group: "aafc" });
+
+    await waitFor(() => expect(result.current.canCreate).toEqual(true));
+    expect(mockPost).toHaveBeenCalledTimes(2);
   });
 
   it("Grants a permission when any of the user's groups has it.", async () => {
@@ -139,6 +191,16 @@ describe("useResourcePermissions", () => {
         loading: false
       })
     );
+    expect(mockPost).not.toHaveBeenCalled();
+  });
+
+  it("Allows everything to admins for a given group without calling the API.", async () => {
+    const { result } = renderPermissionsHook(
+      { ...PARAMS, group: "cnc" },
+      { groupNames: ["aafc"], isAdmin: true }
+    );
+
+    await waitFor(() => expect(result.current.canDelete).toEqual(true));
     expect(mockPost).not.toHaveBeenCalled();
   });
 

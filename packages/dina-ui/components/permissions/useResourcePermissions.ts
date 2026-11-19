@@ -11,6 +11,9 @@ export interface UseResourcePermissionsParams {
 
   /** Attribute the API's permission-check reads the group from ("group" unless the API says otherwise). */
   groupAttribute?: string;
+
+  /** Only check this group, e.g. the group of the record being viewed. Defaults to all of the user's groups. */
+  group?: string;
 }
 
 export interface ResourcePermissions {
@@ -36,18 +39,21 @@ const ALL_ALLOWED: ResourcePermissions = {
 
 /**
  * What the user may do with a resource type, using the API's permission-check endpoint.
- * Permissions depend on the group, so each one is true when granted in any of the user's groups.
+ * Permissions depend on the group, so each one is true when granted in the given group, or in any
+ * of the user's groups when no group is given.
  * Everything is denied while loading, so buttons stay hidden until the check completes.
  */
 export function useResourcePermissions({
   apiBaseUrl,
   typeName,
-  groupAttribute = "group"
+  groupAttribute = "group",
+  group
 }: UseResourcePermissionsParams): ResourcePermissions {
   const { apiClient } = useApiClient();
   const { isAdmin, groupNames } = useAccount();
   const [permissions, setPermissions] = useState(LOADING_PERMISSIONS);
-  const groupKey = (groupNames ?? []).join(",");
+  const groupsToCheck = group === undefined ? groupNames ?? [] : [group];
+  const groupKey = groupsToCheck.join(",");
 
   useEffect(() => {
     if (isAdmin) {
@@ -59,13 +65,13 @@ export function useResourcePermissions({
     (async () => {
       try {
         const results = await Promise.all(
-          (groupNames ?? []).map((group) =>
+          groupsToCheck.map((groupToCheck) =>
             apiClient.axios.post<PermissionCheckResponse>(
               `${apiBaseUrl}/permission-check`,
               {
                 data: {
                   type: typeName,
-                  attributes: { [groupAttribute]: group }
+                  attributes: { [groupAttribute]: groupToCheck }
                 }
               }
             )
