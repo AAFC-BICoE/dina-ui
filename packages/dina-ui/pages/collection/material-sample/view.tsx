@@ -424,6 +424,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <FieldSetIconContext.Provider value={SECTION_ICONS}>
                   <div
                     className={`flex-grow-1 container-fluid ${styles.viewSections}`}
+                    style={{ minWidth: 0 }}
                   >
                     <MaterialSampleViewHeader materialSample={materialSample} />
                     <MaterialSampleRestrictionsAlert />

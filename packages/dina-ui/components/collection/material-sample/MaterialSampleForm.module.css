@@ -124,3 +124,34 @@
   :global(.mt-2) {
   margin-top: 0 !important;
 }
+
+.compactHeaderAnchor {
+  position: sticky;
+  height: 0;
+  z-index: 1030;
+}
+
+.compactHeader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 6px 6px -6px rgba(0, 0, 0, 0.2);
+}
+
+.compactHeaderHidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .compactHeader {
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out, visibility 0.2s;
+  }
+}
+
+.compactText {
+  flex: 1 1 0;
+  max-width: max-content;
+}

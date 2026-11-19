@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { useRef } from "react";
 import { FaBug, FaLock } from "react-icons/fa";
 import { FaTurnUp } from "react-icons/fa6";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { GroupLabel } from "../../group-select/GroupFieldView";
+import { MaterialSampleCompactHeader } from "./MaterialSampleCompactHeader";
 
 export interface MaterialSampleViewHeaderProps {
   materialSample: MaterialSample;
@@ -30,70 +32,86 @@ export function MaterialSampleViewHeader({
     0
   );
 
+  const headerRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div
-      className={`d-flex flex-wrap justify-content-between gap-3 mt-3 pb-3 mb-3 border-bottom ${
-        materialSample.isRestricted ? "border-danger" : ""
-      }`}
-    >
-      <div className="flex-grow-1" style={{ minWidth: 0 }}>
-        {parent && (
+    <>
+      <MaterialSampleCompactHeader
+        materialSample={materialSample}
+        scientificName={scientificName}
+        headerRef={headerRef}
+      />
+      <div
+        ref={headerRef}
+        className={`d-flex flex-wrap flex-md-nowrap justify-content-between gap-3 pb-3 mb-3 border-bottom ${
+          parent ? "mt-3" : ""
+        } ${materialSample.isRestricted ? "border-danger" : ""}`}
+      >
+        <div className="flex-grow-1" style={{ minWidth: 0 }}>
+          {parent && (
+            <div className="text-muted">
+              <FaTurnUp className="me-1" style={{ transform: "scaleX(-1)" }} />
+              <span style={{ position: "relative", top: "2px" }}>
+                <DinaMessage id="parent" />{" "}
+                <Link
+                  href={`/collection/material-sample/view?id=${parent.uuid}`}
+                >
+                  {parent.name}
+                </Link>
+              </span>
+            </div>
+          )}
+          <h2 id="wb-cont" className="fw-bold mb-2">
+            {materialSample.materialSampleName ?? materialSample.id}
+          </h2>
+          {scientificName && (
+            <div className="fs-5 mb-1" style={{ overflowWrap: "anywhere" }}>
+              {scientificName}
+            </div>
+          )}
           <div className="text-muted">
-            <FaTurnUp className="me-1" style={{ transform: "scaleX(-1)" }} />
-            <span style={{ position: "relative", top: "2px" }}>
-              <DinaMessage id="parent" />{" "}
-              <Link href={`/collection/material-sample/view?id=${parent.uuid}`}>
-                {parent.name}
-              </Link>
-            </span>
+            <FaBug className="me-2" />
+            {organisms.length}{" "}
+            {organisms.length === 1 ? "organism" : "organisms"} ·{" "}
+            {determinationCount}{" "}
+            {determinationCount === 1 ? "determination" : "determinations"}
           </div>
-        )}
-        <h2 id="wb-cont" className="fw-bold mb-2">
-          {materialSample.materialSampleName ?? materialSample.id}
-        </h2>
-        {scientificName && (
-          <div className="fs-5 mb-1" style={{ overflowWrap: "anywhere" }}>
-            {scientificName}
-          </div>
-        )}
-        <div className="text-muted">
-          <FaBug className="me-2" />
-          {organisms.length} {organisms.length === 1 ? "organism" : "organisms"}{" "}
-          · {determinationCount}{" "}
-          {determinationCount === 1 ? "determination" : "determinations"}
         </div>
-      </div>
-      <div className="border-start ps-3 d-flex flex-column gap-2">
-        <div>
-          <div className="text-muted small">
-            <DinaMessage id="group" />
-          </div>
-          <GroupLabel
-            groupName={materialSample.group}
-            defaultLinkColor={true}
-          />
-        </div>
-        {collection?.id && (
+        <div
+          className="border-start ps-3 mt-3 d-flex flex-column gap-2 flex-shrink-0"
+          style={{ maxWidth: "25rem", overflowWrap: "anywhere" }}
+        >
           <div>
             <div className="text-muted small">
-              <DinaMessage id="collection" />
+              <DinaMessage id="group" />
             </div>
-            <Link href={`/collection/collection/view?id=${collection.id}`}>
-              {collection.name || collection.id}
-              {collection.code ? ` (${collection.code})` : ""}
-            </Link>
+            <GroupLabel
+              groupName={materialSample.group}
+              defaultLinkColor={true}
+            />
           </div>
-        )}
-        {!materialSample.publiclyReleasable && (
-          <div className="not-publicly-releasable">
-            <div className="fw-bold">
-              <FaLock className="me-1" />
-              <DinaMessage id="notPubliclyReleasable" />
+          {collection?.id && (
+            <div>
+              <div className="text-muted small">
+                <DinaMessage id="collection" />
+              </div>
+              <Link href={`/collection/collection/view?id=${collection.id}`}>
+                {collection.name || collection.id}
+                {collection.code ? ` (${collection.code})` : ""}
+              </Link>
             </div>
-            {materialSample.notPubliclyReleasableReason}
-          </div>
-        )}
+          )}
+          {!materialSample.publiclyReleasable && (
+            <div className="not-publicly-releasable">
+              <div className="fw-bold">
+                <FaLock className="me-1" />
+                <DinaMessage id="notPubliclyReleasable" />
+              </div>
+              {materialSample.notPubliclyReleasableReason}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
