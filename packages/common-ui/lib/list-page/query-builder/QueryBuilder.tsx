@@ -118,6 +118,25 @@ interface QueryBuilderProps {
 
   // Callback function to handle copying URL with query filters to clipboard
   onCopyToClipboard: () => Promise<void>;
+
+  /**
+   * Whether to render the Search/Reset buttons. Set to false when the query
+   * builder is embedded in a form and doesn't need to be executed. Defaults to
+   * true.
+   */
+  showActions?: boolean;
+
+  /**
+   * Whether to render the "Search" heading above the builder. Defaults to true.
+   */
+  showHeading?: boolean;
+
+  /**
+   * Whether to automatically load the user's default/last used saved search when
+   * the builder loads. Set to false when the tree is owned by a form, so a stored
+   * query isn't overwritten on load. Defaults to true.
+   */
+  autoLoadSavedSearch?: boolean;
 }
 
 function QueryBuilder({
@@ -134,7 +153,10 @@ function QueryBuilder({
   uniqueName,
   validationErrors,
   triggerSearch,
-  onCopyToClipboard
+  onCopyToClipboard,
+  showActions = true,
+  showHeading = true,
+  autoLoadSavedSearch = true
 }: QueryBuilderProps) {
   const [copiedToClipboard, setCopiedToClipboard] = useState<boolean>(false);
   const onChange = useCallback((immutableTree: ImmutableTree) => {
@@ -169,6 +191,7 @@ function QueryBuilder({
             fontWeight: "bold"
           }}
           className="mb-2"
+          hidden={!showHeading}
         >
           <DinaMessage id="search" />
         </label>
@@ -184,6 +207,7 @@ function QueryBuilder({
           setGroups={setGroups}
           uniqueName={uniqueName}
           triggerSearch={triggerSearch}
+          autoLoadSavedSearch={autoLoadSavedSearch}
           copiedToClipboard={copiedToClipboard}
           setCopiedToClipboard={setCopiedToClipboard}
           onCopyToClipboard={async () => {
@@ -198,25 +222,29 @@ function QueryBuilder({
           renderBuilder={renderBuilder}
         />
         <div className="mt-2">
-          <Button
-            onClick={onSubmit}
-            className="me-2"
-            disabled={validationErrors.length > 0}
-          >
-            <FaSearch className="me-2" />
-            <DinaMessage id="search" />
-          </Button>
-          <Button
-            onClick={() => {
-              onReset();
-              setCopiedToClipboard(false);
-            }}
-            variant="secondary"
-            className="me-2"
-          >
-            <FaArrowRotateLeft className="me-2" />
-            <CommonMessage id="resetButtonText" />
-          </Button>
+          {showActions && (
+            <>
+              <Button
+                onClick={onSubmit}
+                className="me-2"
+                disabled={validationErrors.length > 0}
+              >
+                <FaSearch className="me-2" />
+                <DinaMessage id="search" />
+              </Button>
+              <Button
+                onClick={() => {
+                  onReset();
+                  setCopiedToClipboard(false);
+                }}
+                variant="secondary"
+                className="me-2"
+              >
+                <FaArrowRotateLeft className="me-2" />
+                <CommonMessage id="resetButtonText" />
+              </Button>
+            </>
+          )}
         </div>
       </QueryBuilderContextProvider>
     </>

@@ -1,12 +1,35 @@
+import { Config, Utils } from "@react-awesome-query-builder/ui";
+import {
+  applyRootQuery,
+  elasticSearchFormatExport
+} from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { Dataset, DatasetAttributes } from "../../../types/collection-api";
 import { DataExportDataset } from "../../../types/dina-export-api";
 
-export function normalizeDatasetExportQuery(query: unknown): string {
-  if (!query || typeof query !== "object" || !("query" in query)) {
-    throw new Error("A search query is required for a dataset export.");
+/**
+ * Converts the dataset's stored query builder tree (JSON) into the Elasticsearch
+ * query the export service expects. Returns undefined when the query is missing
+ * or can't be converted.
+ */
+export function buildDatasetExportQuery(
+  query?: string,
+  config?: Config
+): string | undefined {
+  if (!query || !config) {
+    return undefined;
   }
-
-  return JSON.stringify({ query: (query as { query: unknown }).query });
+  try {
+    const tree = Utils.loadTree(JSON.parse(query));
+    const queryDSL = applyRootQuery(
+      elasticSearchFormatExport(tree, config),
+      undefined
+    );
+    return queryDSL?.query
+      ? JSON.stringify({ query: queryDSL.query })
+      : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export function toDatasetExportSnapshot(dataset: Dataset): DataExportDataset {

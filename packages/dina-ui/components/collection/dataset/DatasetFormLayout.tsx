@@ -5,6 +5,7 @@ import {
   MultilingualTitle,
   NumberField,
   prefixedFieldProps,
+  QueryBuilderField,
   ResourceSelectField,
   SelectField,
   StringArrayField,
@@ -13,6 +14,7 @@ import {
 } from "common-ui";
 import { GroupSelectField, PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { dynamicFieldMappingForMaterialSample } from "../../../pages/collection/material-sample/list";
 import {
   AgentRole,
   DATASET_AGENT_ROLES,
@@ -23,11 +25,15 @@ import {
 } from "../../../types/collection-api";
 import { License } from "../../../types/objectstore-api";
 import { InlineArrayField, InlineRowCtx } from "../InlineArrayField";
+import { getDatasetExportDefinition } from "./datasetExportDefinitions";
 
 const DATASET_TYPE_OPTIONS = DATASET_TYPES.map((value) => ({
   label: value,
   value
 }));
+
+/** Matches the limit the export page used to enforce. */
+const MAX_EXPORT_NAME_LENGTH = 100;
 
 /** Role value paired with its message key, so the keys stay type-checked. */
 const DATASET_AGENT_ROLE_OPTIONS = DATASET_AGENT_ROLES.map((value) => ({
@@ -60,6 +66,11 @@ export function DatasetFormLayout() {
   const { readOnly } = useDinaFormContext();
   const { formatMessage, locale } = useDinaIntl();
 
+  const validateExportName = (value?: string) =>
+    value && value.length > MAX_EXPORT_NAME_LENGTH
+      ? formatMessage("datasetExportNameTooLong")
+      : undefined;
+
   // Nested field paths, so labels stay keyed off the short field name:
   const rights = prefixedFieldProps("usageRights");
   const geographic = prefixedFieldProps("coverage.geographic");
@@ -71,6 +82,14 @@ export function DatasetFormLayout() {
 
   return (
     <div>
+      <div className="row">
+        <TextField
+          className="col-md-6"
+          name="exportName"
+          requiredField={true}
+          validate={validateExportName}
+        />
+      </div>
       <div className="row">
         <SelectField
           className="col-md-6 datasetType"
@@ -254,6 +273,18 @@ export function DatasetFormLayout() {
               <StringArrayField {...fieldProps("funderIdentifiers")} />
             </div>
           )}
+        />
+      </FieldSet>
+
+      <FieldSet
+        id="dataset-query-section"
+        legend={<DinaMessage id="datasetQuery" />}
+      >
+        <QueryBuilderField
+          name="query"
+          indexName={getDatasetExportDefinition().indexName}
+          dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
+          copyQueryLinkPath="/collection/material-sample/list"
         />
       </FieldSet>
 

@@ -98,6 +98,7 @@ export interface DatasetProject {
 
 export interface DatasetAttributes {
   type: "dataset";
+  exportName?: string;
   datasetVersion?: string;
   publicationDate?: string;
   group?: string;
@@ -110,6 +111,14 @@ export interface DatasetAttributes {
   coverage?: DatasetCoverage;
   methods?: DatasetMethods;
   project?: DatasetProject;
+
+  /**
+   * The curated query defining which records belong to the dataset,
+   * serialized as JSON. The back-end DTO transports this as a String and
+   * converts it to its jsonb Map.
+   */
+  query?: string;
+
   createdOn?: string;
   createdBy?: string;
 }
