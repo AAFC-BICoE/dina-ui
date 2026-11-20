@@ -675,7 +675,7 @@ export default function DateHistogram({
         <div>
           <strong className="d-block">
             {renderTitle(currentPreset?.interval || "year")}
-            {addFilter && <Tooltip id={`${idBase}-add-filter-tooltip`} />}
+            {addFilter && <Tooltip id="addFilterTooltip" />}
           </strong>
         </div>
         <DropdownButton
