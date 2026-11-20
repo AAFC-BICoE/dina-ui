@@ -11,6 +11,7 @@ import {
 } from "../api-client/useQuery";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { SortableSelect } from "./sortable-select/SortableSelect";
+import { Z_INDEX } from "../z-index/zIndex";
 
 export interface ControlledVocabularySelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
@@ -88,6 +89,7 @@ export function ControlledVocabularySelectField(
                 options={options}
                 placeholder={formatMessage("typeHereToSearch")}
                 styles={{
+                  menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
                   placeholder: (base) => ({ ...base, color: "#5c5c5c" })
                 }}
                 value={selectedValue}

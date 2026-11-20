@@ -3,7 +3,7 @@ import { Alert, Badge, Button, Card, Col, Form, Row } from "react-bootstrap";
 import { FaExclamationTriangle, FaSyncAlt, FaUndo } from "react-icons/fa";
 import Select from "react-select";
 import { useEffect, useState } from "react";
-import { isValidUuid, useAccount, useApiClient } from "common-ui";
+import { isValidUuid, useAccount, useApiClient, Z_INDEX } from "common-ui";
 import { useRouter } from "next/router";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
@@ -163,7 +163,7 @@ export function ReindexPage() {
     value: type
   }));
   const selectStyles = {
-    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+    menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
   };
 
   return (

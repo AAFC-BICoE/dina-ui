@@ -9,7 +9,8 @@ import {
   useAccount,
   useQuery,
   downloadBlobFile,
-  useApiClient
+  useApiClient,
+  Z_INDEX
 } from "common-ui";
 import { FaTag } from "react-icons/fa6";
 
@@ -155,6 +156,7 @@ export function GenerateLabelDropdownButton({
             <DinaMessage id="selectTemplate" />
           </strong>
           <Select<ReportTemplateOption>
+            styles={{ menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }) }}
             className="mt-2"
             name="template"
             options={reportTemplateOptions}

@@ -7,6 +7,7 @@ import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { GroupBase } from "react-select";
 import Creatable, { CreatableProps } from "react-select/creatable";
 import { SelectOption } from "./SelectField";
+import { Z_INDEX } from "../z-index/zIndex";
 
 export interface CreatableSelectFieldProps<T> extends FieldWrapperProps {
   disabled?: boolean;
@@ -129,7 +130,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
             ...provided,
             color: "#5c5c5c"
           }),
-          menu: (base) => ({ ...base, zIndex: 1050 }),
+          menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
           control: (base) => ({
             ...base,
             ...(invalid && {

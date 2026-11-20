@@ -13,6 +13,7 @@ import {
   withResponse
 } from "../api-client/useQuery";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
+import { Z_INDEX } from "../z-index/zIndex";
 
 export interface FieldExtensionSelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
@@ -87,6 +88,9 @@ export function FieldExtensionSelectField(
 
           return (
             <Select
+              styles={{
+                menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+              }}
               onChange={onChange}
               options={options}
               placeholder={formatMessage("typeHereToSearch")}

@@ -13,7 +13,6 @@
   transform: scale(1);
 }
 
-
 .placeholderCard {
   position: relative;
   width: 180px;
@@ -39,17 +38,16 @@
 .dropdownMenuCustom {
   position: absolute;
   top: 0;
-  left: 100%; 
-  margin-left: 12px; 
+  left: 100%;
+  margin-left: 12px;
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 100;
+  z-index: var(--dina-z-dropdown);
   min-width: 220px;
   padding: 8px 0;
 }
-
 
 .dropdownMenuCustom div {
   padding: 10px 14px;
@@ -69,12 +67,13 @@
 .isHovered {
   background-color: #d2d6e0ff;
   border-color: #1976d2;
-  box-shadow: 0 12px 40px rgba(25, 118, 210, 0.25), 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 40px rgba(25, 118, 210, 0.25),
+    0 8px 24px rgba(0, 0, 0, 0.15);
   transform: translateY(-8px) scale(1.03);
 }
 
 .isHovered::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -2px;
   left: -2px;
@@ -96,7 +95,7 @@
 }
 
 .navigationCard:active::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -121,7 +120,8 @@
 }
 
 /* Customize mode – used to scope cursor/pointer-events if needed */
-.customizing {}
+.customizing {
+}
 
 .overlayControls {
   position: absolute;
@@ -150,9 +150,8 @@
 }
 
 .draggableCard:active {
-  cursor: grabbing !important; 
+  cursor: grabbing !important;
 }
-
 
 .cardGripIcon {
   font-size: 22px;
@@ -188,11 +187,9 @@
   cursor: default;
 }
 
-
 :global(.withRail) .cardBodyWrapper :global(.navigationCard) {
   cursor: default !important;
 }
-
 
 @keyframes glow {
   from {

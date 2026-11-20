@@ -6,7 +6,8 @@ import {
   FieldWrapper,
   useDinaFormContext,
   useFieldLabels,
-  useModal
+  useModal,
+  Z_INDEX
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { useState } from "react";
@@ -321,7 +322,7 @@ function IdentifiersInput({
             isDisabled={disabled}
             styles={{
               placeholder: (base) => ({ ...base, color: "#5c5c5c" }),
-              menu: (base) => ({ ...base, zIndex: 1050 })
+              menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
             }}
           />
         </div>

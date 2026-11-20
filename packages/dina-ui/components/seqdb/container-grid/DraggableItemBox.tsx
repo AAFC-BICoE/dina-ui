@@ -2,6 +2,7 @@ import _ from "lodash";
 import { useDraggable } from "@dnd-kit/core";
 import RcTooltip from "rc-tooltip";
 import Link from "next/link";
+import { Z_INDEX } from "common-ui";
 
 interface DraggableItemBoxProps<ItemType extends { sampleName?: string }> {
   onClick?: (e: any) => void;
@@ -62,6 +63,7 @@ export function DraggableItemBox<
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       <RcTooltip
+        zIndex={Z_INDEX.tooltip}
         placement="top"
         trigger={coordinates ? "hover" : ""}
         overlay={

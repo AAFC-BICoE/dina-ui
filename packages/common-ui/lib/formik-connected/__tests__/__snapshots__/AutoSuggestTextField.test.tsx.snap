@@ -56,7 +56,7 @@ exports[`AutoSuggestTextField Elastic Search only provided, results are fetched 
           display: block;
           position: absolute;
           width: 100%;
-          z-index: 20;
+          z-index: var(--dina-z-dropdown);
         }
         .autosuggest .suggestion-highlighted { 
           background-color: #ddd;
@@ -194,7 +194,7 @@ exports[`AutoSuggestTextField Snapshot test 1`] = `
           display: block;
           position: absolute;
           width: 100%;
-          z-index: 20;
+          z-index: var(--dina-z-dropdown);
         }
         .autosuggest .suggestion-highlighted { 
           background-color: #ddd;

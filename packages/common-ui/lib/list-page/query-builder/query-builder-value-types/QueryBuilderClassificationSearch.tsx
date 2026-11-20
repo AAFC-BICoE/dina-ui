@@ -9,6 +9,7 @@ import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOp
 import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
 import { ESIndexMapping, TransformToDSLProps } from "../../types";
 import { transformTextSearchToDSL } from "./QueryBuilderTextSearch";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryRowClassificationSearchProps {
   /**
@@ -141,9 +142,10 @@ export default function QueryRowClassificationSearch({
         minMenuHeight={600}
         menuPortalTarget={document.body}
         styles={{
+          menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
           menu: (base) => ({
             ...base,
-            zIndex: 9999
+            zIndex: Z_INDEX.dropdown
           })
         }}
       />
@@ -167,9 +169,10 @@ export default function QueryRowClassificationSearch({
             minMenuHeight={600}
             menuPortalTarget={document.body}
             styles={{
+              menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
               menu: (base) => ({
                 ...base,
-                zIndex: 9999
+                zIndex: Z_INDEX.dropdown
               })
             }}
           />

@@ -12,7 +12,8 @@ import {
   useQuery,
   useAccount,
   TextField,
-  SimpleSearchFilterBuilder
+  SimpleSearchFilterBuilder,
+  Z_INDEX
 } from "common-ui";
 import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -274,6 +275,9 @@ export function MaterialSampleSplitGenerationForm({
               <DinaMessage id="selectSplitConfiguration" />
             </strong>
             <Select<SplitConfigurationOption>
+              styles={{
+                menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+              }}
               className="mt-1 mb-3"
               name="splitConfiguration"
               options={splitConfigurationOptions}

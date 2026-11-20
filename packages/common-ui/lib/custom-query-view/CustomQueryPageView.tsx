@@ -8,6 +8,7 @@ import { DINAUI_MESSAGES_ENGLISH } from "@dina-ui/intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { CustomViewField } from "../list-page/query-builder/useQueryBuilderConfig";
 import { Button } from "react-bootstrap";
+import { Z_INDEX } from "../z-index/zIndex";
 export interface CustomQueryOption {
   /**
    * Value to be saved when selecting the option.
@@ -147,6 +148,9 @@ export function CustomQueryPageView<TData extends KitsuResource>({
               <div className="col-sm-4">
                 <label style={{ width: "100%" }}>
                   <Select<CustomQueryOption>
+                    styles={{
+                      menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+                    }}
                     className="mt-2"
                     name="customQueryOptions"
                     options={translatedOptions}

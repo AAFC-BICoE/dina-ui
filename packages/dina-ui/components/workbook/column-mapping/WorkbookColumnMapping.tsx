@@ -1,3 +1,4 @@
+import { Z_INDEX } from "common-ui";
 import {
   AreYouSureModal,
   CheckBoxField,
@@ -894,7 +895,10 @@ export function WorkbookColumnMapping({
                         }
                         menuPortalTarget={document.body}
                         styles={{
-                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: Z_INDEX.dropdown
+                          })
                         }}
                       />
                     </FieldWrapper>
@@ -905,7 +909,10 @@ export function WorkbookColumnMapping({
                         options={entityTypes}
                         menuPortalTarget={document.body}
                         styles={{
-                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: Z_INDEX.dropdown
+                          })
                         }}
                         isDisabled={isTypeDisabled}
                       />
@@ -921,7 +928,10 @@ export function WorkbookColumnMapping({
                         menuPortalTarget: document.body,
                         isDisabled: isGroupDisabled,
                         styles: {
-                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: Z_INDEX.dropdown
+                          })
                         }
                       }}
                     />

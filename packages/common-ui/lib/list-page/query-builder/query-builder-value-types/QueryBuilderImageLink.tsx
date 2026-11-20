@@ -8,6 +8,7 @@ import { KitsuResource } from "kitsu";
 import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { RAW_EXTS } from "dina-ui/components/object-store/object-store-utils";
 import { ExternalLink } from "common-ui";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryRowImageLinkProps {
   /**
@@ -117,9 +118,10 @@ export default function QueryRowImageLink({
         }
         menuPortalTarget={document.body}
         styles={{
+          menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
           menu: (base) => ({
             ...base,
-            zIndex: 9999
+            zIndex: Z_INDEX.dropdown
           })
         }}
         captureMenuScroll={true}

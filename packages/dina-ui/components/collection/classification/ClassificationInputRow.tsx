@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FaMinus } from "react-icons/fa";
 import Select from "react-select";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { Z_INDEX } from "common-ui";
 
 export interface ClassificationInputRowProps {
   rowIndex: number;
@@ -45,6 +46,7 @@ export function ClassificationInputRow({
     <div className="d-flex w-100 my-1">
       <div className="w-100">
         <Select
+          styles={{ menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }) }}
           id="classificationRank"
           options={taxonomicRanOptions}
           value={

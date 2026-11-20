@@ -8,6 +8,7 @@ import {
   ModalProvider
 } from "common-ui";
 import "common-ui/common-ui-style.scss";
+import "common-ui/lib/z-index/z-index.css";
 import "common-ui/lib/button-bar/buttonbar.css";
 import "common-ui/lib/table/react-table.css";
 import "../components/object-store/file-upload/file-upload-style.css";

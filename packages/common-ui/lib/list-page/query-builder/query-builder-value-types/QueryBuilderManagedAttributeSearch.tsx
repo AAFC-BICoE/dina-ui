@@ -30,6 +30,7 @@ import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderEl
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import { useQueryBuilderContext } from "../QueryBuilder";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryBuilderManagedAttributeSearchProps {
   /**
@@ -308,7 +309,7 @@ export default function QueryRowManagedAttributeSearch({
                 styles={{
                   menu: (base) => ({
                     ...base,
-                    zIndex: 9999
+                    zIndex: Z_INDEX.dropdown
                   })
                 }}
               />
@@ -340,7 +341,7 @@ export default function QueryRowManagedAttributeSearch({
                 styles={{
                   menu: (base) => ({
                     ...base,
-                    zIndex: 9999
+                    zIndex: Z_INDEX.dropdown
                   })
                 }}
               />
@@ -504,6 +505,7 @@ export default function QueryRowManagedAttributeSearch({
           onKeyDown,
           captureMenuScroll: true,
           menuPlacement: isInColumnSelector ? "bottom" : "auto",
+          menuPortalTarget: isInColumnSelector ? document.body : undefined,
           menuShouldScrollIntoView: false,
           minMenuHeight: 600,
           onMenuOpen: () => {
@@ -534,10 +536,10 @@ export default function QueryRowManagedAttributeSearch({
           minMenuHeight={600}
           menuPortalTarget={document.body}
           styles={{
-            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
             menu: (base) => ({
               ...base,
-              zIndex: 9999
+              zIndex: Z_INDEX.dropdown
             })
           }}
         />

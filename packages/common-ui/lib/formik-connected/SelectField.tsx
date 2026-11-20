@@ -4,6 +4,7 @@ import { ComponentProps, RefObject } from "react";
 import Select, { StylesConfig } from "react-select";
 import { ReadOnlyValue } from "./FieldView";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
+import { Z_INDEX } from "../z-index/zIndex";
 
 export interface SelectOption<T> {
   label: string;
@@ -135,7 +136,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
             ...provided,
             color: "#5c5c5c"
           }),
-          menu: (base) => ({ ...base, zIndex: 1050 }),
+          menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
           control: (base) => ({
             ...base,
             ...(invalid && {

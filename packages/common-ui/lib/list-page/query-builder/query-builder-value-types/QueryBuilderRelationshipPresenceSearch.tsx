@@ -8,6 +8,7 @@ import {
   existsQuery,
   termQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 export interface QueryRowRelationshipPresenceSearchProps {
   /**
@@ -122,9 +123,10 @@ export default function QueryRowRelationshipPresenceSearch({
         }
         menuPortalTarget={document.body}
         styles={{
+          menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
           menu: (base) => ({
             ...base,
-            zIndex: 9999
+            zIndex: Z_INDEX.dropdown
           })
         }}
         onInputChange={(inputValue) => setRelationshipSearchValue(inputValue)}
@@ -150,9 +152,10 @@ export default function QueryRowRelationshipPresenceSearch({
             }
             menuPortalTarget={document.body}
             styles={{
+              menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
               menu: (base) => ({
                 ...base,
-                zIndex: 9999
+                zIndex: Z_INDEX.dropdown
               })
             }}
           />

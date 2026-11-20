@@ -12,7 +12,8 @@ import {
   SmallSwitch,
   Tooltip,
   useDinaFormContext,
-  useModal
+  useModal,
+  Z_INDEX
 } from "common-ui";
 import {
   ComponentType,
@@ -433,7 +434,7 @@ const DataComponentNavItem = ({
           "list-group-item d-flex gap-2 align-items-center"
         )}
         key={section.id}
-        style={{ ...style, zIndex: 1030 }}
+        style={{ ...style, zIndex: Z_INDEX.stickyNav }}
       >
         {isTemplate && <NavSortHandle {...listeners} isDragging={isDragging} />}
         <Tag

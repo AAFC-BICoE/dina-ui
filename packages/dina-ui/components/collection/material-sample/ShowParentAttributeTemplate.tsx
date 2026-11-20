@@ -3,7 +3,8 @@ import {
   SelectField,
   SelectOption,
   SimpleSearchFilterBuilder,
-  useQuery
+  useQuery,
+  Z_INDEX
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import _ from "lodash";
@@ -163,8 +164,8 @@ export function ShowParentAttributeTemplate({
         ...provided,
         color: "#5c5c5c"
       }),
-      menu: (base) => ({ ...base, zIndex: 1050 }),
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
+      menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
       control: (base) => ({
         ...base
       }),

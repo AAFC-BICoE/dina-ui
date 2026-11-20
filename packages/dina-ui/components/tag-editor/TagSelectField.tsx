@@ -6,7 +6,8 @@ import {
   useAccount,
   useBulkEditTabContext,
   useQuery,
-  SortableSelect
+  SortableSelect,
+  Z_INDEX
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
@@ -321,6 +322,7 @@ function TagSelectInner({
   const selectedOptions = (value ?? []).map(toOption);
 
   const customStyle: any = {
+    menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
     multiValueLabel: (base) => ({ ...base, cursor: "move" }),
     placeholder: (base) => ({ ...base, color: "#5c5c5c" }),
     control: (base) => ({

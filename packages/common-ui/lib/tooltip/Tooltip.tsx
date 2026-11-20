@@ -3,6 +3,7 @@ import RcTooltip from "rc-tooltip";
 import { ReactNode } from "react";
 import { FaInfoCircle } from "react-icons/fa";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Z_INDEX } from "../z-index/zIndex";
 
 export interface TooltipProps {
   /** The ID of the message to show in the tooltip. */
@@ -134,7 +135,7 @@ export function Tooltip({
         }
         placement={placement}
         trigger={["focus", "hover"]}
-        zIndex={9001}
+        zIndex={Z_INDEX.tooltip}
       >
         <span>
           {visibleElement ? (

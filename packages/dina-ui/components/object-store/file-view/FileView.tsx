@@ -20,6 +20,7 @@ import { FaDownload } from "react-icons/fa6";
 import { FaLink } from "react-icons/fa";
 import { PDFViewer } from "./PDFViewer";
 import { formatBytes } from "../object-store-utils";
+import { Z_INDEX } from "common-ui";
 
 export type DownLoadLinks = {
   original?: string;
@@ -145,6 +146,7 @@ export function FileView({
                   }}
                 >
                   <RcTooltip
+                    zIndex={Z_INDEX.tooltip}
                     overlay={<>{shownTypeIndicator}</>}
                     placement="top"
                     align={{

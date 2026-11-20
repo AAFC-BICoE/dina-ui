@@ -1,3 +1,4 @@
+import { Z_INDEX } from "common-ui";
 import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
 import Select from "react-select";
 
@@ -33,7 +34,7 @@ export function SelectNavigation<T extends { key: string }>({
   const invalid = !!invalidElements?.length;
 
   const customStyle = {
-    menu: (base) => ({ ...base, zIndex: 1050 }),
+    menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
     control: (base) => ({
       ...base,
       ...(invalid && {

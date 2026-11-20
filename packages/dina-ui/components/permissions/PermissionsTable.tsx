@@ -1,4 +1,4 @@
-import { ReactTable, LoadingSpinner } from "common-ui";
+import { ReactTable, LoadingSpinner, Z_INDEX } from "common-ui";
 import { useAvailableGroupOptions } from "../group-select/GroupSelectField";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import Select from "react-select";
@@ -123,7 +123,7 @@ export function PermissionsTable() {
                   typeof document !== "undefined" ? document.body : undefined
                 }
                 styles={{
-                  menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                  menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
                 }}
               />
             </div>
