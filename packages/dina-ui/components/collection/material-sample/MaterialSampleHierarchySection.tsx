@@ -10,7 +10,11 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FaDownload } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME,
+  MaterialSample
+} from "../../../types/collection-api";
+import { SECTION_ICONS } from "./material-sample-form-nav/MaterialSampleFormNav";
 import {
   HIERARCHY_FONT,
   HIERARCHY_LEVELS,
@@ -79,6 +83,7 @@ export function MaterialSampleHierarchySection({
       id="material-sample-hierarchy"
       headerKey="materialSampleHierarchy"
       defaultOpen={true}
+      icon={SECTION_ICONS[MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME]}
     >
       <MaterialSampleHierarchyChart materialSample={materialSample} />
     </CollapsibleSection>

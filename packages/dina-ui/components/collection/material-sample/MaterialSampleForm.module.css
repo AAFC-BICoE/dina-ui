@@ -10,6 +10,10 @@
   > :global(.fieldset-h2-adjustment),
 .topLevelEmbeddedSection
   :global(.legend-wrapper)
+  :global(.fieldset-h2-adjustment),
+.viewSections
+  fieldset:not(.viewSections fieldset fieldset)
+  > :global(.legend-wrapper)
   :global(.fieldset-h2-adjustment) {
   font-size: 0.95rem !important;
   font-weight: 600;
@@ -22,7 +26,10 @@
 
 .dataComponents > fieldset > :global(.legend-wrapper),
 .topLevelEmbeddedSection > fieldset > :global(.legend-wrapper),
-.topLevelEmbeddedSection > div > fieldset > :global(.legend-wrapper) {
+.topLevelEmbeddedSection > div > fieldset > :global(.legend-wrapper),
+.viewSections
+  fieldset:not(.viewSections fieldset fieldset)
+  > :global(.legend-wrapper) {
   background-color: #eceff4;
   margin: -0.5rem -1.5rem 1rem;
   padding: 0.9rem 1.5rem;
@@ -32,7 +39,11 @@
 /* Bootstrap's legend margin pushes the title off-centre in the header bar. */
 .dataComponents > fieldset > :global(.legend-wrapper) > legend,
 .topLevelEmbeddedSection > fieldset > :global(.legend-wrapper) > legend,
-.topLevelEmbeddedSection > div > fieldset > :global(.legend-wrapper) > legend {
+.topLevelEmbeddedSection > div > fieldset > :global(.legend-wrapper) > legend,
+.viewSections
+  fieldset:not(.viewSections fieldset fieldset)
+  > :global(.legend-wrapper)
+  > legend {
   margin-bottom: 0;
 }
 
@@ -73,4 +84,74 @@
 .topLevelEmbeddedSection > fieldset,
 .topLevelEmbeddedSection > div > fieldset {
   background-color: #fff;
+}
+
+/*
+ * View page: every top-level section gets the edit page's header bar above, however deeply its
+ * FieldSet is nested. The collapsible sections (hierarchy, transactions) get the same look.
+ * !important beats the global .accordion-button rules in common-ui-style.scss, which use it too.
+ */
+.viewSections :global(.accordion-button),
+.viewSections :global(.accordion-button:not(.collapsed)),
+.viewSections :global(.accordion-button:hover),
+.viewSections :global(.accordion-button:active) {
+  background-color: #eceff4 !important;
+  color: #335075 !important;
+  font-size: 0.95rem !important;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.9rem 1.5rem;
+  box-shadow: none;
+}
+
+.viewSections :global(.accordion-button:not(.collapsed)) {
+  border-bottom: 1px solid #d5dbe3;
+}
+
+/* Headers with controls beside the title (e.g. the children query dropdown): centre them vertically. */
+.viewSections
+  fieldset:not(.viewSections fieldset fieldset)
+  > :global(.legend-wrapper)
+  > :global(.row) {
+  align-items: center;
+}
+
+.viewSections
+  fieldset:not(.viewSections fieldset fieldset)
+  > :global(.legend-wrapper)
+  > :global(.row)
+  :global(.mt-2) {
+  margin-top: 0 !important;
+}
+
+.compactHeaderAnchor {
+  position: sticky;
+  height: 0;
+  z-index: 1030;
+}
+
+.compactHeader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 6px 6px -6px rgba(0, 0, 0, 0.2);
+}
+
+.compactHeaderHidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .compactHeader {
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out, visibility 0.2s;
+  }
+}
+
+.compactText {
+  flex: 1 1 0;
+  max-width: max-content;
 }

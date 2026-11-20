@@ -1,31 +1,16 @@
 import Link from "next/link";
 import { MaterialSample } from "../../../types/collection-api";
-import { NotPubliclyReleasableWarning } from "../../tag-editor/NotPubliclyReleasableWarning";
-import { GroupSelectField } from "../../group-select/GroupSelectField";
-import { useDinaFormContext } from "../../../../common-ui/lib/formik-connected/DinaForm";
-import { DinaFormSection } from "common-ui";
-import { GroupLabel } from "../../group-select/GroupFieldView";
 import { BreadcrumbBanner } from "../../breadcrumb/BreadcrumbBanner";
 
 export interface MaterialSampleBreadCrumbProps {
   disableLastLink?: boolean;
   materialSample: MaterialSample;
-  /**
-   * Sets a default group from local storage if no initial value is set (e.g. from existing value in a group field).
-   * This should be used in forms to add new data, not in search forms like list pages.
-   */
-  enableStoredDefaultGroup?: boolean;
-
-  enableGroupSelectField?: boolean;
 }
 
 export function MaterialSampleBreadCrumb({
   disableLastLink,
-  materialSample,
-  enableStoredDefaultGroup,
-  enableGroupSelectField
+  materialSample
 }: MaterialSampleBreadCrumbProps) {
-  const { readOnly } = useDinaFormContext();
   const parentPath = [...(materialSample.hierarchy?.slice(1) ?? [])];
 
   const displayName = materialSample.materialSampleName ?? materialSample.id;
@@ -45,20 +30,6 @@ export function MaterialSampleBreadCrumb({
     ) ?? 0;
 
   const collectionName = materialSample.collection?.name;
-  const customStyle = {
-    option: (base) => {
-      return {
-        ...base,
-        ...{ fontWeight: "normal" }
-      };
-    },
-    control: (base) => {
-      return {
-        ...base,
-        ...{ fontWeight: "normal" }
-      };
-    }
-  };
   return (
     <>
       {/* Current Material Sample Name */}
@@ -110,31 +81,6 @@ export function MaterialSampleBreadCrumb({
           </div>
         </div>
         <div className="col-md-6 d-flex flex-column align-items-end mt-4">
-          {enableGroupSelectField &&
-            (!readOnly ? (
-              <div className="w-100 mb-0">
-                <DinaFormSection horizontal={"flex"}>
-                  <GroupSelectField
-                    disableTemplateCheckbox={true}
-                    name="group"
-                    enableStoredDefaultGroup={enableStoredDefaultGroup}
-                    readOnlyHideLabel={true}
-                    removeBottomMargin={true}
-                    styles={customStyle}
-                  />
-                </DinaFormSection>
-              </div>
-            ) : (
-              <div
-                className="d-inline-flex flex-row"
-                style={{ fontSize: "1.4rem" }}
-              >
-                <div className="header-group-text">
-                  <GroupLabel groupName={materialSample?.group} />
-                </div>
-                <NotPubliclyReleasableWarning />
-              </div>
-            ))}
           {scientificName && (
             <div
               className="fw-medium text-end"

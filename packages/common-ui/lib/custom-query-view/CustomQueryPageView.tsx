@@ -55,6 +55,9 @@ export interface CustomQueryPageViewProps<TData extends KitsuResource>
 
   removePadding?: boolean;
 
+  /** id of the wrapping FieldSet, e.g. for scroll targets and legend icons. */
+  fieldSetId?: string;
+
   // The link object for the button to view the items attached to the entity.
   linkObject?: {
     pathname: string;
@@ -78,6 +81,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
   titleKey,
   customQueryOptions,
   removePadding,
+  fieldSetId,
   linkObject,
   linkMessageId,
   ...queryPageProps
@@ -132,6 +136,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
 
   return (
     <FieldSet
+      id={fieldSetId}
       legend={legend}
       removePadding={removePadding}
       wrapLegend={(innerLegend) => (

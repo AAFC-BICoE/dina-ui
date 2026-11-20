@@ -119,7 +119,13 @@ export function Tooltip({
       <RcTooltip
         id={id}
         overlay={
-          <div style={{ maxWidth: "25rem", whiteSpace: "pre-wrap" }}>
+          <div
+            style={{
+              maxWidth: "25rem",
+              whiteSpace: "pre-wrap",
+              overflowWrap: "anywhere"
+            }}
+          >
             {tooltipMessage}
             {directComponent}
             {tooltipImage}

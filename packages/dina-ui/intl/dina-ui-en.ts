@@ -1049,6 +1049,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   derivatives: "Derivatives",
   originalMaterialSampleLabel: "Original Material Sample",
   overwriteValues: "Overwrite Values",
+  parent: "Parent",
   parentCollectionLabel: "Parent Collection",
   parentMaterialSample: "Parent Material Sample",
   parentSampleNotFoundLabel: " Parent sample not found",
