@@ -228,6 +228,8 @@ export function DateField(props: DateFieldProps) {
               }
               showYearDropdown={true}
               todayButton="Today"
+              // Fixed height stops the popup flipping above/below between months
+              fixedHeight
               disabled={isDisabled}
               onFocus={(event) => (event.target as HTMLInputElement).select()}
               selected={selectedDate}
