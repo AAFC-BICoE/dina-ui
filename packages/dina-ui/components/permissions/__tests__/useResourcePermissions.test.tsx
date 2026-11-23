@@ -204,9 +204,9 @@ describe("useResourcePermissions", () => {
     expect(mockPost).not.toHaveBeenCalled();
   });
 
-  it("Allows everything when the check fails, since the API enforces permissions on save.", async () => {
-    const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
-    mockPost.mockRejectedValue(new Error("404 Not Found"));
+  it("Allows everything when every check fails for another reason, e.g. no endpoint, and returns the error.", async () => {
+    const error = { response: { status: 404 } };
+    mockPost.mockRejectedValue(error);
     const { result } = renderPermissionsHook();
 
     await waitFor(() =>
@@ -214,10 +214,74 @@ describe("useResourcePermissions", () => {
         canCreate: true,
         canEdit: true,
         canDelete: true,
-        loading: false
+        loading: false,
+        error
       })
     );
-    expect(warn).toHaveBeenCalled();
-    warn.mockRestore();
+  });
+
+  it.each([401, 403])(
+    "Denies everything and returns the error when the API refuses the user with a %s.",
+    async (status) => {
+      const error = { response: { status } };
+      mockPost.mockRejectedValue(error);
+      const { result } = renderPermissionsHook();
+
+      await waitFor(() =>
+        expect(result.current).toEqual({
+          canCreate: false,
+          canEdit: false,
+          canDelete: false,
+          loading: false,
+          error
+        })
+      );
+    }
+  );
+
+  it("Only uses the groups that were checked when another group's check fails.", async () => {
+    const error = { response: { status: 500 } };
+    mockPost.mockImplementation(async (_url, body) => {
+      if (body.data.attributes.group === "cnc") {
+        throw error;
+      }
+      return {
+        data: { data: { attributes: { permissions: ["read", "create"] } } }
+      };
+    });
+    const { result } = renderPermissionsHook();
+
+    await waitFor(() =>
+      expect(result.current).toEqual({
+        canCreate: true,
+        canEdit: false,
+        canDelete: false,
+        loading: false,
+        error
+      })
+    );
+  });
+
+  it("Does not allow everything when only some of the checks fail and the rest grant nothing.", async () => {
+    mockPost.mockImplementation(async (_url, body) => {
+      if (body.data.attributes.group === "cnc") {
+        throw { response: { status: 500 } };
+      }
+      return { data: { data: { attributes: { permissions: ["read"] } } } };
+    });
+    const { result } = renderPermissionsHook();
+
+    await waitFor(() => expect(result.current.loading).toEqual(false));
+    expect(result.current.canCreate).toEqual(false);
+    expect(result.current.canEdit).toEqual(false);
+    expect(result.current.canDelete).toEqual(false);
+  });
+
+  it("Has no error when the checks succeed.", async () => {
+    mockPermissionsByGroup({ aafc: ["read"] });
+    const { result } = renderPermissionsHook();
+
+    await waitFor(() => expect(result.current.loading).toEqual(false));
+    expect(result.current.error).toBeUndefined();
   });
 });

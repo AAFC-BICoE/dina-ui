@@ -21,7 +21,12 @@ export interface ResourcePermissions {
   canEdit: boolean;
   canDelete: boolean;
   loading: boolean;
+  error?: unknown;
 }
+
+/** The user was refused by the API, so the permissions are denied rather than unknown. */
+const isAuthError = (error: any) =>
+  [401, 403].includes(error?.response?.status);
 
 const LOADING_PERMISSIONS: ResourcePermissions = {
   canCreate: false,
@@ -42,6 +47,10 @@ const ALL_ALLOWED: ResourcePermissions = {
  * Permissions depend on the group, so each one is true when granted in the given group, or in any
  * of the user's groups when no group is given.
  * Everything is denied while loading, so buttons stay hidden until the check completes.
+ *
+ * A group whose check fails grants nothing, and the first error is returned as `error`. When every
+ * check fails for a reason other than the user being refused (401/403), such as an API without a
+ * permission-check endpoint, everything is allowed since the API still enforces permissions on save.
  */
 export function useResourcePermissions({
   apiBaseUrl,
@@ -63,39 +72,45 @@ export function useResourcePermissions({
     let cancelled = false;
     setPermissions(LOADING_PERMISSIONS);
     (async () => {
-      try {
-        const results = await Promise.all(
-          groupsToCheck.map((groupToCheck) =>
-            apiClient.axios.post<PermissionCheckResponse>(
-              `${apiBaseUrl}/permission-check`,
-              {
-                data: {
-                  type: typeName,
-                  attributes: { [groupAttribute]: groupToCheck }
-                }
+      const results = await Promise.allSettled(
+        groupsToCheck.map((groupToCheck) =>
+          apiClient.axios.post<PermissionCheckResponse>(
+            `${apiBaseUrl}/permission-check`,
+            {
+              data: {
+                type: typeName,
+                attributes: { [groupAttribute]: groupToCheck }
               }
-            )
+            }
           )
-        );
-        const granted = results.flatMap(
-          ({ data }) => data?.data?.attributes?.permissions ?? []
-        );
-        if (!cancelled) {
-          setPermissions({
-            canCreate: granted.includes("create"),
-            canEdit: granted.includes("update"),
-            canDelete: granted.includes("delete"),
-            loading: false
-          });
-        }
-      } catch (e) {
-        // If there is a failure in the permission check, assume all permissions are allowed to
-        // avoid hiding buttons unnecessarily. The API will still enforce permissions on it's own.
-        console.warn(e);
-        if (!cancelled) {
-          setPermissions(ALL_ALLOWED);
-        }
+        )
+      );
+      const errors = results.flatMap((result) =>
+        result.status === "rejected" ? [result.reason] : []
+      );
+      const granted = results.flatMap((result) =>
+        result.status === "fulfilled"
+          ? result.value.data?.data?.attributes?.permissions ?? []
+          : []
+      );
+      if (cancelled) {
+        return;
       }
+      const checkUnavailable =
+        errors.length > 0 &&
+        errors.length === results.length &&
+        !errors.some(isAuthError);
+      setPermissions(
+        checkUnavailable
+          ? { ...ALL_ALLOWED, error: errors[0] }
+          : {
+              canCreate: granted.includes("create"),
+              canEdit: granted.includes("update"),
+              canDelete: granted.includes("delete"),
+              loading: false,
+              error: errors[0]
+            }
+      );
     })();
     return () => {
       cancelled = true;

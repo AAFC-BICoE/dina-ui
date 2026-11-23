@@ -51,7 +51,10 @@ How the result is decided:
 * An `undefined` group means "no group given", so it falls back to all of the user's groups. When the group comes from data that is still loading, wait for it before relying on the result.
 * Everything is `false` while `loading` is `true`, so buttons stay hidden until the check completes.
 * Admins always get everything, without a request, even when `group` is given.
-* If the check fails (for example the API has no `permission-check` endpoint), everything is `true` so buttons aren't hidden by mistake. The API still rejects anything the user isn't allowed to do.
+* The result can also return an `error`: the first error received from a check, so the caller can show a message. It is `undefined` when every check succeeded.
+* A group whose check fails grants nothing, so when only some groups fail, the permissions come from the groups that were checked.
+* When the API refuses the user (401 or 403), everything is `false`.
+* When every check fails for another reason (for example the API has no `permission-check` endpoint), everything is `true` so buttons aren't hidden by mistake. The API still rejects anything the user isn't allowed to do.
 
 == Limits
 
