@@ -9,11 +9,20 @@ export const Z_INDEX = {
   /** Sticky bars and columns inside page content. */
   sticky: 100,
 
+  /**
+   * Dropdown menus in page content (react-select `menu`/`menuPortal`, Bootstrap dropdowns, date pickers).
+   * Below the sticky nav and button bar so menus scroll under them. Menus inside a modal or the button bar stack within it.
+   */
+  dropdown: 1000,
+
   /** Sticky section navigation (e.g. material sample form nav). */
   stickyNav: 1030,
 
   /** Sticky top button bar. */
   buttonBar: 1045,
+
+  /** Site header, so its nav, notification and user menus drop over the button bar. */
+  header: 1046,
 
   /** Full-screen overlays (full-screen table, full-screen loading). */
   overlay: 1050,
@@ -24,10 +33,7 @@ export const Z_INDEX = {
   /** Modal dialogs. */
   modal: 3000,
 
-  /** All dropdown menus (react-select `menu`/`menuPortal`, nav, popovers). Sits above modals. */
-  dropdown: 9000,
-
-  /** Tooltips, including those on dropdown options. */
+  /** Tooltips and popovers, including tooltips on dropdown options. */
   tooltip: 9100,
 
   /** Toast notifications. Sits above everything. */

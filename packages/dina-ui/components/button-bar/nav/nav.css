@@ -4,6 +4,12 @@ body {
   background-color: #ffffff;
   color: #666666;
 }
+/* Lifts the header's menus (nav, notifications, user) over the sticky button bar below it. */
+header {
+  position: relative;
+  z-index: var(--dina-z-header);
+}
+
 .dropdown:hover .dropdown-menu {
   margin-top: -5px;
 }

@@ -1,12 +1,13 @@
 /* Global z-index layers. `zIndex.ts` is the source of truth, so keep these in sync. */
 :root {
   --dina-z-sticky: 100;
+  --dina-z-dropdown: 1000;
   --dina-z-sticky-nav: 1030;
   --dina-z-button-bar: 1045;
+  --dina-z-header: 1046;
   --dina-z-overlay: 1050;
   --dina-z-dragging: 1100;
   --dina-z-modal: 3000;
-  --dina-z-dropdown: 9000;
   --dina-z-tooltip: 9100;
   --dina-z-toast: 10000;
 }

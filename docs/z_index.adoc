@@ -14,13 +14,14 @@ Lowest to highest:
 |`Z_INDEX` key |CSS variable |Value |Used for
 
 |`sticky` |`--dina-z-sticky` |100 |Sticky bars and columns inside page content.
+|`dropdown` |`--dina-z-dropdown` |1000 |Dropdown menus in page content (react-select `menu`/`menuPortal`, Bootstrap dropdowns, date pickers). Below the sticky nav and button bar so menus scroll under them.
 |`stickyNav` |`--dina-z-sticky-nav` |1030 |Sticky section navigation (e.g. material sample form nav).
 |`buttonBar` |`--dina-z-button-bar` |1045 |Sticky top button bar.
+|`header` |`--dina-z-header` |1046 |Site header, so its nav, notification and user menus drop over the button bar.
 |`overlay` |`--dina-z-overlay` |1050 |Full-screen overlays (full-screen table, full-screen loading).
 |`dragging` |`--dina-z-dragging` |1100 |Item being dragged.
 |`modal` |`--dina-z-modal` |3000 |Modal dialogs.
-|`dropdown` |`--dina-z-dropdown` |9000 |All dropdown menus (react-select `menu`/`menuPortal`, nav, popovers). Sits above modals so menus opened inside a modal are not clipped.
-|`tooltip` |`--dina-z-tooltip` |9100 |Tooltips, including those on dropdown options.
+|`tooltip` |`--dina-z-tooltip` |9100 |Tooltips and popovers, including tooltips on dropdown options.
 |`toast` |`--dina-z-toast` |10000 |Toast notifications. Sits above everything.
 |===
 
@@ -37,7 +38,9 @@ import { Z_INDEX } from "common-ui";
 <div style={{ position: "sticky", top: 0, zIndex: Z_INDEX.sticky }}>...</div>
 ----
 
-For react-select, set both `menu` and `menuPortal` so the menu is correct whether or not it is portalled:
+For react-select, set both `menu` and `menuPortal` so the menu is correct whether or not it is portalled.
+A menu inside a modal or the sticky button bar stacks within it, so it still paints above that element.
+A menu portalled to `<body>` is raised above the modal or full-screen table automatically while one is open (see `common-ui-style.scss`):
 
 [source,tsx]
 ----
