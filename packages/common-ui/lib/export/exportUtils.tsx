@@ -5,10 +5,9 @@ import { ObjectExport } from "@dina-ui/types/objectstore-api";
 /**
  * Total number of objects allowed to be exported in the UI.
  *
- * This is applied to both the object-store export and the molecular analysis export. It also
- * matches the Elasticsearch result window, so all the matched ids can be loaded in a single query.
+ * This is applied to both the object-store export and the molecular analysis export.
  */
-export const MAX_OBJECT_EXPORT_TOTAL = 10000;
+export const MAX_OBJECT_EXPORT_TOTAL = 1000;
 
 /**
  * The purpose of this limit is to prevent too many requests being performed on the molecular

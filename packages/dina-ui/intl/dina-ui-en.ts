@@ -1721,9 +1721,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   visibleToEveryone: "Visible to everyone",
   viewAttachedMaterialSamples: "View Attached Material Samples",
   viewAttachedItems: "View Attached Items",
-  fileNameAliasField: "Name Files By",
-  fileNameAliasFieldTooltip:
-    "Choose which field to use as the file name of each exported object. If no field is chosen, the original file names are used.",
+  fileNameAliasField: "File Name Alias Field",
   downloadTemplate: "Download Template",
   existingTemplates: "Existing Templates",
   viewMaterialSamplesInCollection: "View material samples in this collection",
