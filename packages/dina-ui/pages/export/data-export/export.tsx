@@ -30,6 +30,10 @@ import {
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
   MAX_OBJECT_EXPORT_TOTAL
 } from "common-ui/lib/export/exportUtils";
+import {
+  applyPagination,
+  applySourceFilteringString
+} from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { QueryFieldSelector } from "common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
 import QueryRowManagedAttributeSearch from "common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import {
@@ -180,7 +184,7 @@ function ExportTypeCard({
 
 export default function ExportPage<TData extends KitsuResource>() {
   const { formatNumber, formatMessage } = useIntl();
-  const { bulkGet, save } = useApiClient();
+  const { apiClient, bulkGet, save } = useApiClient();
   const router = useRouter();
 
   // Unique name to be used for the local storage.
@@ -270,8 +274,34 @@ export default function ExportPage<TData extends KitsuResource>() {
     }
   }
 
+  /**
+   * Selected objects are stored as ids. When "export all matched" was used, no ids are stored, so
+   * they are retrieved by re-running the stored search query.
+   *
+   * There is a limit being enforced on the maximum number of objects that can be exported at once.
+   * This should be checked before attempting to fetch all object ids.
+   */
+  async function fetchObjectIds(): Promise<string[]> {
+    if (localStorageExportObjectIds.length > 0 || !queryObject) {
+      return localStorageExportObjectIds;
+    }
+    const queryDSL = applyPagination(
+      applySourceFilteringString(queryObject, ["data.id"]),
+      totalRecords,
+      0
+    );
+    const resp = await apiClient.axios.post(
+      "search-api/search-ws/search",
+      queryDSL,
+      { params: { indexName } }
+    );
+    return (resp?.data?.hits?.hits ?? [])
+      .map((hit) => hit?._source?.data?.id)
+      .filter(Boolean);
+  }
+
   async function fetchObjectMetadatas() {
-    const paths = localStorageExportObjectIds.map(
+    const paths = (await fetchObjectIds()).map(
       (id) => `metadata/${id}?include=derivatives`
     );
     return await bulkGet<Metadata>(paths, {
@@ -285,7 +315,8 @@ export default function ExportPage<TData extends KitsuResource>() {
     async function loadObjectMetadatas() {
       if (
         exportType === "OBJECT_ARCHIVE" &&
-        localStorageExportObjectIds.length > 0
+        totalRecords > 0 &&
+        totalRecords <= MAX_OBJECT_EXPORT_TOTAL
       ) {
         setLoadingObjectMetadatas(true);
         try {
@@ -302,7 +333,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     }
 
     loadObjectMetadatas();
-  }, [exportType, localStorageExportObjectIds]);
+  }, [exportType, localStorageExportObjectIds, totalRecords]);
 
   // Image Type and Resize Images apply to every object, so they are only offered when every object
   // is an image. Otherwise the original files are exported.
@@ -505,8 +536,9 @@ export default function ExportPage<TData extends KitsuResource>() {
   );
 
   const disableObjectExportButton =
-    localStorageExportObjectIds.length < 1 ||
-    totalRecords > MAX_OBJECT_EXPORT_TOTAL;
+    totalRecords < 1 ||
+    totalRecords > MAX_OBJECT_EXPORT_TOTAL ||
+    loadingObjectMetadatas;
 
   const imageTypeLabel = (type: ExportImageType) =>
     formatMessage({ id: `exportImageType_${type}` as any });
@@ -660,10 +692,11 @@ export default function ExportPage<TData extends KitsuResource>() {
           <TextField name={"name"} customName="exportName" disabled={loading} />
         </div>
         <div className="col-md-6 mb-3">
-          <label className="d-block mb-2">
+          <label className="d-flex align-items-center mb-2">
             <strong>
               <DinaMessage id="fileNameAliasField" />
             </strong>
+            <Tooltip id="fileNameAliasFieldTooltip" className="ms-2" />
           </label>
           <QueryFieldSelector
             indexMap={indexMap as ESIndexMapping[]}
@@ -762,7 +795,10 @@ export default function ExportPage<TData extends KitsuResource>() {
           <SubmitButton
             buttonProps={(formik) => ({
               style: { width: "100%" },
-              disabled: loading || exportRequestSubmitted,
+              disabled:
+                loading ||
+                exportRequestSubmitted ||
+                (exportType === "OBJECT_ARCHIVE" && disableObjectExportButton),
               onClick: () => {
                 if (exportType === "TABULAR_DATA") {
                   exportData(formik);
@@ -782,7 +818,7 @@ export default function ExportPage<TData extends KitsuResource>() {
             ) : (
               <DinaMessage
                 id="exportObjectsCountButton"
-                values={{ count: localStorageExportObjectIds.length }}
+                values={{ count: totalRecords ?? 0 }}
               />
             )}
           </SubmitButton>
@@ -795,7 +831,10 @@ export default function ExportPage<TData extends KitsuResource>() {
         </div>
         {exportType === "OBJECT_ARCHIVE" && disableObjectExportButton && (
           <div className="form-text mt-0">
-            <CommonMessage id="exportObjectsMaxLimitTooltip" />
+            <CommonMessage
+              id="exportObjectsMaxLimitTooltip"
+              values={{ limit: formatNumber(MAX_OBJECT_EXPORT_TOTAL) }}
+            />
           </div>
         )}
         {exportType === "TABULAR_DATA" && (

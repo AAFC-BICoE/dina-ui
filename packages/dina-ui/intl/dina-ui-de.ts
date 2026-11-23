@@ -661,7 +661,9 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_xmpMetadataDate_tooltip:
     "Datum und Uhrzeit der letzten Änderung des Eintrags",
   field_xmpRightsWebStatement: "Lizenz",
-  fileNameAliasField: "Aliasfeld für Dateinamen",
+  fileNameAliasField: "Dateien benennen nach",
+  fileNameAliasFieldTooltip:
+    "Wählen Sie das Feld, das als Dateiname jedes exportierten Objekts verwendet wird. Ist kein Feld ausgewählt, werden die ursprünglichen Dateinamen verwendet.",
   fileTooBig: "Datei ist zu groß",
   filterAttribute: "Filterattribut",
   filterByGroup: "nach Gruppe filtern",
