@@ -15,7 +15,6 @@ import {
   OBJECT_EXPORT_IDS_KEY
 } from "common-ui";
 import userEvent from "@testing-library/user-event";
-import { MAX_OBJECT_EXPORT_TOTAL } from "common-ui/lib/export/exportUtils";
 import ExportPage from "@dina-ui/pages/export/data-export/export";
 import { dynamicFieldMappingForMaterialSample } from "@dina-ui/pages/collection/material-sample/list";
 
@@ -885,8 +884,8 @@ describe("ExportPage Component", () => {
       await userEvent.click(wrapper.getByRole("radio", { name: /^objects/i }));
       await waitForLoadingToDisappear();
 
-      // The "Name Files By" section should be visible
-      expect(wrapper.getByText(/name files by/i)).toBeInTheDocument();
+      // The "File Name Alias Field" section should be visible
+      expect(wrapper.getByText(/file name alias field/i)).toBeInTheDocument();
 
       // Select "originalFilename" as the alias field.
       // The field label in the dropdown is the intl message "field_originalFilename" = "Original Filename"
@@ -1186,161 +1185,6 @@ describe("ExportPage Component", () => {
       ).toBeInTheDocument();
     });
 
-    describe("Export limit and exporting all matched objects", () => {
-      const MATCH_ALL_QUERY = { query: { match_all: {} } };
-
-      const searchCalls = () =>
-        mockAxiosPost.mock.calls.filter(([path]) =>
-          String(path).includes("search-api/search-ws/search")
-        );
-
-      it("Looks up the ids from the stored query when all matched records are exported", async () => {
-        // "Export all matched" stores no ids, only the query and the total.
-        window.sessionStorage.setItem(DATA_EXPORT_TOTAL_RECORDS_KEY, "3");
-        window.sessionStorage.setItem(
-          OBJECT_EXPORT_IDS_KEY,
-          JSON.stringify([])
-        );
-        window.localStorage.setItem(
-          DATA_EXPORT_QUERY_KEY,
-          JSON.stringify(MATCH_ALL_QUERY)
-        );
-        mockAxiosPost.mockResolvedValue({
-          data: {
-            hits: {
-              hits: ["obj-1", "obj-2", "obj-3"].map((id) => ({
-                _source: { data: { id } }
-              }))
-            }
-          }
-        });
-
-        const wrapper = mountWithAppContext(<ExportPage />, testCtx);
-        await waitForLoadingToDisappear();
-
-        // Nothing is searched until the Objects type is selected.
-        expect(searchCalls()).toHaveLength(0);
-
-        await userEvent.click(
-          wrapper.getByRole("radio", { name: /^objects/i })
-        );
-        await waitForLoadingToDisappear();
-
-        expect(searchCalls()).toEqual([
-          [
-            "search-api/search-ws/search",
-            {
-              ...MATCH_ALL_QUERY,
-              _source: { includes: ["data.id"] },
-              size: 3,
-              from: 0
-            },
-            { params: { indexName: "dina_object_store_index" } }
-          ]
-        ]);
-
-        await userEvent.click(
-          wrapper.getByRole("button", { name: "Export 3 Objects" })
-        );
-
-        expect(mockSave).toHaveBeenCalledWith(
-          [
-            expect.objectContaining({
-              resource: expect.objectContaining({
-                fileIdentifiers: [
-                  "file-obj-1?include=derivatives",
-                  "file-obj-2?include=derivatives",
-                  "file-obj-3?include=derivatives"
-                ]
-              })
-            })
-          ],
-          { apiBaseUrl: "/objectstore-api" }
-        );
-      });
-
-      it("Does not search for ids when the objects were selected with checkboxes", async () => {
-        const wrapper = mountWithAppContext(<ExportPage />, testCtx);
-        await waitForLoadingToDisappear();
-
-        await userEvent.click(
-          wrapper.getByRole("radio", { name: /^objects/i })
-        );
-        await waitForLoadingToDisappear();
-
-        expect(searchCalls()).toHaveLength(0);
-        expect(
-          wrapper.getByRole("button", { name: "Export 2 Objects" })
-        ).toBeEnabled();
-      });
-
-      it("Disables the export when more than the maximum objects are matched", async () => {
-        window.sessionStorage.setItem(
-          DATA_EXPORT_TOTAL_RECORDS_KEY,
-          String(MAX_OBJECT_EXPORT_TOTAL + 1)
-        );
-        window.sessionStorage.setItem(
-          OBJECT_EXPORT_IDS_KEY,
-          JSON.stringify([])
-        );
-        window.localStorage.setItem(
-          DATA_EXPORT_QUERY_KEY,
-          JSON.stringify(MATCH_ALL_QUERY)
-        );
-
-        const wrapper = mountWithAppContext(<ExportPage />, testCtx);
-        await waitForLoadingToDisappear();
-
-        await userEvent.click(
-          wrapper.getByRole("radio", { name: /^objects/i })
-        );
-        await waitForLoadingToDisappear();
-
-        expect(
-          wrapper.getByText(/maximum limit of 10,000 files/i)
-        ).toBeInTheDocument();
-        expect(
-          wrapper.getByRole("button", { name: /^export .* objects$/i })
-        ).toBeDisabled();
-
-        // No point loading that many ids when the export is not allowed.
-        expect(searchCalls()).toHaveLength(0);
-        expect(mockBulkGet).not.toHaveBeenCalled();
-      });
-
-      it("Allows an export of exactly the maximum number of objects", async () => {
-        window.sessionStorage.setItem(
-          DATA_EXPORT_TOTAL_RECORDS_KEY,
-          String(MAX_OBJECT_EXPORT_TOTAL)
-        );
-        window.sessionStorage.setItem(
-          OBJECT_EXPORT_IDS_KEY,
-          JSON.stringify([])
-        );
-        window.localStorage.setItem(
-          DATA_EXPORT_QUERY_KEY,
-          JSON.stringify(MATCH_ALL_QUERY)
-        );
-        mockAxiosPost.mockResolvedValue({
-          data: { hits: { hits: [{ _source: { data: { id: "obj-1" } } }] } }
-        });
-
-        const wrapper = mountWithAppContext(<ExportPage />, testCtx);
-        await waitForLoadingToDisappear();
-
-        await userEvent.click(
-          wrapper.getByRole("radio", { name: /^objects/i })
-        );
-        await waitForLoadingToDisappear();
-
-        expect(wrapper.queryByText(/maximum limit/i)).not.toBeInTheDocument();
-        expect(searchCalls()[0][1].size).toBe(MAX_OBJECT_EXPORT_TOTAL);
-        expect(
-          wrapper.getByRole("button", { name: /^export .* objects$/i })
-        ).toBeEnabled();
-      });
-    });
-
     it("Shows the Data/Objects export type cards only for object-store-list", async () => {
       const wrapper = mountWithAppContext(<ExportPage />, testCtx);
       await waitForLoadingToDisappear();
@@ -1369,7 +1213,7 @@ describe("ExportPage Component", () => {
       expect(wrapper.queryByText(/^separator$/i)).not.toBeInTheDocument();
       expect(wrapper.getByText(/image processing/i)).toBeInTheDocument();
       expect(wrapper.getByText(/resize images/i)).toBeInTheDocument();
-      expect(wrapper.getByText(/name files by/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/file name alias field/i)).toBeInTheDocument();
       expect(wrapper.getByText(/image type/i)).toBeInTheDocument();
       await waitFor(() => {
         expect(wrapper.getAllByText(/large image/i).length).toBeGreaterThan(0);

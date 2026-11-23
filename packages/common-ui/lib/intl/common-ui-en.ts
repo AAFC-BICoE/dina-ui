@@ -202,7 +202,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   applyButtonText: "Apply",
   exportObjectsButtonText: "Export Objects",
   exportObjectsMaxLimitTooltip:
-    "Export Objects has a maximum limit of {limit} files. Select up to {limit} files to export.",
+    "Export Objects has a maximum limit of 100 files. Select up to 100 files to export.",
   mismatchMaterialSampleTypeError:
     "Some Material Samples do not match the Split Configuration and were removed.",
   backToParentFile: "Back to parent file: {parentFilename}",
