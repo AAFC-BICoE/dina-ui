@@ -77,7 +77,9 @@ const config: Config.InitialOptions = {
       }
     ]
   },
-  transformIgnorePatterns: [`/node_modules/(?!common-ui|axios|dnd-core|dexie)`],
+  transformIgnorePatterns: [
+    `/node_modules/(?!common-ui|axios|dnd-core|dexie|keycloak-js)`
+  ],
   globalSetup: "./jest-global-setup.js"
 };
 
