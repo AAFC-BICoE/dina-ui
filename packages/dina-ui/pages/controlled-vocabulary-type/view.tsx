@@ -23,6 +23,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { ControlledVocabulary } from "../../types/collection-api/resources/ControlledVocabulary";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
+import styles from "../controlled-vocabulary/controlled-vocabulary.module.css";
 import { ControlledVocabularyFormLayout } from "./edit";
 
 export default function ControlledVocabularyViewPage() {
@@ -107,9 +108,10 @@ function ControlledVocabularyItemsSection({
       : component;
 
   return (
-    <FieldSet legend={<DinaMessage id="items" />}>
+    <FieldSet legend={<DinaMessage id="controlledVocabularyItemsTitle" />}>
       <ListPageLayout<ControlledVocabularyItem>
         id="controlled-vocabulary-items"
+        filterFormClassName={styles.cvItemsFilterPanel}
         filterType={ListLayoutFilterType.FREE_TEXT}
         filterAttributes={CV_FILTER_ATTRIBUTES}
         filterPlaceholder={formatMessage(

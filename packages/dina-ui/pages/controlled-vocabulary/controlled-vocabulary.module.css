@@ -38,6 +38,20 @@
   flex-basis: 100%;
 }
 
+.cvItemsFilterPanel {
+  align-items: flex-end;
+}
+
+.cvItemsFilterPanel > :first-child {
+  flex: 1 1 20rem;
+}
+
+.cvItemsFilterPanel :global(.list-inline),
+.cvItemsFilterPanel :global(.list-inline-item) {
+  display: block;
+  margin-right: 0;
+}
+
 /* Holds the Managed Attributes and Filter by Type sections */
 .cvSidebar {
   width: 340px;

@@ -182,7 +182,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   controlledVocabularySearchPlaceholder:
     "Rechercher par nom, clé, unité ou créateur",
   controlledVocabularyTitle: "Vocabulaire vérifié",
-  editControlledVocabularyTitle: "Modifier le vocabulaire contrôlé",
+  controlledVocabularyItemsTitle: "Éléments du vocabulaire contrôlé",
+  editControlledVocabularyTitle: "Modifier le type de vocabulaire contrôlé",
   convertToDepthMinMax: "Conversion de la profondeur min/max",
   convertToElevationMinMax: "Conversion de l’élévation min/max",
   coordinateUncertaintyInMeters: "Coordonner l’incertitude en mètres",
@@ -678,7 +679,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   isFiledAs: "Classé en tant que",
   isTargetHeader: "Est-ce ciblé?",
   isolation: "Isolation",
-  items: "Éléments",
   keepContentsTogether: "Ne pas séparer le contenu",
   languageOfPage: "fra",
   largeImg: "Grande image",

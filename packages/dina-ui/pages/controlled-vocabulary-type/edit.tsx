@@ -1,19 +1,20 @@
 import {
-  ButtonBar,
   DateField,
   DinaForm,
   MultilingualDescription,
   MultilingualTitle,
-  SubmitButton,
+  RefSubmitButton,
   TextField,
   useDinaFormContext,
   useQuery,
   useSubmitHandler,
   withResponse
 } from "common-ui";
+import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { RefObject, useRef } from "react";
 import {
   CONTROLLED_VOCABULARY_APIS,
   ControlledVocabularyApi,
@@ -31,16 +32,44 @@ export default function ControlledVocabularyEditPage() {
   const id = router.query.id?.toString();
   const api = getControlledVocabularyApi(router.query);
   const { apiPath } = CONTROLLED_VOCABULARY_APIS[api];
+  const formRef = useRef<FormikProps<any>>(null);
 
   const query = useQuery<ControlledVocabulary>(
     { path: `${apiPath}/controlled-vocabulary/${id}` },
     { disabled: !id }
   );
 
+  const buttonBarContent = (
+    <>
+      <div className="col-md-6 col-sm-12 mt-2">
+        <Link
+          href={controlledVocabularyPageUrl(
+            "/controlled-vocabulary-type/view",
+            api,
+            { id: String(id) }
+          )}
+          className="back-button my-auto me-auto"
+        >
+          <DinaMessage id="backToReadOnlyPage" />
+        </Link>
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <RefSubmitButton formRef={formRef} className="ms-auto" />
+      </div>
+    </>
+  );
+
   return (
-    <PageLayout titleId="editControlledVocabularyTitle">
+    <PageLayout
+      titleId="editControlledVocabularyTitle"
+      buttonBarContent={buttonBarContent}
+    >
       {withResponse(query, ({ data }) => (
-        <ControlledVocabularyForm fetchedVocabulary={data} api={api} />
+        <ControlledVocabularyForm
+          fetchedVocabulary={data}
+          api={api}
+          formRef={formRef}
+        />
       ))}
     </PageLayout>
   );
@@ -48,10 +77,12 @@ export default function ControlledVocabularyEditPage() {
 
 function ControlledVocabularyForm({
   fetchedVocabulary,
-  api
+  api,
+  formRef
 }: {
   fetchedVocabulary: PersistedResource<ControlledVocabulary>;
   api: ControlledVocabularyApi;
+  formRef: RefObject<FormikProps<any> | null>;
 }) {
   const router = useRouter();
   const { apiBaseUrl } = CONTROLLED_VOCABULARY_APIS[api];
@@ -80,17 +111,8 @@ function ControlledVocabularyForm({
         } as InputResource<ControlledVocabulary>
       }
       onSubmit={onSubmit}
+      innerRef={formRef}
     >
-      <ButtonBar className="mb-4">
-        <div className="col-md-6 col-sm-12 mt-2">
-          <Link href={viewPageUrl} className="back-button my-auto me-auto">
-            <DinaMessage id="backToReadOnlyPage" />
-          </Link>
-        </div>
-        <div className="col-md-6 col-sm-12 d-flex">
-          <SubmitButton className="ms-auto" />
-        </div>
-      </ButtonBar>
       <ControlledVocabularyFormLayout />
     </DinaForm>
   );
