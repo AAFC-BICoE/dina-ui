@@ -182,6 +182,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   controlledVocabularySearchPlaceholder:
     "Rechercher par nom, clé, unité ou créateur",
   controlledVocabularyTitle: "Vocabulaire vérifié",
+  editControlledVocabularyTitle: "Modifier le vocabulaire contrôlé",
   convertToDepthMinMax: "Conversion de la profondeur min/max",
   convertToElevationMinMax: "Conversion de l’élévation min/max",
   coordinateUncertaintyInMeters: "Coordonner l’incertitude en mètres",
@@ -194,6 +195,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createMaterialSampleFormTemplate:
     "Créer un modèle de formulaire des échantillons de matériau",
   createNew: "Créer",
+  createItem: "Créer un élément",
   createNewLabel: "Créer nouveau",
   createNewMaterialSamples: "Créer de nouveaux échantillons de matériaux",
   createNewView: "Créer une nouvelle vue",
@@ -568,6 +570,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_typeStatus: "Type de statut",
   field_typeStatusEvidence: "Type de statut - Preuve",
   field_unit: "Unité",
+  field_vocabClass: "Classe de vocabulaire",
   field_useNextSequence: "Utiliser le prochain identifiant disponible",
   field_username: "Nom d’utilisateur",
   field_useTargetOrganism: "Utiliser l'organisme ciblé",
@@ -675,6 +678,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   isFiledAs: "Classé en tant que",
   isTargetHeader: "Est-ce ciblé?",
   isolation: "Isolation",
+  items: "Éléments",
   keepContentsTogether: "Ne pas séparer le contenu",
   languageOfPage: "fra",
   largeImg: "Grande image",

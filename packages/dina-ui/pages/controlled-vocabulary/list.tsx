@@ -1,7 +1,4 @@
 import {
-  ColumnDefinition,
-  dateCell,
-  descriptionCell,
   getPreferredMultilingualPair,
   ListLayoutFilterType,
   ListPageLayout,
@@ -11,17 +8,14 @@ import {
   SimpleSearchFilterBuilder
 } from "common-ui";
 import { useLocalStorage } from "@rehooks/local-storage";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo, useCallback, useState, useEffect } from "react";
-import { FaPlus } from "react-icons/fa";
 
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import {
   Head,
   GroupSelectField,
-  groupCell,
   ModuleTabConfig,
   ModuleTabs,
   TypeFilterState,
@@ -36,10 +30,12 @@ import {
   CONTROLLED_VOCABULARY_APIS,
   ControlledVocabularyApiConfig
 } from "packages/dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import {
+  CV_FILTER_ATTRIBUTES,
+  getControlledVocabularyItemColumns
+} from "packages/dina-ui/components/controlled-vocabulary/ControlledVocabularyItemColumns";
 import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 import { VOCABULARY_ELEMENT_TYPE_OPTIONS } from "packages/dina-ui/types/collection-api/resources/VocabularyElementType";
-
-const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy"];
 
 const CV_LIST_ID = "controlled-vocabulary-list";
 
@@ -48,112 +44,6 @@ const MANAGED_ATTRIBUTE_VOCABULARY_KEY = "managed_attribute";
 
 /** Sidebar option for items without a dinaComponent, so they're still counted and filterable. */
 const NO_DATA_COMPONENT = "NO_DATA_COMPONENT";
-
-/** Accepted values past this count are hidden behind a "Show More" toggle. */
-const ACCEPTED_VALUES_LIMIT = 7;
-
-function AcceptedValuesBadges({ values }: { values: string[] }) {
-  const [expanded, setExpanded] = useState(false);
-  const shown = expanded ? values : values.slice(0, ACCEPTED_VALUES_LIMIT);
-
-  return (
-    <div className="d-flex flex-wrap align-items-center gap-1">
-      {shown.map((value, index) => (
-        <span key={index} className="badge rounded-pill bg-secondary">
-          {value}
-        </span>
-      ))}
-      {values.length > ACCEPTED_VALUES_LIMIT && (
-        <button
-          type="button"
-          className="btn btn-link btn-sm p-0"
-          onClick={() => setExpanded(!expanded)}
-        >
-          <DinaMessage id={expanded ? "showLess" : "showMore"} />
-        </button>
-      )}
-    </div>
-  );
-}
-
-/** Links the item by its title in the user's language, falling back to its name. */
-function NameCell({
-  item,
-  viewRoute
-}: {
-  item: ControlledVocabularyItem;
-  viewRoute: string;
-}) {
-  const { locale } = useDinaIntl();
-  const title = getPreferredMultilingualPair(
-    item.multilingualTitle?.titles,
-    "title",
-    locale
-  )?.title;
-
-  return (
-    <Link href={`${viewRoute}?id=${item.id}`}>
-      {title || item.name || item.id}
-    </Link>
-  );
-}
-
-function getColumns(
-  viewRoute: string,
-  componentLabel: (component: string) => string
-): ColumnDefinition<ControlledVocabularyItem>[] {
-  return [
-    {
-      accessorKey: "name",
-      header: () => <DinaMessage id="field_name" />,
-      cell: ({ row: { original } }) => (
-        <NameCell item={original} viewRoute={viewRoute} />
-      )
-    },
-    {
-      accessorKey: "dinaComponent",
-      header: () => <DinaMessage id="field_dinaComponent" />,
-      cell: ({ row: { original } }) =>
-        original.dinaComponent ? componentLabel(original.dinaComponent) : ""
-    },
-    {
-      accessorKey: "vocabularyElementType",
-      header: () => <DinaMessage id="field_vocabularyElementType" />,
-      cell: ({ row: { original } }) => {
-        const option = VOCABULARY_ELEMENT_TYPE_OPTIONS.find(
-          ({ value }) => value === original.vocabularyElementType
-        );
-        return option ? (
-          <DinaMessage id={option.labelKey} />
-        ) : (
-          original.vocabularyElementType ?? ""
-        );
-      }
-    },
-    {
-      accessorKey: "unit",
-      header: () => <DinaMessage id="field_unit" />,
-      cell: ({ row: { original } }) => original.unit ?? ""
-    },
-    {
-      accessorKey: "acceptedValues",
-      header: () => <DinaMessage id="field_acceptedValues" />,
-      cell: ({ row: { original } }) =>
-        Array.isArray(original.acceptedValues) ? (
-          <AcceptedValuesBadges values={original.acceptedValues} />
-        ) : (
-          ""
-        )
-    },
-    descriptionCell(false, false, "multilingualDescription"),
-    groupCell("group"),
-    {
-      accessorKey: "createdBy",
-      header: () => <DinaMessage id="field_createdBy" />
-    },
-    dateCell("createdOn")
-  ];
-}
 
 const CV_MODULES: Array<ControlledVocabularyApiConfig & { titleKey: string }> =
   [
@@ -183,7 +73,10 @@ const SHARED_CV_PARAMS = {
   filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
     .whereIn("type", ["MANAGED_ATTRIBUTE", "SYSTEM"])
     .build(),
-  fields: { "controlled-vocabulary": "id,name,key,type,vocabClass" },
+  fields: {
+    "controlled-vocabulary":
+      "id,name,key,type,vocabClass,multilingualDescription"
+  },
   sort: "name"
 };
 
@@ -256,7 +149,7 @@ function getParentId(item: ControlledVocabularyItem): string | undefined {
 }
 
 export default function ControlledVocabularyListPage() {
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
   const { apiClient } = useApiClient();
   const router = useRouter();
 
@@ -476,10 +369,17 @@ export default function ControlledVocabularyListPage() {
         id,
         label: String(cv.name),
         // -1 marks a failed count load.
-        count: countsFailed ? -1 : filteredCounts.parents[id] ?? 0
+        count: countsFailed ? -1 : filteredCounts.parents[id] ?? 0,
+        href: `${activeModule.vocabularyEntityLink}/view?id=${id}`,
+        description:
+          getPreferredMultilingualPair(
+            cv.multilingualDescription?.descriptions,
+            "desc",
+            locale
+          )?.desc ?? undefined
       };
     });
-  }, [cvItems, countsFailed, filteredCounts]);
+  }, [cvItems, countsFailed, filteredCounts, activeModule, locale]);
 
   // 5. Filter group helpers
   const getParentFilterGroups = useCallback(
@@ -572,7 +472,10 @@ export default function ControlledVocabularyListPage() {
 
     if (isMixedCase) {
       return {
-        columns: getColumns(activeModule.viewRoute, componentLabel),
+        columns: getControlledVocabularyItemColumns(
+          activeModule.viewRoute,
+          componentLabel
+        ),
         path: itemsPath,
         filter,
         include: "controlledVocabulary",
@@ -588,7 +491,10 @@ export default function ControlledVocabularyListPage() {
     }
 
     return {
-      columns: getColumns(activeModule.viewRoute, componentLabel),
+      columns: getControlledVocabularyItemColumns(
+        activeModule.viewRoute,
+        componentLabel
+      ),
       path: itemsPath,
       ...(Object.keys(filter).length > 0 ? { filter } : {})
     };
@@ -603,20 +509,7 @@ export default function ControlledVocabularyListPage() {
   ]);
 
   return (
-    <PageLayout
-      titleId="controlledVocabularyTitle"
-      buttonBarContent={
-        <div className="flex d-flex ms-auto">
-          <Link
-            href={activeModule.editRoute}
-            className="btn btn-primary ms-auto"
-          >
-            <FaPlus className="me-2" />
-            <DinaMessage id="createNew" />
-          </Link>
-        </div>
-      }
-    >
+    <PageLayout titleId="controlledVocabularyTitle">
       <Head
         title={
           formatMessage("controlledVocabularyTitle" as any) ??

@@ -118,7 +118,10 @@ describe("Controlled vocabulary list page", () => {
       {
         page: { limit: 1000 },
         filter: { type: { IN: "MANAGED_ATTRIBUTE,SYSTEM" } },
-        fields: { "controlled-vocabulary": "id,name,key,type,vocabClass" },
+        fields: {
+          "controlled-vocabulary":
+            "id,name,key,type,vocabClass,multilingualDescription"
+        },
         sort: "name"
       }
     );

@@ -8,6 +8,7 @@ export interface ControlledVocabularyAttributes {
   group: string;
   vocabClass?: string;
   term?: string;
+  version?: string;
   multilingualTitle?: MultilingualTitle;
   multilingualDescription?: MultilingualDescription;
   vocabularyElementType?: string;
