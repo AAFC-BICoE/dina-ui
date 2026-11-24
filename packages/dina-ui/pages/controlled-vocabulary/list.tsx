@@ -28,7 +28,9 @@ import styles from "./controlled-vocabulary.module.css";
 import { useControlledVocabularySidebarData } from "packages/dina-ui/components/controlled-vocabulary/useControlledVocabularySidebarData";
 import {
   CONTROLLED_VOCABULARY_APIS,
-  ControlledVocabularyApiConfig
+  ControlledVocabularyApi,
+  ControlledVocabularyApiConfig,
+  controlledVocabularyPageUrl
 } from "packages/dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   CV_FILTER_ATTRIBUTES,
@@ -45,25 +47,33 @@ const MANAGED_ATTRIBUTE_VOCABULARY_KEY = "managed_attribute";
 /** Sidebar option for items without a dinaComponent, so they're still counted and filterable. */
 const NO_DATA_COMPONENT = "NO_DATA_COMPONENT";
 
-const CV_MODULES: Array<ControlledVocabularyApiConfig & { titleKey: string }> =
-  [
-    {
-      titleKey: "collectionListTitle",
-      ...CONTROLLED_VOCABULARY_APIS.collection
-    },
-    {
-      titleKey: "objectStoreTitle",
-      ...CONTROLLED_VOCABULARY_APIS.objectstore
-    },
-    {
-      titleKey: "seqdbTitle",
-      ...CONTROLLED_VOCABULARY_APIS.sequencing
-    },
-    {
-      titleKey: "agentsSectionTitle",
-      ...CONTROLLED_VOCABULARY_APIS.agent
-    }
-  ];
+const CV_MODULES: Array<
+  ControlledVocabularyApiConfig & {
+    titleKey: string;
+    api: ControlledVocabularyApi;
+  }
+> = [
+  {
+    titleKey: "collectionListTitle",
+    api: "collection",
+    ...CONTROLLED_VOCABULARY_APIS.collection
+  },
+  {
+    titleKey: "objectStoreTitle",
+    api: "objectstore",
+    ...CONTROLLED_VOCABULARY_APIS.objectstore
+  },
+  {
+    titleKey: "seqdbTitle",
+    api: "sequencing",
+    ...CONTROLLED_VOCABULARY_APIS.sequencing
+  },
+  {
+    titleKey: "agentsSectionTitle",
+    api: "agent",
+    ...CONTROLLED_VOCABULARY_APIS.agent
+  }
+];
 
 const MODULE_TABS: ModuleTabConfig[] = CV_MODULES.map(({ titleKey }) => ({
   titleKey
@@ -370,7 +380,11 @@ export default function ControlledVocabularyListPage() {
         label: String(cv.name),
         // -1 marks a failed count load.
         count: countsFailed ? -1 : filteredCounts.parents[id] ?? 0,
-        href: `${activeModule.vocabularyEntityLink}/view?id=${id}`,
+        href: controlledVocabularyPageUrl(
+          "/controlled-vocabulary-type/view",
+          activeModule.api,
+          { id }
+        ),
         description:
           getPreferredMultilingualPair(
             cv.multilingualDescription?.descriptions,
@@ -473,7 +487,7 @@ export default function ControlledVocabularyListPage() {
     if (isMixedCase) {
       return {
         columns: getControlledVocabularyItemColumns(
-          activeModule.viewRoute,
+          activeModule.api,
           componentLabel
         ),
         path: itemsPath,
@@ -492,7 +506,7 @@ export default function ControlledVocabularyListPage() {
 
     return {
       columns: getControlledVocabularyItemColumns(
-        activeModule.viewRoute,
+        activeModule.api,
         componentLabel
       ),
       path: itemsPath,

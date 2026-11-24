@@ -46,12 +46,7 @@ export type ControlledVocabularyApi =
 export interface ControlledVocabularyApiConfig {
   apiPath: string;
   apiBaseUrl: string;
-  entityLink: string;
-  editRoute: string;
-  viewRoute: string;
   listRoute: string;
-  /** Base route of the pages of a controlled vocabulary (the type its items belong to), e.g. its "/view" page. */
-  vocabularyEntityLink: string;
   /** Data component types available when creating/editing an item in this API. */
   componentTypes: readonly string[];
   /** i18n key for each component type, used as the option label. */
@@ -59,9 +54,9 @@ export interface ControlledVocabularyApiConfig {
 }
 
 /**
- * API, route and form configuration for the controlled-vocabulary-item pages.
+ * API, route and form configuration for the controlled vocabulary pages.
  * A controlled vocabulary item may reside in any of the configured APIs, and
- * each API has its own page routes and data component types.
+ * each API has its own data component types.
  */
 export const CONTROLLED_VOCABULARY_APIS: Record<
   ControlledVocabularyApi,
@@ -70,22 +65,14 @@ export const CONTROLLED_VOCABULARY_APIS: Record<
   collection: {
     apiPath: "collection-api",
     apiBaseUrl: "/collection-api",
-    entityLink: "/controlled-vocabulary-item",
-    editRoute: "/controlled-vocabulary-item/edit",
-    viewRoute: "/controlled-vocabulary-item/view",
     listRoute: "/controlled-vocabulary/list",
-    vocabularyEntityLink: "/controlled-vocabulary",
     componentTypes: COLLECTION_MODULE_TYPES,
     componentTypeLabels: COLLECTION_MODULE_TYPE_LABELS as Record<string, string>
   },
   objectstore: {
     apiPath: "objectstore-api",
     apiBaseUrl: "/objectstore-api",
-    entityLink: "/object-store/controlled-vocabulary-item",
-    editRoute: "/object-store/controlled-vocabulary-item/edit",
-    viewRoute: "/object-store/controlled-vocabulary-item/view",
     listRoute: "/controlled-vocabulary/list?tab=1",
-    vocabularyEntityLink: "/object-store/controlled-vocabulary",
     componentTypes: OBJECT_STORE_MODULE_TYPES,
     componentTypeLabels: OBJECT_STORE_MODULE_TYPE_LABELS as Record<
       string,
@@ -95,26 +82,41 @@ export const CONTROLLED_VOCABULARY_APIS: Record<
   sequencing: {
     apiPath: "seqdb-api",
     apiBaseUrl: "/seqdb-api",
-    entityLink: "/seqdb/controlled-vocabulary-item",
-    editRoute: "/seqdb/controlled-vocabulary-item/edit",
-    viewRoute: "/seqdb/controlled-vocabulary-item/view",
     listRoute: "/controlled-vocabulary/list?tab=2",
-    vocabularyEntityLink: "/seqdb/controlled-vocabulary",
     componentTypes: SEQDB_MODULE_TYPES,
     componentTypeLabels: SEQDB_MODULE_TYPE_LABELS as Record<string, string>
   },
   agent: {
     apiPath: "agent-api",
     apiBaseUrl: "/agent-api",
-    entityLink: "/agent/controlled-vocabulary-item",
-    editRoute: "/agent/controlled-vocabulary-item/edit",
-    viewRoute: "/agent/controlled-vocabulary-item/view",
     listRoute: "/controlled-vocabulary/list?tab=3",
-    vocabularyEntityLink: "/agent/controlled-vocabulary",
     componentTypes: AGENT_MODULE_TYPES,
     componentTypeLabels: AGENT_MODULE_TYPE_LABELS as Record<string, string>
   }
 };
+
+/** Reads the API from a page's ?api= param, falling back to collection when it's missing or unknown. */
+export function getControlledVocabularyApi(
+  query: Record<string, string | string[] | undefined>
+): ControlledVocabularyApi {
+  const api = String(query.api);
+  // Not "in", which would also accept inherited keys like "toString".
+  return Object.keys(CONTROLLED_VOCABULARY_APIS).includes(api)
+    ? (api as ControlledVocabularyApi)
+    : "collection";
+}
+
+/**
+ * Link to a controlled vocabulary page, which reads the API from its ?api= param.
+ * e.g. controlledVocabularyPageUrl("/controlled-vocabulary-item/view", "agent", { id })
+ */
+export function controlledVocabularyPageUrl(
+  path: string,
+  api: ControlledVocabularyApi,
+  params: Record<string, string> = {}
+) {
+  return `${path}?${new URLSearchParams({ api, ...params })}`;
+}
 
 /**
  * Converts multilingualTitle and multilingualDescription from the stored format to the

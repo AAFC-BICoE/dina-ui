@@ -287,7 +287,7 @@ interface FilterCheckboxRowProps {
   onChange: () => void;
 }
 
-/** Checkbox with its label on the left, and its count badge and description tooltip on the right. */
+/** Checkbox with its label and description tooltip on the left, and its count badge on the right. */
 function FilterCheckboxRow({
   id,
   label,
@@ -313,12 +313,6 @@ function FilterCheckboxRow({
         <label htmlFor={id} className="form-check-label">
           {label}
         </label>
-      </div>
-      {/* Hide the badge when the count is unknown (-1) or empty */}
-      <div className="d-flex align-items-center">
-        {typeof count === "number" && count > 0 && (
-          <span className="badge bg-secondary ms-2">{count}</span>
-        )}
         {description && (
           <Tooltip
             directText={description}
@@ -327,6 +321,10 @@ function FilterCheckboxRow({
           />
         )}
       </div>
+      {/* Hide the badge when the count is unknown (-1) or empty */}
+      {typeof count === "number" && count > 0 && (
+        <span className="badge bg-secondary ms-2">{count}</span>
+      )}
     </li>
   );
 }

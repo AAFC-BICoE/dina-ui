@@ -10,6 +10,10 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 import { VOCABULARY_ELEMENT_TYPE_OPTIONS } from "../../types/collection-api/resources/VocabularyElementType";
 import { groupCell } from "../group-select/GroupFieldView";
+import {
+  ControlledVocabularyApi,
+  controlledVocabularyPageUrl
+} from "./controlledVocabularyItemUtils";
 
 /** Item attributes searched by the controlled-vocabulary-item free-text filter. */
 export const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy"];
@@ -44,10 +48,10 @@ function AcceptedValuesBadges({ values }: { values: string[] }) {
 /** Links the item by its title in the user's language, falling back to its name. */
 function NameCell({
   item,
-  viewRoute
+  api
 }: {
   item: ControlledVocabularyItem;
-  viewRoute: string;
+  api: ControlledVocabularyApi;
 }) {
   const { locale } = useDinaIntl();
   const title = getPreferredMultilingualPair(
@@ -57,23 +61,27 @@ function NameCell({
   )?.title;
 
   return (
-    <Link href={`${viewRoute}?id=${item.id}`}>
+    <Link
+      href={controlledVocabularyPageUrl(
+        "/controlled-vocabulary-item/view",
+        api,
+        { id: String(item.id) }
+      )}
+    >
       {title || item.name || item.id}
     </Link>
   );
 }
 
 export function getControlledVocabularyItemColumns(
-  viewRoute: string,
+  api: ControlledVocabularyApi,
   componentLabel: (component: string) => string
 ): ColumnDefinition<ControlledVocabularyItem>[] {
   return [
     {
       accessorKey: "name",
       header: () => <DinaMessage id="field_name" />,
-      cell: ({ row: { original } }) => (
-        <NameCell item={original} viewRoute={viewRoute} />
-      )
+      cell: ({ row: { original } }) => <NameCell item={original} api={api} />
     },
     {
       accessorKey: "dinaComponent",
