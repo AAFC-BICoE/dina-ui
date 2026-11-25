@@ -131,6 +131,20 @@ function getExportFile(
   return metadata;
 }
 
+/**
+ * Returns the identifier to send to the object export for a file returned by getExportFile.
+ * Externally hosted resources have no fileIdentifier: the API uses the metadata id instead.
+ */
+function getExportIdentifier(
+  metadata: PersistedResource<Metadata>,
+  file: { fileIdentifier?: string }
+): string | undefined {
+  if (file === metadata && metadata.resourceExternalURL) {
+    return metadata.id;
+  }
+  return file.fileIdentifier;
+}
+
 function isJpegFile(file: { dcFormat?: string; fileExtension?: string }) {
   const ext = file.fileExtension?.toLowerCase();
   return file.dcFormat === "image/jpeg" || ext === ".jpg" || ext === ".jpeg";
@@ -456,8 +470,8 @@ export default function ExportPage<TData extends KitsuResource>() {
       const metadatas = (objectMetadatas ??
         (await fetchObjectMetadatas())) as PersistedResource<Metadata>[];
 
-      const exportFiles = metadatas.map((metadata) =>
-        getExportFile(metadata, exportImageType)
+      const exportIdentifiers = metadatas.map((metadata) =>
+        getExportIdentifier(metadata, getExportFile(metadata, exportImageType))
       );
 
       const filenameAliases = {};
@@ -473,9 +487,9 @@ export default function ExportPage<TData extends KitsuResource>() {
                     .label
                 )
               : get(metadata, selectedFilenameAliasField.label);
-          const fileIdentifier = exportFiles[index].fileIdentifier;
-          if (fileIdentifier) {
-            filenameAliases[fileIdentifier] = filenameAlias;
+          const exportIdentifier = exportIdentifiers[index];
+          if (exportIdentifier) {
+            filenameAliases[exportIdentifier] = filenameAlias;
           }
         });
       }
@@ -485,7 +499,7 @@ export default function ExportPage<TData extends KitsuResource>() {
       const objectExportSaveArg = {
         resource: {
           type: "object-export",
-          fileIdentifiers: exportFiles.map((file) => file.fileIdentifier),
+          fileIdentifiers: exportIdentifiers,
           name: formik?.values?.name,
           ...(hasFilenameAliases ? { filenameAliases } : {}),
           ...(exportResizePercentage < 100

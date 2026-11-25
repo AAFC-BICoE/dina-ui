@@ -1091,6 +1091,70 @@ describe("ExportPage Component", () => {
       });
     });
 
+    it("Exports externally hosted resources using the metadata id", async () => {
+      // obj-1 is externally hosted (no fileIdentifier), obj-2 is a stored file
+      mockBulkGet.mockImplementation(async (paths: string[]) => {
+        if (paths[0]?.includes("metadata/")) {
+          return paths.map((path: string) => {
+            const id = path.split("/").pop()?.split("?")[0];
+            return id === "obj-1"
+              ? {
+                  id,
+                  type: "metadata",
+                  dcType: "IMAGE",
+                  resourceExternalURL: "file:///mnt/images/external.jpg",
+                  originalFilename: `original-${id}.jpg`,
+                  derivatives: []
+                }
+              : {
+                  id,
+                  type: "metadata",
+                  fileIdentifier: `file-${id}`,
+                  dcType: "IMAGE",
+                  fileExtension: ".jpg",
+                  originalFilename: `original-${id}.jpg`,
+                  derivatives: []
+                };
+          });
+        }
+        return [];
+      });
+
+      const wrapper = mountWithAppContext(<ExportPage />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // Switch into "Object" mode.
+      await userEvent.click(wrapper.getByRole("radio", { name: /^objects/i }));
+      await waitForLoadingToDisappear();
+
+      // Select "originalFilename" as the alias field.
+      await userEvent.click(wrapper.getAllByRole("combobox")[0]);
+      await userEvent.click(await wrapper.findByText(/original filename/i));
+
+      await userEvent.click(
+        wrapper.getByRole("button", { name: "Export 2 Objects" })
+      );
+
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledWith(
+          [
+            {
+              resource: expect.objectContaining({
+                type: "object-export",
+                fileIdentifiers: ["obj-1", "file-obj-2"],
+                filenameAliases: {
+                  "obj-1": "original-obj-1.jpg",
+                  "file-obj-2": "original-obj-2.jpg"
+                }
+              }),
+              type: "object-export"
+            }
+          ],
+          { apiBaseUrl: "/objectstore-api" }
+        );
+      });
+    });
+
     it("Exports the selected Image Type derivative and shows it in the summary", async () => {
       mockBulkGet.mockImplementation(async (paths: string[]) => {
         if (paths[0]?.includes("metadata/")) {
