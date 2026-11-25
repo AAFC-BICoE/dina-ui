@@ -239,7 +239,7 @@ describe("buildHierarchyOption", () => {
       }),
       formatMessage
     );
-    expect(wide.height).toEqual(40 * 76);
+    expect(wide.height).toEqual(40 * 66);
   });
 
   it("Escapes HTML in the tooltip", () => {
@@ -280,6 +280,38 @@ describe("buildHierarchyOption", () => {
     render(5);
     // The root (+) disappears here while its children stay.
     expect(() => render(7)).not.toThrow();
+    chart.dispose();
+  });
+
+  it("Keeps a big last subtree below its childless siblings (bug 82813)", () => {
+    // Childless siblings, then a last child with many children: the tidy tree centred those beside the siblings.
+    const siblings = Array.from({ length: 9 }, (_v, i) => sample(`s${i}`));
+    const last = sample("last");
+    const grandchildren = Array.from({ length: 17 }, (_v, i) =>
+      sample(`g${i}`)
+    );
+    const { option, height } = buildHierarchyOption(
+      baseData({
+        children: { current: [...siblings, last], last: grandchildren }
+      }),
+      formatMessage
+    );
+    const chart = echarts.init(null as any, null as any, {
+      renderer: "svg",
+      ssr: true,
+      width: 2000,
+      height
+    });
+    chart.setOption(option as any);
+    const tree = (chart as any).getModel().getSeriesByIndex(0).getData().tree;
+    const y = (id: string) => tree.getNodeById(id).getLayout().y;
+
+    const lastSiblingY = y("s8");
+    expect(grandchildren.every((g) => y(g.id) > lastSiblingY)).toEqual(true);
+    // One row per leaf, parents centred on their children.
+    const rowHeight = y("s1") - y("s0");
+    expect(y("g0") - lastSiblingY).toBeCloseTo(rowHeight);
+    expect(y("last")).toBeCloseTo((y("g0") + y("g16")) / 2);
     chart.dispose();
   });
 });
