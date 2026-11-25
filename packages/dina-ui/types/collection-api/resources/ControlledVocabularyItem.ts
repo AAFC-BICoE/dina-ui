@@ -18,6 +18,7 @@ export interface ControlledVocabularyItemAttributes {
   createdOn?: string;
   createdBy?: string;
   uriTemplate?: string;
+  systemDefined?: boolean;
 }
 
 export interface ControlledVocabularyItemRelationships {

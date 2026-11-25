@@ -1,23 +1,22 @@
 import { DinaForm } from "common-ui";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { MdEdit } from "react-icons/md";
 import { ViewPageLayout } from "../../components";
 import {
   CONTROLLED_VOCABULARY_APIS,
-  ControlledVocabularyApi,
+  controlledVocabularyPageUrl,
+  getControlledVocabularyApi,
   transformControlledVocabularyItemForForm
 } from "../../components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 import { ControlledVocabularyItemFormLayout } from "./edit";
 
-export function ControlledVocabularyItemViewPage({
-  api = "collection"
-}: {
-  api?: ControlledVocabularyApi;
-}) {
-  const { apiPath, apiBaseUrl, entityLink, editRoute, listRoute } =
-    CONTROLLED_VOCABULARY_APIS[api];
+export default function ControlledVocabularyItemViewPage() {
+  const router = useRouter();
+  const api = getControlledVocabularyApi(router.query);
+  const { apiPath, apiBaseUrl, listRoute } = CONTROLLED_VOCABULARY_APIS[api];
 
   return (
     <ViewPageLayout<ControlledVocabularyItem>
@@ -37,16 +36,21 @@ export function ControlledVocabularyItemViewPage({
         path: `${apiPath}/controlled-vocabulary-item/${id}`,
         include: "controlledVocabulary"
       })}
-      entityLink={entityLink}
+      entityLink="/controlled-vocabulary-item"
       specialListUrl={listRoute}
       type="controlled-vocabulary-item"
       apiBaseUrl={apiBaseUrl}
       nameField="name"
       mainClass="container-fluid"
       showEditButton={true}
+      showDeleteButton={(item) => !item.systemDefined}
       editButton={({ initialValues }) => (
         <Link
-          href={`${editRoute}?id=${initialValues.id}`}
+          href={controlledVocabularyPageUrl(
+            "/controlled-vocabulary-item/edit",
+            api,
+            { id: initialValues.id }
+          )}
           className="btn btn-primary"
           style={{ paddingLeft: "15px", paddingRight: "15px" }}
         >
@@ -62,5 +66,3 @@ export function ControlledVocabularyItemViewPage({
     />
   );
 }
-
-export default ControlledVocabularyItemViewPage;

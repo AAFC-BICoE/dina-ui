@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { within } from "@testing-library/react";
+import { waitFor, within } from "@testing-library/react";
 import { mountWithAppContext } from "common-ui";
 import { useState } from "react";
 import {
@@ -153,6 +153,45 @@ describe("TypeFilterSideBarDynamic", () => {
       children: []
     });
     expect(wrapper.getByLabelText("Material Sample")).not.toBeChecked();
+  });
+
+  it("Links each type to its page and shows its description in a tooltip.", async () => {
+    const wrapper = mountWithAppContext(
+      <TypeFilterSideBarDynamic
+        parents={[
+          {
+            id: "ma",
+            label: "Managed Attribute",
+            count: 20,
+            href: "/controlled-vocabulary/view?id=ma",
+            description: "Attributes created by users on-demand."
+          }
+        ]}
+        selected={{ parent_cv_ids: [] }}
+        onChange={mockOnChange}
+      />
+    );
+
+    expect(
+      wrapper.getByRole("link", { name: "Managed Attribute" })
+    ).toHaveAttribute("href", "/controlled-vocabulary/view?id=ma");
+
+    await userEvent.hover(
+      wrapper.container.querySelector("#cv-type-filter .tooltip-info-icon")!
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tooltip", {
+          name: "Attributes created by users on-demand."
+        })
+      ).toBeInTheDocument()
+    );
+
+    // The "All Types" row has no link or tooltip.
+    expect(wrapper.getAllByRole("link")).toHaveLength(1);
+    expect(
+      wrapper.container.querySelectorAll("#cv-type-filter .tooltip-info-icon")
+    ).toHaveLength(1);
   });
 
   it("Hides the managed attributes section when no vocabulary has data components.", () => {
