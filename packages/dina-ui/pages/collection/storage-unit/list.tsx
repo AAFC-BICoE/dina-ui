@@ -107,6 +107,18 @@ export default function storageUnitListPage() {
           enableMultiSort: true
         }}
         enableRelationshipPresence={true}
+        dynamicFieldMapping={{
+          fields: [
+            {
+              type: "managedAttribute",
+              label: "managedAttributes",
+              component: "STORAGE_UNIT",
+              path: "data.attributes.managedAttributes",
+              apiEndpoint: "collection-api/controlled-vocabulary-item"
+            }
+          ],
+          relationshipFields: []
+        }}
         columns={columns}
         mandatoryDisplayedColumns={["name"]}
         bulkDeleteButtonProps={{
