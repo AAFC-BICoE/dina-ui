@@ -58,7 +58,6 @@ export * from "./managed-attributes/ManagedAttributesEditor";
 export * from "./page-layouts/ViewPageLayout";
 export * from "./assemblage/AssemblageSelectSection";
 export * from "./project/ProjectSelectSection";
-export * from "./transaction/TransactionMaterialDirectionSection";
 export * from "./resource-select-fields/resource-select-fields";
 export * from "./revision-by-user/CommonRevisionsByUserPage";
 export * from "./storage/BrowseStorageTree";

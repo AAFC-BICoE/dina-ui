@@ -919,6 +919,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   otherIdentifiers: "Weitere Identifikatoren",
   overwriteValues: "Inhalte überschreiben",
   parentCollectionLabel: "Ausgangssammlung",
+  parent: "Übergeordnet",
   parentMaterialSample: "Ausgangsprobe",
   "parentMaterialSample.materialSampleName": "Primär-ID",
   parentSampleNotFoundLabel: "Ausgangsprobe wurde nicht gefunden",

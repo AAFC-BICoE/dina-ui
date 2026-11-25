@@ -14,8 +14,7 @@ export interface LayoutToggleProps {
 /**
  * Pill-style toggle for switching between the classic and new home layouts,
  * placed beside the global search bar. Uses Bootstrap Button components
- * wrapped in the same card+pill visual style as the
- * TransactionMaterialDirectionSection. When the new layout is active and
+ * wrapped in the shared card+pill visual style. When the new layout is active and
  * customize props are provided, a gear icon appears to enter customize mode.
  *
  * Layout props are passed in from the parent page so that the toggle shares

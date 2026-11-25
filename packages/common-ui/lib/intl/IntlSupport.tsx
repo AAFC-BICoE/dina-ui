@@ -1,4 +1,8 @@
 import { useLocalStorage } from "@rehooks/local-storage";
+import moment from "moment";
+// Importing a locale file sets moment's global locale. The provider overrides it.
+// @ts-ignore: moment provides no types for locale files
+import "moment/locale/fr";
 import { createContext, useContext, useEffect, useMemo } from "react";
 import {
   FormattedMessage as ReactFormattedMessage,
@@ -41,6 +45,9 @@ export function getIntlSupport<TMessages extends MessageDictionary>({
   function IntlProvider({ children }: IntlProviderProps) {
     const [storedLocale, setLocale] = useLocalStorage("locale");
     const locale = storedLocale ?? "en";
+    // Set during render so children always see the current moment locale.
+    // Use English when moment hasn't loaded the locale:
+    moment.locale([locale, "en"]);
 
     useEffect(() => {
       // When the locale changes, update the html lang attribute:

@@ -1,0 +1,152 @@
+.placeholder {
+  padding: 28px 16px;
+  border: 1px dashed #ccc;
+  border-radius: 0.375rem;
+  text-align: center;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One row per action: date tile | details | buttons. */
+.action {
+  display: grid;
+  grid-template-columns: 76px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.action:first-child {
+  padding-top: 0;
+}
+
+.action:last-child {
+  border-bottom: 0;
+}
+
+.editing {
+  background: #fff8e1;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 76px;
+  border-radius: 0.375rem;
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.month {
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.day {
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+.details {
+  min-width: 0;
+  padding-top: 10px;
+}
+
+.type {
+  font-size: 1.0625rem;
+}
+
+.pill {
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.subline {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin-top: 0.25rem;
+  font-size: 0.9375rem;
+}
+
+/* Tile and pill colours. Always paired with text, never the only signal. */
+.navy {
+  background: rgba(51, 80, 117, 0.08);
+  color: #335075;
+}
+
+.green {
+  background: #d1e7dd;
+  color: #0a3622;
+}
+
+.red {
+  background: #f8d7da;
+  color: #842029;
+}
+
+.amber {
+  background: #fff3cd;
+  color: #664d03;
+}
+
+.blue {
+  background: #cfe2ff;
+  color: #052c65;
+}
+
+.gray {
+  background: #e9ecef;
+  color: #333;
+}
+
+.cancelled {
+  background: #e9ecef;
+  color: #6c757d;
+}
+
+.rowButton {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 0.375rem;
+  color: #fff;
+  font-size: 20px;
+}
+
+.edit {
+  background: #61a1fe;
+}
+
+.remove {
+  background: #e87c86;
+}
+
+.form {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  background: rgba(51, 80, 117, 0.04);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.submit:disabled {
+  opacity: 0.5;
+}

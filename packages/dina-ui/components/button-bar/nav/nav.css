@@ -4,7 +4,7 @@ body {
   background-color: #ffffff;
   color: #666666;
 }
-.dropdown:hover .dropdown-menu {
+.navbar .dropdown:hover .dropdown-menu {
   margin-top: -5px;
   z-index: 9000;
 }
