@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
@@ -127,19 +127,40 @@ export default function QueryRowManagedAttributeSearch({
     }
   }, [isMenuOpen]);
 
+  // The last value this component sent to the Query Builder.
+  const lastSentValue = useRef<string | undefined>(undefined);
+
   // Convert the state in this component to a value that can be stored in the Query Builder.
-  useEffect(() => {
-    if (setValue) {
-      setValue(JSON.stringify(managedAttributeState));
+  function sendToQueryBuilder(state: ManagedAttributeSearchStates) {
+    if (!setValue) {
+      return;
     }
+    const newValue = JSON.stringify(state);
+    if (newValue === value || newValue === lastSentValue.current) {
+      return;
+    }
+    lastSentValue.current = newValue;
+    setValue(newValue);
+  }
+
+  // Catches state changes not sent directly from an event handler (e.g. operator defaults, preload).
+  useEffect(() => {
+    sendToQueryBuilder(managedAttributeState);
   }, [managedAttributeState, setValue]);
 
   // Convert a value from Query Builder into the Managed Attribute State in this component.
   // Dependent on the managedAttributeConfig to indicate when it's changed.
   useEffect(() => {
-    if (value) {
-      setManagedAttributeState(JSON.parse(value));
+    if (!value) {
+      return;
     }
+
+    // Ignore our own update coming back from the Query Builder.
+    if (value === lastSentValue.current) {
+      return;
+    }
+
+    setManagedAttributeState(JSON.parse(value));
   }, [managedAttributeConfig, value]);
 
   // The search performed when loading the query URL could not include this managed attribute
@@ -258,11 +279,15 @@ export default function QueryRowManagedAttributeSearch({
     const commonProps = {
       matchType: operator,
       value: managedAttributeState.searchValue,
-      setValue: (userInput) =>
-        setManagedAttributeState({
+      setValue: (userInput) => {
+        const newState = {
           ...managedAttributeState,
           searchValue: userInput ?? ""
-        })
+        };
+        setManagedAttributeState(newState);
+        // Send right away instead of from an effect so fast typing doesn't chain effect updates.
+        sendToQueryBuilder(newState);
+      }
     };
 
     switch (type) {
