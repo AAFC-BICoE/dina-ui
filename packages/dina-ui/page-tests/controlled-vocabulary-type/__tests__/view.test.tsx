@@ -29,7 +29,10 @@ const TEST_ITEM = {
   dinaComponent: "PERSON"
 };
 
-function mountPage(permissions: string[], itemPermissions: string[] = []) {
+function mountPage(
+  permissions: string[],
+  itemPermissions: string[] | number = []
+) {
   const mockGet = jest.fn<any, any>(async (path: string) =>
     path === "agent-api/controlled-vocabulary/ma-id"
       ? { data: testVocabulary(permissions) }
@@ -37,9 +40,14 @@ function mountPage(permissions: string[], itemPermissions: string[] = []) {
       ? { data: [TEST_ITEM], meta: { totalResourceCount: 1 } }
       : { data: [] }
   );
-  const mockPost = jest.fn(async () => ({
-    data: { data: { attributes: { permissions: itemPermissions } } }
-  }));
+  const mockPost = jest.fn(async () => {
+    if (typeof itemPermissions === "number") {
+      throw { response: { status: itemPermissions } };
+    }
+    return {
+      data: { data: { attributes: { permissions: itemPermissions } } }
+    };
+  });
   const wrapper = mountWithAppContext(<ControlledVocabularyViewPage />, {
     apiContext: {
       apiClient: { get: mockGet, axios: { post: mockPost } } as any
@@ -107,6 +115,23 @@ describe("Controlled vocabulary view page", () => {
 
   it("Hides the Create Item button from users who can't create items.", async () => {
     const { wrapper } = mountPage(["update"], ["read"]);
+    await waitForLoadingToDisappear();
+
+    await wrapper.findByRole("link", { name: "Edit" });
+    expect(wrapper.queryByRole("link", { name: "Create Item" })).toBeNull();
+  });
+
+  it("Shows the Create Item button when the permission check is unavailable, since the API still checks on save.", async () => {
+    const { wrapper } = mountPage([], 500);
+    await waitForLoadingToDisappear();
+
+    expect(
+      await wrapper.findByRole("link", { name: "Create Item" })
+    ).toBeInTheDocument();
+  });
+
+  it("Hides the Create Item button when the permission check refuses the user.", async () => {
+    const { wrapper } = mountPage(["update"], 403);
     await waitForLoadingToDisappear();
 
     await wrapper.findByRole("link", { name: "Edit" });

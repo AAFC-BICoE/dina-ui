@@ -2,8 +2,10 @@ import ControlledVocabularyItemViewPage from "../../../pages/controlled-vocabula
 import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import "@testing-library/jest-dom";
 
+let mockQuery: Record<string, string> = { id: "item-1", api: "sequencing" };
+
 jest.mock("next/router", () => ({
-  useRouter: () => ({ query: { id: "item-1", api: "sequencing" } }),
+  useRouter: () => ({ query: mockQuery }),
   withRouter: (Component) => Component
 }));
 
@@ -20,10 +22,10 @@ const TEST_ITEM = {
   }
 };
 
-/** Item GET returning the given per-record permissions. */
-function mockGetWithPermissions(permissions: string[]) {
+/** Item GET from the given API returning the given per-record permissions. */
+function mockGetWithPermissions(permissions: string[], apiPath = "seqdb-api") {
   return jest.fn<any, any>(async (path: string) =>
-    path === "seqdb-api/controlled-vocabulary-item/item-1"
+    path === `${apiPath}/controlled-vocabulary-item/item-1`
       ? {
           data: {
             ...TEST_ITEM,
@@ -38,6 +40,10 @@ function mockGetWithPermissions(permissions: string[]) {
 }
 
 describe("Controlled vocabulary item view page", () => {
+  beforeEach(() => {
+    mockQuery = { id: "item-1", api: "sequencing" };
+  });
+
   it("Loads the item from the ?api= API and links to its edit page and list tab.", async () => {
     const mockGet = mockGetWithPermissions(["read", "update"]);
     const wrapper = mountWithAppContext(<ControlledVocabularyItemViewPage />, {
@@ -72,5 +78,29 @@ describe("Controlled vocabulary item view page", () => {
 
     expect(wrapper.getByText("seqdb_attribute")).toBeInTheDocument();
     expect(wrapper.queryByRole("link", { name: "Edit" })).toBeNull();
+  });
+
+  it("Loads the item from the collection API when ?api= is missing.", async () => {
+    mockQuery = { id: "item-1" };
+    const mockGet = mockGetWithPermissions(
+      ["read", "update"],
+      "collection-api"
+    );
+    const wrapper = mountWithAppContext(<ControlledVocabularyItemViewPage />, {
+      apiContext: { apiClient: { get: mockGet } as any }
+    });
+    await waitForLoadingToDisappear();
+
+    expect(mockGet).toHaveBeenCalledWith(
+      "collection-api/controlled-vocabulary-item/item-1",
+      expect.anything()
+    );
+    expect(wrapper.getByRole("link", { name: "Edit" })).toHaveAttribute(
+      "href",
+      "/controlled-vocabulary-item/edit?api=collection&id=item-1"
+    );
+    expect(
+      wrapper.getByRole("link", { name: /back to list/i })
+    ).toHaveAttribute("href", "/controlled-vocabulary/list");
   });
 });
