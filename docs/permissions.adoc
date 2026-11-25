@@ -1,0 +1,65 @@
+= Checking Permissions
+
+Some back-end APIs expose a `permission-check` endpoint (`POST /<api>/permission-check`) that tells the UI what the current user may do with a resource type. Not every API has it yet, so check that the API you need does before relying on it. Use it to hide or disable buttons the user can't use. The API still enforces permissions on every request, so the UI check only improves the experience.
+
+== useResourcePermissions
+
+`useResourcePermissions` (`packages/dina-ui/components/permissions/useResourcePermissions.ts`) wraps the endpoint. Pass the API base URL and the JSON:API type:
+
+[source,tsx]
+----
+const { canCreate, canEdit, canDelete, loading } = useResourcePermissions({
+  apiBaseUrl: "/collection-api",
+  typeName: "controlled-vocabulary-item"
+});
+
+return canCreate && <CreateButton entityLink="/controlled-vocabulary-item" />;
+----
+
+To check one specific group, such as the group of the record being shown, pass `group`:
+
+[source,tsx]
+----
+const { canEdit, canDelete } = useResourcePermissions({
+  apiBaseUrl: "/collection-api",
+  typeName: "project",
+  group: project.group
+});
+----
+
+[cols="1,3"]
+|===
+|Parameter |Description
+
+|`apiBaseUrl`
+|API that owns the resource, e.g. `/collection-api`.
+
+|`typeName`
+|JSON:API type of the resource, e.g. `controlled-vocabulary-item`.
+
+|`groupAttribute`
+|Optional. Attribute the API reads the group from. Defaults to `group`. Some APIs use another name (e.g. `bucket` for object store).
+
+|`group`
+|Optional. Only this group is checked. Without it, every group the user belongs to is checked. The group doesn't have to be one of the user's groups.
+|===
+
+How the result is decided:
+
+* Permissions depend on the group. With `group`, only that group is checked. Without it, the hook checks each group the user belongs to, and a permission is `true` when *any* group grants it.
+* The check runs again when `group` changes.
+* An `undefined` group means "no group given", so it falls back to all of the user's groups. When the group comes from data that is still loading, wait for it before relying on the result.
+* Everything is `false` while `loading` is `true`, so buttons stay hidden until the check completes.
+* Admins always get everything, without a request, even when `group` is given.
+* The result can also return an `error`: the first error received from a check, so the caller can show a message. It is `undefined` when every check succeeded.
+* A group whose check fails grants nothing, so when only some groups fail, the permissions come from the groups that were checked.
+* When the API refuses the user (401 or 403), everything is `false`.
+* When every check fails for another reason (for example the API has no `permission-check` endpoint), everything is `true` so buttons aren't hidden by mistake. The API still rejects anything the user isn't allowed to do.
+
+== Limits
+
+Without `group`, the hook answers "can the user do this in some group?". That fits a Create button on a list page, but not a decision about one record. Pass the record's `group` for that. Permissions can also depend on more than the group (for example who created the record). The hook only sends the group, so for a single record, prefer the other permission mechanisms:
+
+* *View pages*: `ViewPageLayout` reads `meta.permissions` returned with the resource (it sends the `include-dina-permission` header) and hides the edit and delete buttons itself.
+* *List page bulk actions*: `BulkActionsDropdown` checks the groups of the selected records.
+* *Permissions table*: `usePermissionsCheck` builds the user's permissions per resource for a chosen group.
