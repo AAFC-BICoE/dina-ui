@@ -19,6 +19,7 @@ export function ExistingObjectsAttacher({
       header: () => <FieldHeader name="filename" />,
       accessorKey: "data.attributes.filename",
       isKeyword: true,
+      isKeywordNumeric: true,
       id: "filename"
     },
     {
