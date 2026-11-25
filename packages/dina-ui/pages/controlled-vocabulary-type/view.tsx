@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { FaPlus } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
-import { ViewPageLayout } from "../../components";
+import { useResourcePermissions, ViewPageLayout } from "../../components";
 import {
   CV_FILTER_ATTRIBUTES,
   getControlledVocabularyItemColumns
@@ -30,6 +30,11 @@ export default function ControlledVocabularyViewPage() {
   const router = useRouter();
   const api = getControlledVocabularyApi(router.query);
   const { apiPath, apiBaseUrl, listRoute } = CONTROLLED_VOCABULARY_APIS[api];
+
+  const { canCreate: canCreateItem } = useResourcePermissions({
+    apiBaseUrl,
+    typeName: "controlled-vocabulary-item"
+  });
 
   return (
     <ViewPageLayout<ControlledVocabulary>
@@ -59,10 +64,8 @@ export default function ControlledVocabularyViewPage() {
       apiBaseUrl={apiBaseUrl}
       showDeleteButton={false}
       showGroup={false}
-      // Only shown to users who can edit the vocabulary.
-      editButton={({ initialValues }) => (
-        <>
-          {/* TODO: also require useResourcePermissions canCreate for "controlled-vocabulary-item" once PR #2012 is merged. */}
+      extraButtons={({ initialValues }) =>
+        canCreateItem && (
           <Link
             href={controlledVocabularyPageUrl(
               "/controlled-vocabulary-item/edit",
@@ -74,18 +77,21 @@ export default function ControlledVocabularyViewPage() {
             <FaPlus className="me-2" />
             <DinaMessage id="createItem" />
           </Link>
-          <Link
-            href={controlledVocabularyPageUrl(
-              "/controlled-vocabulary-type/edit",
-              api,
-              { id: initialValues.id }
-            )}
-            className="btn btn-primary"
-          >
-            <MdEdit className="me-2" />
-            <DinaMessage id="operation_edit" />
-          </Link>
-        </>
+        )
+      }
+      // Only shown to users who can edit the vocabulary.
+      editButton={({ initialValues }) => (
+        <Link
+          href={controlledVocabularyPageUrl(
+            "/controlled-vocabulary-type/edit",
+            api,
+            { id: initialValues.id }
+          )}
+          className="btn btn-primary"
+        >
+          <MdEdit className="me-2" />
+          <DinaMessage id="operation_edit" />
+        </Link>
       )}
     />
   );
