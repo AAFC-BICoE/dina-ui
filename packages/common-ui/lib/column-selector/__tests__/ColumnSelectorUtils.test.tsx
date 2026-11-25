@@ -637,6 +637,7 @@ describe("ColumnSelectorUtils", () => {
         cell: expect.anything(),
         header: expect.anything(),
         isKeyword: true,
+        isKeywordNumeric: false,
         isColumnVisible: true
       });
 
@@ -707,6 +708,7 @@ describe("ColumnSelectorUtils", () => {
         cell: expect.anything(),
         header: expect.anything(),
         isKeyword: false,
+        isKeywordNumeric: false,
         isColumnVisible: true
       });
 
