@@ -1231,7 +1231,7 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   text-align: center;
 }
 
-.dina-list-table .ReactTable tbody td > * {
+.dina-list-table .ReactTable tbody td > *:not(.spinner-border) {
   display: inline-block;
   min-width: var(--cell-block-min-width, 50%);
   text-align: left;
