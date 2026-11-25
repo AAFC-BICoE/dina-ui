@@ -23,12 +23,16 @@ const TEST_ITEM = {
 };
 
 /** Item GET from the given API returning the given per-record permissions. */
-function mockGetWithPermissions(permissions: string[], apiPath = "seqdb-api") {
+function mockGetWithPermissions(
+  permissions: string[],
+  apiPath = "seqdb-api",
+  item: Record<string, unknown> = TEST_ITEM
+) {
   return jest.fn<any, any>(async (path: string) =>
     path === `${apiPath}/controlled-vocabulary-item/item-1`
       ? {
           data: {
-            ...TEST_ITEM,
+            ...item,
             meta: {
               permissionsProvider: "SuperUserInGroupCUDAuthorizationService",
               permissions
@@ -102,5 +106,40 @@ describe("Controlled vocabulary item view page", () => {
     expect(
       wrapper.getByRole("link", { name: /back to list/i })
     ).toHaveAttribute("href", "/controlled-vocabulary/list");
+  });
+
+  it("Shows the Delete button to users who can delete the item.", async () => {
+    const wrapper = mountWithAppContext(<ControlledVocabularyItemViewPage />, {
+      apiContext: {
+        apiClient: {
+          get: mockGetWithPermissions(["read", "update", "delete"])
+        } as any
+      }
+    });
+    await waitForLoadingToDisappear();
+
+    expect(wrapper.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+  });
+
+  it("Hides the Delete button for system-defined items, even with delete permission.", async () => {
+    const wrapper = mountWithAppContext(<ControlledVocabularyItemViewPage />, {
+      apiContext: {
+        apiClient: {
+          get: mockGetWithPermissions(
+            ["read", "update", "delete"],
+            "seqdb-api",
+            {
+              ...TEST_ITEM,
+              systemDefined: true
+            }
+          )
+        } as any
+      }
+    });
+    await waitForLoadingToDisappear();
+
+    expect(wrapper.getByText("seqdb_attribute")).toBeInTheDocument();
+    expect(wrapper.queryByRole("button", { name: "Delete" })).toBeNull();
+    expect(wrapper.getByRole("link", { name: "Edit" })).toBeInTheDocument();
   });
 });

@@ -43,6 +43,7 @@ export default function ControlledVocabularyItemViewPage() {
       nameField="name"
       mainClass="container-fluid"
       showEditButton={true}
+      showDeleteButton={(item) => !item.systemDefined}
       editButton={({ initialValues }) => (
         <Link
           href={controlledVocabularyPageUrl(

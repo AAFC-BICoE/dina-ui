@@ -40,7 +40,7 @@ type ViewPageLayoutPropsBase<T extends KitsuResource> = {
   extraButtons?: (formProps: ResourceFormProps<T>) => ReactNode;
   deleteButton?: (formProps: ResourceFormProps<T>) => ReactNode;
   showEditButton?: boolean;
-  showDeleteButton?: boolean;
+  showDeleteButton?: boolean | ((resource: PersistedResource<T>) => boolean);
   showGroup?: boolean;
   showBackButton?: boolean;
   /** Show the link to the "revisions" page if there is one. */
@@ -248,7 +248,9 @@ function ViewPageLayoutInner<T extends KitsuResource>({
                     <DinaMessage id="revisionsButtonText" />
                   </Link>
                 )}
-                {showDeleteButton &&
+                {(typeof showDeleteButton === "function"
+                  ? showDeleteButton(resource)
+                  : showDeleteButton) &&
                   canDelete &&
                   (deleteButton ? (
                     deleteButton(formProps)
