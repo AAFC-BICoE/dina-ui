@@ -369,6 +369,7 @@ function getEntityColumn<TData extends KitsuResource>(
       header: () => <FieldHeader name={indexColumn?.label} />,
       accessorKey: indexColumn?.value,
       isKeyword: indexColumn?.keywordMultiFieldSupport,
+      isKeywordNumeric: indexColumn?.keywordNumericSupport,
       columnSelectorString: path,
       enableSorting: indexColumn?.value === "id" ? false : true
     };
@@ -407,6 +408,7 @@ export function getNestedColumn<TData extends KitsuResource>(
       ),
       accessorKey: accessorKeyElasticSearch,
       isKeyword: indexColumn.keywordMultiFieldSupport,
+      isKeywordNumeric: indexColumn.keywordNumericSupport,
       isColumnVisible: true,
       cell: ({ row: { original } }) => {
         let values: any[] = [original];

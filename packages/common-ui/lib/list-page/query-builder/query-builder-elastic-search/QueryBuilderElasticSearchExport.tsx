@@ -249,7 +249,9 @@ export function applySortingRules<TData extends KitsuResource>(
 
         const indexPath =
           accessor +
-          (columnDefinition.isKeyword && columnDefinition.isKeyword === true
+          (columnDefinition.isKeywordNumeric
+            ? ".keyword_numeric"
+            : columnDefinition.isKeyword && columnDefinition.isKeyword === true
             ? ".keyword"
             : "");
 
