@@ -9,6 +9,7 @@ import {
   SimpleSearchFilterBuilder,
   StringArrayField,
   TextField,
+  ToggleField,
   useAccount,
   useDinaFormContext,
   useQuery,
@@ -34,6 +35,7 @@ import {
   controlledVocabularyPageUrl,
   getControlledVocabularyApi,
   getInitialVocabularyElementType,
+  getNewItemPosition,
   multilingualFieldsForSave,
   transformControlledVocabularyItemForForm
 } from "../../components/controlled-vocabulary/controlledVocabularyItemUtils";
@@ -202,6 +204,22 @@ function ControlledVocabularyItemEditPageContent({
           submittedValues.uriTemplate = `${submittedValues.uriTemplate}$1`;
         }
 
+        return submittedValues;
+      },
+      // New items of an ordered vocabulary go last; Change Order reorders them.
+      async (submittedValues, { apiClient }) => {
+        const vocabularyId = submittedValues.controlledVocabulary?.id;
+        const position =
+          !fetchedItem && vocabularyId
+            ? await getNewItemPosition(
+                apiClient,
+                CONTROLLED_VOCABULARY_APIS[api].apiPath,
+                vocabularyId
+              )
+            : undefined;
+        if (position) {
+          submittedValues.position = position;
+        }
         return submittedValues;
       }
     ],
@@ -439,6 +457,13 @@ export function ControlledVocabularyItemFormLayout({
       </div>
       <MultilingualTitle />
       <MultilingualDescription />
+      <div className="row">
+        {readOnly && <ToggleField className="col-md-6" name="systemDefined" />}
+        {/* Only items of ordered vocabularies have one. */}
+        {initialValues?.position != null && (
+          <TextField className="col-md-6" name="position" disabled={true} />
+        )}
+      </div>
       {readOnly && (
         <div className="row">
           <DateField

@@ -142,6 +142,11 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cataloguedObjectListTitle: "Katalogisierte Objekte",
   cfiaPPCLevel: "CFIA PPC Level",
   changedProperties: "Änderungen",
+  changeOrder: "Reihenfolge ändern",
+  changeOrderInstructions:
+    "Ziehen Sie Elemente, um sie neu anzuordnen, oder wählen Sie ein Element aus und verwenden Sie die Pfeilschaltflächen. Die Reihenfolge wird für alle Benutzer dieses Vokabulars gespeichert.",
+  changeOrderNotEnoughItems:
+    "Zum Ändern der Reihenfolge werden mindestens zwei Elemente benötigt.",
   changingTheStorageUnitTypeWillDeleteWarning:
     "Änderung des Lagereinheitentyps löscht die bestehenden gespeicherten Koordinaten.",
   changingTheStorageUnitTypeWillDeleteWarningButtonText: "Fortfahren",
@@ -285,6 +290,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Verwenden Sie die Registerkarte, um zum Attribut zu navigieren, und drücken Sie dann die Leertaste, um es auszuwählen. Verwenden Sie die Pfeiltasten, um das Element zu verschieben, und drücken Sie dann die Leertaste, um es zu platzieren.",
   dragDropMouseInstructions:
     "Ziehen Sie das Attribut per Drag & Drop an seine neue Position.",
+  dragToReorder: "Zum Neuordnen ziehen",
   duplicate: "Duplikat",
   duplicateFilesFound: "doppelte Dateien gefunden",
   duplicatePersonFound:
@@ -545,6 +551,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_notPubliclyReleasableReason:
     "Grund, warum es nicht möglich ist, es öffentlich bekannt zu geben",
   field_openedDate: "Eröffnungsdatum",
+  field_ordered: "Geordnet",
   field_organismRemarks: "Organismus-Bemerkungen",
   field_organismsIndividualEntry: "Eintrag einzelner Organismen",
   field_organismsIndividualEntry_tooltip:
@@ -567,6 +574,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_personIdentifierTypeError: "Identifikatortyp ist erforderlich.",
   field_personIdentifierUniqueError: "Identifikatoren müssen eindeutig sein.",
   field_personIdentifierValueError: "Identifikatorwert ist erforderlich.",
+  field_position: "Position",
   field_preparationDate: "Datum der Aufbereitung",
   field_preparationFixative: "Fixativ der Aufbereitung",
   field_preparationFixative_tooltip:
@@ -623,6 +631,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Startzeitpunktformat muss ein Teilformat von YYYY-MM-DDTHH:MM:SS.MMM sein. Wenn ein Datum/Zeitwert vorhanden ist, ist „T“ erforderlich.",
   field_status: "Status",
   field_storageUnit: "Lagereinheit",
+  field_systemDefined: "Systemdefiniert",
   field_tags: "Schlagwörter",
   "field_targetIdentifiableEntitySummary.primaryDetermination.classification":
     "Klassifikation des Zielorganismus",
@@ -737,6 +746,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   isGeneric: "Generisch",
   isTargetHeader: "Ist Ziel?",
   isolation: "Isolation",
+  itemCount: "{count, plural, one {# Element} other {# Elemente}}",
   keepContentsTogether: "Inhalte zusammen halten",
   language: "Sprache",
   languageOfPage: "de",
@@ -875,6 +885,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   moveAllContent: "den gesamten Inhalt verschieben",
   moveAllContent_tooltip:
     "Alle Aufbewahrungseinheiten für Kinder und alle Materialproben werden in die neue Aufbewahrungseinheit verlegt.",
+  moveItemDown: "{name} nach unten verschieben",
+  moveItemUp: "{name} nach oben verschieben",
   multiple: "Mehrere",
   multipleMaterialSamples: "Mehrere Materialproben",
   multipleSamplesWellCoordinates:
@@ -886,6 +898,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Sie haben keine Dateien für die Massenbearbeitung hochgeladen. Gehen Sie zur Upload-Seite",
   noChildren: "keine Kindelemente",
   noDataComponent: "Keine Datenkomponente",
+  noDescription: "Keine Beschreibung",
   noFileToDisplay: "keine Datei zur Anzeige vorhanden",
   noGroups: "keine Gruppen",
   noManagedAttributeValues: "Keine Werte für Zusatzfelder vorhanden.",
@@ -1051,6 +1064,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   resetMetadataEditorAttributesButtonText:
     "Auf ursprüngliches Attributelayout zurücksetzen",
   resetNamesToDefaultValues: "Namen auf den ursprünglichen Inhalt zurücksetzen",
+  resetToOriginalOrder: "Ursprüngliche Reihenfolge wiederherstellen",
   resourceNotFoundWarning: "Ressource nicht gefunden",
   restricted: "Eingeschränkt",
   restrictions: "Einschränkungen",
@@ -1101,6 +1115,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   saveAsDefault: "als Default speichern",
   saveChanges: "Änderungen speichern …",
   saveGeoReferenceAssertion: "Geo-Referenz Erklärung speichern",
+  saveOrder: "Reihenfolge speichern",
   saveSearch: "Suche speichern",
   saveSearchInstruction:
     "Bitte tragen Sie einen Namen für Ihre Suche ein. Sie können diese Suche auch als default markieren",

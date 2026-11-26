@@ -5,6 +5,7 @@ import {
   MultilingualTitle,
   RefSubmitButton,
   TextField,
+  ToggleField,
   useDinaFormContext,
   useQuery,
   useSubmitHandler,
@@ -141,7 +142,8 @@ export function ControlledVocabularyFormLayout() {
           name="term"
           link={initialValues?.term ?? ""}
         />
-        {readOnly && <TextField className="col-md-6" name="version" />}
+        {/* Set when the vocabulary is created; the API doesn't allow changing it. */}
+        {readOnly && <ToggleField className="col-md-6" name="ordered" />}
       </div>
       <MultilingualTitle />
       <MultilingualDescription />

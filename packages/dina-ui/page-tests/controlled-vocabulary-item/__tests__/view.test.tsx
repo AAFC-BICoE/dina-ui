@@ -142,4 +142,33 @@ describe("Controlled vocabulary item view page", () => {
     expect(wrapper.queryByRole("button", { name: "Delete" })).toBeNull();
     expect(wrapper.getByRole("link", { name: "Edit" })).toBeInTheDocument();
   });
+
+  it("Shows the position only for items that have one.", async () => {
+    const wrapper = mountWithAppContext(<ControlledVocabularyItemViewPage />, {
+      apiContext: {
+        apiClient: {
+          get: mockGetWithPermissions(["read"], "seqdb-api", {
+            ...TEST_ITEM,
+            position: 3
+          })
+        } as any
+      }
+    });
+    await waitForLoadingToDisappear();
+    expect(wrapper.getByText("Position")).toBeInTheDocument();
+    expect(wrapper.getByText("3")).toBeInTheDocument();
+
+    wrapper.unmount();
+    const unordered = mountWithAppContext(
+      <ControlledVocabularyItemViewPage />,
+      {
+        apiContext: {
+          apiClient: { get: mockGetWithPermissions(["read"]) } as any
+        }
+      }
+    );
+    await waitForLoadingToDisappear();
+    expect(unordered.getAllByText("SeqDB attribute").length).toBeGreaterThan(0);
+    expect(unordered.queryByText("Position")).toBeNull();
+  });
 });

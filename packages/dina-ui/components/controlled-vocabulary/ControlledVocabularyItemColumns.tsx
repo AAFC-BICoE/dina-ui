@@ -1,4 +1,5 @@
 import {
+  booleanCell,
   ColumnDefinition,
   dateCell,
   descriptionCell,
@@ -75,9 +76,18 @@ function NameCell({
 
 export function getControlledVocabularyItemColumns(
   api: ControlledVocabularyApi,
-  componentLabel: (component: string) => string
+  componentLabel: (component: string) => string,
+  ordered = false
 ): ColumnDefinition<ControlledVocabularyItem>[] {
   return [
+    ...(ordered
+      ? [
+          {
+            accessorKey: "position",
+            header: () => <DinaMessage id="field_position" />
+          }
+        ]
+      : []),
     {
       accessorKey: "name",
       header: () => <DinaMessage id="field_name" />,
@@ -120,6 +130,7 @@ export function getControlledVocabularyItemColumns(
     },
     descriptionCell(false, false, "multilingualDescription"),
     groupCell("group"),
+    booleanCell("systemDefined"),
     {
       accessorKey: "createdBy",
       header: () => <DinaMessage id="field_createdBy" />

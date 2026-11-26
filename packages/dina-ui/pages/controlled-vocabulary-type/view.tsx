@@ -6,9 +6,11 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { useResourcePermissions, ViewPageLayout } from "../../components";
+import { ChangeOrderButton } from "../../components/controlled-vocabulary/ChangeOrderButton";
 import {
   CV_FILTER_ATTRIBUTES,
   getControlledVocabularyItemColumns
@@ -31,10 +33,11 @@ export default function ControlledVocabularyViewPage() {
   const api = getControlledVocabularyApi(router.query);
   const { apiPath, apiBaseUrl, listRoute } = CONTROLLED_VOCABULARY_APIS[api];
 
-  const { canCreate: canCreateItem } = useResourcePermissions({
-    apiBaseUrl,
-    typeName: "controlled-vocabulary-item"
-  });
+  const { canCreate: canCreateItem, canEdit: canEditItem } =
+    useResourcePermissions({
+      apiBaseUrl,
+      typeName: "controlled-vocabulary-item"
+    });
 
   return (
     <ViewPageLayout<ControlledVocabulary>
@@ -52,8 +55,9 @@ export default function ControlledVocabularyViewPage() {
             <ControlledVocabularyFormLayout />
           </DinaForm>
           <ControlledVocabularyItemsSection
-            vocabularyId={props.initialValues.id}
+            vocabulary={props.initialValues}
             api={api}
+            canEditItems={canEditItem}
           />
         </>
       )}
@@ -99,14 +103,18 @@ export default function ControlledVocabularyViewPage() {
 
 /** Table of the items in the vocabulary. */
 function ControlledVocabularyItemsSection({
-  vocabularyId,
-  api
+  vocabulary,
+  api,
+  canEditItems
 }: {
-  vocabularyId: string;
+  vocabulary: ControlledVocabulary;
   api: ControlledVocabularyApi;
+  canEditItems: boolean;
 }) {
   const { formatMessage } = useDinaIntl();
   const { apiBaseUrl, componentTypeLabels } = CONTROLLED_VOCABULARY_APIS[api];
+  const ordered = !!vocabulary.ordered;
+  const [reloadKey, setReloadKey] = useState(0);
 
   const componentLabel = (component: string) =>
     componentTypeLabels[component]
@@ -114,19 +122,45 @@ function ControlledVocabularyItemsSection({
       : component;
 
   return (
-    <FieldSet legend={<DinaMessage id="controlledVocabularyItemsTitle" />}>
+    <FieldSet
+      legend={<DinaMessage id="controlledVocabularyItemsTitle" />}
+      wrapLegend={(legend) => (
+        <div className="d-flex align-items-center justify-content-between">
+          {legend}
+          {ordered && canEditItems && (
+            <ChangeOrderButton
+              vocabularyId={String(vocabulary.id)}
+              vocabularyName={vocabulary.name}
+              apiBaseUrl={apiBaseUrl}
+              onSaved={() => setReloadKey((key) => key + 1)}
+            />
+          )}
+        </div>
+      )}
+    >
       <ListPageLayout<ControlledVocabularyItem>
-        id="controlled-vocabulary-items"
+        // The table's sort is saved per id, so ordered vocabularies keep their own (position by default).
+        id={
+          ordered
+            ? "controlled-vocabulary-ordered-items"
+            : "controlled-vocabulary-items"
+        }
         filterFormClassName={styles.cvItemsFilterPanel}
         filterType={ListLayoutFilterType.FREE_TEXT}
         filterAttributes={CV_FILTER_ATTRIBUTES}
         filterPlaceholder={formatMessage(
           "controlledVocabularySearchPlaceholder"
         )}
+        defaultSort={ordered ? [{ id: "position", desc: false }] : undefined}
         queryTableProps={{
-          columns: getControlledVocabularyItemColumns(api, componentLabel),
+          columns: getControlledVocabularyItemColumns(
+            api,
+            componentLabel,
+            ordered
+          ),
           path: `${apiBaseUrl}/controlled-vocabulary-item`,
-          filter: { "controlledVocabulary.uuid": { EQ: vocabularyId } }
+          filter: { "controlledVocabulary.uuid": { EQ: vocabulary.id } },
+          deps: [reloadKey]
         }}
       />
     </FieldSet>

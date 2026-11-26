@@ -9,6 +9,7 @@ export interface ControlledVocabularyAttributes {
   vocabClass?: string;
   term?: string;
   version?: string;
+  ordered?: boolean;
   multilingualTitle?: MultilingualTitle;
   multilingualDescription?: MultilingualDescription;
   vocabularyElementType?: string;

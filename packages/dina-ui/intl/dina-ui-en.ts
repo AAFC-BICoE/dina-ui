@@ -232,6 +232,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cataloguedObjectListTitle: "Catalogued Objects",
   cfiaPPCLevel: " CFIA PPC Level",
   changedProperties: "Changes",
+  changeOrder: "Change Order",
+  changeOrderInstructions:
+    "Drag items to reorder, or focus an item and use the arrow buttons. The order is saved for everyone using this vocabulary.",
+  changeOrderNotEnoughItems:
+    "At least two items are needed to change the order.",
   childCultureStrains: "Culture Strains",
   childMaterialSamples: "Direct Material Sample Children",
   childrenStorageUnits: "Children Storage Units",
@@ -385,6 +390,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dragDropKeyboardInstructions:
     "Tab to the attribute, then press space to select it. Use the arrow keys to move the item, then press space to place it.",
   dragDropMouseInstructions: "Drag and drop the attribute to its new position.",
+  dragToReorder: "Drag to reorder",
   duplicate: "Duplicate",
   duplicateFilesFound: "duplicate files found",
   duplicatePersonFound:
@@ -666,6 +672,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_multilingualTitle: "Multilingual Title",
   field_name: "Name",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
+  field_ordered: "Ordered",
   field_organismRemarks: "Organism Remarks",
   field_dwcVernacularName: "Vernacular Name",
   field_organismsIndividualEntry: "Individual Organism Entry",
@@ -690,6 +697,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_personIdentifierTypeError: "Identifier type is required.",
   field_personIdentifierValueError: "Identifier value is required.",
   field_personIdentifierUniqueError: "Identifiers must be unique.",
+  field_position: "Position",
   field_preparationDate: "Preparation Date",
   field_preparationFixative: "Preparation Fixative",
   field_preparationFixative_tooltip:
@@ -731,6 +739,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_startEventDateTime: "Start Event Date Time",
   field_startEventDateTime_tooltip:
     "Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
+  field_systemDefined: "System Defined",
   field_tags: "Tags",
   field_targetOrganismPrimaryScientificName:
     "Target Organism Primary Scientific Name",
@@ -881,6 +890,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Is the storage unit representing a generic instance of the storage unit type?",
   isTargetHeader: "Is Target ?",
   isolation: "Isolation",
+  itemCount: "{count, plural, one {# item} other {# items}}",
   keepContentsTogether: "Keep Contents Together",
   language: "Language",
   languageOfPage: "eng",
@@ -1007,6 +1017,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   moveAllContent: " Move All Content",
   moveAllContent_tooltip:
     "Move all child storage units and material samples to the new storage unit.",
+  moveItemDown: "Move {name} down",
+  moveItemUp: "Move {name} up",
   multiple: "Multiple",
   multipleMaterialSamples: "Multiple Material Samples",
   multipleUnits: "Multiple Units",
@@ -1017,6 +1029,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   myRoleInGroup: "My Role",
   noChildren: "No Children",
   noDataComponent: "No Data Component",
+  noDescription: "No description",
   noFileToDisplay: "No file to display",
   noFiltersAvailable: "No filters available",
   noGroups: "No Groups",
@@ -1181,6 +1194,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   requiredField: "Required field",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   resetNamesToDefaultValues: "Reset Names to Default Values",
+  resetToOriginalOrder: "Reset to original order",
   restricted: "Restricted",
   restrictions: "Restrictions",
   revisionsButtonText: "Revisions",
@@ -1225,6 +1239,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAsDefault: "Save as Default",
   saveChanges: "Save Changes...",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
+  saveOrder: "Save Order",
   saveSearch: "Save Search",
   saveSearchInstruction:
     "Enter a name for your search. You can also make this your default search.",

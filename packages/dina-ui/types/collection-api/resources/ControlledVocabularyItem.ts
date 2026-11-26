@@ -19,6 +19,8 @@ export interface ControlledVocabularyItemAttributes {
   createdBy?: string;
   uriTemplate?: string;
   systemDefined?: boolean;
+  /** 1-based position, set only when the vocabulary is ordered. */
+  position?: number;
 }
 
 export interface ControlledVocabularyItemRelationships {
