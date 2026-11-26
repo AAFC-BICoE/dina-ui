@@ -214,3 +214,31 @@ export function getInitialVocabularyElementType(
     ? "PICKLIST"
     : (item.vocabularyElementType as VocabularyElementType | undefined);
 }
+
+/**
+ * Position for a new item: after the last item of an ordered vocabulary, or undefined when the
+ * vocabulary isn't ordered (the API rejects positions there). Uses the highest position rather
+ * than the item count, since deleting items leaves gaps.
+ */
+export async function getNewItemPosition(
+  apiClient: { get: (path: string, params: any) => Promise<any> },
+  apiPath: string,
+  vocabularyId: string
+): Promise<number | undefined> {
+  const { data: vocabulary } = await apiClient.get(
+    `${apiPath}/controlled-vocabulary/${vocabularyId}`,
+    {}
+  );
+  if (!vocabulary?.ordered) {
+    return undefined;
+  }
+  const { data: lastItems } = await apiClient.get(
+    `${apiPath}/controlled-vocabulary-item`,
+    {
+      filter: { "controlledVocabulary.uuid": { EQ: vocabularyId } },
+      sort: "-position",
+      page: { limit: 1 }
+    }
+  );
+  return (lastItems?.[0]?.position ?? 0) + 1;
+}

@@ -1,6 +1,7 @@
 import {
   controlledVocabularyPageUrl,
   getControlledVocabularyApi,
+  getNewItemPosition,
   multilingualFieldsForForm,
   multilingualFieldsForSave,
   transformControlledVocabularyItemForForm
@@ -108,5 +109,52 @@ describe("controlledVocabularyItemUtils", () => {
         acceptedValues: []
       } as any).vocabularyElementType
     ).toEqual("STRING");
+  });
+
+  describe("getNewItemPosition", () => {
+    function mockApiClient(ordered: boolean, lastItems: any[]) {
+      return {
+        get: jest.fn(async (path: string) =>
+          path === "collection-api/controlled-vocabulary/vocab-1"
+            ? { data: { id: "vocab-1", ordered } }
+            : { data: lastItems }
+        )
+      };
+    }
+
+    it("Returns no position for an unordered vocabulary.", async () => {
+      const apiClient = mockApiClient(false, []);
+      expect(
+        await getNewItemPosition(apiClient, "collection-api", "vocab-1")
+      ).toBeUndefined();
+      // The items aren't queried.
+      expect(apiClient.get).toHaveBeenCalledTimes(1);
+    });
+
+    it("Puts the item after the highest position, even with gaps.", async () => {
+      // Positions 1, 2 and 4 after a delete: the item count (3) would collide.
+      const apiClient = mockApiClient(true, [{ id: "item-4", position: 4 }]);
+      expect(
+        await getNewItemPosition(apiClient, "collection-api", "vocab-1")
+      ).toEqual(5);
+      expect(apiClient.get).toHaveBeenLastCalledWith(
+        "collection-api/controlled-vocabulary-item",
+        {
+          filter: { "controlledVocabulary.uuid": { EQ: "vocab-1" } },
+          sort: "-position",
+          page: { limit: 1 }
+        }
+      );
+    });
+
+    it("Starts at 1 in an empty ordered vocabulary.", async () => {
+      expect(
+        await getNewItemPosition(
+          mockApiClient(true, []),
+          "collection-api",
+          "vocab-1"
+        )
+      ).toEqual(1);
+    });
   });
 });

@@ -1,4 +1,5 @@
 import {
+  booleanCell,
   ColumnDefinition,
   dateCell,
   descriptionCell,
@@ -48,10 +49,12 @@ function AcceptedValuesBadges({ values }: { values: string[] }) {
 /** Links the item by its title in the user's language, falling back to its name. */
 function NameCell({
   item,
-  api
+  api,
+  vocabularyId
 }: {
   item: ControlledVocabularyItem;
   api: ControlledVocabularyApi;
+  vocabularyId?: string;
 }) {
   const { locale } = useDinaIntl();
   const title = getPreferredMultilingualPair(
@@ -65,7 +68,9 @@ function NameCell({
       href={controlledVocabularyPageUrl(
         "/controlled-vocabulary-item/view",
         api,
-        { id: String(item.id) }
+        vocabularyId
+          ? { id: String(item.id), controlledVocabularyId: vocabularyId }
+          : { id: String(item.id) }
       )}
     >
       {title || item.name || item.id}
@@ -75,13 +80,25 @@ function NameCell({
 
 export function getControlledVocabularyItemColumns(
   api: ControlledVocabularyApi,
-  componentLabel: (component: string) => string
+  componentLabel: (component: string) => string,
+  ordered = false,
+  vocabularyId?: string
 ): ColumnDefinition<ControlledVocabularyItem>[] {
   return [
+    ...(ordered
+      ? [
+          {
+            accessorKey: "position",
+            header: () => <DinaMessage id="field_position" />
+          }
+        ]
+      : []),
     {
       accessorKey: "name",
       header: () => <DinaMessage id="field_name" />,
-      cell: ({ row: { original } }) => <NameCell item={original} api={api} />
+      cell: ({ row: { original } }) => (
+        <NameCell item={original} api={api} vocabularyId={vocabularyId} />
+      )
     },
     {
       accessorKey: "dinaComponent",
@@ -120,6 +137,7 @@ export function getControlledVocabularyItemColumns(
     },
     descriptionCell(false, false, "multilingualDescription"),
     groupCell("group"),
+    booleanCell("systemDefined"),
     {
       accessorKey: "createdBy",
       header: () => <DinaMessage id="field_createdBy" />

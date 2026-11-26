@@ -125,6 +125,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   attachments: "Pièces jointes",
   attributeLabel: "Attribut",
   auditSnapshot: "Aperçu de l'audit",
+  backToControlledVocabulary: "Retour au vocabulaire contrôlé",
   backToParentUnit: "Retour à l'unité parent",
   baseNameLabel: "Nom de base",
   batchModeInfo:
@@ -143,6 +144,15 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cataloguedObjectListTitle: "Objets catalogués",
   cfiaPPCLevel: "Niveau ACIA PPC",
   changedProperties: "Modifications",
+  changeOrder: "Modifier l'ordre",
+  changeOrderConflict:
+    "Quelqu'un d'autre a modifié l'ordre en même temps. Fermez et rouvrez Modifier l'ordre pour voir l'ordre le plus récent.",
+  changeOrderInstructions:
+    "Faites glisser les éléments pour les réordonner, ou sélectionnez un élément et utilisez les boutons fléchés. L'ordre est enregistré pour tous les utilisateurs de ce vocabulaire.",
+  changeOrderNotEnoughItems:
+    "Il faut au moins deux éléments pour modifier l'ordre.",
+  changeOrderNotPermitted:
+    "Vous n'avez pas la permission de modifier certains de ces éléments, l'ordre n'a donc pas été enregistré.",
   childCultureStrains: "Souches de culture",
   childMaterialSamples: "Échantillon de Matériel Direct Enfants",
   childrenStorageUnits: "Tables enfants des unités de stockage",
@@ -283,6 +293,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Utiliser le tabulateur pour accéder à l'attribut, puis appuyer sur la barre d'espacement pour le sélectionner. Utiliser les touches fléchées pour déplacer l'élément, puis appuyer sur la barre d'espacement pour le placer.",
   dragDropMouseInstructions:
     "Glisser et déposer l'attribut à sa nouvelle position.",
+  dragToReorder: "Glisser pour réordonner",
   duplicate: "Dupliquer",
   duplicateFilesFound: "fichiers en double trouvés",
   duplicatePersonFound:
@@ -505,6 +516,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_name: "Nom",
   field_notPubliclyReleasableReason:
     "Raison pour laquelle il n’est pas possible de le divulguer publiquement",
+  field_ordered: "Ordonné",
   field_organismRemarks: "Organisme Remarques",
   field_organismsIndividualEntry: "Entrée d'un organisme individuel",
   field_organismsIndividualEntry_tooltip:
@@ -523,6 +535,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Autres numéros ou identifiants associés à l’événement de collecte qui permettent de le distinguer. N’incluez PAS les identifiants basés sur les spécimens, tels que les numéros d’accession.",
   field_parentStorageUnit: "Emplacement",
   field_path: "Chemin",
+  field_position: "Position",
   field_preparationDate: "Date de la préparation",
   field_preparationFixative: "Solution de fixation de la préparation",
   field_preparationFixative_tooltip:
@@ -559,6 +572,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_startEventDateTime: "Date et heure de l'événement initial",
   field_startEventDateTime_tooltip:
     "Le format de date/heure du début de l’événement doit être un sous-ensemble de : AAAA-MM-JJTHH:MM:SS.MMM, si la date est présente, 'T’ est obligatoire",
+  field_systemDefined: "Défini par le système",
   field_tags: "Étiquettes",
   field_targetOrganismPrimaryGeoShape:
     "Géomorphologie primaire de l'organisme cible",
@@ -679,6 +693,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   isFiledAs: "Classé en tant que",
   isTargetHeader: "Est-ce ciblé?",
   isolation: "Isolation",
+  itemCount: "{count, plural, one {# élément} other {# éléments}}",
   keepContentsTogether: "Ne pas séparer le contenu",
   languageOfPage: "fra",
   largeImg: "Grande image",
@@ -775,6 +790,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   moveAllContent: "Déplacer tout le contenu",
   moveAllContent_tooltip:
     "Transférez tous les articles de rangement pour enfants et les échantillons dans le nouvel espace de rangement",
+  moveItemDown: "Descendre {name}",
+  moveItemUp: "Monter {name}",
   multiple: "Multiple",
   multipleMaterialSamples: "Échantillons à matériel multiple",
   multipleUnits: "Multiples unités",
@@ -783,6 +800,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   myRoleInGroup: "Mon rôle",
   noChildren: "Aucune table enfant",
   noDataComponent: "Aucun composant de données",
+  noDescription: "Aucune description",
   noFileToDisplay: "Aucun fichier à afficher",
   noFiltersAvailable: "Aucun filtre disponible",
   noGroups: "Aucun groupe",
@@ -904,6 +922,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   resetMetadataEditorAttributesButtonText:
     "Réinitialiser à la disposition initiale des attributs",
   resetNamesToDefaultValues: "Réinitialiser les noms aux valeurs par défaut",
+  resetToOriginalOrder: "Rétablir l'ordre d'origine",
   restricted: "Avec restriction",
   restrictions: "Restrictions",
   revisionsButtonText: "Révisions",
@@ -932,6 +951,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   saveAsDefault: "Enregistrer comme valeur par défaut",
   saveChanges: "Enregistrer les modifications",
   saveGeoReferenceAssertion: "Sauvegarder l’assertion de géoréférence",
+  saveOrder: "Enregistrer l'ordre",
   saveSearch: "Enregistrer la recherche",
   saveSearchInstruction:
     "Entrez un nom pour la recherche. Vous pouvez également faire de cette recherche votre recherche par défaut.",
