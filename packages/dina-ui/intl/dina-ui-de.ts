@@ -101,6 +101,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   attributeLabel: "Attribut",
   auditSnapshot: "Audit-Schnappschuss",
   autoSelectButtonTitle: "Automatisch auswählen",
+  backToControlledVocabulary: "Zurück zum kontrollierten Vokabular",
   backToParentUnit: "Zurück zur Vorfahren",
   backToUpload: "Zurück zum Upload",
   backToUploadWorkbook: "Zurück zum Upload-Arbeitsbuch",

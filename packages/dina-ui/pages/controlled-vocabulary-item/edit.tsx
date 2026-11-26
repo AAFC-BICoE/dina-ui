@@ -386,6 +386,7 @@ export function ControlledVocabularyItemFormLayout({
           optionLabel={(cv) => cv.name}
           omitNullOption={true}
           requiredField={true}
+          isDisabled={isEditMode}
         />
         <SelectField
           className="col-md-6"

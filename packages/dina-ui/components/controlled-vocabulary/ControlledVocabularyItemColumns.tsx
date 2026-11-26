@@ -49,10 +49,12 @@ function AcceptedValuesBadges({ values }: { values: string[] }) {
 /** Links the item by its title in the user's language, falling back to its name. */
 function NameCell({
   item,
-  api
+  api,
+  vocabularyId
 }: {
   item: ControlledVocabularyItem;
   api: ControlledVocabularyApi;
+  vocabularyId?: string;
 }) {
   const { locale } = useDinaIntl();
   const title = getPreferredMultilingualPair(
@@ -66,7 +68,9 @@ function NameCell({
       href={controlledVocabularyPageUrl(
         "/controlled-vocabulary-item/view",
         api,
-        { id: String(item.id) }
+        vocabularyId
+          ? { id: String(item.id), controlledVocabularyId: vocabularyId }
+          : { id: String(item.id) }
       )}
     >
       {title || item.name || item.id}
@@ -77,7 +81,8 @@ function NameCell({
 export function getControlledVocabularyItemColumns(
   api: ControlledVocabularyApi,
   componentLabel: (component: string) => string,
-  ordered = false
+  ordered = false,
+  vocabularyId?: string
 ): ColumnDefinition<ControlledVocabularyItem>[] {
   return [
     ...(ordered
@@ -91,7 +96,9 @@ export function getControlledVocabularyItemColumns(
     {
       accessorKey: "name",
       header: () => <DinaMessage id="field_name" />,
-      cell: ({ row: { original } }) => <NameCell item={original} api={api} />
+      cell: ({ row: { original } }) => (
+        <NameCell item={original} api={api} vocabularyId={vocabularyId} />
+      )
     },
     {
       accessorKey: "dinaComponent",

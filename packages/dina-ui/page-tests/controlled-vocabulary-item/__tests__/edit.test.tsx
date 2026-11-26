@@ -97,6 +97,9 @@ describe("Controlled vocabulary item edit page", () => {
     );
     // The vocabulary is selected by default.
     expect(wrapper.getByText("Managed Attribute")).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("combobox", { name: /controlled vocabulary/i })
+    ).toBeEnabled();
 
     await selectOption(
       wrapper.getByRole("combobox", { name: /target data component type/i }),
@@ -187,6 +190,12 @@ describe("Controlled vocabulary item edit page", () => {
       "agent-api/controlled-vocabulary/ma-id",
       expect.anything()
     );
+    // An existing item can't move to another vocabulary.
+    // A disabled react-select input has no accessible name, so find it by the selected vocabulary.
+    const vocabularyField = (
+      await wrapper.findByText("Managed Attribute")
+    ).closest("label");
+    expect(vocabularyField?.querySelector("input")).toBeDisabled();
     expect(
       wrapper.getByRole("link", { name: /back to read-only page/i })
     ).toHaveAttribute(

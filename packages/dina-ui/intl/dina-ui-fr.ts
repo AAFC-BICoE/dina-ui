@@ -125,6 +125,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   attachments: "Pièces jointes",
   attributeLabel: "Attribut",
   auditSnapshot: "Aperçu de l'audit",
+  backToControlledVocabulary: "Retour au vocabulaire contrôlé",
   backToParentUnit: "Retour à l'unité parent",
   baseNameLabel: "Nom de base",
   batchModeInfo:

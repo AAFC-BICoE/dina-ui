@@ -72,6 +72,27 @@ describe("Controlled vocabulary item view page", () => {
     ).toHaveAttribute("href", "/controlled-vocabulary/list?tab=2");
   });
 
+  it("Links back to the vocabulary the item was opened from.", async () => {
+    mockQuery = {
+      id: "item-1",
+      api: "sequencing",
+      controlledVocabularyId: "ma-id"
+    };
+    const wrapper = mountWithAppContext(<ControlledVocabularyItemViewPage />, {
+      apiContext: {
+        apiClient: { get: mockGetWithPermissions(["read"]) } as any
+      }
+    });
+    await waitForLoadingToDisappear();
+
+    expect(
+      wrapper.getByRole("link", { name: "Back to controlled vocabulary" })
+    ).toHaveAttribute(
+      "href",
+      "/controlled-vocabulary-type/view?api=sequencing&id=ma-id"
+    );
+  });
+
   it("Hides the Edit button from users who can't update the item.", async () => {
     const wrapper = mountWithAppContext(<ControlledVocabularyItemViewPage />, {
       apiContext: {

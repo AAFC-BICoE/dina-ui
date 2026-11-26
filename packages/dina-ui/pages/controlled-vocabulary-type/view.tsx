@@ -156,7 +156,8 @@ function ControlledVocabularyItemsSection({
           columns: getControlledVocabularyItemColumns(
             api,
             componentLabel,
-            ordered
+            ordered,
+            String(vocabulary.id)
           ),
           path: `${apiBaseUrl}/controlled-vocabulary-item`,
           filter: { "controlledVocabulary.uuid": { EQ: vocabulary.id } },

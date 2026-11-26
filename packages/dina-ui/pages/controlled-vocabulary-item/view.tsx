@@ -17,6 +17,13 @@ export default function ControlledVocabularyItemViewPage() {
   const router = useRouter();
   const api = getControlledVocabularyApi(router.query);
   const { apiPath, apiBaseUrl, listRoute } = CONTROLLED_VOCABULARY_APIS[api];
+  // Set when the item was opened from its vocabulary's page instead of the main list.
+  const vocabularyId = router.query.controlledVocabularyId?.toString();
+  const backUrl = vocabularyId
+    ? controlledVocabularyPageUrl("/controlled-vocabulary-type/view", api, {
+        id: vocabularyId
+      })
+    : listRoute;
 
   return (
     <ViewPageLayout<ControlledVocabularyItem>
@@ -59,8 +66,10 @@ export default function ControlledVocabularyItemViewPage() {
         </Link>
       )}
       backButton={
-        <Link href={listRoute} className="back-button my-auto me-auto">
-          <DinaMessage id="backToList" />
+        <Link href={backUrl} className="back-button my-auto me-auto">
+          <DinaMessage
+            id={vocabularyId ? "backToControlledVocabulary" : "backToList"}
+          />
         </Link>
       }
     />

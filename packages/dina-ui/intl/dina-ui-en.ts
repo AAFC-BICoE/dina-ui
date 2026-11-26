@@ -192,6 +192,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachments: "Attachments",
   attributeLabel: "Attribute",
   auditSnapshot: "Audit Snapshot",
+  backToControlledVocabulary: "Back to controlled vocabulary",
   backToParentUnit: "Back To Parent Unit",
   baseNameLabel: "Base Name",
   batchModeInfo: "Batch Mode: All Material Samples have the same ID.",

@@ -103,7 +103,7 @@ describe("Controlled vocabulary view page", () => {
       await wrapper.findByRole("link", { name: "Agent attribute" })
     ).toHaveAttribute(
       "href",
-      "/controlled-vocabulary-item/view?api=agent&id=item-1"
+      "/controlled-vocabulary-item/view?api=agent&id=item-1&controlledVocabularyId=ma-id"
     );
   });
 
