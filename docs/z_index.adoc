@@ -1,0 +1,81 @@
+= Z-Index Layers
+
+All global stacking values live in one place so dropdowns, modals, tooltips and toasts layer the same way across the site. Don't hard-code a large `z-index` number. Use one of the layers below.
+
+* React/TypeScript: `Z_INDEX` in `packages/common-ui/lib/z-index/zIndex.ts` (exported from `common-ui`). This file is the source of truth.
+* CSS: `--dina-z-*` variables in `packages/common-ui/lib/z-index/z-index.css` (loaded globally in `packages/dina-ui/pages/_app.tsx`).
+
+== Layers
+
+Lowest to highest:
+
+[cols="1,1,1,3"]
+|===
+|`Z_INDEX` key |CSS variable |Value |Used for
+
+|`sticky` |`--dina-z-sticky` |100 |Sticky bars and columns inside page content.
+|`dropdown` |`--dina-z-dropdown` |1000 |Dropdown menus in page content (react-select `menu`/`menuPortal`, Bootstrap dropdowns, date pickers). Below the sticky nav and button bar so menus scroll under them.
+|`stickyNav` |`--dina-z-sticky-nav` |1030 |Sticky section navigation (e.g. material sample form nav).
+|`buttonBar` |`--dina-z-button-bar` |1045 |Sticky top button bar.
+|`header` |`--dina-z-header` |1046 |Site header, so its nav, notification and user menus drop over the button bar.
+|`overlay` |`--dina-z-overlay` |1050 |Full-screen overlays (full-screen table, full-screen loading).
+|`dragging` |`--dina-z-dragging` |1100 |Item being dragged.
+|`modal` |`--dina-z-modal` |3000 |Modal dialogs.
+|`tooltip` |`--dina-z-tooltip` |9100 |Tooltips and popovers, including tooltips on dropdown options.
+|`toast` |`--dina-z-toast` |10000 |Toast notifications. Sits above everything.
+|===
+
+Small literal values (`-1` to `20`) are still fine for stacking elements *within a single component*. Use the layers for anything that has to stack against other parts of the page.
+
+== Using it in React
+
+Import `Z_INDEX` from `common-ui` (or relatively from `../z-index/zIndex` inside `common-ui` itself):
+
+[source,tsx]
+----
+import { Z_INDEX } from "common-ui";
+
+<div style={{ position: "sticky", top: 0, zIndex: Z_INDEX.sticky }}>...</div>
+----
+
+For react-select, set both `menu` and `menuPortal` so the menu is correct whether or not it is portalled.
+A menu inside a modal or the sticky button bar stacks within it, so it still paints above that element.
+A menu portalled to `<body>` is raised above the modal or full-screen table automatically while one is open (see `common-ui-style.scss`):
+
+[source,tsx]
+----
+<Select
+  styles={{
+    menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
+    menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+  }}
+/>
+----
+
+== Using it in CSS / SCSS
+
+Reference the CSS variable:
+
+[source,css]
+----
+.my-floating-menu {
+  z-index: var(--dina-z-dropdown);
+}
+----
+
+To sit just above (or below) a layer, offset it with `calc` instead of picking a new number:
+
+[source,css]
+----
+.my-element {
+  z-index: calc(var(--dina-z-sticky-nav) + 1);
+}
+----
+
+== Adding or changing a layer
+
+1. Update `Z_INDEX` in `zIndex.ts`. Keep the keys in order, lowest to highest, with a short comment.
+2. Add the matching variable to `z-index.css`. The name is the key in kebab-case with a `--dina-z-` prefix (`stickyNav` -> `--dina-z-sticky-nav`).
+3. Update this documentation to reflect the new or changed layer.
+4. Run `packages/common-ui/lib/z-index/__tests__/zIndex.test.ts`. It fails if the TypeScript constants and CSS variables are out of sync.
+5. Update the table above.

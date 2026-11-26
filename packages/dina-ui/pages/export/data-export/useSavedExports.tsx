@@ -19,6 +19,7 @@ import {
   convertColumnsToPaths,
   getColumnFunctions
 } from "common-ui/lib/column-selector/ColumnSelectorUtils";
+import { Z_INDEX } from "common-ui";
 
 export const VISIBILITY_OPTIONS: {
   label: React.JSX.Element;
@@ -503,6 +504,7 @@ export default function useSavedExports<TData extends KitsuResource>({
               publiclyReleasable: boolean;
             };
           }>
+            styles={{ menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }) }}
             className="mt-2 mb-3"
             name="visibility"
             options={VISIBILITY_OPTIONS}

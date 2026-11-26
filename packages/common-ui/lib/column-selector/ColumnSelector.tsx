@@ -13,6 +13,7 @@ import { ColumnSelectorList } from "./ColumnSelectorList";
 import { generateColumnDefinition } from "./ColumnSelectorUtils";
 import { DataExportTemplate } from "@dina-ui/types/dina-export-api";
 import { FaColumns } from "react-icons/fa";
+import { Z_INDEX } from "../z-index/zIndex";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
 
@@ -425,7 +426,7 @@ export function ColumnSelector<TData extends KitsuResource>(
             overflowY: "scroll",
             width: "25rem",
             padding: "1.25rem 1.25rem 1.25rem 1.25rem",
-            zIndex: 9000
+            zIndex: Z_INDEX.dropdown
           }}
         >
           <ColumnSelectorList

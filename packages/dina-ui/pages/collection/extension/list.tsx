@@ -1,6 +1,12 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { ColumnDef } from "@tanstack/react-table";
-import { FieldHeader, ReactTable, descriptionCell, useQuery } from "common-ui";
+import {
+  FieldHeader,
+  ReactTable,
+  descriptionCell,
+  useQuery,
+  Z_INDEX
+} from "common-ui";
 import { FreeTextFilterForm } from "packages/common-ui/lib/list-page-layout/FreeTextFilterForm";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import Select from "react-select";
@@ -115,7 +121,7 @@ export default function FieldListPage() {
             options={extensionOptions}
             onChange={onExtensionSelectionChanged}
             defaultValue={extensionOptions?.[0]}
-            styles={{ menu: (base) => ({ ...base, zIndex: 9999 }) }}
+            styles={{ menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }) }}
           />
         </div>
         <div className="mt-3">

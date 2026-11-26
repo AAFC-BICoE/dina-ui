@@ -1,3 +1,4 @@
+import { Z_INDEX } from "common-ui";
 import { useFormikContext } from "formik";
 import _ from "lodash";
 import { useMemo } from "react";
@@ -53,8 +54,8 @@ export function WorkbookFieldSelectField({
         ...provided,
         color: "#5c5c5c"
       }),
-      menu: (base) => ({ ...base, zIndex: 1050 }),
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
+      menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
       control: (base) => ({
         ...base
       }),
@@ -140,7 +141,9 @@ export function WorkbookFieldSelectField({
               selectProps={{
                 className: "ms-2",
                 menuPortalTarget: document.body,
-                styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+                styles: {
+                  menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+                }
               }}
               filter={(input: string) =>
                 SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
@@ -190,7 +193,9 @@ export function WorkbookFieldSelectField({
               selectProps={{
                 className: "ms-2",
                 menuPortalTarget: document.body,
-                styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+                styles: {
+                  menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+                }
               }}
               filter={(input: string) =>
                 SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
@@ -242,7 +247,9 @@ export function WorkbookFieldSelectField({
             selectProps={{
               className: "flex-fill ms-2",
               menuPortalTarget: document.body,
-              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+              styles: {
+                menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+              }
             }}
             filter={(input: string) =>
               SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
@@ -271,7 +278,9 @@ export function WorkbookFieldSelectField({
             selectProps={{
               className: "flex-fill ms-2",
               menuPortalTarget: document.body,
-              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+              styles: {
+                menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+              }
             }}
             filter={(input: string) =>
               SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
@@ -299,7 +308,9 @@ export function WorkbookFieldSelectField({
             selectProps={{
               className: "flex-fill ms-2",
               menuPortalTarget: document.body,
-              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+              styles: {
+                menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+              }
             }}
             filter={(input: string) =>
               SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
@@ -328,7 +339,9 @@ export function WorkbookFieldSelectField({
             selectProps={{
               className: "flex-fill ms-2",
               menuPortalTarget: document.body,
-              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+              styles: {
+                menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+              }
             }}
             filter={(input: string) =>
               SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
@@ -357,7 +370,9 @@ export function WorkbookFieldSelectField({
             selectProps={{
               className: "ms-2",
               menuPortalTarget: document.body,
-              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+              styles: {
+                menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+              }
             }}
           />
         </div>
@@ -372,7 +387,9 @@ export function WorkbookFieldSelectField({
             selectProps={{
               className: "ms-2",
               menuPortalTarget: document.body,
-              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+              styles: {
+                menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+              }
             }}
             model="collection-api/controlled-vocabulary-item"
             filter={(input: string) =>

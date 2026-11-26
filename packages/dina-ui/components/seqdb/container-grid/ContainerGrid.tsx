@@ -1,3 +1,4 @@
+import { Z_INDEX } from "common-ui";
 import { ColumnDef } from "@tanstack/react-table";
 import RcTooltip from "rc-tooltip";
 import { useEffect, useMemo, useState } from "react";
@@ -73,7 +74,7 @@ export function ContainerGrid<
           left: 0,
           background: "white",
           boxShadow: "7px 0px 9px 0px rgba(0,0,0,0.1)",
-          zIndex: 500
+          zIndex: Z_INDEX.sticky
         }
       }
     });
@@ -157,6 +158,7 @@ function GridCell<ItemType extends { sampleName?: string }>({
 
   return (
     <RcTooltip
+      zIndex={Z_INDEX.tooltip}
       placement="top"
       trigger={"hover"}
       visible={(dragHover || hover) && batchItemSample === undefined}

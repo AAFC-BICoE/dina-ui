@@ -16,6 +16,7 @@ import QueryBuilderDateSearch, {
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryRowTextSearchProps {
   /**
@@ -286,9 +287,10 @@ export default function QueryRowFieldExtensionSearch({
             }
             menuPortalTarget={document.body}
             styles={{
+              menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
               menu: (base) => ({
                 ...base,
-                zIndex: 9999
+                zIndex: Z_INDEX.dropdown
               })
             }}
           />
@@ -313,7 +315,7 @@ export default function QueryRowFieldExtensionSearch({
             styles={{
               menu: (base) => ({
                 ...base,
-                zIndex: 9999
+                zIndex: Z_INDEX.dropdown
               })
             }}
           />
@@ -362,9 +364,10 @@ export default function QueryRowFieldExtensionSearch({
         minMenuHeight={600}
         menuPortalTarget={document.body}
         styles={{
+          menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
           menu: (base) => ({
             ...base,
-            zIndex: 9999
+            zIndex: Z_INDEX.dropdown
           })
         }}
       />
@@ -387,9 +390,10 @@ export default function QueryRowFieldExtensionSearch({
             }
             menuPortalTarget={document.body}
             styles={{
+              menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
               menu: (base) => ({
                 ...base,
-                zIndex: 9999
+                zIndex: Z_INDEX.dropdown
               })
             }}
             onInputChange={(inputValue) => setFieldSearchValue(inputValue)}
@@ -423,9 +427,10 @@ export default function QueryRowFieldExtensionSearch({
             minMenuHeight={600}
             menuPortalTarget={document.body}
             styles={{
+              menuPortal: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
               menu: (base) => ({
                 ...base,
-                zIndex: 9999
+                zIndex: Z_INDEX.dropdown
               })
             }}
           />

@@ -38,7 +38,7 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 9500;
+  z-index: var(--dina-z-dropdown);
   margin-top: 4px; /* Slight gap below the button */
 }
 
@@ -52,7 +52,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  z-index: 9500;
+  z-index: var(--dina-z-dropdown);
 }
 
 .settings-dropdown-item:hover {

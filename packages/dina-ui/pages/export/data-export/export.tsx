@@ -18,7 +18,8 @@ import {
   SubmitButton,
   TextField,
   Tooltip,
-  useApiClient
+  useApiClient,
+  Z_INDEX
 } from "common-ui";
 import {
   convertColumnsToAliases,
@@ -603,6 +604,7 @@ export default function ExportPage<TData extends KitsuResource>() {
             </strong>
           </label>
           <Select<{ value: ColumnSeparator; label: string }>
+            styles={{ menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }) }}
             name="separator"
             options={SEPARATOR_OPTIONS}
             onChange={(selection) => {
@@ -626,6 +628,9 @@ export default function ExportPage<TData extends KitsuResource>() {
           </label>
           <div className="d-flex gap-2">
             <Select<SavedExportOption>
+              styles={{
+                menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+              }}
               className="flex-grow-1"
               name="savedExportOption"
               options={savedExportOptions}
@@ -676,6 +681,9 @@ export default function ExportPage<TData extends KitsuResource>() {
                 publiclyReleasable: boolean;
               };
             }>
+              styles={{
+                menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
+              }}
               name="visibility"
               options={VISIBILITY_OPTIONS}
               onChange={(selected) => {
@@ -985,6 +993,12 @@ export default function ExportPage<TData extends KitsuResource>() {
                         <Tooltip id="exportImageTypeTooltip" className="ms-2" />
                       </label>
                       <Select<{ value: ExportImageType; label: string }>
+                        styles={{
+                          menu: (base) => ({
+                            ...base,
+                            zIndex: Z_INDEX.dropdown
+                          })
+                        }}
                         name="imageType"
                         options={imageTypeOptions}
                         onChange={(selection) => {
@@ -1016,6 +1030,12 @@ export default function ExportPage<TData extends KitsuResource>() {
                         />
                       </label>
                       <Select
+                        styles={{
+                          menu: (base) => ({
+                            ...base,
+                            zIndex: Z_INDEX.dropdown
+                          })
+                        }}
                         name="resizePercentage"
                         options={RESIZE_OPTIONS}
                         onChange={(selection) => {

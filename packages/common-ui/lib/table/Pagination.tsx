@@ -11,6 +11,7 @@ import {
   FaAngleRight
 } from "react-icons/fa";
 import classNames from "classnames";
+import { Z_INDEX } from "../z-index/zIndex";
 
 export function Pagination<TData>({
   table,
@@ -148,6 +149,7 @@ export function Pagination<TData>({
           </span>
           <CreatableSelect<SelectOption<number>>
             name="pageSize"
+            menuPlacement="auto"
             value={{
               value: table.getState().pagination.pageSize,
               label: `${table.getState().pagination.pageSize}`
@@ -169,6 +171,7 @@ export function Pagination<TData>({
               }
             }}
             styles={{
+              menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
               control: (base) => ({
                 ...base,
                 minHeight: "30px",

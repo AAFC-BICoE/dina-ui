@@ -144,7 +144,7 @@ function QueryBuilderAutoSuggestionTextSearch({
             display: block;
             position: absolute;
             width: 100%;
-            z-index: 20;
+            z-index: var(--dina-z-dropdown);
           }
           .autosuggest .suggestion-highlighted { 
             background-color: #ddd;

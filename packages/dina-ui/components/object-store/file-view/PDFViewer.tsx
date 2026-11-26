@@ -1,7 +1,7 @@
 import React, { useState, ReactNode } from "react";
 import { Document, Page } from "react-pdf";
 import { Button, ButtonGroup } from "react-bootstrap";
-import { LoadingSpinner } from "common-ui";
+import { LoadingSpinner, Z_INDEX } from "common-ui";
 import RcTooltip from "rc-tooltip";
 import "pdfjs-dist/legacy/build/pdf.worker.min.mjs";
 
@@ -62,6 +62,7 @@ export function PDFViewer({
         }}
       >
         <RcTooltip
+          zIndex={Z_INDEX.tooltip}
           overlay={<>{shownTypeIndicator}</>}
           placement="top"
           align={{

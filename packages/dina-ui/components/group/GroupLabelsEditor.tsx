@@ -7,7 +7,8 @@ import {
   FieldSpy,
   FieldWrapper,
   FormikButton,
-  useInstanceContext
+  useInstanceContext,
+  Z_INDEX
 } from "../../../common-ui/lib";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
@@ -75,7 +76,15 @@ function GroupLabelsEditorInner({
                     return (
                       <input
                         className="form-control"
-                        onChange={(event) => setValue((event.target as HTMLTextAreaElement | HTMLInputElement).value)}
+                        onChange={(event) =>
+                          setValue(
+                            (
+                              event.target as
+                                | HTMLTextAreaElement
+                                | HTMLInputElement
+                            ).value
+                          )
+                        }
                         value={value || ""}
                       />
                     );
@@ -104,6 +113,7 @@ function GroupLabelsEditorInner({
         </div>
         <div className="row">
           <Select<Option>
+            styles={{ menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }) }}
             options={languageOptions}
             value={languageToAdd}
             onChange={(value) => {

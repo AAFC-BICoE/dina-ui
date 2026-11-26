@@ -1,6 +1,7 @@
 import Select from "react-select";
 import { FieldItem } from "@react-awesome-query-builder/ui";
 import { ESIndexMapping } from "../../types";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryOperatorSelectorProps {
   options?: FieldItem[];
@@ -49,7 +50,7 @@ export function QueryOperatorSelector({
       ...provided,
       color: "#5c5c5c"
     }),
-    menu: (base) => ({ ...base, zIndex: 1050 }),
+    menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
     control: (base) => ({
       ...base
     })

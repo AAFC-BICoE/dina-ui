@@ -34,5 +34,5 @@ a.wb-link-inv {
   color: #fff;
   font-weight: 700;
   padding: 5px;
-  z-index: 501;
+  z-index: var(--dina-z-sticky);
 }

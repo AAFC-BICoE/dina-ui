@@ -8,6 +8,7 @@ import {
 import Select from "react-select";
 import { useIntl } from "react-intl";
 import { SimpleSearchFilterBuilder } from "common-ui";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 export interface QueryRowRelationshipAutocompleteSearchProps {
   /**
@@ -180,7 +181,7 @@ export function QueryRowRelationshipAutocompleteSearch({
         styles={{
           menu: (base) => ({
             ...base,
-            zIndex: 9999
+            zIndex: Z_INDEX.dropdown
           })
         }}
       />

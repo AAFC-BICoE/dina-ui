@@ -1,3 +1,4 @@
+import { Z_INDEX } from "common-ui";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
 import { Button } from "react-bootstrap";
@@ -122,7 +123,7 @@ export function QualityControlSection({
                       menuShouldScrollIntoView={false}
                       minMenuHeight={600}
                       styles={{
-                        menu: (base) => ({ ...base, zIndex: 9999 })
+                        menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown })
                       }}
                     />
                   ) : (

@@ -7,6 +7,7 @@ import { ESIndexMapping } from "../../types";
 import { GLOBAL_SEARCH_FIELDNAME } from "../useQueryBuilderConfig";
 import { useSessionStorage } from "usehooks-ts";
 import { SHORTCUT_GLOBAL_SEARCH_QUERY } from "../query-builder-value-types/QueryBuilderGlobalSearch";
+import { Z_INDEX } from "../../../z-index/zIndex";
 
 interface QueryFieldSelectorProps {
   /** The CSS classes of the div wrapper. */
@@ -143,7 +144,7 @@ export function QueryFieldSelector({
         ...provided,
         color: "#5c5c5c"
       }),
-      menu: (base) => ({ ...base, zIndex: 1050 }),
+      menu: (base) => ({ ...base, zIndex: Z_INDEX.dropdown }),
       control: (base) => ({
         ...base
       }),
