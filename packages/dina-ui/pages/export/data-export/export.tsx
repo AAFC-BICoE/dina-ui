@@ -133,16 +133,17 @@ function getExportFile(
 
 /**
  * Returns the identifier to send to the object export for a file returned by getExportFile.
- * Externally hosted resources have no fileIdentifier: the API uses the metadata id instead.
+ * Externally hosted resources have no fileIdentifier: they are identified by the metadata id
+ * and must be sent as externalResourceIds instead of fileIdentifiers.
  */
 function getExportIdentifier(
   metadata: PersistedResource<Metadata>,
   file: { fileIdentifier?: string }
-): string | undefined {
+): { id?: string; isExternalResource: boolean } {
   if (file === metadata && metadata.resourceExternalURL) {
-    return metadata.id;
+    return { id: metadata.id, isExternalResource: true };
   }
-  return file.fileIdentifier;
+  return { id: file.fileIdentifier, isExternalResource: false };
 }
 
 function isJpegFile(file: { dcFormat?: string; fileExtension?: string }) {
@@ -487,7 +488,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                     .label
                 )
               : get(metadata, selectedFilenameAliasField.label);
-          const exportIdentifier = exportIdentifiers[index];
+          const exportIdentifier = exportIdentifiers[index].id;
           if (exportIdentifier) {
             filenameAliases[exportIdentifier] = filenameAlias;
           }
@@ -496,10 +497,18 @@ export default function ExportPage<TData extends KitsuResource>() {
 
       const hasFilenameAliases = Object.keys(filenameAliases).length > 0;
 
+      const fileIdentifiers = exportIdentifiers
+        .filter((identifier) => !identifier.isExternalResource)
+        .map((identifier) => identifier.id);
+      const externalResourceIds = exportIdentifiers
+        .filter((identifier) => identifier.isExternalResource)
+        .map((identifier) => identifier.id);
+
       const objectExportSaveArg = {
         resource: {
           type: "object-export",
-          fileIdentifiers: exportIdentifiers,
+          fileIdentifiers,
+          ...(externalResourceIds.length > 0 ? { externalResourceIds } : {}),
           name: formik?.values?.name,
           ...(hasFilenameAliases ? { filenameAliases } : {}),
           ...(exportResizePercentage < 100

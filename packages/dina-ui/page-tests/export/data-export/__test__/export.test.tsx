@@ -1091,7 +1091,7 @@ describe("ExportPage Component", () => {
       });
     });
 
-    it("Exports externally hosted resources using the metadata id", async () => {
+    it("Exports externally hosted resources as externalResourceIds using the metadata id", async () => {
       // obj-1 is externally hosted (no fileIdentifier), obj-2 is a stored file
       mockBulkGet.mockImplementation(async (paths: string[]) => {
         if (paths[0]?.includes("metadata/")) {
@@ -1141,7 +1141,8 @@ describe("ExportPage Component", () => {
             {
               resource: expect.objectContaining({
                 type: "object-export",
-                fileIdentifiers: ["obj-1", "file-obj-2"],
+                fileIdentifiers: ["file-obj-2"],
+                externalResourceIds: ["obj-1"],
                 filenameAliases: {
                   "obj-1": "original-obj-1.jpg",
                   "file-obj-2": "original-obj-2.jpg"
