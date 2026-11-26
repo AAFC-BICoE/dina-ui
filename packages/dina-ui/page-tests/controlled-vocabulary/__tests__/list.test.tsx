@@ -5,7 +5,9 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
-jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
+jest.mock("next/link", () => ({ children, href }) => (
+  <a href={href}>{children}</a>
+));
 
 jest.mock("next/router", () => ({
   useRouter: () => ({ query: {}, push: jest.fn() })
@@ -118,7 +120,10 @@ describe("Controlled vocabulary list page", () => {
       {
         page: { limit: 1000 },
         filter: { type: { IN: "MANAGED_ATTRIBUTE,SYSTEM" } },
-        fields: { "controlled-vocabulary": "id,name,key,type,vocabClass" },
+        fields: {
+          "controlled-vocabulary":
+            "id,name,key,type,vocabClass,multilingualDescription"
+        },
         sort: "name"
       }
     );
@@ -236,5 +241,51 @@ describe("Controlled vocabulary list page", () => {
     // Zero counts hide the badge:
     expect(countOf("Collecting Event")).toBeUndefined();
     expect(countOf("Association Type")).toBeUndefined();
+  });
+  it("Links each sidebar vocabulary to its page in the tab's API, with its description as a tooltip.", async () => {
+    const agentVocabulary = {
+      id: "agent-ma-id",
+      type: "controlled-vocabulary",
+      name: "Agent Managed Attribute",
+      key: "managed_attribute",
+      multilingualDescription: {
+        descriptions: [{ lang: "en", desc: "Attributes for agents." }]
+      }
+    };
+    const get = jest.fn<any, any>(async (path: string, params: any) =>
+      path === "/agent-api/controlled-vocabulary"
+        ? { data: [agentVocabulary] }
+        : mockGet(path, params)
+    );
+    const wrapper = mountWithAppContext(<ControlledVocabularyListPage />, {
+      apiContext: { apiClient: { get } as any }
+    });
+
+    await waitFor(() =>
+      expect(wrapper.getByLabelText("Material Sample")).toBeChecked()
+    );
+    expect(
+      wrapper.getByRole("link", { name: "Managed Attribute" })
+    ).toHaveAttribute(
+      "href",
+      "/controlled-vocabulary-type/view?api=collection&id=managed-attribute-id"
+    );
+
+    await userEvent.click(wrapper.getByRole("tab", { name: "Agents" }));
+
+    expect(
+      await wrapper.findByRole("link", { name: "Agent Managed Attribute" })
+    ).toHaveAttribute(
+      "href",
+      "/controlled-vocabulary-type/view?api=agent&id=agent-ma-id"
+    );
+    await userEvent.hover(
+      wrapper.container.querySelector("#cv-type-filter .tooltip-info-icon")!
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tooltip", { name: "Attributes for agents." })
+      ).toBeInTheDocument()
+    );
   });
 });

@@ -1,5 +1,5 @@
 import { InputResource, PersistedResource } from "kitsu";
-import { fromPairs } from "lodash";
+import { fromPairs, toPairs } from "lodash";
 import {
   COLLECTION_MODULE_TYPE_LABELS,
   COLLECTION_MODULE_TYPES
@@ -18,6 +18,7 @@ import {
   AGENT_MODULE_TYPES
 } from "../../types/agent-api/resources/AgentModuleType";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
+import { MultilingualDescription, MultilingualTitle } from "../../types/common";
 
 export const COLLECTION_OTHER_IDENTIFIERS_ID =
   "019c961e-4c0d-7398-b4ae-73687826b3b5";
@@ -45,9 +46,6 @@ export type ControlledVocabularyApi =
 export interface ControlledVocabularyApiConfig {
   apiPath: string;
   apiBaseUrl: string;
-  entityLink: string;
-  editRoute: string;
-  viewRoute: string;
   listRoute: string;
   /** Data component types available when creating/editing an item in this API. */
   componentTypes: readonly string[];
@@ -56,9 +54,9 @@ export interface ControlledVocabularyApiConfig {
 }
 
 /**
- * API, route and form configuration for the controlled-vocabulary-item pages.
+ * API, route and form configuration for the controlled vocabulary pages.
  * A controlled vocabulary item may reside in any of the configured APIs, and
- * each API has its own page routes and data component types.
+ * each API has its own data component types.
  */
 export const CONTROLLED_VOCABULARY_APIS: Record<
   ControlledVocabularyApi,
@@ -67,9 +65,6 @@ export const CONTROLLED_VOCABULARY_APIS: Record<
   collection: {
     apiPath: "collection-api",
     apiBaseUrl: "/collection-api",
-    entityLink: "/controlled-vocabulary-item",
-    editRoute: "/controlled-vocabulary-item/edit",
-    viewRoute: "/controlled-vocabulary-item/view",
     listRoute: "/controlled-vocabulary/list",
     componentTypes: COLLECTION_MODULE_TYPES,
     componentTypeLabels: COLLECTION_MODULE_TYPE_LABELS as Record<string, string>
@@ -77,9 +72,6 @@ export const CONTROLLED_VOCABULARY_APIS: Record<
   objectstore: {
     apiPath: "objectstore-api",
     apiBaseUrl: "/objectstore-api",
-    entityLink: "/object-store/controlled-vocabulary-item",
-    editRoute: "/object-store/controlled-vocabulary-item/edit",
-    viewRoute: "/object-store/controlled-vocabulary-item/view",
     listRoute: "/controlled-vocabulary/list?tab=1",
     componentTypes: OBJECT_STORE_MODULE_TYPES,
     componentTypeLabels: OBJECT_STORE_MODULE_TYPE_LABELS as Record<
@@ -90,9 +82,6 @@ export const CONTROLLED_VOCABULARY_APIS: Record<
   sequencing: {
     apiPath: "seqdb-api",
     apiBaseUrl: "/seqdb-api",
-    entityLink: "/seqdb/controlled-vocabulary-item",
-    editRoute: "/seqdb/controlled-vocabulary-item/edit",
-    viewRoute: "/seqdb/controlled-vocabulary-item/view",
     listRoute: "/controlled-vocabulary/list?tab=2",
     componentTypes: SEQDB_MODULE_TYPES,
     componentTypeLabels: SEQDB_MODULE_TYPE_LABELS as Record<string, string>
@@ -100,14 +89,100 @@ export const CONTROLLED_VOCABULARY_APIS: Record<
   agent: {
     apiPath: "agent-api",
     apiBaseUrl: "/agent-api",
-    entityLink: "/agent/controlled-vocabulary-item",
-    editRoute: "/agent/controlled-vocabulary-item/edit",
-    viewRoute: "/agent/controlled-vocabulary-item/view",
     listRoute: "/controlled-vocabulary/list?tab=3",
     componentTypes: AGENT_MODULE_TYPES,
     componentTypeLabels: AGENT_MODULE_TYPE_LABELS as Record<string, string>
   }
 };
+
+/** Reads the API from a page's ?api= param, falling back to collection when it's missing or unknown. */
+export function getControlledVocabularyApi(
+  query: Record<string, string | string[] | undefined>
+): ControlledVocabularyApi {
+  const api = String(query.api);
+  // Not "in", which would also accept inherited keys like "toString".
+  return Object.keys(CONTROLLED_VOCABULARY_APIS).includes(api)
+    ? (api as ControlledVocabularyApi)
+    : "collection";
+}
+
+/**
+ * Link to a controlled vocabulary page, which reads the API from its ?api= param.
+ * e.g. controlledVocabularyPageUrl("/controlled-vocabulary-item/view", "agent", { id })
+ */
+export function controlledVocabularyPageUrl(
+  path: string,
+  api: ControlledVocabularyApi,
+  params: Record<string, string> = {}
+) {
+  return `${path}?${new URLSearchParams({ api, ...params })}`;
+}
+
+/**
+ * Converts multilingualTitle and multilingualDescription from the stored format to the
+ * editable { lang: text } format used by the MultilingualTitle and MultilingualDescription fields.
+ */
+export function multilingualFieldsForForm(resource: {
+  multilingualTitle?: MultilingualTitle;
+  multilingualDescription?: MultilingualDescription;
+}) {
+  return {
+    multilingualDescription: fromPairs<string | undefined>(
+      resource.multilingualDescription?.descriptions?.map(({ desc, lang }) => [
+        lang ?? "",
+        desc ?? ""
+      ])
+    ),
+    multilingualTitle: fromPairs<string | undefined>(
+      resource.multilingualTitle?.titles?.map(({ title, lang }) => [
+        lang ?? "",
+        title ?? ""
+      ])
+    )
+  };
+}
+
+/**
+ * Converts the editable multilingualTitle and multilingualDescription back to the stored format.
+ * Only the non-empty values are kept, and a field is set to null when all of them are empty.
+ */
+export function multilingualFieldsForSave<T extends Record<string, any>>(
+  submittedValues: T
+): T {
+  const values: Record<string, any> = submittedValues;
+  if (values.multilingualDescription) {
+    try {
+      const descriptions = toPairs(values.multilingualDescription)
+        .map(([lang, desc]) => ({ lang, desc }))
+        .filter(
+          ({ desc }) =>
+            desc !== null && desc !== undefined && String(desc).trim() !== ""
+        );
+
+      values.multilingualDescription =
+        descriptions.length > 0 ? { descriptions } : null;
+    } catch (_) {
+      // If the value is in an unexpected format, don't save anything.
+      values.multilingualDescription = null;
+    }
+  }
+  if (values.multilingualTitle) {
+    try {
+      const titles = toPairs(values.multilingualTitle)
+        .map(([lang, title]) => ({ lang, title }))
+        .filter(
+          ({ title }) =>
+            title !== null && title !== undefined && String(title).trim() !== ""
+        );
+
+      values.multilingualTitle = titles.length > 0 ? { titles } : null;
+    } catch (_) {
+      // If the value is in an unexpected format, don't save anything.
+      values.multilingualTitle = null;
+    }
+  }
+  return submittedValues;
+}
 
 /**
  * Transforms a ControlledVocabularyItem from the API format to a format suitable for form editing.
@@ -120,20 +195,7 @@ export function transformControlledVocabularyItemForForm(
 ): InputResource<ControlledVocabularyItem> {
   return {
     ...item,
-    // Convert multilingualDescription to editable Dictionary format:
-    multilingualDescription: fromPairs<string | undefined>(
-      item.multilingualDescription?.descriptions?.map(({ desc, lang }) => [
-        lang ?? "",
-        desc ?? ""
-      ])
-    ),
-    // Convert multilingualTitle to editable Dictionary format:
-    multilingualTitle: fromPairs<string | undefined>(
-      item.multilingualTitle?.titles?.map(({ title, lang }) => [
-        lang ?? "",
-        title ?? ""
-      ])
-    ),
+    ...multilingualFieldsForForm(item),
     // Set vocabularyElementType to PICKLIST if acceptedValues has items
     vocabularyElementType: item.acceptedValues?.length
       ? "PICKLIST"

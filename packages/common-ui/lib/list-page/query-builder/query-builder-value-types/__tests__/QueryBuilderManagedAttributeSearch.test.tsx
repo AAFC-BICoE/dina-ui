@@ -1,5 +1,6 @@
 import { mountWithAppContext } from "common-ui";
-import { waitFor } from "@testing-library/react";
+import { act, fireEvent, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import "@testing-library/jest-dom";
 import QueryRowManagedAttributeSearch, {
   transformManagedAttributeToDSL
@@ -380,7 +381,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
         })
       );
 
-      // Once preloaded, the dropdown options are loaded normally again. 
+      // Once preloaded, the dropdown options are loaded normally again.
       // The group scope defaults to "All Groups", so no group filter is applied.
       expect(mockGet).toHaveBeenLastCalledWith(
         "objectstore-api/controlled-vocabulary-item",
@@ -389,6 +390,110 @@ describe("QueryBuilderManagedAttributeSearch", () => {
 
       // Should not be stuck in a render loop re-applying the preloaded attribute.
       expect(setValue.mock.calls.length).toBeLessThan(10);
+    });
+  });
+
+  describe("Barcode scanner input", () => {
+    const STRING_MANAGED_ATTRIBUTE = {
+      id: "01a21337-6f9e-71a6-87cd-bcd15f2a3ba9",
+      type: "controlled-vocabulary-item",
+      name: "TEST Barcode",
+      key: "test_barcode",
+      group: "aafc",
+      vocabularyElementType: "STRING",
+      acceptedValues: null
+    };
+
+    /** Upper bound so a render loop fails the test instead of hanging Jest. */
+    const MAX_SET_VALUE_CALLS = 500;
+
+    /** Holds the value like the Query Builder store does and feeds it back down as a prop. */
+    function QueryBuilderHarness({
+      onValue,
+      onSetValue
+    }: {
+      onValue: (v: string) => void;
+      onSetValue: () => number;
+    }) {
+      const [value, setValue] = useState(
+        JSON.stringify({
+          searchValue: "",
+          selectedOperator: "exactMatch",
+          selectedType: "STRING",
+          selectedManagedAttribute: STRING_MANAGED_ATTRIBUTE
+        })
+      );
+      onValue(value);
+      return (
+        <QueryRowManagedAttributeSearch
+          value={value}
+          setValue={(newValue) => {
+            // Stop feeding values back once the loop limit is hit so the test can finish.
+            if (onSetValue() <= MAX_SET_VALUE_CALLS) {
+              setValue(newValue);
+            }
+          }}
+          isInColumnSelector={false}
+          managedAttributeConfig={
+            {
+              label: "managedAttributes",
+              value: "data.attributes.managedAttributes",
+              path: "data.attributes.managedAttributes",
+              type: "managedAttribute",
+              dynamicField: {
+                type: "managedAttribute",
+                label: "managedAttributes",
+                path: "data.attributes.managedAttributes",
+                apiEndpoint: "objectstore-api/controlled-vocabulary-item",
+                component: "ENTITY"
+              }
+            } as any
+          }
+        />
+      );
+    }
+
+    it("Keeps the full value when a barcode scanner types it in one fast burst", async () => {
+      const BARCODE = "01-01001010202";
+      const consoleError = jest.spyOn(console, "error").mockImplementation();
+      try {
+        let latestValue = "";
+        let setValueCalls = 0;
+
+        const { container } = mountWithAppContext(
+          <QueryBuilderHarness
+            onValue={(v) => (latestValue = v)}
+            onSetValue={() => ++setValueCalls}
+          />,
+          { apiContext }
+        );
+
+        const input = container.querySelector(
+          "input.form-control"
+        ) as HTMLInputElement;
+        expect(input).toBeInTheDocument();
+
+        // A scanner sends every key before React finishes re-rendering, so fire all the
+        // change events in a single act() instead of letting each one settle.
+        act(() => {
+          for (let i = 1; i <= BARCODE.length; i++) {
+            fireEvent.change(input, { target: { value: BARCODE.slice(0, i) } });
+          }
+        });
+
+        // Each keystroke should only round trip through the Query Builder a few times.
+        expect(setValueCalls).toBeLessThan(BARCODE.length * 5);
+        await waitFor(() =>
+          expect(JSON.parse(latestValue).searchValue).toEqual(BARCODE)
+        );
+        expect(
+          consoleError.mock.calls.some((call) =>
+            String(call[0]).includes("Maximum update depth exceeded")
+          )
+        ).toBe(false);
+      } finally {
+        consoleError.mockRestore();
+      }
     });
   });
 });

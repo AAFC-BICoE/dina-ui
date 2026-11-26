@@ -30,6 +30,13 @@ export type TableColumn<TData extends KitsuResource> = ColumnDef<TData> & {
   isKeyword?: boolean;
 
   /**
+   * Sort using the "keyword_numeric" multi-field (natural order, e.g. ABC2 before ABC10) instead of ".keyword".
+   *
+   * If this is set to true, then the column will be sorted by this by default.
+   */
+  isKeywordNumeric?: boolean;
+
+  /**
    * The QueryPage will only display the accessors that are displayed on the result table. However,
    * if you have custom cells that receive other fields you will need to add them to this list so
    * elastic search includes the fields in the result.

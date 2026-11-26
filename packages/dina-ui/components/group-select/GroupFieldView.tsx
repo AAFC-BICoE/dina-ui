@@ -19,11 +19,20 @@ export function GroupFieldView(props: GroupFieldViewProps) {
   );
 }
 
-/** Renders the group label (if available) or the group name. */
-export function GroupLabel({ groupName }) {
-  const { label, id } = useGroupLabel(groupName);
+/** Renders the group label (if available) or the group name. The link is grey unless defaultLinkColor is set. */
+export function GroupLabel({
+  groupName,
+  defaultLinkColor
+}: {
+  groupName?: string;
+  defaultLinkColor?: boolean;
+}) {
+  const { label, id } = useGroupLabel(groupName as string);
   return id ? (
-    <Link href={`/group/view?id=${id}`} style={{ color: "#525252" }}>
+    <Link
+      href={`/group/view?id=${id}`}
+      style={defaultLinkColor ? undefined : { color: "#525252" }}
+    >
       {label}
     </Link>
   ) : (

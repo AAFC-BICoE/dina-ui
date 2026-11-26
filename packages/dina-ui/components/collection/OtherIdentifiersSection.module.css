@@ -5,3 +5,7 @@
 .chipField > :global(label) > :global(.field-label) {
   padding-top: 9px;
 }
+
+.chipField > :global(label) :global(.chip-list) {
+  padding-top: 6px;
+}

@@ -15,6 +15,7 @@ export interface DataEntryViewerProps extends DataEntryProps {
 export function DataEntryViewer({
   extensionValues,
   legend,
+  id,
   name,
   disableDinaForm,
   blockOptionsEndpoint,
@@ -36,6 +37,7 @@ export function DataEntryViewer({
         readOnlyRender={(_value, _form) => (
           <DataEntry
             legend={legend}
+            id={id}
             name={name}
             blockOptionsEndpoint={blockOptionsEndpoint}
             readOnly={true}
@@ -46,6 +48,7 @@ export function DataEntryViewer({
       >
         <DataEntry
           legend={legend}
+          id={id}
           name={name}
           blockOptionsEndpoint={blockOptionsEndpoint}
           readOnly={true}
@@ -61,6 +64,7 @@ export function DataEntryViewer({
     >
       <DataEntry
         legend={legend}
+        id={id}
         name={name}
         blockOptionsEndpoint={blockOptionsEndpoint}
         readOnly={true}

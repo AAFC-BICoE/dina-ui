@@ -16,7 +16,6 @@ import {
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import _ from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
@@ -32,7 +31,10 @@ import { GroupSelectField } from "../../components";
 import {
   CONTROLLED_VOCABULARY_APIS,
   ControlledVocabularyApi,
+  controlledVocabularyPageUrl,
+  getControlledVocabularyApi,
   getInitialVocabularyElementType,
+  multilingualFieldsForSave,
   transformControlledVocabularyItemForForm
 } from "../../components/controlled-vocabulary/controlledVocabularyItemUtils";
 import PageLayout from "../../components/page/PageLayout";
@@ -59,13 +61,13 @@ function useFormSubmission() {
   return useContext(FormSubmissionContext);
 }
 
-export function ControlledVocabularyItemEditPage({
-  router,
-  api = "collection"
-}: WithRouterProps & { api?: ControlledVocabularyApi }) {
+export function ControlledVocabularyItemEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
-  const { apiPath, apiBaseUrl, viewRoute, listRoute } =
-    CONTROLLED_VOCABULARY_APIS[api];
+  // Set when creating an item from a controlled vocabulary's page.
+  const controlledVocabularyId =
+    router.query.controlledVocabularyId?.toString();
+  const api = getControlledVocabularyApi(router.query);
+  const { apiPath, apiBaseUrl, listRoute } = CONTROLLED_VOCABULARY_APIS[api];
   const title = id
     ? "editControlledVocabularyItemTitle"
     : "addControlledVocabularyItemTitle";
@@ -76,6 +78,11 @@ export function ControlledVocabularyItemEditPage({
       include: "controlledVocabulary"
     },
     { disabled: id === undefined }
+  );
+
+  const controlledVocabularyQuery = useQuery<ControlledVocabulary>(
+    { path: `${apiPath}/controlled-vocabulary/${controlledVocabularyId}` },
+    { disabled: !controlledVocabularyId }
   );
 
   return (
@@ -89,18 +96,27 @@ export function ControlledVocabularyItemEditPage({
               title={title}
               api={api}
               apiBaseUrl={apiBaseUrl}
-              viewRoute={viewRoute}
               listRoute={listRoute}
             />
           ))}
         </div>
+      ) : controlledVocabularyId ? (
+        withResponse(controlledVocabularyQuery, ({ data }) => (
+          <ControlledVocabularyItemEditPageContent
+            router={router}
+            initialControlledVocabulary={data}
+            title={title}
+            api={api}
+            apiBaseUrl={apiBaseUrl}
+            listRoute={listRoute}
+          />
+        ))
       ) : (
         <ControlledVocabularyItemEditPageContent
           router={router}
           title={title}
           api={api}
           apiBaseUrl={apiBaseUrl}
-          viewRoute={viewRoute}
           listRoute={listRoute}
         />
       )}
@@ -110,21 +126,22 @@ export function ControlledVocabularyItemEditPage({
 
 interface ControlledVocabularyItemEditPageContentProps {
   fetchedItem?: PersistedResource<ControlledVocabularyItem>;
+  /** Controlled vocabulary selected by default when creating an item. */
+  initialControlledVocabulary?: PersistedResource<ControlledVocabulary>;
   router: WithRouterProps["router"];
   title: string;
   api: ControlledVocabularyApi;
   apiBaseUrl: string;
-  viewRoute: string;
   listRoute: string;
 }
 
 function ControlledVocabularyItemEditPageContent({
   fetchedItem,
+  initialControlledVocabulary,
   router,
   title,
   api,
   apiBaseUrl,
-  viewRoute,
   listRoute
 }: ControlledVocabularyItemEditPageContentProps) {
   const { formatMessage } = useDinaIntl();
@@ -133,7 +150,10 @@ function ControlledVocabularyItemEditPageContent({
 
   const initialValues: InputResource<ControlledVocabularyItem> = fetchedItem
     ? transformControlledVocabularyItemForForm(fetchedItem)
-    : { type: "controlled-vocabulary-item" };
+    : {
+        type: "controlled-vocabulary-item",
+        controlledVocabulary: initialControlledVocabulary
+      };
 
   const onSubmit = useSubmitHandler<InputResource<ControlledVocabularyItem>>({
     resourceType: "controlled-vocabulary-item",
@@ -172,48 +192,7 @@ function ControlledVocabularyItemEditPageContent({
           delete submittedValues.unit;
         }
 
-        // Convert the editable format to the stored format. Only include the
-        // non-empty descriptions, and set to null if all of them are empty.
-        if (submittedValues.multilingualDescription) {
-          try {
-            const descriptions = _.toPairs(
-              submittedValues.multilingualDescription
-            )
-              .map(([lang, desc]) => ({ lang, desc }))
-              .filter(
-                ({ desc }) =>
-                  desc !== null &&
-                  desc !== undefined &&
-                  String(desc).trim() !== ""
-              );
-
-            submittedValues.multilingualDescription =
-              descriptions.length > 0 ? { descriptions } : (null as any);
-          } catch (_) {
-            // If the value is in an unexpected format, don't save anything.
-            submittedValues.multilingualDescription = null as any;
-          }
-        }
-        // Convert the editable format to the stored format. Only include the
-        // non-empty titles, and set to null if all of them are empty.
-        if (submittedValues.multilingualTitle) {
-          try {
-            const titles = _.toPairs(submittedValues.multilingualTitle)
-              .map(([lang, title]) => ({ lang, title }))
-              .filter(
-                ({ title }) =>
-                  title !== null &&
-                  title !== undefined &&
-                  String(title).trim() !== ""
-              );
-
-            submittedValues.multilingualTitle =
-              titles.length > 0 ? { titles } : (null as any);
-          } catch (_) {
-            // If the value is in an unexpected format, don't save anything.
-            submittedValues.multilingualTitle = null as any;
-          }
-        }
+        multilingualFieldsForSave(submittedValues);
 
         // Uri template should be null if empty string, and should include $1 if not empty.
         if (
@@ -227,7 +206,11 @@ function ControlledVocabularyItemEditPageContent({
       }
     ],
     onSuccess: async (savedItem) => {
-      await router.push(`${viewRoute}?id=${savedItem.id}`);
+      await router.push(
+        controlledVocabularyPageUrl("/controlled-vocabulary-item/view", api, {
+          id: savedItem.id
+        })
+      );
     }
   });
 
@@ -245,7 +228,11 @@ function ControlledVocabularyItemEditPageContent({
       </Link>
     ) : (
       <Link
-        href={`${viewRoute}?id=${id}`}
+        href={controlledVocabularyPageUrl(
+          "/controlled-vocabulary-item/view",
+          api,
+          { id }
+        )}
         className="back-button my-auto me-auto"
       >
         <DinaMessage id="backToReadOnlyPage" />

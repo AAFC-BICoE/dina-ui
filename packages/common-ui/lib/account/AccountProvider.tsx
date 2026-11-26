@@ -119,9 +119,9 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
     keycloakGroups as string[]
   );
 
-  const login = keycloak.login;
+  const login = () => keycloak.login();
 
-  const logout = keycloak.logout;
+  const logout = () => keycloak.logout();
 
   const getCurrentToken = async () => {
     // If it expires in the next 30 seconds, generate a new one.

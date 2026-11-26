@@ -17,7 +17,7 @@ export interface TabularResultsModalProps {
   fileName: string;
   replaceError?: TabularResultsUploadError;
   onReplace: () => void;
-  onRemove: () => Promise<void>;
+  onRemove: () => Promise<boolean>;
   onClose: () => void;
 }
 
@@ -181,8 +181,9 @@ export function TabularResultsModal({
           <Button
             variant="danger"
             onClick={async () => {
-              await onRemove();
-              setConfirmRemove(false);
+              if (await onRemove()) {
+                setConfirmRemove(false);
+              }
             }}
           >
             <FaTrashAlt size={18} className="me-2" />

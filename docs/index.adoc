@@ -51,6 +51,8 @@ include::write_operations.adoc[]
 
 include::search_filters.adoc[]
 
+include::permissions.adoc[]
+
 :leveloffset: 1
 
 = Creating Tests

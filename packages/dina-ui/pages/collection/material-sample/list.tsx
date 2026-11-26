@@ -533,7 +533,8 @@ export default function MaterialSampleListPage() {
       ),
       header: () => <FieldHeader name="materialSampleName" />,
       accessorKey: "data.attributes.materialSampleName",
-      isKeyword: true
+      isKeyword: true,
+      isKeywordNumeric: true
     },
 
     // Collection Name (External Relationship)

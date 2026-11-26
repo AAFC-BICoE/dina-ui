@@ -203,6 +203,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   continueWithWorkbook: "Mit Arbeitsmappe fortfahren",
   contributors: "Mitwirkende",
   controlledVocabularyTitle: "Kontrolliertes Vokabular",
+  controlledVocabularyItemsTitle: "Elemente des kontrollierten Vokabulars",
+  editControlledVocabularyTitle: "Typ des kontrollierten Vokabulars bearbeiten",
   convertToDepthMinMax: "Umwandeln in Min/Max Tiefe",
   convertToElevationMinMax: "Umwandeln in Min/Max Richthöhe",
   coordinateUncertaintyInMeters: "Koordinatenungenauigkeit in Metern",
@@ -215,6 +217,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createFormTemplate: "Aus einer Vorlage anlegen",
   createMaterialSampleFormTemplate: "Materialprobe nach Vorlage anlegen",
   createNew: "Neu erstellen",
+  createItem: "Element erstellen",
   createNewLabel: "Neu anlegen",
   createNewMaterialSamples: "Neues Materialprobe anlegen",
   createNewView: "Neuen View anlegen",
@@ -637,6 +640,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_typeStatus: "Statustyp",
   field_typeStatusEvidence: "Statustyp - Nachweis",
   field_uriTemplate: "URI-Vorlage",
+  field_vocabClass: "Vokabularklasse",
   field_useNextSequence: "Verwenden Sie den nächsten verfügbaren Identifikator",
   field_useTargetOrganism: "Verwenden Sie den Zielorganismus",
   field_useTargetOrganismError:
@@ -661,7 +665,9 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_xmpMetadataDate_tooltip:
     "Datum und Uhrzeit der letzten Änderung des Eintrags",
   field_xmpRightsWebStatement: "Lizenz",
-  fileNameAliasField: "Aliasfeld für Dateinamen",
+  fileNameAliasField: "Dateien benennen nach",
+  fileNameAliasFieldTooltip:
+    "Wählen Sie das Feld, das als Dateiname jedes exportierten Objekts verwendet wird. Ist kein Feld ausgewählt, werden die ursprünglichen Dateinamen verwendet.",
   fileTooBig: "Datei ist zu groß",
   filterAttribute: "Filterattribut",
   filterByGroup: "nach Gruppe filtern",
@@ -917,6 +923,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   otherIdentifiers: "Weitere Identifikatoren",
   overwriteValues: "Inhalte überschreiben",
   parentCollectionLabel: "Ausgangssammlung",
+  parent: "Übergeordnet",
   parentMaterialSample: "Ausgangsprobe",
   "parentMaterialSample.materialSampleName": "Primär-ID",
   parentSampleNotFoundLabel: "Ausgangsprobe wurde nicht gefunden",

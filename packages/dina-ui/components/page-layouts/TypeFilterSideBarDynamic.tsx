@@ -1,4 +1,5 @@
-import { FieldSet } from "common-ui";
+import { FieldSet, Tooltip } from "common-ui";
+import Link from "next/link";
 import React, { useMemo } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
@@ -6,6 +7,10 @@ export interface SidebarOption {
   id: string;
   label: string;
   count?: number;
+  /** Page the label links to. */
+  href?: string;
+  /** Shown in a tooltip next to the count. */
+  description?: string;
 }
 
 export interface TypeFilterState {
@@ -249,8 +254,9 @@ export function TypeFilterSideBarDynamic({
               <FilterCheckboxRow
                 key={p.id}
                 id={`cv-${p.id}`}
-                label={p.label}
+                label={p.href ? <Link href={p.href}>{p.label}</Link> : p.label}
                 count={displayCount(p)}
+                description={p.description}
                 checked={selectedParentSet.has(p.id)}
                 onChange={() => handleToggleType(p.id)}
               />
@@ -277,16 +283,18 @@ interface FilterCheckboxRowProps {
   count?: number;
   checked: boolean;
   indeterminate?: boolean;
+  description?: string;
   onChange: () => void;
 }
 
-/** Checkbox with its label on the left and its count badge on the right. */
+/** Checkbox with its label and description tooltip on the left, and its count badge on the right. */
 function FilterCheckboxRow({
   id,
   label,
   count,
   checked,
   indeterminate = false,
+  description,
   onChange
 }: FilterCheckboxRowProps) {
   return (
@@ -305,6 +313,13 @@ function FilterCheckboxRow({
         <label htmlFor={id} className="form-check-label">
           {label}
         </label>
+        {description && (
+          <Tooltip
+            directText={description}
+            placement="right"
+            className="ms-2"
+          />
+        )}
       </div>
       {/* Hide the badge when the count is unknown (-1) or empty */}
       {typeof count === "number" && count > 0 && (

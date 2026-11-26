@@ -94,6 +94,28 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
   });
 
   describe("applySortingRules", () => {
+    test("Columns with keyword_numeric support sort on .keyword_numeric", async () => {
+      const result = applySortingRules(
+        ELASTIC_SEARCH_QUERY,
+        [{ id: "materialSampleName", desc: false }],
+        [
+          {
+            id: "materialSampleName",
+            accessorKey: "data.attributes.materialSampleName",
+            isKeyword: true,
+            isKeywordNumeric: true
+          }
+        ] as any
+      );
+      expect(result.sort).toEqual([
+        {
+          "data.attributes.materialSampleName.keyword_numeric": {
+            order: "asc"
+          }
+        }
+      ]);
+    });
+
     test("Sorting on columns without id", async () => {
       expect(
         applySortingRules(
