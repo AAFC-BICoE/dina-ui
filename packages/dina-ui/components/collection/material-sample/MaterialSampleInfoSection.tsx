@@ -2,7 +2,6 @@ import {
   AutoSuggestTextField,
   ControlledVocabularySelectField,
   DateField,
-  DinaFormSection,
   FieldSet,
   FieldSpy,
   FieldWrapper,
@@ -22,6 +21,7 @@ import { MaterialSampleStateReadOnlyRender } from "../MaterialSampleStateWarning
 import _ from "lodash";
 import classNames from "classnames";
 import { useState } from "react";
+import { FaCircleInfo } from "react-icons/fa6";
 import styles from "./MaterialSampleInfoSection.module.css";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
@@ -32,7 +32,13 @@ export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
   "materialSampleType"
 ];
 
-export function MaterialSampleInfoSection({ id }: { id?: string }) {
+export function MaterialSampleInfoSection({
+  id,
+  visibleManagedAttributeKeys
+}: {
+  id?: string;
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
+}) {
   const { locale, formatMessage } = useDinaIntl();
 
   const { readOnly, isTemplate } = useDinaFormContext();
@@ -105,6 +111,27 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
             ) : null
           }
         </FieldSpy>
+      )}
+      {!readOnly && (
+        <div className="small text-muted mt-3 d-flex align-items-center gap-1">
+          <FaCircleInfo style={{ color: "#335075" }} />
+          <span>
+            <DinaMessage id="materialSampleInfoManagedAttributesHint" />{" "}
+            <a href={`#${MANAGED_ATTRIBUTES_COMPONENT_NAME}`}>
+              <DinaMessage id="managedAttributes" />
+            </a>
+          </span>
+        </div>
+      )}
+      {readOnly && (
+        <ManagedAttributesEditor
+          valuesPath="managedAttributes"
+          managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+          managedAttributeComponent="MATERIAL_SAMPLE"
+          visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
+          disableClearButton={true}
+          isControlledVocabulary={true}
+        />
       )}
     </FieldSet>
   );
@@ -206,6 +233,7 @@ const SPLIT_EXAMPLES: Record<"parent" | "thisSample", SplitExampleRow[]> = {
 /** Where split names start from: this sample (isBaseForSplitByType) or a parent of another type. */
 function SplitNamesStartFromField() {
   const { formatMessage } = useDinaIntl();
+  const { readOnly } = useDinaFormContext();
   const options = [
     {
       value: false,
@@ -229,7 +257,7 @@ function SplitNamesStartFromField() {
   return (
     <FieldWrapper
       name="isBaseForSplitByType"
-      className={styles.splitField}
+      className={readOnly ? styles.splitReadOnly : styles.splitField}
       disableTemplateCheckbox={true}
       disableLabelClick={true}
       readOnlyRender={(value) =>
@@ -406,44 +434,5 @@ function SplitOptionInfoPanel({
         {formatMessage("splitExampleFooter")}
       </div>
     </div>
-  );
-}
-
-export function MaterialSampleInfoManagedAttributes({
-  id,
-  visibleManagedAttributeKeys
-}: {
-  id?: string;
-  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
-}) {
-  const { readOnly } = useDinaFormContext();
-
-  if (!readOnly) {
-    return null;
-  }
-
-  return (
-    <DinaFormSection
-      componentName={MANAGED_ATTRIBUTES_COMPONENT_NAME}
-      sectionName="managed-attributes-section"
-    >
-      <div className="row">
-        <div className="col-md-12">
-          <ManagedAttributesEditor
-            valuesPath="managedAttributes"
-            managedAttributeApiPath="collection-api/controlled-vocabulary-item"
-            managedAttributeComponent="MATERIAL_SAMPLE"
-            fieldSetProps={{
-              id,
-              legend: <DinaMessage id="materialSampleManagedAttributes" />
-            }}
-            managedAttributeOrderFieldName="managedAttributesOrder"
-            visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
-            disableClearButton={true}
-            isControlledVocabulary={true}
-          />
-        </div>
-      </div>
-    </DinaFormSection>
   );
 }
