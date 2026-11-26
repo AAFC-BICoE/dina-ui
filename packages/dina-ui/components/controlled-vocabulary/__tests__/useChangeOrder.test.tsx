@@ -112,4 +112,42 @@ describe("useChangeOrder", () => {
     expect(result.current.saving).toEqual(false);
     expect(onSaved).not.toHaveBeenCalled();
   });
+
+  it("Explains a position another save took first.", async () => {
+    mockSave.mockRejectedValueOnce(
+      new Error(
+        'Bad Request: ERROR: duplicate key value violates unique constraint "unique_position_per_controlled_vocabulary"'
+      )
+    );
+    const { result } = await renderChangeOrder();
+
+    act(() => result.current.moveItem(0, 1));
+    await act(() => result.current.saveOrder());
+
+    expect(result.current.error).toEqual(
+      "Someone else changed the order at the same time. Close and reopen Change Order to see the latest order."
+    );
+    expect(onSaved).not.toHaveBeenCalled();
+  });
+
+  it("Explains a refused save instead of showing the request URL.", async () => {
+    mockSave.mockRejectedValueOnce(
+      Object.assign(
+        new Error("/collection-api/controlled-vocabulary-item/bulk:"),
+        {
+          cause: { status: 403 }
+        }
+      )
+    );
+    const { result } = await renderChangeOrder();
+
+    act(() => result.current.moveItem(0, 1));
+    await act(() => result.current.saveOrder());
+
+    expect(result.current.error).toEqual(
+      "You don't have permission to change some of these items, so the order wasn't saved."
+    );
+    // Nothing was saved, so the user's order stays for them to adjust.
+    expect(ids(result.current.items)).toEqual(["b", "a", "c"]);
+  });
 });

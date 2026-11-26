@@ -3,6 +3,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { SaveArgs, useApiClient, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useState } from "react";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 
 export type OrderItem = PersistedResource<ControlledVocabularyItem>;
@@ -31,6 +32,7 @@ export function useChangeOrder({
   onSaved
 }: UseChangeOrderParams) {
   const { save } = useApiClient();
+  const { formatMessage } = useDinaIntl();
   const [original, setOriginal] = useState<OrderItem[]>([]);
   const [items, setItems] = useState<OrderItem[]>([]);
   // The last moved or currently dragged item, highlighted in the list.
@@ -96,7 +98,14 @@ export function useChangeOrder({
       }
       onSaved();
     } catch (e) {
-      setError(e?.message ?? String(e));
+      // Replace the raw API errors users can hit: another save took a position first, or an item is in a group they can't edit.
+      setError(
+        /unique_position_per_controlled_vocabulary/.test(e?.message)
+          ? formatMessage("changeOrderConflict")
+          : e?.cause?.status === 403
+          ? formatMessage("changeOrderNotPermitted")
+          : e?.message ?? String(e)
+      );
     } finally {
       setSaving(false);
     }

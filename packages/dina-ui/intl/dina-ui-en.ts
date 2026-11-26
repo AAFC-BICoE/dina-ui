@@ -233,10 +233,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cfiaPPCLevel: " CFIA PPC Level",
   changedProperties: "Changes",
   changeOrder: "Change Order",
+  changeOrderConflict:
+    "Someone else changed the order at the same time. Close and reopen Change Order to see the latest order.",
   changeOrderInstructions:
     "Drag items to reorder, or focus an item and use the arrow buttons. The order is saved for everyone using this vocabulary.",
   changeOrderNotEnoughItems:
     "At least two items are needed to change the order.",
+  changeOrderNotPermitted:
+    "You don't have permission to change some of these items, so the order wasn't saved.",
   childCultureStrains: "Culture Strains",
   childMaterialSamples: "Direct Material Sample Children",
   childrenStorageUnits: "Children Storage Units",

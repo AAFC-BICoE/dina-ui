@@ -143,10 +143,14 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cfiaPPCLevel: "CFIA PPC Level",
   changedProperties: "Änderungen",
   changeOrder: "Reihenfolge ändern",
+  changeOrderConflict:
+    "Jemand anderes hat die Reihenfolge gleichzeitig geändert. Schließen und öffnen Sie „Reihenfolge ändern“ erneut, um die aktuelle Reihenfolge zu sehen.",
   changeOrderInstructions:
     "Ziehen Sie Elemente, um sie neu anzuordnen, oder wählen Sie ein Element aus und verwenden Sie die Pfeilschaltflächen. Die Reihenfolge wird für alle Benutzer dieses Vokabulars gespeichert.",
   changeOrderNotEnoughItems:
     "Zum Ändern der Reihenfolge werden mindestens zwei Elemente benötigt.",
+  changeOrderNotPermitted:
+    "Sie haben keine Berechtigung, einige dieser Elemente zu ändern, daher wurde die Reihenfolge nicht gespeichert.",
   changingTheStorageUnitTypeWillDeleteWarning:
     "Änderung des Lagereinheitentyps löscht die bestehenden gespeicherten Koordinaten.",
   changingTheStorageUnitTypeWillDeleteWarningButtonText: "Fortfahren",

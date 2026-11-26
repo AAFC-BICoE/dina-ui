@@ -144,10 +144,14 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cfiaPPCLevel: "Niveau ACIA PPC",
   changedProperties: "Modifications",
   changeOrder: "Modifier l'ordre",
+  changeOrderConflict:
+    "Quelqu'un d'autre a modifié l'ordre en même temps. Fermez et rouvrez Modifier l'ordre pour voir l'ordre le plus récent.",
   changeOrderInstructions:
     "Faites glisser les éléments pour les réordonner, ou sélectionnez un élément et utilisez les boutons fléchés. L'ordre est enregistré pour tous les utilisateurs de ce vocabulaire.",
   changeOrderNotEnoughItems:
     "Il faut au moins deux éléments pour modifier l'ordre.",
+  changeOrderNotPermitted:
+    "Vous n'avez pas la permission de modifier certains de ces éléments, l'ordre n'a donc pas été enregistré.",
   childCultureStrains: "Souches de culture",
   childMaterialSamples: "Échantillon de Matériel Direct Enfants",
   childrenStorageUnits: "Tables enfants des unités de stockage",
