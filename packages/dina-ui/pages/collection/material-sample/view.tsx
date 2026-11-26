@@ -27,6 +27,7 @@ import {
   Head,
   MaterialSampleFormTemplateSelect,
   MaterialSampleIdentifiersSection,
+  MaterialSampleInfoManagedAttributes,
   MaterialSampleInfoSection,
   Nav,
   OrganismsField,
@@ -66,6 +67,7 @@ import {
   MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
   MATERIAL_SAMPLE_CHILDREN_COMPONENT_NAME,
   MATERIAL_SAMPLE_HIERARCHY_COMPONENT_NAME,
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
   MaterialSample,
   ORGANISMS_COMPONENT_NAME,
@@ -505,6 +507,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
                     <MaterialSampleInfoSection
                       id={MATERIAL_SAMPLE_INFO_COMPONENT_NAME}
+                      visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+                    />
+                    <MaterialSampleInfoManagedAttributes
+                      id={MANAGED_ATTRIBUTES_COMPONENT_NAME}
                       visibleManagedAttributeKeys={visibleManagedAttributeKeys}
                     />
                     {withResponse(colEventQuery, ({ data: colEvent }) => {

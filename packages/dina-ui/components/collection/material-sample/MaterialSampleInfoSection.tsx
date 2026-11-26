@@ -2,11 +2,13 @@ import {
   AutoSuggestTextField,
   ControlledVocabularySelectField,
   DateField,
+  DinaFormSection,
   FieldSet,
   FieldSpy,
   FieldWrapper,
   INLINE_LABEL_WIDTH,
   TextField,
+  DinaFormContext,
   useDinaFormContext
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../..//intl/dina-ui-intl";
@@ -20,7 +22,7 @@ import { Vocabulary } from "../../../types/collection-api";
 import { MaterialSampleStateReadOnlyRender } from "../MaterialSampleStateWarning";
 import _ from "lodash";
 import classNames from "classnames";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { FaCircleInfo } from "react-icons/fa6";
 import styles from "./MaterialSampleInfoSection.module.css";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
@@ -434,5 +436,59 @@ function SplitOptionInfoPanel({
         {formatMessage("splitExampleFooter")}
       </div>
     </div>
+  );
+}
+
+/** Shows the managed attributes on their own when the Form Template hides the Material Sample Info section they normally appear in. */
+export function MaterialSampleInfoManagedAttributes({
+  id,
+  visibleManagedAttributeKeys
+}: {
+  id?: string;
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
+}) {
+  const { readOnly } = useDinaFormContext();
+  const { formTemplate, isTemplate } = useContext(DinaFormContext) ?? {};
+
+  // Copy of FieldSet's check for hiding the Material Sample Info section.
+  const infoSectionHidden =
+    !!formTemplate &&
+    ((!isTemplate &&
+      !formTemplate.components?.find(
+        (component) => component.name === MATERIAL_SAMPLE_INFO_COMPONENT_NAME
+      )?.visible) ||
+      !!_.find(
+        _.find(formTemplate.components, {
+          name: MATERIAL_SAMPLE_INFO_COMPONENT_NAME
+        })?.sections,
+        { name: "material-sample-info-section" }
+      )?.items?.every((item) => item.visible === false));
+
+  if (!readOnly || !infoSectionHidden) {
+    return null;
+  }
+
+  return (
+    <DinaFormSection
+      componentName={MANAGED_ATTRIBUTES_COMPONENT_NAME}
+      sectionName="managed-attributes-section"
+    >
+      <div className="row">
+        <div className="col-md-12">
+          <ManagedAttributesEditor
+            valuesPath="managedAttributes"
+            managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+            managedAttributeComponent="MATERIAL_SAMPLE"
+            fieldSetProps={{
+              id,
+              legend: <DinaMessage id="materialSampleManagedAttributes" />
+            }}
+            visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
+            disableClearButton={true}
+            isControlledVocabulary={true}
+          />
+        </div>
+      </div>
+    </DinaFormSection>
   );
 }
