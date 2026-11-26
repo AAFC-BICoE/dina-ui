@@ -190,3 +190,8 @@
   background-color: #335075;
   border-color: #335075;
 }
+
+/* An unset value still reads as "Parent of another type", so the label isn't greyed out as empty. */
+.splitReadOnly :global(.field-label-empty) {
+  color: inherit;
+}

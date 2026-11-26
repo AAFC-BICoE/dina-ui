@@ -737,6 +737,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Modèles de formulaire des échantillons de matériau",
   materialSampleHierarchy: "Hiérarchie de l’échantillon de matériau",
   materialSampleInfo: "Info sur l'échantillon de matière",
+  materialSampleInfoManagedAttributesHint:
+    "Les attributs gérés se modifient dans leur propre section :",
   materialSampleListTitle: "Échantillons de matériaux",
   materialSampleManagedAttributes:
     "Attributs gérés de l’échantillon de matière",

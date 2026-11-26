@@ -8,6 +8,7 @@ import {
   FieldWrapper,
   INLINE_LABEL_WIDTH,
   TextField,
+  DinaFormContext,
   useDinaFormContext
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../..//intl/dina-ui-intl";
@@ -21,7 +22,8 @@ import { Vocabulary } from "../../../types/collection-api";
 import { MaterialSampleStateReadOnlyRender } from "../MaterialSampleStateWarning";
 import _ from "lodash";
 import classNames from "classnames";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { FaCircleInfo } from "react-icons/fa6";
 import styles from "./MaterialSampleInfoSection.module.css";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
@@ -32,7 +34,13 @@ export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
   "materialSampleType"
 ];
 
-export function MaterialSampleInfoSection({ id }: { id?: string }) {
+export function MaterialSampleInfoSection({
+  id,
+  visibleManagedAttributeKeys
+}: {
+  id?: string;
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
+}) {
   const { locale, formatMessage } = useDinaIntl();
 
   const { readOnly, isTemplate } = useDinaFormContext();
@@ -105,6 +113,27 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
             ) : null
           }
         </FieldSpy>
+      )}
+      {!readOnly && (
+        <div className="small text-muted mt-3 d-flex align-items-center gap-1">
+          <FaCircleInfo style={{ color: "#335075" }} />
+          <span>
+            <DinaMessage id="materialSampleInfoManagedAttributesHint" />{" "}
+            <a href={`#${MANAGED_ATTRIBUTES_COMPONENT_NAME}`}>
+              <DinaMessage id="managedAttributes" />
+            </a>
+          </span>
+        </div>
+      )}
+      {readOnly && (
+        <ManagedAttributesEditor
+          valuesPath="managedAttributes"
+          managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+          managedAttributeComponent="MATERIAL_SAMPLE"
+          visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
+          disableClearButton={true}
+          isControlledVocabulary={true}
+        />
       )}
     </FieldSet>
   );
@@ -206,6 +235,7 @@ const SPLIT_EXAMPLES: Record<"parent" | "thisSample", SplitExampleRow[]> = {
 /** Where split names start from: this sample (isBaseForSplitByType) or a parent of another type. */
 function SplitNamesStartFromField() {
   const { formatMessage } = useDinaIntl();
+  const { readOnly } = useDinaFormContext();
   const options = [
     {
       value: false,
@@ -229,7 +259,7 @@ function SplitNamesStartFromField() {
   return (
     <FieldWrapper
       name="isBaseForSplitByType"
-      className={styles.splitField}
+      className={readOnly ? styles.splitReadOnly : styles.splitField}
       disableTemplateCheckbox={true}
       disableLabelClick={true}
       readOnlyRender={(value) =>
@@ -409,6 +439,7 @@ function SplitOptionInfoPanel({
   );
 }
 
+/** Shows the managed attributes on their own when the Form Template hides the Material Sample Info section they normally appear in. */
 export function MaterialSampleInfoManagedAttributes({
   id,
   visibleManagedAttributeKeys
@@ -417,8 +448,23 @@ export function MaterialSampleInfoManagedAttributes({
   visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }) {
   const { readOnly } = useDinaFormContext();
+  const { formTemplate, isTemplate } = useContext(DinaFormContext) ?? {};
 
-  if (!readOnly) {
+  // Copy of FieldSet's check for hiding the Material Sample Info section.
+  const infoSectionHidden =
+    !!formTemplate &&
+    ((!isTemplate &&
+      !formTemplate.components?.find(
+        (component) => component.name === MATERIAL_SAMPLE_INFO_COMPONENT_NAME
+      )?.visible) ||
+      !!_.find(
+        _.find(formTemplate.components, {
+          name: MATERIAL_SAMPLE_INFO_COMPONENT_NAME
+        })?.sections,
+        { name: "material-sample-info-section" }
+      )?.items?.every((item) => item.visible === false));
+
+  if (!readOnly || !infoSectionHidden) {
     return null;
   }
 
@@ -437,7 +483,6 @@ export function MaterialSampleInfoManagedAttributes({
               id,
               legend: <DinaMessage id="materialSampleManagedAttributes" />
             }}
-            managedAttributeOrderFieldName="managedAttributesOrder"
             visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
             disableClearButton={true}
             isControlledVocabulary={true}

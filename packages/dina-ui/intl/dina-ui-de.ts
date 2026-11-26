@@ -801,6 +801,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   materialSampleFormTemplate: "Formularvorlage zur Materialprobe",
   materialSampleFormTemplates: "Formularvorlage zur Materialprobe",
   materialSampleInfo: "Information zur Materialprobe",
+  materialSampleInfoManagedAttributesHint:
+    "Zusatzfelder werden in einem eigenen Abschnitt bearbeitet:",
   materialSampleListTitle: "Materialprobe",
   materialSampleManagedAttributes: "Zusatzfelder zur Materialprobe",
   materialSampleName: "Name der Materialprobe",

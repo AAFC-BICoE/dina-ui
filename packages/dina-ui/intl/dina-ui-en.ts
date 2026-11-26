@@ -958,6 +958,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleFormTemplates: "Material Sample Form Templates",
   materialSampleHierarchy: "Material Sample Hierarchy",
   materialSampleInfo: "Material Sample Info",
+  materialSampleInfoManagedAttributesHint:
+    "Managed attributes are edited in their own section:",
   materialSampleListTitle: "Material Samples",
   materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleName: "Material Sample Name",
