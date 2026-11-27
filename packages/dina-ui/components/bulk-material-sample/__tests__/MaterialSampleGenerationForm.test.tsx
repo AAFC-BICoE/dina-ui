@@ -62,7 +62,7 @@ describe("MaterialSampleGenerationForm", () => {
     await waitFor(() => {
       expect(
         wrapper.getByRole("combobox", {
-          name: /collection type here to search\./i
+          name: /collection type here to search/i
         })
       ).toBeInTheDocument();
     });
@@ -71,7 +71,7 @@ describe("MaterialSampleGenerationForm", () => {
     // Change the collection
     await userEvent.type(
       wrapper.getByRole("combobox", {
-        name: /collection type here to search\./i
+        name: /collection type here to search/i
       }),
       "test-collection"
     );

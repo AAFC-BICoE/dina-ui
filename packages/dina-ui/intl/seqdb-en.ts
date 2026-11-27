@@ -80,7 +80,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   libraryPoolsListTitle: "Library Pools",
   libraryPrepBatch: "Library Prep Batch",
   libraryPrepBatchListTitle: "Library Prep Batches",
-  materialSampleNameAndVersion: "Sample Name and Version",
+  materialSampleNameAndVersion: "Material Sample Name and Version",
   ngsIndexes: "NGS Indexes",
   ngsWorkflowListTitle: "NGS Workflow",
   ngsWorkflowWholeGenomeSeqPoolingTitle:

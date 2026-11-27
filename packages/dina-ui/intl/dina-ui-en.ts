@@ -330,7 +330,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createNewLabel: "Create New",
   createNewMaterialSamples: "Create New Material Samples",
   createNewView: "Create New View",
-  createSampleWithFormTemplate: "Create Sample",
+  createSampleWithFormTemplate: "Create Material Sample",
   createSavedSearch: "Create Saved Search",
   createSplitWorkflow: "Create Split",
   createStorage: "Create Storage",
@@ -484,7 +484,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Method used during an Collecting Event. Examples: UV light trap, bottom traw",
   field_collectingEventHost: "Host",
   field_collectingEventHost_tooltip:
-    "Observed host of the material-sample at the time of the collecting-event",
+    "Observed host of the material sample at the time of the collecting event",
   field_collectingEventSubstrate: "Substrate",
   field_collectingEventSubstrate_tooltip:
     "Observed surface on which an organism was collected and understood to have lived",
@@ -536,7 +536,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "The degree to which an Organism survives, reproduces, and expands its range at the given place and time.",
   field_dwcFieldNumber: "Collection Number",
   field_dwcFieldNumber_tooltip:
-    "An identifier given to the event in the field at the time of collecting one or more samples. Often serves as a link between field notes and the Event.",
+    "An identifier given to the event in the field at the time of collecting one or more material samples. Often serves as a link between field notes and the Event.",
   field_dwcGeodeticDatum: "Geodetic Datum",
   field_dwcGeodeticDatum_tooltip:
     "The geodetic datum upon which the geographic coordinates given in decimalLatitude and decimalLongitude is based. Recommended best practice is to use the EPSG code. Examples: EPSG:4326 (EPSG code for WGS84)",
@@ -620,21 +620,22 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_isRestricted: "Is Restricted",
   field_isBaseForSplitByType: "Split Names Start From",
   splitNamesFromParent: "Parent of another type",
-  splitNamesFromThisSample: "This sample",
+  splitNamesFromThisSample: "This material sample",
   splitNamesStartFromHelp:
     "This setting is only relevant when using a Material Sample Type split strategy.",
   splitNamesFromParentDescription:
-    "Default. Names start from the nearest sample above with a different type.",
+    "Default. Names start from the nearest material sample above with a different type.",
   splitNamesFromThisSampleDescription:
-    "Names for samples split below this one start from this sample.",
+    "Names for material samples split below this one start from this material sample.",
   splitNamesFromParentRule:
-    "The search keeps moving up until it finds a sample of a different type. Here ABC-123-a is the same type, so it continues to ABC-123.",
+    "The search keeps moving up until it finds a material sample of a different type. Here ABC-123-a is the same type, so it continues to ABC-123.",
   splitNamesFromThisSampleRule:
-    "With this setting on, the search stops at this sample, even though a higher sample (ABC-123) has a different type.",
+    "With this setting on, the search stops at this material sample, even though a higher material sample (ABC-123) has a different type.",
   splitHowBaseIsFound: "How the base is found",
-  splitHowBaseIsFoundStep1: "Start at the parent of the sample being split.",
+  splitHowBaseIsFoundStep1:
+    "Start at the parent of the material sample being split.",
   splitHowBaseIsFoundStep2:
-    "Stop if that sample has this setting on, or has a different type.",
+    "Stop if that material sample has this setting on, or has a different type.",
   splitHowBaseIsFoundStep3: "Otherwise move up one level and check again.",
   splitExampleWholeOrganism: "Whole Organism",
   splitExampleOrganismPart: "Organism Part",
@@ -650,7 +651,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitExampleKeepGoing: "keep going up",
   splitExampleStop: "stop: names start here",
   splitExampleFooter:
-    "Numbers show the order levels are checked. Dashed rows are the new children. Sample IDs and types are examples.",
+    "Numbers show the order levels are checked. Dashed rows are the new children. Material sample IDs and types are examples.",
   field_isolatedBy: "Isolated By",
   field_isolatedOn: "Isolated On",
   field_isolationRemarks: "Isolation Remarks",
@@ -901,7 +902,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   languageOfPage: "eng",
   largeImg: "Large Image",
   croppedImg: "Cropped Image",
-  latestSampleTitle: "Most Recent Sample Added",
+  latestSampleTitle: "Most Recent Material Sample Added",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
@@ -932,7 +933,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "material-sample": "Material Sample",
   metadata: "Metadata",
   materialDirection_tooltip:
-    "Transaction Material Direction: {materialDirection}",
+    "Transaction Material Sample Direction: {materialDirection}",
   materialIn: "Material In",
   materialOut: "Material Out",
   materialSample: "Material Sample",
@@ -1076,7 +1077,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   parent: "Parent",
   parentCollectionLabel: "Parent Collection",
   parentMaterialSample: "Parent Material Sample",
-  parentSampleNotFoundLabel: " Parent sample not found",
+  parentSampleNotFoundLabel: "Parent material sample not found",
   partial: "Partial",
   personListTitle: "Persons",
   phacAnimalRGLevel: "PHAC Animal RG Level",
@@ -1313,7 +1314,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   source: "Source",
   specifyParentContainer: "Please select parent container",
   splitButton: "Split",
-  splitFrom: "Split from",
+  splitFrom: "Split from:",
   splitGenerationOptionLabel: "Generation Options",
   splitGenerationOptionLowercase: "a (Lowercase letters)",
   splitGenerationOptionNumerical: "1 (Numerical)",
@@ -1326,8 +1327,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitSampleChildSamplesToCreateLabel: "Child Material Samples to create",
   splitSampleConfigLegend: "Configure Action: Split",
   splitSampleDescription:
-    "Split a Parent Sample into one or more Child Samples",
-  splitSampleInstructions: "Max number of child samples to create is 30",
+    "Split a Parent Material Sample into one or more Child Material Samples",
+  splitSampleInstructions:
+    "Max number of child material samples to create is 30",
   splitSampleRemarksPlaceholder:
     " Describe what you did, what was changed, or what happened as a result. (i.e. removed leg)",
   splitSampleTagOriginalAsDestroyed: 'Tag Original as "Destroyed"',
@@ -1564,7 +1566,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   mapColumns: "Column Mapping",
   field_transactionNumber: "Transaction Number",
   field_transactionType: "Transaction Type",
-  field_materialDirection: "Material Direction",
+  field_materialDirection: "Material Sample Direction",
   field_otherIdentifiers: "Other Identifiers",
   field_purpose: "Purpose",
   field_status: "Status",

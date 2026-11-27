@@ -24,7 +24,6 @@ import PageLayout from "../../../components/page/PageLayout";
 
 export default function StorageUnitTypeEditPage() {
   const router = useRouter();
-  const { formatMessage } = useDinaIntl();
 
   const {
     query: { id }
@@ -42,7 +41,7 @@ export default function StorageUnitTypeEditPage() {
   }
 
   return (
-    <PageLayout titleId={formatMessage(title)}>
+    <PageLayout titleId={title}>
       {id ? (
         withResponse(storageUnitTypeQuery, ({ data }) => (
           <StorageUnitTypeForm storageUnitType={data} onSaved={goToViewPage} />

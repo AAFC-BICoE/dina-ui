@@ -8,7 +8,6 @@ import {
 import Link from "next/link";
 import { groupCell, GroupSelectField } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnitType } from "../../../types/collection-api";
 
 const STORAGE_UNIT_TYPE_FILTER_ATTRIBUTES = ["name", "createdBy"];
@@ -29,11 +28,9 @@ const STORAGE_UNIT_TYPE_TABLE_COLUMNS: ColumnDefinition<StorageUnitType>[] = [
 ];
 
 export default function StorageUnitTypeListPage() {
-  const { formatMessage } = useDinaIntl();
-
   return (
     <PageLayout
-      titleId={formatMessage("storageUnitTypeListTitle")}
+      titleId="storageUnitTypeListTitle"
       buttonBarContent={
         <div className="flex d-flex ms-auto">
           <CreateButton entityLink="/collection/storage-unit-type" />

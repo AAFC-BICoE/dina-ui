@@ -1200,7 +1200,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   splitConfiguration_separator_dash: "Bindestrich",
   splitConfiguration_separator_space: "Leerzeichen",
   splitConfiguration_separator_underscore: "Unterstrich",
-  splitFrom: "Aufteilen von",
+  splitFrom: "Aufteilen von:",
   splitGenerationOptionLabel: "Generierungsoptionen",
   splitGenerationOptionLowercase: "a (Kleinbuchstaben)",
   splitGenerationOptionNumerical: "1 (Zahlen)",

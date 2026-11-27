@@ -294,7 +294,7 @@ export function MaterialSampleSplitGenerationForm({
             <Card>
               <Card.Body>
                 <strong>
-                  <DinaMessage id="splitFrom" />:
+                  <DinaMessage id="splitFrom" />
                 </strong>
                 <ul className="mb-0">
                   {filteredMaterialSamples.map((materialSample, index) => (
