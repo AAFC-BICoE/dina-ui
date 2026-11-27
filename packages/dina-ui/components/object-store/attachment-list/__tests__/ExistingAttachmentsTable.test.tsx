@@ -155,6 +155,47 @@ describe("ExistingAttachmentsTable component", () => {
     });
   });
 
+  it("Falls back to the metadata id when there is no filename", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <ExistingAttachmentsTable metadatas={METADATA_FILES} />
+      </DinaForm>,
+      {
+        apiContext: {
+          ...apiContext,
+          bulkGet: jest.fn(async (paths) =>
+            (await mockBulkGet(paths)).map((resource: any) =>
+              resource?.id === "11111111-1111-1111-1111-111111111111"
+                ? { ...resource, filename: undefined }
+                : resource
+            )
+          )
+        }
+      }
+    );
+    await waitForLoadingToDisappear();
+
+    await waitFor(() => {
+      const rows = wrapper.container.querySelectorAll(".ReactTable tbody tr");
+      expect(rows).toHaveLength(2);
+
+      // The attachment with a filename still shows its filename:
+      expect(
+        wrapper.getByRole("link", { name: /test-file-1.png/i })
+      ).toBeInTheDocument();
+
+      // The attachment without a filename shows its id, linking to the object view page:
+      const fallbackLink = wrapper.getByRole("link", {
+        name: /11111111-1111-1111-1111-111111111111/i
+      });
+      expect(fallbackLink).toBeInTheDocument();
+      expect(fallbackLink).toHaveAttribute(
+        "href",
+        "/object-store/object/view?id=11111111-1111-1111-1111-111111111111"
+      );
+    });
+  });
+
   it("Shows the object store unavailable message when the metadata request fails", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
