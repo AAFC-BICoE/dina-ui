@@ -116,7 +116,7 @@ function StorageUnitGridForm() {
 
   return (
     <PageLayout
-      titleId={formatMessage("storageUnitGridTitle")}
+      titleId="storageUnitGridTitle"
       buttonBarContent={buttonBarContent}
     >
       {withResponse(storageUnitQuery, ({ data }) => (

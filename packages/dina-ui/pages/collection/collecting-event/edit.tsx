@@ -42,7 +42,7 @@ export default function CollectingEventEditPage() {
   const collectingEventQuery = useCollectingEventQuery(id?.toString());
 
   return (
-    <PageLayout titleId={formatMessage(title)}>
+    <PageLayout titleId={title}>
       <Head title={formatMessage(title)} />
       {id ? (
         <div>

@@ -157,7 +157,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   resetSort: "Reset Sort",
   results: " Results",
   rows: "rows",
-  rowsPerPage: "rows per page",
+  rowsPerPage: "Rows per page",
   search: "Search",
   searchResults: "Search results",
   select: "Select",

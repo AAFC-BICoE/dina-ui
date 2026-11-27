@@ -146,7 +146,6 @@ function ControlledVocabularyItemEditPageContent({
   apiBaseUrl,
   listRoute
 }: ControlledVocabularyItemEditPageContentProps) {
-  const { formatMessage } = useDinaIntl();
   const formRef =
     useRef<FormikProps<InputResource<ControlledVocabularyItem>>>(null);
 
@@ -268,10 +267,7 @@ function ControlledVocabularyItemEditPageContent({
 
   return (
     <FormSubmissionContext.Provider value={{ submitForm, formRef }}>
-      <PageLayout
-        titleId={formatMessage(title as any)}
-        buttonBarContent={buttonBarContent}
-      >
+      <PageLayout titleId={title} buttonBarContent={buttonBarContent}>
         <DinaForm
           initialValues={initialValues}
           onSubmit={onSubmit}

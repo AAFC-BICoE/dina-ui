@@ -144,7 +144,7 @@ export function Pagination<TData>({
           <span className="-totalPages">{totalPages}</span>
         </span>
         <span className="-select-wrap -pageSizeOptions">
-          <span style={{ textTransform: "capitalize" }}>
+          <span>
             <DinaMessage id="rowsPerPage" />
           </span>
           <CreatableSelect<SelectOption<number>>

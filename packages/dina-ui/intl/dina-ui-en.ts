@@ -1313,7 +1313,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   source: "Source",
   specifyParentContainer: "Please select parent container",
   splitButton: "Split",
-  splitFrom: "Split from",
+  splitFrom: "Split from:",
   splitGenerationOptionLabel: "Generation Options",
   splitGenerationOptionLowercase: "a (Lowercase letters)",
   splitGenerationOptionNumerical: "1 (Numerical)",
