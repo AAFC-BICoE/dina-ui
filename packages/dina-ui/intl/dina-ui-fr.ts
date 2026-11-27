@@ -154,7 +154,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   changeOrderNotPermitted:
     "Vous n'avez pas la permission de modifier certains de ces éléments, l'ordre n'a donc pas été enregistré.",
   childCultureStrains: "Souches de culture",
-  childMaterialSamples: "Échantillon de Matériel Direct Enfants",
+  childMaterialSamples: "Enfants directs de l’échantillon de matériel",
   childrenStorageUnits: "Unités de stockage descendantes",
   closePreviewButtonText: "Fermer la prévisualisation",
   colSearchBoxTooltip: "Rechercher dans le Catalogue de la vie",
@@ -211,27 +211,27 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createNewMaterialSamples: "Créer de nouveaux échantillons de matériel",
   createNewView: "Créer une nouvelle vue",
   createSampleWithFormTemplate:
-    "Créer un échantillon à l'aide d'un modèle de formulaire",
-  createSavedSearch: "Créer une recherche sauvegardée",
+    "Créer un échantillon de matériel à l'aide d'un modèle de formulaire",
+  createSavedSearch: "Créer une recherche enregistrée",
   createSplitWorkflow: "Créer un fractionnement",
   field_isBaseForSplitByType: "Noms du fractionnement à partir de",
   splitNamesFromParent: "Parent d’un autre type",
-  splitNamesFromThisSample: "Cet échantillon",
+  splitNamesFromThisSample: "Cet échantillon de matériel",
   splitNamesStartFromHelp:
     "Ce paramètre ne s’applique que lors de l’utilisation d’une stratégie de fractionnement par type d’échantillon de matériel.",
   splitNamesFromParentDescription:
-    "Par défaut. Les noms partent de l’échantillon le plus proche au-dessus ayant un type différent.",
+    "Par défaut. Les noms partent de l’échantillon de matériel le plus proche au-dessus ayant un type différent.",
   splitNamesFromThisSampleDescription:
-    "Les noms des échantillons fractionnés sous celui-ci partent de cet échantillon.",
+    "Les noms des échantillons de matériel fractionnés sous celui-ci partent de cet échantillon de matériel.",
   splitNamesFromParentRule:
-    "La recherche remonte jusqu’à trouver un échantillon d’un type différent. Ici, ABC-123-a est du même type, elle continue donc jusqu’à ABC-123.",
+    "La recherche remonte jusqu’à trouver un échantillon de matériel d’un type différent. Ici, ABC-123-a est du même type, elle continue donc jusqu’à ABC-123.",
   splitNamesFromThisSampleRule:
-    "Lorsque ce paramètre est activé, la recherche s’arrête à cet échantillon, même si un échantillon plus haut (ABC-123) a un type différent.",
+    "Lorsque ce paramètre est activé, la recherche s’arrête à cet échantillon de matériel, même si un échantillon de matériel plus haut (ABC-123) a un type différent.",
   splitHowBaseIsFound: "Comment la base est trouvée",
   splitHowBaseIsFoundStep1:
-    "Commencer au parent de l’échantillon en fractionnement.",
+    "Commencer au parent de l’échantillon de matériel en fractionnement.",
   splitHowBaseIsFoundStep2:
-    "Arrêter si cet échantillon a ce paramètre activé ou un type différent.",
+    "Arrêter si cet échantillon de matériel a ce paramètre activé ou un type différent.",
   splitHowBaseIsFoundStep3:
     "Sinon, remonter d’un niveau et vérifier à nouveau.",
   splitExampleWholeOrganism: "Organisme entier",
@@ -248,7 +248,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   splitExampleKeepGoing: "continuer à remonter",
   splitExampleStop: "arrêter : les noms partent d’ici",
   splitExampleFooter:
-    "Les numéros indiquent l’ordre de vérification des niveaux. Les lignes en pointillés sont les nouveaux enfants. Les identifiants et types d’échantillons sont des exemples.",
+    "Les numéros indiquent l’ordre de vérification des niveaux. Les lignes en pointillés sont les nouveaux enfants. Les identifiants et types d’échantillons de matériel sont des exemples.",
   createStorage: "Créer un espace d'entreposage",
   customPlaceName: "Nom de lieu personnalisé",
   dataComponents: "Sections",
@@ -408,7 +408,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "La mesure dans laquelle un organisme survit, se reproduit et étend son aire de répartition à un endroit et à un moment donnés.",
   field_dwcFieldNumber: "Numéro de collection",
   field_dwcFieldNumber_tooltip:
-    "Identifiant donné à l'activité sur le terrain au moment de la collecte d'un ou de plusieurs échantillons, servant souvent de lien entre les notes prises sur le terrain et l'activité.",
+    "Identifiant donné à l'activité sur le terrain au moment de la collecte d'un ou de plusieurs échantillons de matériel, servant souvent de lien entre les notes prises sur le terrain et l'activité.",
   field_dwcGeodeticDatum: "Référence géodésique",
   field_dwcGeodeticDatum_tooltip:
     "La référence géodésique sur laquelle les coordonnées géographiques decimalLatitude et decimalLongitude sont fondées. La pratique exemplaire recommandée est ",
@@ -714,7 +714,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   makePrimary: "Définir comme principale",
   managedAttributeEditTitle: "Modifier l’attribut géré",
   managedAttributeTemplateOrderInfo:
-    "Cette disposition des attributs gérés sera sauvegardée dans le modèle de formulaire.",
+    "Cette disposition des attributs gérés sera enregistrée dans le modèle de formulaire.",
   managedAttributeDeleteWarning:
     "La suppression de cet attribut géré pourrait avoir un impact sur des ressources non suivies existantes comme les exportations ou les scripts. Voulez-vous vraiment continuer ?",
   managedAttributeValueLabel: "Valeur",
@@ -724,7 +724,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   managedAttributesViews: "Modèles de formulaires",
   "material-sample": "Échantillon de matériel",
   materialDirection_tooltip:
-    "Direction du matériau visé par la transaction : {materialDirection}",
+    "Direction de l’échantillon de matériel de la transaction : {materialDirection}",
   materialIn: "Entrée de matériel",
   materialOut: "Sortie de matériel",
   materialSample: "Échantillon de matériel",
@@ -791,11 +791,11 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Utilisez les unités suivantes pour la conversion automatique : pi, po, pi po, vg, mm, cm, km",
   moveAllContent: "Déplacer tout le contenu",
   moveAllContent_tooltip:
-    "Transférez tous les articles de rangement pour enfants et les échantillons dans le nouvel espace de rangement",
+    "Transférez tous les articles de rangement pour enfants et les échantillons de matériel dans le nouvel espace de rangement",
   moveItemDown: "Descendre {name}",
   moveItemUp: "Monter {name}",
   multiple: "Multiple",
-  multipleMaterialSamples: "Échantillons à matériel multiple",
+  multipleMaterialSamples: "Plusieurs échantillons de matériel",
   multipleUnits: "Multiples unités",
   mustBeValidDecimalValue: "Doit être une valeur décimale valide.",
   mustBeValidIntegerValue: "Doit être une valeur entière valide.",
@@ -838,7 +838,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   parentCollectionLabel: "Collection mère",
   parent: "Parent",
   parentMaterialSample: "Échantillon de matériel parent",
-  parentSampleNotFoundLabel: "Échantillon parent non trouvé",
+  parentSampleNotFoundLabel: "Échantillon de matériel parent non trouvé",
   partial: "Partiel",
   peopleTitle: "Personnes",
   personListTitle: "Personnes",
@@ -936,8 +936,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   rolesPerGroup: "Rôles par groupe",
   runWorkflow: "Exécuter le flux des travaux",
   save: "Enregistrer",
-  bulkEditingAllSamples: "Modification de {total} échantillons",
-  bulkEditingSampleOf: "Modification de l'échantillon {current} sur {total}",
+  bulkEditingAllSamples: "Modification de {total} échantillons de matériel",
+  bulkEditingSampleOf:
+    "Modification de l'échantillon de matériel {current} sur {total}",
   bulkEditingAllMetadata:
     "Modification de {total} enregistrements de métadonnées",
   bulkEditingMetadataOf: "Modification des métadonnées {current} sur {total}",
@@ -1016,9 +1017,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Échantillons de matériel enfant à créer",
   splitSampleConfigLegend: "Configurer une action : Division ",
   splitSampleDescription:
-    "Diviser un échantillon parent en un ou plusieurs échantillons enfant",
+    "Diviser un échantillon de matériel parent en un ou plusieurs échantillons de matériel enfant",
   splitSampleInstructions:
-    "Le nombre maximum d’échantillons enfant à créer est de 30",
+    "Le nombre maximum d’échantillons de matériel enfant à créer est de 30",
   splitSampleRemarksPlaceholder:
     "Décrivez ce que vous avez fait, ce qui a été modifié, ou ce qui s’est passé en a résulté (par exemple, la suppression d’une partie)",
   splitSampleTagOriginalAsDestroyed: "Identifier l’original comme « Détruit »",
@@ -1030,7 +1031,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "La série continue est seulement disponible si l'échantillon de matériel qui est fractionné a déjà des enfants pour continuer la série.",
   splitSeriesOptionLabel: "Options de séries",
   splitSeriesOptionNew: "Nouvelle série",
-  splitSubsampleTitle: "Division (sous-échantillon)",
+  splitSubsampleTitle: "Division de l’échantillon de matériel",
   splitWorkflowRunTitle: "Exécuter la division du flux de travail ",
   spreadsheetHeader: "En-tête de la feuille de calcul",
   startNewRunConfigLabel: "Lancer une nouvelle éxécution",
@@ -1124,7 +1125,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Entrer la nouvelle étiquette ou consulter les précédentes étiquettes",
   typeSpecimen: "Taper spécimen",
   unit: "Unité",
-  unsavedChanges: "Modifications non sauvegardées apportées",
+  unsavedChanges: "Modifications non enregistrées apportées",
   unsetAsDefault: "Ne plus définir par défaut",
   unsupportedFileTypeError:
     'Le fichier "{fileName}" ne peut pas être téléversé puisque ce type de fichier n\'est pas pris en charge.  ',
@@ -1178,7 +1179,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_storageUnit: "Unité de stockage",
   field_transactionNumber: "Numéro de transaction",
   field_transactionType: "Type de transaction",
-  field_materialDirection: "Direction du matériau",
+  field_materialDirection: "Direction de l’échantillon de matériel",
   field_otherIdentifiers: "Autres identifiants",
   field_purpose: "But",
   field_status: "Statut",
@@ -1211,7 +1212,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   permission_denied: "Refusé",
   permission_unavailable: "Indisponible",
   permission_objectOwner: "Propriétaire",
-  resource_materialSample: "Échantillon",
+  resource_materialSample: "Échantillon de matériel",
   resource_controlledVocabulary: "Vocabulaire contrôlé",
   resource_collection: "Collection",
   resource_project: "Projet",

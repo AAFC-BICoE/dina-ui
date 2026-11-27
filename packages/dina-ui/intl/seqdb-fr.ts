@@ -75,7 +75,7 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   libraryPoolsListTitle: "Banques des bibliothèques",
   libraryPrepBatch: "Lot préparé d'une bibliothèque",
   libraryPrepBatchListTitle: "Lots préparés des bibliothèques",
-  materialSampleNameAndVersion: "Nom et version de l'échantillon",
+  materialSampleNameAndVersion: "Nom et version de l'échantillon de matériel",
   ngsWorkflowListTitle: "Flux de séquençage de nouvelle génération (SNG)",
   ngsWorkflowWholeGenomeSeqPoolingTitle:
     "Flux de SNG - Banques pour le séquençage de tout le génome",
@@ -122,7 +122,7 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   sampleGridInstructions:
     "Faites glisser et déposez des échantillons entre la liste d'échantillons et la grille, ou placez automatiquement les échantillons dans la grille en sélectionnant une option « Remplir par » puis en cliquant sur le bouton « Déplacer tout ».",
   sampleSelectionInstructions:
-    "Votre sélection d’échantillons est sauvegardée lorsque vous appuyez sur un bouton de sélection ou de désélection. Il n’y a pas de bouton Enregistrer distinct.",
+    "Votre sélection d’échantillons est enregistrée lorsque vous appuyez sur un bouton de sélection ou de désélection. Il n’y a pas de bouton Enregistrer distinct.",
   sampleSelectionTitle: "Sélection d’échantillons",
   sampleVersion: "Version de l'échantillon",
   sangerWorkflowSequencingListTitle: "Méthode de Sanger - Séquençage",
@@ -135,9 +135,9 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   selectMaterialSamples: "Sélectionner des échantillons de matériel",
   selectPcrBatch: "Sélectionner Lot de PCR",
   selectPcrBatchTitle: "Sélectionner Lot de PCR",
-  selectSamples: "Sélectionner échantillons moléculaires",
+  selectSamples: "Sélectionner des échantillons de matériel",
   selectedPoolContents: "Contenu des banques sélectionnées",
-  selectedSamplesTitle: "Échantillons sélectionnés",
+  selectedSamplesTitle: "Échantillons de matériel sélectionnés",
   seqBatch: "Lot de SEQ",
   seqBatchListTitle: "Lots de SEQ",
   seqBatchName: "Nom du lot de SEQ",
