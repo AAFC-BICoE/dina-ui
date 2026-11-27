@@ -789,6 +789,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   metadataUploadDetailsLabel: "Télécharger les détails",
   metersField_tooltip:
     "Utilisez les unités suivantes pour la conversion automatique : pi, po, pi po, vg, mm, cm, km",
+  molecularAnalysisExport: "Exportation d’analyse moléculaire",
   moveAllContent: "Déplacer tout le contenu",
   moveAllContent_tooltip:
     "Transférez tous les articles de rangement pour enfants et les échantillons de matériel dans le nouvel espace de rangement",

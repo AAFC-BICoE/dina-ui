@@ -21,12 +21,14 @@ import { useIntl } from "react-intl";
 import {
   FaCheck,
   FaCodeBranch,
-  FaDownload,
+  FaDna,
+  FaFileArchive,
   FaExclamationTriangle,
   FaInfoCircle,
   FaPen,
   FaTimes,
-  FaTrash
+  FaTrash,
+  FaTable
 } from "react-icons/fa";
 import { ReactNode, useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
@@ -152,6 +154,8 @@ export interface BulkActionsDropdownProps<TData extends KitsuResource> {
   edit?: BulkEditButtonProps;
   split?: BulkSplitButtonProps;
   dataExport?: DataExportButtonProps<TData>;
+  objectExport?: DataExportButtonProps<TData>;
+  molecularExport?: DataExportButtonProps<TData>;
   del?: BulkDeleteButtonProps;
 }
 
@@ -161,6 +165,8 @@ export function BulkActionsDropdown<TData extends KitsuResource>({
   edit,
   split,
   dataExport,
+  objectExport,
+  molecularExport,
   del
 }: BulkActionsDropdownProps<TData>) {
   const { values } = useFormikContext<BulkSelectableFormValues>();
@@ -246,6 +252,15 @@ export function BulkActionsDropdown<TData extends KitsuResource>({
             {dataExport && (
               <DataExportButton {...dataExport} className={itemClass} />
             )}
+            {objectExport && (
+              <ObjectExportButton {...objectExport} className={itemClass} />
+            )}
+            {molecularExport && (
+              <MolecularExportButton
+                {...molecularExport}
+                className={itemClass}
+              />
+            )}
             {del &&
               withWarning(
                 <BulkDeleteButton
@@ -284,6 +299,26 @@ export function BulkActionsDropdown<TData extends KitsuResource>({
                 exportAll
                 className={itemClass}
               />
+              {objectExport && (
+                <ObjectExportButton
+                  {...objectExport}
+                  exportAll
+                  className={itemClass}
+                />
+              )}
+              {molecularExport && (
+                <MolecularExportButton
+                  {...molecularExport}
+                  exportAll
+                  className={itemClass}
+                />
+              )}
+              <div className="bulk-actions-note">
+                <FaInfoCircle />
+                <span>
+                  <CommonMessage id="searchResultsNote" />
+                </span>
+              </div>
             </div>
           )}
         </div>
@@ -630,6 +665,10 @@ export interface DataExportButtonProps<TData extends KitsuResource> {
   className?: string;
   /** Export every matching record, ignoring the current selection. */
   exportAll?: boolean;
+  label?: ReactNode;
+  icon?: ReactNode;
+  /** Export type the data export page starts on, e.g. OBJECT_ARCHIVE. */
+  exportType?: string;
 }
 
 /**
@@ -653,7 +692,10 @@ export function DataExportButton<TData extends KitsuResource>({
   indexName,
   entityLink,
   className = "btn btn-primary",
-  exportAll
+  exportAll,
+  label,
+  icon = <FaTable className="me-2" />,
+  exportType
 }: DataExportButtonProps<TData>) {
   const router = useRouter();
   const [_exportObjectIds, setExportObjectIds] = useSessionStorage<string[]>(
@@ -701,16 +743,62 @@ export function DataExportButton<TData extends KitsuResource>({
           query: {
             uniqueName,
             indexName,
-            entityLink
+            entityLink,
+            ...(exportType ? { exportType } : {})
           }
         });
       }}
     >
-      <FaDownload className="me-2" />
-      <CommonMessage
-        id={exportAll ? "exportAllMatching" : "exportSelectedButtonText"}
-      />
+      {icon}
+      {label ?? (
+        <CommonMessage
+          id={exportAll ? "exportAllMatching" : "exportSelectedButtonText"}
+        />
+      )}
     </FormikButton>
+  );
+}
+
+/** Selected rows as an archive of the object files, the data export page opens on that type. */
+export function ObjectExportButton<TData extends KitsuResource>(
+  props: DataExportButtonProps<TData>
+) {
+  return (
+    <DataExportButton
+      {...props}
+      exportType="OBJECT_ARCHIVE"
+      icon={<FaFileArchive className="me-2" />}
+      label={
+        <CommonMessage
+          id={
+            props.exportAll
+              ? "exportAllObjectsButtonText"
+              : "exportSelectedObjectsButtonText"
+          }
+        />
+      }
+    />
+  );
+}
+
+/** Same as the selected-rows data export, but skips the data export page. */
+export function MolecularExportButton<TData extends KitsuResource>(
+  props: DataExportButtonProps<TData>
+) {
+  return (
+    <DataExportButton
+      {...props}
+      icon={<FaDna className="me-2" />}
+      label={
+        <CommonMessage
+          id={
+            props.exportAll
+              ? "molecularAnalysisExportAllButtonText"
+              : "molecularAnalysisExportButtonText"
+          }
+        />
+      }
+    />
   );
 }
 

@@ -255,6 +255,7 @@ export default function MetadataListPage() {
                   groupAttribute: "bucket"
                 }}
                 bulkEditPath={"/object-store/metadata/bulk-edit"}
+                enableObjectExport={true}
                 dataExportProps={{
                   dataExportPath: "/export/data-export/export",
                   entityLink: "/object-store/object"

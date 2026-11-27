@@ -231,14 +231,21 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   noDeletePermission:
     "You don't have permission to delete records in these groups: {groups}.",
   onSelectedCount: "Selected ({count})",
-  onAllMatched: "All matched ({total})",
+  onAllMatched: "Search results ({total})",
+  searchResultsNote:
+    "Applies to every record matching your current search, on all pages. Checkboxes are ignored.",
+  exportAllObjectsButtonText: "Export All Matching Objects",
   noPermissionForGroups: "No permission for group: {groups}",
   noSelectionHint:
     "Tick the checkboxes in the table to choose records. These actions apply to the records you choose.",
   actionsOnSelected: "Actions on {count} selected",
   tableSelectedSuffix: " · {count} selected",
-  exportSelectedButtonText: "Export Selected",
-  exportAllMatching: "Export All Matching",
+  exportSelectedButtonText: "Export Selected Data",
+  exportSelectedObjectsButtonText: "Export Selected Objects",
+  exportAllMatching: "Export All Matching Data",
+  molecularAnalysisExportButtonText: "Export Selected Molecular Analysis",
+  molecularAnalysisExportAllButtonText:
+    "Export All Matching Molecular Analysis",
   deleteSuccess: "Successfully deleted {count} records.",
   noData: "No Data",
   listView: "List",

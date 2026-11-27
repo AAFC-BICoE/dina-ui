@@ -683,6 +683,7 @@ export default function MaterialSampleListPage() {
             dataExportPath: "/export/data-export/export",
             entityLink: "/collection/material-sample"
           }}
+          molecularExportPath="/export/molecular-analysis-export/export"
           bulkSplitPath="/collection/material-sample/bulk-split"
           tabs={MATERIAL_SAMPLE_TABS}
           defaultTab="list"

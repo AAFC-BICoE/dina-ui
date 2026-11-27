@@ -113,6 +113,16 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   min: "Min",
   mismatchMaterialSampleTypeError:
     "Einige Materialproben entsprechen nicht der Aufteilungskonfiguration und wurden entfernt.",
+  onAllMatched: "Suchergebnisse ({total})",
+  searchResultsNote:
+    "Gilt für alle Datensätze, die Ihrer aktuellen Suche entsprechen, auf allen Seiten. Kontrollkästchen werden ignoriert.",
+  exportAllObjectsButtonText: "Alle passenden Objekte exportieren",
+  exportSelectedButtonText: "Ausgewählte Daten exportieren",
+  exportSelectedObjectsButtonText: "Ausgewählte Objekte exportieren",
+  exportAllMatching: "Alle passenden Daten exportieren",
+  molecularAnalysisExportButtonText: "Ausgewählte Molekularanalyse exportieren",
+  molecularAnalysisExportAllButtonText:
+    "Alle passenden Molekularanalysen exportieren",
   multipleValues: "Mehrere Werte",
   multipleValuesFound: "Mehrere Werte gefunden",
   name: "Name",
