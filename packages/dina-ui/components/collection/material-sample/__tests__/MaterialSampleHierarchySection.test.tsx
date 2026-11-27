@@ -178,7 +178,9 @@ describe("MaterialSampleHierarchySection", () => {
     Object.defineProperty(box, "clientWidth", { value: 800 });
     Object.defineProperty(box, "clientHeight", { value: 500 });
     const layout = { current: { x: 1500, y: 900 } };
+    const zr = { setCursorStyle: jest.fn(), on: jest.fn() };
     lastProps().onChartReady({
+      getZr: () => zr,
       getModel: () => ({
         getSeriesByIndex: () => ({
           layoutInfo: { x: 120, y: 30 },
@@ -192,6 +194,8 @@ describe("MaterialSampleHierarchySection", () => {
     expect(box.style.maxHeight).toEqual("500px");
     expect(box.scrollLeft).toEqual(120 + 1500 - 400);
     expect(box.scrollTop).toEqual(30 + 900 - 250);
+    // The background shows a pan cursor.
+    expect(zr.setCursorStyle).toHaveBeenCalledWith("grab");
   });
 
   it("Pans by dragging, without opening the card under the cursor", async () => {

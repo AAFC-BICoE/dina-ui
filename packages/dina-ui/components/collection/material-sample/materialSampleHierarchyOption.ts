@@ -1,4 +1,41 @@
+import { PRIORITY, registerLayout } from "echarts";
 import _ from "lodash";
+
+/**
+ * ECharts' tidy tree lets a subtree spread up beside childless siblings, so its edges
+ * run past their cards. Tree series with `rowPerLeaf` are re-placed after the built-in
+ * layout: each leaf gets its own row and each parent is centred on its children
+ * (on the middle child when there is an odd number of them).
+ *
+ * AI assisted in generating this layout adjustment for ECharts' tidy tree.
+ */
+registerLayout(PRIORITY.VISUAL.LAYOUT + 1, (ecModel) => {
+  ecModel.eachSeriesByType("tree", (series: any) => {
+    const root =
+      series.get("rowPerLeaf") && series.getData().tree.root.children[0];
+    if (!root) return;
+    const rowOf = new Map<any, number>();
+    let leaves = 0;
+    const assignRow = (node: any): number => {
+      const childRows = node.children.map(assignRow);
+      const count = childRows.length;
+      // Odd: level with the middle child; uneven subtrees would pull the first/last midpoint off it.
+      const row = !count
+        ? leaves++
+        : count % 2
+        ? childRows[(count - 1) / 2]
+        : (childRows[0] + childRows[count - 1]) / 2;
+      rowOf.set(node, row);
+      return row;
+    };
+    assignRow(root);
+    // x (the column) stays as ECharts set it; only y changes.
+    const rowHeight = series.layoutInfo.height / leaves;
+    rowOf.forEach((row, node) =>
+      node.setLayout({ y: (row + 0.5) * rowHeight }, true)
+    );
+  });
+});
 
 /** How many levels are shown on load, and added by each (+) click. */
 export const HIERARCHY_LEVELS = 5;
@@ -41,7 +78,7 @@ export const TYPE_COLOR: Record<string, string> = {
 export const HIERARCHY_FONT =
   '"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif';
 
-const CARD_ROW_HEIGHT = 76;
+const CARD_ROW_HEIGHT = 66;
 const COLUMN_WIDTH = 290;
 // Cards hang to the right of their node, so the right margin must fit a whole card (196 + padding + border).
 const MARGIN_RIGHT = 230;
@@ -240,6 +277,7 @@ export function buildHierarchyOption(
     series: [
       {
         type: "tree",
+        rowPerLeaf: true,
         // A new root gets a new view: ECharts' tree diff crashes removing the root (+) when animation is off.
         id: root.id ?? "up",
         orient: "LR",

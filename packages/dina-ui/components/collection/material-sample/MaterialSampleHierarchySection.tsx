@@ -299,6 +299,20 @@ function MaterialSampleHierarchyChart({
     box.scrollTop = series.layoutInfo.y + y - box.clientHeight / 2;
   }
 
+  /** Shows a grab cursor on the background so users know they can drag to pan; cards keep the pointer. */
+  function showPanCursor(chart: any) {
+    const zr = chart.getZr();
+    // ZRender resets the cursor on every move just before these fire; "grabbing" while the button is held.
+    const update = (e: any) =>
+      zr.setCursorStyle(
+        e.event?.buttons & 1 ? "grabbing" : e.target?.cursor ?? "grab"
+      );
+    zr.setCursorStyle("grab");
+    zr.on("mousemove", update);
+    zr.on("mousedown", update);
+    zr.on("mouseup", update);
+  }
+
   function download() {
     const url = chartRef.current
       ?.getEchartsInstance()
@@ -359,7 +373,7 @@ function MaterialSampleHierarchyChart({
       </div>
       <div
         ref={scrollRef}
-        style={{ overflow: "auto", maxHeight: VIEWPORT_HEIGHT }}
+        style={{ overflow: "auto", maxHeight: VIEWPORT_HEIGHT, cursor: "grab" }}
         // Drag to pan with the mouse; touch scrolls natively and the scrollbars (target = box) still work.
         onPointerDown={(e) => {
           if (e.pointerType === "mouse" && e.target !== e.currentTarget) {
@@ -393,7 +407,10 @@ function MaterialSampleHierarchyChart({
           option={view.option}
           notMerge={true}
           onEvents={onEvents}
-          onChartReady={scrollToCurrent}
+          onChartReady={(chart) => {
+            scrollToCurrent(chart);
+            showPanCursor(chart);
+          }}
           // Fixed size so columns stay 290px apart instead of stretching to the box.
           style={{ height: view.height, width: view.width, margin: "0 auto" }}
         />
