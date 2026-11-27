@@ -171,7 +171,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     true: "Vrai",
     tryAgain: "Réessayer",
     selectedOptionAdded: "Ajouté",
-    typeHereToSearch: "Rechercher…",
+    typeHereToSearch: "Tapez ici pour rechercher",
     typeToSearchOrChooseFromNewest:
       "Saisir la recherche ou choisir parmi les plus récents",
     uiAppVersion: "Version de l’application IU : {version}",
