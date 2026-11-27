@@ -131,7 +131,11 @@ export function ExistingAttachmentsTable({
           <ExternalLink href={`/object-store/object/view?id=${id}`}>
             {metadata?.filename}
           </ExternalLink>
-        ) : null;
+        ) : (
+          <ExternalLink href={`/object-store/object/view?id=${id}`}>
+            {id}
+          </ExternalLink>
+        );
       },
       accessorKey: "filename",
       header: () => <FieldHeader name="filename" />
