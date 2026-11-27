@@ -100,7 +100,7 @@ describe("Storage Unit edit page.", () => {
     // Select Storage Unit Type
     await userEvent.click(
       wrapper.getByRole("combobox", {
-        name: /storage unit type type here to search\./i
+        name: /storage unit type type here to search/i
       })
     );
     await waitFor(() => {

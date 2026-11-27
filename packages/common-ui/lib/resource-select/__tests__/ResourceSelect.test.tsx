@@ -91,10 +91,10 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
-    await userEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     // There should be 4 options including the <None> option.
@@ -119,10 +119,10 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
-    await userEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     // Select the third option.
@@ -152,10 +152,10 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
-    await userEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     // Select the third option.
@@ -175,7 +175,7 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
     expect(mockGet).toHaveBeenCalledTimes(1);
@@ -193,7 +193,7 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
     expect(mockGet).toHaveBeenCalledTimes(1);
@@ -217,7 +217,7 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
     // Simulate changing the value and filtering it.
@@ -272,11 +272,11 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
     // Display the options...
-    await userEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     const options = wrapper.getAllByRole("option");
@@ -412,11 +412,11 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
     // Display the options...
-    await userEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     const options = wrapper.getAllByRole("option");
@@ -449,11 +449,11 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
     // Display the options...
-    await userEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     const options = wrapper.getAllByRole("option");
@@ -496,11 +496,11 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
     // Display the options...
-    await userEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     const options = wrapper.getAllByRole("option");
@@ -549,11 +549,11 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
     // There should be 5 options including the custom callback option and the none option.
-    await userEvent.click(wrapper.getByText(/type here to search\./i));
+    await userEvent.click(wrapper.getByText(/type here to search/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
 
     const options = wrapper.getAllByRole("option");
@@ -584,7 +584,7 @@ describe("ResourceSelect component", () => {
       />
     );
     await waitFor(() => {
-      expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+      expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
     });
 
     expect(mockBulkGet).lastCalledWith(["todo/ABC"], {
@@ -644,7 +644,7 @@ describe("ResourceSelect component", () => {
       );
 
       await waitFor(() => {
-        expect(wrapper.getByText(/type here to search\./i)).toBeInTheDocument();
+        expect(wrapper.getByText(/type here to search/i)).toBeInTheDocument();
       });
 
       await userEvent.click(wrapper.getByRole("combobox"));

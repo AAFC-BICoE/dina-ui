@@ -115,7 +115,7 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
 
     // Select the protocol from the dropdown.
     await userEvent.click(
-      wrapper.getByRole("combobox", { name: /protocol type here to search\./i })
+      wrapper.getByRole("combobox", { name: /protocol type here to search/i })
     );
     await userEvent.click(
       wrapper.getByRole("option", { name: /protocol test 1/i })

@@ -79,7 +79,7 @@ exports[`AutoSuggestTextField Elastic Search only provided, results are fetched 
                     aria-controls="react-autowhatever-examplePersonNameField"
                     autocomplete="none"
                     class="form-control"
-                    placeholder="Type here to search."
+                    placeholder="Type here to search"
                     type="text"
                     value="p"
                   />
@@ -217,7 +217,7 @@ exports[`AutoSuggestTextField Snapshot test 1`] = `
                     aria-controls="react-autowhatever-examplePersonNameField"
                     autocomplete="none"
                     class="form-control"
-                    placeholder="Type here to search."
+                    placeholder="Type here to search"
                     type="text"
                     value=""
                   />

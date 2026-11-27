@@ -291,7 +291,7 @@ describe("PcrBatch edit page", () => {
     // Select a storage unit type.
     await userEvent.click(
       wrapper.getByRole("combobox", {
-        name: /storage unit type type here to search\./i
+        name: /storage unit type type here to search/i
       })
     );
     await waitFor(() =>
@@ -353,7 +353,7 @@ describe("PcrBatch edit page", () => {
     // Select a storage unit type.
     await userEvent.click(
       wrapper.getByRole("combobox", {
-        name: /storage unit type type here to search\./i
+        name: /storage unit type type here to search/i
       })
     );
     await waitFor(() =>
