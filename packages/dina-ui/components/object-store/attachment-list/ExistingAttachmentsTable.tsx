@@ -127,13 +127,9 @@ export function ExistingAttachmentsTable({
           );
         }
 
-        return metadata?.filename ? (
+        return (
           <ExternalLink href={`/object-store/object/view?id=${id}`}>
-            {metadata?.filename}
-          </ExternalLink>
-        ) : (
-          <ExternalLink href={`/object-store/object/view?id=${id}`}>
-            {id}
+            {metadata?.filename ?? id}
           </ExternalLink>
         );
       },
