@@ -250,6 +250,12 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   dataExportProps?: { dataExportPath: string; entityLink: string };
 
+  /** Adds an "Export Selected Objects" action (object store list only), needs dataExportProps. */
+  enableObjectExport?: boolean;
+
+  /** Adds a molecular analysis export action (selected rows only) that goes straight to this page. */
+  molecularExportPath?: string;
+
   /** Query path if user selected only 1 item */
   singleEditPath?: string;
 
@@ -410,6 +416,8 @@ export function QueryPage<TData extends KitsuResource>({
   bulkSplitPath,
   singleEditPath,
   dataExportProps,
+  molecularExportPath,
+  enableObjectExport,
   reactTableProps,
   defaultSort,
   defaultPageSize,
@@ -1396,6 +1404,34 @@ export function QueryPage<TData extends KitsuResource>({
                             dataExportProps
                               ? {
                                   pathname: dataExportProps.dataExportPath,
+                                  entityLink: dataExportProps.entityLink,
+                                  totalRecords,
+                                  query: elasticSearchQuery,
+                                  uniqueName,
+                                  columns,
+                                  dynamicFieldMapping,
+                                  indexName
+                                }
+                              : undefined
+                          }
+                          objectExport={
+                            dataExportProps && enableObjectExport
+                              ? {
+                                  pathname: dataExportProps.dataExportPath,
+                                  entityLink: dataExportProps.entityLink,
+                                  totalRecords,
+                                  query: elasticSearchQuery,
+                                  uniqueName,
+                                  columns,
+                                  dynamicFieldMapping,
+                                  indexName
+                                }
+                              : undefined
+                          }
+                          molecularExport={
+                            dataExportProps && molecularExportPath
+                              ? {
+                                  pathname: molecularExportPath,
                                   entityLink: dataExportProps.entityLink,
                                   totalRecords,
                                   query: elasticSearchQuery,

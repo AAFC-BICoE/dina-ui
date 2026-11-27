@@ -8,6 +8,17 @@ const mockPost = jest.fn();
 
 jest.mock("next/router", () => ({ useRouter: () => ({ push: jest.fn() }) }));
 
+const exportProps = {
+  pathname: "/export",
+  totalRecords: 326,
+  query: {},
+  uniqueName: "test",
+  columns: [],
+  dynamicFieldMapping: undefined,
+  indexName: "idx",
+  entityLink: "/collection"
+} as any;
+
 function mountMenu(
   itemIdsToSelect: Record<string, boolean>,
   accountContext: any = { isAdmin: false },
@@ -83,6 +94,69 @@ const buttonNamed = (w: ReturnType<typeof mountMenu>, name: RegExp) =>
   w.getByRole("button", { name });
 
 describe("BulkActionsDropdown", () => {
+  it("Shows the molecular export only when configured, disabled until rows are selected.", () => {
+    const mount = (selected: Record<string, boolean>, molecularExport?: any) =>
+      mountWithAppContext(
+        <DinaForm initialValues={{ itemIdsToSelect: selected }}>
+          <BulkActionsDropdown
+            dataExport={exportProps}
+            molecularExport={molecularExport}
+          />
+        </DinaForm>
+      );
+    const alt = { ...exportProps, pathname: "/molecular" };
+
+    const selectedName = "Export Selected Molecular Analysis";
+    const allName = "Export All Matching Molecular Analysis";
+
+    expect(mount({}).queryByText(selectedName)).not.toBeInTheDocument();
+    expect(mount({}).queryByText(allName)).not.toBeInTheDocument();
+
+    // Nothing selected: the selected option is disabled, the all matched one is not.
+    const none = mount({}, alt);
+    expect(none.getByRole("button", { name: selectedName })).toBeDisabled();
+    expect(none.getByRole("button", { name: allName })).toBeEnabled();
+
+    const some = mount({ a: true }, alt);
+    // The first menu is still in the document, so take the last match.
+    expect(
+      some.getAllByRole("button", { name: selectedName }).pop()
+    ).toBeEnabled();
+  });
+
+  it("Shows Export Selected Objects only when configured, disabled until rows are selected.", () => {
+    const mount = (selected: Record<string, boolean>, objectExport?: any) =>
+      mountWithAppContext(
+        <DinaForm initialValues={{ itemIdsToSelect: selected }}>
+          <BulkActionsDropdown
+            dataExport={exportProps}
+            objectExport={objectExport}
+          />
+        </DinaForm>
+      );
+    const name = "Export Selected Objects";
+
+    expect(mount({}).queryByText(name)).not.toBeInTheDocument();
+
+    expect(mount({}, exportProps).getByRole("button", { name })).toBeDisabled();
+    // The earlier menus are still in the document, so take the last match.
+    expect(
+      mount({ a: true }, exportProps).getAllByRole("button", { name }).pop()
+    ).toBeEnabled();
+
+    // Search results: the all matching objects option ignores the checkboxes, with a note.
+    const allName = "Export All Matching Objects";
+    const noSelection = mount({}, exportProps);
+    expect(
+      noSelection.getAllByRole("button", { name: allName }).pop()
+    ).toBeEnabled();
+    expect(
+      noSelection.getAllByText(
+        /Applies to every record matching your current search/
+      )
+    ).not.toHaveLength(0);
+  });
+
   it("Disables the selection items but not Export All Matching when nothing is selected.", () => {
     const w = mountMenu({});
 
@@ -100,7 +174,7 @@ describe("BulkActionsDropdown", () => {
     expect(
       w.getByText(/Tick the checkboxes in the table to choose records/)
     ).toBeInTheDocument();
-    expect(w.getByText("All matched (326)")).toBeInTheDocument();
+    expect(w.getByText("Search results (326)")).toBeInTheDocument();
     expect(buttonNamed(w, /export all matching/i)).toBeEnabled();
   });
 

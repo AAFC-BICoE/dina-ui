@@ -13,13 +13,21 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     noDeletePermission:
       "Vous n'avez pas la permission de supprimer les enregistrements de ces groupes : {groups}.",
     onSelectedCount: "Sélection ({count})",
-    onAllMatched: "Tous les résultats ({total})",
+    onAllMatched: "Résultats de la recherche ({total})",
+    searchResultsNote:
+      "S’applique à tous les enregistrements correspondant à votre recherche actuelle, sur toutes les pages. Les cases cochées sont ignorées.",
+    exportAllObjectsButtonText: "Exporter tous les objets correspondants",
     noPermissionForGroups: "Aucune permission pour le groupe : {groups}",
     noSelectionHint:
       "Cochez les cases du tableau pour choisir des enregistrements. Ces actions s'appliquent aux enregistrements choisis.",
     actionsOnSelected: "Actions sur {count} sélectionné(s)",
-    exportSelectedButtonText: "Exporter la sélection",
-    exportAllMatching: "Exporter tous les résultats",
+    exportSelectedButtonText: "Exporter la sélection (données)",
+    exportSelectedObjectsButtonText: "Exporter les objets sélectionnés",
+    exportAllMatching: "Exporter tous les résultats (données)",
+    molecularAnalysisExportButtonText:
+      "Exporter la sélection (analyse moléculaire)",
+    molecularAnalysisExportAllButtonText:
+      "Exporter tous les résultats (analyse moléculaire)",
     tableSelectedSuffix: " · {count} sélectionné(s)",
     add: "Ajouter",
     addNew: "Ajouter nouveau",

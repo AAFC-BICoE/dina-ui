@@ -53,7 +53,7 @@ import {
 import { Metadata, ObjectExport } from "dina-ui/types/objectstore-api";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
-import { FaFileExport, FaHistory, FaTrash } from "react-icons/fa";
+import { FaDna, FaHistory, FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
@@ -222,7 +222,11 @@ export default function ExportPage<TData extends KitsuResource>() {
   );
 
   // State holding the current export type. For example, Data export / Object export.
-  const [exportType, setExportType] = useState<ExportType>("TABULAR_DATA");
+  const [exportType, setExportType] = useState<ExportType>(
+    router.query.exportType === "OBJECT_ARCHIVE"
+      ? "OBJECT_ARCHIVE"
+      : "TABULAR_DATA"
+  );
 
   // Only available through the object export (all objects need to be images), which file of each
   // image to export.
@@ -913,6 +917,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                   className="ms-auto"
                   visibleElement={
                     <div className="btn btn-primary disabled">
+                      <FaDna size={18} style={{ marginRight: "8px" }} />
                       <DinaMessage id="molecularAnalysisExport" />
                     </div>
                   }
@@ -922,7 +927,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                   href={`/export/molecular-analysis-export/export?entityLink=${entityLink}`}
                   className="btn btn-primary ms-auto"
                 >
-                  <FaFileExport size={18} style={{ marginRight: "8px" }} />
+                  <FaDna size={18} style={{ marginRight: "8px" }} />
                   <DinaMessage id="molecularAnalysisExport" />
                 </Link>
               )}
