@@ -314,6 +314,32 @@ describe("buildHierarchyOption", () => {
     expect(y("last")).toBeCloseTo((y("g0") + y("g16")) / 2);
     chart.dispose();
   });
+
+  it("Levels a parent with its middle child when it has an odd number of children", () => {
+    // Uneven subtrees: p1 has 3 children, p3 has 9, the rest have none.
+    const parents = ["p1", "p2", "p3", "p4", "p5"].map((id) => sample(id));
+    const kids = (prefix: string, n: number) =>
+      Array.from({ length: n }, (_v, i) => sample(`${prefix}c${i}`));
+    const { option, height } = buildHierarchyOption(
+      baseData({
+        children: { current: parents, p1: kids("p1", 3), p3: kids("p3", 9) }
+      }),
+      formatMessage
+    );
+    const chart = echarts.init(null as any, null as any, {
+      renderer: "svg",
+      ssr: true,
+      width: 2000,
+      height
+    });
+    chart.setOption(option as any);
+    const tree = (chart as any).getModel().getSeriesByIndex(0).getData().tree;
+    const y = (id: string) => tree.getNodeById(id).getLayout().y;
+
+    expect(y("current")).toBeCloseTo(y("p3"));
+    expect(y("p3")).toBeCloseTo(y("p3c4"));
+    chart.dispose();
+  });
 });
 
 describe("hierarchyNodeFromSource", () => {

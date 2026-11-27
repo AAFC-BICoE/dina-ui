@@ -4,7 +4,8 @@ import _ from "lodash";
 /**
  * ECharts' tidy tree lets a subtree spread up beside childless siblings, so its edges
  * run past their cards. Tree series with `rowPerLeaf` are re-placed after the built-in
- * layout: each leaf gets its own row and each parent is centred on its children.
+ * layout: each leaf gets its own row and each parent is centred on its children
+ * (on the middle child when there is an odd number of them).
  *
  * AI assisted in generating this layout adjustment for ECharts' tidy tree.
  */
@@ -17,9 +18,13 @@ registerLayout(PRIORITY.VISUAL.LAYOUT + 1, (ecModel) => {
     let leaves = 0;
     const assignRow = (node: any): number => {
       const childRows = node.children.map(assignRow);
-      const row = childRows.length
-        ? (childRows[0] + childRows[childRows.length - 1]) / 2
-        : leaves++;
+      const count = childRows.length;
+      // Odd: level with the middle child; uneven subtrees would pull the first/last midpoint off it.
+      const row = !count
+        ? leaves++
+        : count % 2
+        ? childRows[(count - 1) / 2]
+        : (childRows[0] + childRows[count - 1]) / 2;
       rowOf.set(node, row);
       return row;
     };
